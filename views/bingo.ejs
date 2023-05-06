@@ -1,0 +1,81 @@
+<%- include('head'); -%>
+
+<body>
+<div class="container-fluid">
+  <div class="col d-flex px-0 pt-0 pb-3">
+    <a href="/" class="btn btn-sm btn-outline-info">
+      <i class="material-icons md-small">close</i>
+    </a>
+    <div id="start" class="btn btn-sm btn-outline-info py-0 mx-1" style="width:150px;">Start</div>
+  </div>
+
+
+  <div class="container-fluid" style="min-height:100vh;">
+    <div class="row">
+      <div id="display" class="col d-flex flex-wrap justify-content-center text-center" style="display:none;"></div>
+    </div>
+
+    <div id="slides" class="row" style="display:none;">
+      <div class="col-1">
+        <button id="prev" class="btn btn-light" style="min-height:100%" aria-label="previous slide">
+          <i class="material-icons md-large">navigate_before</i>
+        </button>
+      </div>
+
+      <div class="col-10" style="height:80vh">
+        <div id="currentSlide" class="justify-content-center text-center display-1" style="height:100%;position:relative;"></div>
+      </div>
+
+      <div class="col-1">
+        <button id="next" class="btn btn-light" style="min-height:100%" aria-label="next slide">
+          <i class="material-icons md-large">navigate_next</i>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+
+<script>
+$(function(){
+  let i = 0;
+  let vocab = <%- JSON.stringify(list) %>;
+  let images = {};
+
+  for (let v of vocab){
+    $('#display').append(`<div class="rounded-3 bg-white border display-1">
+                            <div style="font-size:3rem;">${v.replace('_', " ")}
+                              <div style="height:15rem;width:15rem;position:relative;">
+                                <img src="image/svg/${v}.svg" class="img-fluid" alt="${v}" style="height:100%;">
+                              </div>
+                            </div>
+                          </div>`);
+  }
+
+  vocab = FYshuffle(vocab);
+  $("#currentSlide").html(`<img src="image/svg/${vocab[0]}.svg" class="img-fluid" alt="${vocab[0]}" style="height:100%;">`);
+  $("#display").show();
+
+  $("#start").on('click', ()=>{
+    $("#display").empty();
+    $("#slides").show();
+  });
+
+  $("#prev").on('click', ()=>{
+    if (i > 0) {
+      i--;
+      $("#currentSlide").html(`<img src="image/svg/${vocab[i]}.svg" class="img-fluid" alt="${vocab[i]}" style="height:100%;">`);
+    }
+  });
+
+  $("#next").on('click', ()=>{
+    if (i < vocab.length-1) {
+      i++;
+      $("#currentSlide").html(`<img src="image/svg/${vocab[i]}.svg" class="img-fluid" alt="${vocab[i]}" style="height:100%;">`);
+    }
+  });
+});
+
+</script>
+
+<%- include('foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->

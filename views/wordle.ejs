@@ -1,0 +1,219 @@
+<%- include('head'); -%>
+
+<body>
+  <a href="/" class="btn btn-sm btn-outline-info">
+    <i class="material-icons md-small">close</i>
+  </a>
+
+  <div class="container" style="min-height:100vh;">
+  
+    <div class="row my-3">
+      <div class="col text-center">
+        <div id="image"></div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="text-center">
+        <div id="answer"></div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col text-center">
+        <button id="start" aria-label="start" class="btn btn-lg btn-success" style="display:none;">
+          START
+        </button>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col text-center">
+        <div id="guess"></div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div id="keyboard" class="container">
+        <div id="keyrow1" class="row justify-content-center"></div>
+        <div id="keyrow2" class="row justify-content-center"></div>
+        <div id="keyrow3" class="row justify-content-center"></div>
+        <div id="keyrow4" class="row justify-content-center"></div>
+      </div>
+    </div>
+  </div>
+
+
+<script>
+  var words = <%- JSON.stringify(words) %>;
+  var place = 0;
+  var guess = '';
+  var correct = true; // just to get things started
+  const letters = ["q","w","e","r","t","y","u","i","o","p",
+                  "a","s","d","f","g","h","j","k","l",
+                  "z","x","c","v","b","n","m","-","'",
+                  " "];
+
+  // input handlers
+inputLetter = (letter)=>{
+  if(place < word.length){
+    $("#place"+place).html(letter == '_' ? '&nbsp;' : letter);
+    place++;
+    guess += letter;
+  }
+  $("#enter").prop('disabled', place < word.length);
+}
+
+
+backspace = ()=>{
+  if(place > 0){
+    place--;
+    guess = guess.slice(0, -1);
+    $("#place"+place).text('_');
+  }
+  $("#enter").prop('disabled', true);
+}
+
+
+submitAnswer = ()=>{
+  $("#enter").prop('disabled', true);
+  if (guess === word){
+    $("#guess").hide();
+    $("#answer").html(`<div class="btn btn-primary" style="font-size:5em;">${guess.replace('_', ' ')}</div>`);
+    $("#start").show().focus();
+    correct = true;
+  }
+
+  var html = `<div>`;
+  for(let l = 0; l < word.length; l++){
+    let spaceOrChar = guess[l] == '_' ? '&nbsp;' : guess[l];
+    if(guess[l] === word[l]){
+      html += `<div class="btn btn-lg bg-primary text-white" 
+                    style="font-size:2em; width:60px;">${spaceOrChar}</div>`;
+      $(`[data-value=${guess[l]}]`).removeClass('bg-warning text-body').addClass('bg-primary text-white');
+    }
+    else if (word.includes(guess[l])){
+      html += `<div class="btn btn-lg bg-warning" 
+                    style="font-size:2em; width:60px;">${spaceOrChar}</div>`;
+      $(`[data-value=${guess[l]}]`).addClass('bg-warning text-body');
+    }
+    else{
+      html += `<div class="btn btn-lg bg-secondary text-white" 
+                    style="font-size:2em; width:60px;">${spaceOrChar}</div>`;
+      $(`[data-value=${guess[l]}]`).addClass('bg-secondary text-white');
+    }
+  }
+  html += `</div>`;
+
+  $("#guess").html(html);
+  guess = '';
+  place = 0;
+  $(".place").text('_');
+}
+
+
+resetAnswer = ()=>{
+  correct = false;
+  place = 0;
+  guess = '';
+  $("#guess").html('').show();
+  $("#answer").html('');
+
+  word = words.pop();
+  if (word){
+    $("#image").html(`<div class="m-3 p-3 border border-dark bg-white rounded-lg display-1" 
+                            style="position:relative;height:300px;">
+                        <img src="image/svg/${word}.svg" alt="${word}" style="height:100%;"> 
+                      </div>`);
+
+    for (let l = 0; l < word.length; l++){
+      $("#answer").append(`<div id="place${l}" 
+                                class="place btn btn-lg alert-primary" 
+                                style="font-size:2em;width:60px;">_</div>`); 
+    }
+    $("#answer").show();
+
+    $("#start").text('NEXT').hide();
+    $(".letter").removeClass('bg-primary bg-warning bg-secondary text-white');
+  } else { window.location.replace('/'); }
+}
+
+
+$(function(){
+  resetAnswer();
+
+  // set up the keyboard after page load
+  for ( let key of letters.slice( 0, 10)){
+    $("#keyrow1").append(
+      `<div data-value="${key}" class="letter btn btn-lg border shadow m-1" 
+                                style="width:50px;">${key}</div>`);
+  }
+  for ( let key of letters.slice( 10, 19)){
+    $("#keyrow2").append(
+      `<div data-value="${key}" class="letter btn btn-lg border shadow m-1" 
+                                style="width:50px;">${key}</div>`);
+  }
+  for ( let key of letters.slice( 19, letters[-1] )){
+    $("#keyrow3").append(
+      `<div data-value="${key}" class="letter btn btn-lg border shadow m-1" 
+                                style="width:50px;">${key}</div>`);
+  }
+
+  $("#keyrow4").html(`<div data-value="_" class="letter btn btn-lg border shadow m-1" 
+                                style="width:300px;">&nbsp;</div>`)
+
+  $("#keyrow1").append(
+    `<div id="backspace" class="btn btn-lg shadow border m-1" style="width:50px;">
+        <i class="material-icons-outlined">backspace</i>
+      </div>`);
+
+  $("#keyrow2").append(
+    `<button id="enter" class="btn btn-lg shadow border m-1" style="width:50px;" disabled>
+        <i class="material-icons-outlined">keyboard_return</i>
+      </button>`);
+
+
+  // set or reset everything
+
+  $("#start").on('click', ()=>{
+    resetAnswer();
+  });
+
+  // input
+  $(".letter").on('click', function(){
+    inputLetter( $(this).attr('data-value') );
+  });
+
+  $("#backspace").on('click', function(){
+    backspace();
+  });
+
+  $("#enter").on('click', ()=>{
+    submitAnswer();
+  });
+
+  $(window).on('keydown', function(e){
+    if (e.key == ' ' && e.target == document.body){
+      e.preventDefault();
+    }
+  });
+
+  $(window).on('keyup', function(e){
+    if(e.key.length == 1 && letters.includes(e.key)){
+      inputLetter(e.key == ' ' ? '_' : e.key);
+    }
+    else if(e.key == 'Backspace'){
+      backspace();
+    }
+    else if(e.key == 'Enter'){
+      if(correct){
+        resetAnswer();
+      }else if (place === word.length){
+        submitAnswer();
+      }
+    }
+  });
+});
+</script>
+
+<%- include('foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->

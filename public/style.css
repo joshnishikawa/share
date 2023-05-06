@@ -1,0 +1,227 @@
+.write{
+  background-image: url(../image/abc/lines.png);
+  background-size: contain;
+  font-family: 'UD Digi Kyokasho NP-B', sans-serif;
+}
+
+.write img{
+  mix-blend-mode: multiply;
+}
+
+
+[contenteditable] {
+  outline: 0px solid transparent;
+}
+
+#flash{
+  position:relative;
+  font-family: "UD Digi Kyokasho NP-B", sans-serif;
+  font-size: 30vw;
+  font-weight:bold;
+  display:inline-block;
+  margin-left:20px;
+  text-shadow: 5px 5px 10px #99c;
+  -webkit-text-stroke: 5px DarkSlateBlue;
+  color:SlateBlue;
+}
+
+.review{
+  color:LimeGreen !important;
+  text-shadow: 5px 5px 10px #9c9 !important;
+  -webkit-text-stroke: 5px ForestGreen !important;
+}
+
+/*BACKGROUND COLORS///////////////////////////////////////////////////////////*/
+.red{
+  background-color: #e00;
+  background-image: -webkit-linear-gradient(left top, Red, FireBrick);
+}
+.orange{
+  background-color: DarkOrange;
+  background-image: -webkit-linear-gradient(left top, Orange, DarkOrange);
+}
+.yellow{
+  background-color: Yellow;
+  background-image: -webkit-linear-gradient(left top, Yellow, Gold);
+}
+.green{
+  background-color: LimeGreen;
+  background-image: -webkit-linear-gradient(left top, Green 30%, DarkGreen 70%);
+}
+.blue{
+  background-color: #00e;
+  background-image: -webkit-linear-gradient(left top, #00e 30%, DarkBlue 70%);
+}
+.purple{
+  background-color: Purple;
+  background-image: -webkit-linear-gradient(left top, DarkViolet, Purple);
+}
+.black{background-color: Black;}
+.white{background-color: White;}
+.gray{background-color: #999;}
+.pink{
+  background-color: HotPink;
+  background-image: -webkit-linear-gradient(left top, Pink, HotPink);
+ }
+.brown{
+  background-color: SaddleBrown;
+  background-image: -webkit-linear-gradient(left top, Sienna, SaddleBrown);
+}
+.violet{
+  background-color: #c9f;
+  background-image: -webkit-linear-gradient(left top, #c9f, #c6f);
+}
+.silver{
+  background-color: #ccc;
+  background-image: -webkit-linear-gradient(
+  left top, Gray, White 10%, #ccc 35%, white 57%, White 60%, Gray);}
+.gold{
+  background-color: GoldenRod;
+  background-image: -webkit-linear-gradient(
+  left top, GoldenRod, white 27%, White 30%, Gold 65%, White 90%, GoldenRod);
+}
+.lightBlue{background-color: LightSkyBlue;
+  background-image: -webkit-linear-gradient(left top, Cyan, PaleTurquoise);
+}
+.lightGreen{background-color: LimeGreen;
+  background-image: -webkit-linear-gradient(left top, GreenYellow, SpringGreen);
+}
+.lightBrown{background-color: SandyBrown;
+  background-image: -webkit-linear-gradient(left top, Tan, BurlyWood);
+}
+.darkBlue{background-color: DarkBlue;}
+.darkGreen{ background-color: DarkGreen;}
+.darkBrown{background-color: SaddleBrown;}
+
+/*TEXT COLORS/////////////////////////////////////////////////////////////////*/
+.redText{color:Red;}
+.orangeText{color:Orange;}
+.yellowText{color:Yellow;}
+.greenText{color:DarkGreen;}
+.blueText{color:SlateBlue;}
+.purpleText{color:Purple;}
+.blackText{color:Black;}
+.whiteText{-webkit-text-stroke: 2px Gray;
+  color:White;
+}
+.grayText{color:#999;}
+.pinkText{color:Pink;}
+.brownText{color:SaddleBrown;}
+
+/*////////////////////////////////////////////////////////////////////////////*/
+
+#match{
+  height: 100vh;
+  color:SlateBlue;
+  font-weight:bold;
+  text-shadow: 
+    -1px -1px 0 #666,
+    1px -1px 0 #666,
+    -1px 1px 0 #666,
+    1px 1px 0 #666; 
+  font-size: 17vh;
+  line-height:20vh;
+  user-select: none; /* Standard syntax */
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10+ and Edge */
+}
+
+.card{
+  cursor:pointer;
+}
+
+.img-flash{
+  max-width: 70%;
+  max-height:70%;
+}
+
+.spinit {
+  transform: rotate(-90deg);
+  -webkit-transform: rotate(-90deg);
+  -moz-transform: rotate(-90deg);
+  -ms-transform: rotate(-90deg);
+  -o-transform: rotate(-90deg);
+  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+}
+
+/* ////////////////////////////////////////////////////////////////////////// */
+.flip {
+  background-color: transparent;
+  height: 20vh;
+  perspective: 1000px;
+}
+
+.flip-card {
+  cursor:pointer;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: all 0.5s;
+  transform-style: preserve-3d;
+}
+
+.flipped .flip-card {
+  transform: rotateY(180deg);
+}
+
+.flip-back {
+  display: flex;
+  justify-content: center;
+  align-items: center;  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  -ms-backface-visibility: hidden;
+  -o-backface-visibility: hidden;
+}
+
+/* .flipped .flip-card .flip-back img{
+  border: 5px solid #f63 !important;
+  visibility: hidden;
+  backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  -ms-backface-visibility: hidden;
+  -o-backface-visibility: hidden;
+} */
+
+.flip-front {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  -ms-backface-visibility: hidden;
+  -o-backface-visibility: hidden;
+  transform: rotateY(180deg); /* because it starts face-down */
+}
+
+/* DRAGULA */
+.gu-mirror{
+  position:fixed!important;
+  margin: 0!important;
+  z-index:9999!important;
+  opacity: 1 !important;
+}
+
+.gu-hide{
+  display:none!important
+}
+
+.gu-unselectable{
+  -webkit-user-select:none!important;
+  -moz-user-select:none!important;
+  -ms-user-select:none!important;
+  user-select:none!important
+}
+
+.gu-transit{
+  opacity:.5 !important;
+}

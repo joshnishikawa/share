@@ -1,0 +1,68 @@
+<%- include('head'); -%>
+
+<body>
+
+  <div class="container" style="min-height:100vh;">
+    <div class="row">
+      <div class="col">
+        <div id="lc" class="d-flex flex-wrap mb-5 justify-content-center">
+          <button id="showall" class="btn btn-outline-primary">All</button>
+        </div>
+      </div>
+
+    </div>
+    <div class="row">
+
+      <div class="col">
+        <div id="all" class="d-flex flex-wrap d-none"></div>
+      </div>
+
+      <div class="col">
+        <div id="penmanship" class="mx-auto" style="min-height:400px;width:400px;"></div>
+      </div>
+    </div>
+  </div>
+
+</body>
+
+<script>
+
+$(function(){
+  let letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"];
+  let sounds = {
+    "a": "aei", "b": "bmp", "c": "cdgknstxyz", "d": "cdgknstxyz", "e": "aei", 
+    "f": "fv", "g": "cdgknstxyz", "h": "j-ch-sh", "i": "aei", "j": "j-ch-sh", 
+    "k": "cdgknstxyz", "l": "l", "m": "bmp", "n": "cdgknstxyz", "o": "o", 
+    "p": "bmp", "q": "qw", "r": "r", "s": "cdgknstxyz", "t": "cdgknstxyz",
+    "u": "u", "v": "fv", "w": "qw", "x": "cdgknstxyz", "y": "cdgknstxyz", 
+    "z": "cdgknstxyz"
+  };
+
+  for(let i of letters){
+    $("#cap").append(`<button class="l btn btn-outline-primary">${i.toUpperCase()}</div>`);
+    $("#lc").append(`<button class="lc btn btn-outline-success">${i}</div>`);
+    $("#all").append(`<div class="write letter" style="font-size:80px;line-height:105px;width:100px;height:100px;">${i}</div>`);
+  }
+
+  $("#showall").on("click", ()=>{
+    $("#all").toggleClass("d-none");
+  });
+
+  $(".lc").on("click", function(){
+    let letter = $(this).text();
+    $("#penmanship").html(`<div class="write shadow"><img src="/image/abc/${letter}.gif" class="img-fluid" alt="${letter}"></div>`);
+    // $("#pronunciation").html(`<img src="/image/abc/${sounds[letter]}.png" class="img-fluid" alt="${letter}">`)
+  });
+
+  $(document).on("keydown", function(e){
+    if (letters.includes(e.key)){
+      $("#penmanship").html(`<div class="write shadow"><img src="/image/abc/${e.key}.gif" class="img-fluid" alt="${e.key}"></div>`);
+    }
+    else if (e.key == "Backspace"){
+      $("#penmanship").empty();
+    }
+  });
+});
+
+</script>
+<%- include('foot'); -%>

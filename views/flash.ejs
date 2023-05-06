@@ -1,0 +1,190 @@
+<%- include('head'); -%>
+<body>
+  <div class="container-fluid" style="min-height:100vh;margin:0px;">
+
+  <div class="row">
+    <div class="col d-flex p-0">
+      <a href="/" class="btn btn-sm btn-outline-info">
+        <i class="material-icons md-small">close</i>
+      </a>
+      <button id="start" class="btn btn-sm btn-outline-info py-0 mx-1" style="width:150px;">Start</button>
+      <div>
+        <input type="checkbox" id="shuffle" name="shuffle">
+        <label for="shuffle">Shuffle</label>
+      </div>
+    </div>
+  </div>
+    
+  <div id="flash" class="row"></div>
+</div>
+
+<script>
+  var started = false;
+  var deckName = '<%- deckName %>';
+  var originalDeck = <%- deck %>;
+  var deck = originalDeck;
+  var deckLength = deck.length;
+  var review = [];
+  var card = 0;
+  var current = 0;
+
+  function start(){
+    var flash = document.getElementById("flash");
+    if(review.length > 0){ // set the review deck as the main deck
+      deck = review.slice();
+      review = [];
+    }
+    
+    if(card == 0){
+      if (started){
+        if (deck.length != deckLength){ // reviewing, return to the full deck
+          deck = originalDeck;
+          started = true;
+          flash.innerHTML = deck[card];
+        }
+        else{ // using a full deck, clear screen
+          started = false;
+          flash.innerHTML = "";
+        }
+      }
+      else { // start deck
+        var checkBox = document.getElementById("shuffle");
+        if (checkBox.checked == true){ // shuffle if checked
+          deck = FYshuffle(deck);
+        }
+        flash.innerHTML = deck[card];
+        started = true;
+      }
+    }
+    else{
+      card = 0;
+      flash.innerHTML = deck[card];
+    }
+
+    if(deck.length == deckLength){
+      flash.classList.remove("review");
+    }
+    else{flash.classList.add("review");}
+
+    review = [];
+    current = 0;
+    setStartButton();
+  }
+
+
+  function setStartButton(){
+    var start = document.getElementById("start");
+    if(review.length > 0){
+      start.innerHTML = "Review " + review.length;
+    }
+
+    else if (card == 0){
+      if(deck.length == deckLength){ // not reviewing
+        if (started){start.innerHTML = "Clear";}
+        else if (deckLength > 0){
+          start.innerHTML = "Start";
+        }
+        else{
+          start.innerHTML = " . . . ";
+        }
+      }
+      else if (deckLength > 0){
+        start.innerHTML = "Restart Set";
+      }
+    }
+    else{
+      
+      if (deck.length == deckLength){ // not reviewing
+        start.innerHTML = "Restart";}
+      else{
+        start.innerHTML = "Restart Review";}
+    }
+  }
+
+$(function(){
+  $("#shuffle").on('click', ()=>{
+    var checkBox = document.getElementById("shuffle");
+
+    if (checkBox.checked == true){ // shuffle
+      deck = FYshuffle(deck);
+      card = 0;
+    }
+    else {
+      if(deckName == "zero_ten" 
+      || deckName == "zero_twenty" 
+      || deckName == "tens_teens"){
+        deck.sort(function(a, b){return a - b}); // sort numeric
+      }
+      else{ // sort alphabetical
+        deck.sort();
+      }
+      card = current == 0 ? 0 : deck.indexOf(current);
+    }
+  });
+
+
+  // HANDLE "UP" "DOWN" "LEFT" AND "RIGHT" KEY PRESSES
+  $(document).on('keyup',function(e) {
+    var obj = document.getElementById("deckname");
+    var selecting = (document.activeElement === obj);
+
+    if(!selecting && started){
+      if(e.key == "ArrowRight" || e.key == "ArrowUp"){
+
+        if(e.key == "ArrowUp"){ //save card before advancing
+          review.push(deck[card]);
+        }
+
+        if (card < deck.length - 1) {
+          card += 1;
+          current = deck[card];
+          document.getElementById("flash").innerHTML = deck[card];
+        }
+      }
+      else if(e.key == "ArrowLeft"){
+        if (card > 0 && deck.length > 0) {
+          card -= 1;
+          current = deck[card];
+          document.getElementById("flash").innerHTML = deck[card];
+        }
+        else{
+        }
+      }
+      else {
+        // do something with down key
+      }
+    }
+    setStartButton();
+  });
+
+
+  // ADVANCE THROUGH THE DECK WHEN THE WINDOW IS CLICKED (OR TAPPED) /////////////
+  window.onclick = function(event){
+    if (started && !event.target.matches('button') && !event.target.matches('select') &&
+        !event.target.matches('input') && !event.target.matches('label')) {
+      if(card < deck.length -1){
+          card += 1;
+          current = deck[card];
+          document.getElementById("flash").innerHTML = deck[card];
+      }
+      else{
+        document.getElementById("flash").innerHTML = " ";
+      }
+    }
+    setStartButton();
+  }
+
+
+  $("#start").on('click', ()=>{
+    $("#start").focus();
+    start();
+  });
+
+  $("#start").focus();
+  start();
+
+});
+</script>
+
+
+<%- include('foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->

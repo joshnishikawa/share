@@ -1,0 +1,46 @@
+<%- include('head'); -%>
+<body>
+
+<div style="min-height:100vh;">
+  <div id="exit" class="btn btn-sm btn-outline-info">
+    <i class="material-icons md-small">close</i>
+  </div>
+
+  <div id="match" class="container-fluid">
+
+<%  var cols = deck.length / 4; %>
+<%  for (var row = 0; row < 4; row++){ %>
+    <div class="row">
+<%    for (var col = 0; col < cols; col++){ %>
+<%    var index = row * cols + col; %>
+      <div class="col p-0">
+        <div class="flip m-3">
+          <div class="flip-card shadow">
+            <div class="flip-front bg-white rounded border"><%- deck[index] %></div>
+            <div class="flip-back rounded border border-primary text-center <%- backClass[index] %>">
+              <% if(backContent.length > 0){ %>
+                <%-backContent[index] %>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      </div>
+<%    } %>
+    </div>
+<% } %>
+</div>
+
+
+<script>
+$(function(){
+  $("#exit").on('click', ()=>{
+    window.location.replace('/');
+  });
+
+  $(".flip").on('click', function(){
+    $(this).toggleClass('flipped');
+  });
+});
+</script>
+
+<%- include('foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->
