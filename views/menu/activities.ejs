@@ -1,12 +1,9 @@
-<%- include('head'); -%>
 <body>
-
-  <div class="container mt-3" style="min-height:100vh;">
+<div class="container-fluid">
   <div class="row">
-
     <div class="col">
-      <div class="rounded-3 border shadow p-3">
 
+      <div class="rounded-3 border p-3">
         <strong class="text-primary h3">FLASH</strong>
         <button class="btn btn-sm btn-outline-info mb-2" 
                 data-bs-toggle="modal" data-bs-target="#flash_modal">
@@ -21,12 +18,11 @@
           <button type="submit" class="btn btn-primary">Start</button>
         </form>
       </div>
+
     </div>
-
-
     <div class="col">
-      <div class="rounded-3 border shadow p-3">
 
+      <div class="rounded-3 border p-3">
         <strong class="text-primary h3">Q & A</strong>
         <button class="btn btn-sm btn-outline-info mb-2" 
                 data-bs-toggle="modal" data-bs-target="#diagrams_modal">
@@ -41,11 +37,11 @@
           <button type="submit" class="btn btn-primary">Start</button>
         </form>
       </div>
+
     </div>
-
-
     <div class="col">
-      <div class="rounded-3 border shadow p-3">
+
+      <div class="rounded-3 border p-3">
         <strong class="text-primary h3">MATCH</strong>
         <button class="btn btn-sm btn-outline-info mb-2" 
                 data-bs-toggle="modal" data-bs-target="#match_modal">
@@ -66,10 +62,15 @@
           <button type="submit" class="btn btn-primary">Start</button>
         </form>
       </div>
+
     </div>
 
+  </div>
+  <div class="row">
+  
     <div class="col">
-      <div class="rounded-3 border shadow p-3">
+
+      <div class="rounded-3 border p-3">
         <strong class="text-primary h3">WORDLE</strong>
         <button class="btn btn-sm btn-outline-info mb-2" 
                 data-bs-toggle="modal" data-bs-target="#wordle_modal">
@@ -85,13 +86,11 @@
           <button type="submit" class="btn btn-primary">Start</button>
         </form>
       </div>
+
     </div>
-
-  </div>
-  <div class="row">
-
     <div class="col">
-      <div class="rounded-3 border shadow p-3 d-flex">
+
+      <div class="rounded-3 border p-3 d-flex">
         <strong class="text-primary h3">TYPE</strong>
         <button class="btn btn-sm btn-outline-info mb-2" 
                 data-bs-toggle="modal" data-bs-target="#writing_modal">
@@ -101,10 +100,11 @@
           <button type="submit" class="btn btn-primary">Start</button>
         </form>
       </div>
-    </div>
 
+    </div>
     <div class="col">
-      <div class="rounded-3 border shadow p-3 d-flex">
+
+      <div class="rounded-3 border p-3 d-flex">
         <strong class="text-primary h3">WRITE</strong>
         <button class="btn btn-sm btn-outline-info mb-2" 
                 data-bs-toggle="modal" data-bs-target="#writing_modal">
@@ -114,151 +114,60 @@
           <button type="submit" class="btn btn-primary">Start</button>
         </form>
       </div>
+
     </div>
 
   </div>
   <div class="row">
 
-    <div class="col-12">
-      <div class="rounded-3 border shadow p-3">
+    <div class="col">
+
+      <div class="rounded-3 border p-3 d-flex">
         <strong class="text-primary h3">BINGO</strong>
         <button class="btn btn-sm btn-outline-info mb-2" 
                 data-bs-toggle="modal" data-bs-target="#bingo_modal">
           <i class="material-icons md-small">info</i>
         </button>
 
-        <form action="bingo" method="GET" class="form-group mb-0 mx-0">
-          <input id="bingoWords" name="words" type="hidden">
-          <div class="form-check">
-            <input id="hasAllTags" class="form-check-input" type="radio" name="type" value="all" checked>
-            <label class="form-check-label" for="hasAllTags">Has ALL Tags</label>
-          </div>
-          <div class="form-check">
-            <input id="hasAnyTag" class="form-check-input" type="radio" name="type" value="any">
-            <label class="form-check-label" for="hasAnyTag">Has ANY Tag</label>
-          </div>
-
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="imgOnly" id="imgOnly">
-            <label class="form-check-label me-3" for="imgOnly">Require Images</label>
-          </div>
-
-          <div id="bingoTags" class="d-flex flex-wrap"></div>
-
-          <button type="submit" class="btn btn-primary">Start</button>
-          <div id="numOfBingoItems"></div>
+        <form id="bingo" action="bingo" method="GET" class="d-flex justify-content-end w-100 mb-2">
+          <input type="hidden" name="words" value="">
+          <button id="bingoButton" class="btn btn-primary">Start</button>
         </form>
       </div>
+
+    </div>
+    <div class="col">
+
+      <div class="rounded-3 border p-3 d-flex">
+        <strong class="text-primary h3">RECALL</strong>
+        <button class="btn btn-sm btn-outline-info mb-2" 
+                data-bs-toggle="modal" data-bs-target="#recall_modal">
+          <i class="material-icons md-small">info</i>
+        </button>
+
+        <form id="recall" action="recall" method="GET" class="d-flex justify-content-end w-100 mb-2">
+          <input type="hidden" name="words" value="">
+          <button id="recallButton" class="btn btn-primary">Start</button>
+        </form>
+      </div>
+
     </div>
 
   </div>
 </div>
 
-<%- include('modals'); -%>
-
 <script>
 $(function(){
-  $("#sharetab").addClass("active");
 
-  let tags = <%- JSON.stringify(tags) %>;
-  let items = <%- JSON.stringify(items) %>;
-
-  for (let t in tags) {
-    $("#bingoTags").append(`<div class="form-check">
-      <input class="form-check-input" type="checkbox" name="tags" id="tag_${t}" value="${t}" aria-label="bingo tags">
-      <label class="form-check-label me-3" style="margin-left:-5px;" for="tag_${t}">${t}</label>
-    </div>`);
-  }
-
-  let words = [];
-
-  function updateWordList(){
-    words = [];
-    let imgOnly = $("#imgOnly").prop("checked");
-    let checkedTags = $("#bingoTags input:checked").toArray().map(e => e.value);
-
-    if (imgOnly) {
-      if ($("#hasAllTags").is(":checked")) {
-        for (let i in items) {
-          let hasAllTags = true;
-          for (let j of checkedTags) {
-            if (!items[i].includes(j)) {
-              hasAllTags = false;
-              break;
-            }
-          }
-          if (hasAllTags) {
-            words.push(i);
-          }
-        }
-      } else if ($("#hasAnyTag").is(":checked")) {
-        for (let i in items) {
-          for (let j of checkedTags) {
-            if (items[i].includes(j)) {
-              words.push(i);
-              break;
-            }
-          }
-        }
-      }
-    } 
-    else {
-      if ($("#hasAllTags").is(":checked")) {
-        let shortestTag = '';
-        let shortestTagLength = 0;
-        for (let i of checkedTags) {
-          let tagLength = tags[i].length;
-          if (shortestTagLength == 0 || tagLength < shortestTagLength) {
-            shortestTag = i;
-            shortestTagLength = tagLength;
-          }
-        }
-        if (shortestTag){
-          for (let i of tags[shortestTag]){
-            let hasAllTags = true;
-            for (let t of checkedTags) {
-              if (i != shortestTag && !tags[t].includes(i)) {
-                hasAllTags = false;
-                break;
-              }
-            }
-            if (hasAllTags) {
-              words.push(i);
-            }
-          }
-        }
-      }
-      else if ($("#hasAnyTag").is(":checked")) {
-        for (let i of checkedTags) {
-          for (let w of tags[i]){
-            if (!words.includes(w)) {
-              words.push(w);
-            }
-          }
-        }
-      }
-    }
-    $("#bingoWords").val(JSON.stringify(words));
-    $("#numOfBingoItems").text(`(${words.length}) ${words}`);
-  }
-
-  $("#bingoTags input").on('change', ()=>{
-    updateWordList();
+  $("#bingoButton").on('click', ()=>{
+    $("#bingo input[name='words']").val(JSON.stringify(words));
+    $("#bingo").submit();
   });
 
-  $("#hasAllTags").on('change', ()=>{
-    updateWordList();
-  });
-
-  $("#hasAnyTag").on('change', ()=>{
-    updateWordList();
-  });
-
-  $("#imgOnly").on('change', ()=>{
-    updateWordList();
+  $("#recallButton").on('click', ()=>{
+    $("#recall input[name='words']").val(JSON.stringify(words));
+    $("#recall").submit();
   });
 
 });
 </script>
-
-<%- include('foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->

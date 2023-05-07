@@ -24,7 +24,7 @@ router.get('/', (req, res)=>{
 
     fs.readdir( path.join(__dirname, '../public/image/diagrams'), (err, diagrams)=>{
       if (err) throw err;
-      res.render('menu', {session: req.session, decks, diagrams, items, tags});
+      res.render('menu/main', {session: req.session, decks, diagrams, items, tags});
     });
   }catch(err){ console.error(err); }
 });
@@ -186,7 +186,7 @@ router.get('/match', (req, res)=>{
       deck = FYshuffle(deck);
     }
 
-    res.render('match', {deck, backClass, backContent, session: req.session});
+    res.render('match', {deck, backClass, backContent});
   }
   catch(err){ console.error(err); }
 });
@@ -197,7 +197,7 @@ router.get('/wordle', (req, res)=>{
   try{
     var words = FYshuffle( tags[req.query.tag] );
     words = words.filter(word => word.match(/^[a-z_\-']+$/)); // wordle can't handle capital letters
-    res.render('wordle', {words, session: req.session});
+    res.render('wordle', {words});
   }
   catch(err){ console.error(err); }
 });
@@ -206,14 +206,21 @@ router.get('/wordle', (req, res)=>{
 // BINGO ///////////////////////////////////////////////////////////////////////
 router.get('/bingo', (req, res)=>{
   try{
-    let list = req.query.words;
-    list= JSON.parse(list);
+    let list = JSON.parse(req.query.words);
     list = FYshuffle( list );
-    res.render('bingo', {list, session: req.session});
+    res.render('bingo', {list});
   }
   catch(err){ console.error(err); }
 });
 
+// RECALL //////////////////////////////////////////////////////////////////////
+router.get('/recall', (req, res)=>{
+  try{
+    let list = JSON.parse(req.query.words);
+    list = FYshuffle( list );
+    res.render('recall', {list});
+  } catch(err){ console.error(err); }
+});
 
 // apply the exact same shuffle to two arrays of the same length (in place)
 parallelShuffle = (a, b)=>{

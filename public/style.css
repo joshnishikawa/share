@@ -147,7 +147,6 @@
 /* ////////////////////////////////////////////////////////////////////////// */
 .flip {
   background-color: transparent;
-  height: 20vh;
   perspective: 1000px;
 }
 
@@ -177,16 +176,6 @@
   -ms-backface-visibility: hidden;
   -o-backface-visibility: hidden;
 }
-
-/* .flipped .flip-card .flip-back img{
-  border: 5px solid #f63 !important;
-  visibility: hidden;
-  backface-visibility: hidden;
-  -moz-backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  -ms-backface-visibility: hidden;
-  -o-backface-visibility: hidden;
-} */
 
 .flip-front {
   display: flex;

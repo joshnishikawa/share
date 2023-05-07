@@ -1,0 +1,25 @@
+<%- include('../head.ejs') -%>
+
+<div class="container-fluid mt-3" style="min-height:100vh;">
+  <div class="row">
+    <div class="col-3">
+      <%- include('selection.ejs') -%>
+    </div>
+    <div class="col-9">
+      <%- include('activities.ejs') -%>
+    </div>
+  </div>
+</div>
+
+<%- include('modals.ejs') -%>
+<script>
+    var words = [];
+</script>
+
+<footer style="box-shadow: inset 0px 7px 7px #999;"
+        class="alert-dark d-flex justify-content-around pt-2 pb-0">
+  <span class="small">©English Jones 2021</span>
+  <span class="small">joshnishikawa@gmail.com</span>
+</footer>
+
+<%- include('../foot.ejs') -%>

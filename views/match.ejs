@@ -14,7 +14,7 @@
 <%    for (var col = 0; col < cols; col++){ %>
 <%    var index = row * cols + col; %>
       <div class="col p-0">
-        <div class="flip m-3">
+        <div class="flip m-3" style="height:20vh;">
           <div class="flip-card shadow">
             <div class="flip-front bg-white rounded border"><%- deck[index] %></div>
             <div class="flip-back rounded border border-primary text-center <%- backClass[index] %>">

@@ -1,16 +1,12 @@
 <%- include('head'); -%>
 
 <body>
-<div class="container-fluid">
-  <div class="col d-flex px-0 pt-0 pb-3">
-    <a href="/" class="btn btn-sm btn-outline-info">
+  <div style="min-height:100vh;">
+    <div id="exit" class="btn btn-sm btn-outline-info">
       <i class="material-icons md-small">close</i>
-    </a>
+    </div>
     <div id="start" class="btn btn-sm btn-outline-info py-0 mx-1" style="width:150px;">Start</div>
-  </div>
 
-
-  <div class="container-fluid" style="min-height:100vh;">
     <div class="row">
       <div id="display" class="col d-flex flex-wrap justify-content-center text-center" style="display:none;"></div>
     </div>
@@ -74,6 +70,15 @@ $(function(){
       $("#currentSlide").html(`<img src="image/svg/${vocab[i]}.svg" class="img-fluid" alt="${vocab[i]}" style="height:100%;">`);
     }
   });
+
+  $("#exit").on('click', ()=>{
+    window.location.replace('/');
+  });
+
+  $(".flip").on('click', function(){
+    $(this).toggleClass('flipped');
+  });
+
 });
 
 </script>

@@ -1,0 +1,116 @@
+<%- include('head'); -%>
+<body>
+
+<div class="d-flex small">
+  <div id="exit" class="btn btn-sm btn-outline-info">
+    <i class="material-icons">close</i>
+  </div>
+  <div id="start" class="btn btn-sm btn-outline-info">START</div>
+  <input id="searchInput" class="form-control form-control-sm" type="text" placeholder="Search" aria-label="Search" style="display:none;">
+</div>
+
+<div style="min-height:100vh;">
+  <div id="display" class="col d-flex flex-wrap justify-content-center text-center" style="display:none;"></div>
+  <div id="gridContainer" style="display:none;">
+    <div id="grid" class="d-flex flex-wrap"></div>
+  </div>
+</div>
+
+
+<script>
+$(function(){
+  let i = 0;
+  let vocab = <%- JSON.stringify(list) %>;
+  let cols = 0;
+  let rowheight = "";
+
+  let size = vocab.length;
+  if (size > 30){
+    vocab = vocab.slice(0, 30);
+    cols = 2;
+    rowheight = "19vh";
+  } else if (size > 24){
+    vocab = vocab.slice(0, 24);
+    cols = 2;
+    rowheight = "24vh";
+  } else if (size > 18){
+    vocab = vocab.slice(0, 18);
+    cols = 6;
+    rowheight = "32vh";
+  } else if (size > 12){
+    vocab = vocab.slice(0, 12);
+    cols = 3;
+    rowheight = "32vh";
+  } else if (size > 6){
+    vocab = vocab.slice(0, 6);
+    cols = 4;
+    rowheight = "49vh";
+  }
+
+  for (let v of vocab){
+    $('#display').append(`<div class="rounded-3 bg-white border display-1">
+                            <div style="font-size:3rem;">${v.replace('_', " ")}
+                              <div style="height:15rem;width:15rem;position:relative;">
+                                <img src="image/svg/${v}.svg" class="img-fluid" alt="${v}" style="height:100%;">
+                              </div>
+                            </div>
+                          </div>`);
+  }
+
+  $("#display").show();
+
+  vocab = FYshuffle(vocab);
+
+  for (let v of vocab){
+    $("#grid").append(`
+      <div id="${v}" class="col-${cols} vocab p-0" style="height:${rowheight};">
+          <div class="flip m-3" style="height:80%;">
+            <div class="flip-card shadow">
+              <div class="flip-front bg-white rounded border">
+                <img src="image/svg/${v}.svg" alt="${v}" class="img-fluid" style="height:100%;">
+                </div>
+              <div class="flip-back rounded border border-primary text-center alert-primary">
+              </div>
+            </div>
+          </div>
+        </div>`);
+  }
+
+  $("#searchInput").on('keyup', function(e){
+    if (e.key == "Enter"){
+      $(".vocab.bg-warning > .flip").addClass('flipped').promise().done(()=>{
+        $(".vocab.bg-warning").removeClass('bg-warning');
+      });
+    }
+    else{
+      $(".vocab").removeClass('bg-warning');
+      let input = $(this).val().toLowerCase();
+      if (input == ""){return;}
+      let matches = vocab.filter((v)=>{return v.startsWith(input);});
+      for (let v of matches){
+        $(`#${v}`).addClass('bg-warning');
+      }
+    }
+  });
+
+
+  $("#start").on('click', ()=>{
+    $("#display").empty();
+    $("#start").hide();
+    $("#searchInput").show().focus();
+    $("#gridContainer").show();
+  });
+
+  $("#exit").on('click', ()=>{
+    window.location.replace('/');
+  });
+
+  $(".flip").on('click', function(){
+    $(this).toggleClass('flipped');
+  });
+
+});
+
+</script>
+
+<%- include('foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->

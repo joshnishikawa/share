@@ -1,0 +1,119 @@
+<div class="d-flex flex-wrap">
+  <div class="form-check mx-1">
+    <input id="hasAllTags" class="form-check-input" type="radio" name="type" value="all" checked>
+    <label class="form-check-label" for="hasAllTags">Has ALL Tags</label>
+  </div>
+  <div class="form-check mx-1">
+    <input id="hasAnyTag" class="form-check-input" type="radio" name="type" value="any">
+    <label class="form-check-label" for="hasAnyTag">Has ANY Tag</label>
+  </div>
+
+  <div class="form-check mx-1">
+    <input class="form-check-input" type="checkbox" name="imgOnly" id="imgOnly">
+    <label class="form-check-label me-3" for="imgOnly">Require Images</label>
+  </div>
+</div>
+<hr>
+TAGS
+<div id="tags" class="d-flex flex-wrap"></div>
+<div id="numOfItems"></div>
+
+<script>
+$(function(){
+  let tags = <%- JSON.stringify(tags) %>;
+  let items = <%- JSON.stringify(items) %>;
+
+  for (let t in tags) {
+    $("#tags").append(`<div class="form-check">
+      <input class="form-check-input" type="checkbox" name="tags" id="tag_${t}" value="${t}" aria-label="tags">
+      <label class="form-check-label me-3" style="margin-left:-5px;" for="tag_${t}">${t}</label>
+    </div>`);
+  }
+
+  function updateWordList(){
+    words = [];
+    let imgOnly = $("#imgOnly").prop("checked");
+    let checkedTags = $("#tags input:checked").toArray().map(e => e.value);
+
+    if (imgOnly) {
+      if ($("#hasAllTags").is(":checked")) {
+        for (let i in items) {
+          let hasAllTags = true;
+          for (let j of checkedTags) {
+            if (!items[i].includes(j)) {
+              hasAllTags = false;
+              break;
+            }
+          }
+          if (hasAllTags) {
+            words.push(i);
+          }
+        }
+      } else if ($("#hasAnyTag").is(":checked")) {
+        for (let i in items) {
+          for (let j of checkedTags) {
+            if (items[i].includes(j)) {
+              words.push(i);
+              break;
+            }
+          }
+        }
+      }
+    } 
+    else {
+      if ($("#hasAllTags").is(":checked")) {
+        let shortestTag = '';
+        let shortestTagLength = 0;
+        for (let i of checkedTags) {
+          let tagLength = tags[i].length;
+          if (shortestTagLength == 0 || tagLength < shortestTagLength) {
+            shortestTag = i;
+            shortestTagLength = tagLength;
+          }
+        }
+        if (shortestTag){
+          for (let i of tags[shortestTag]){
+            let hasAllTags = true;
+            for (let t of checkedTags) {
+              if (i != shortestTag && !tags[t].includes(i)) {
+                hasAllTags = false;
+                break;
+              }
+            }
+            if (hasAllTags) {
+              words.push(i);
+            }
+          }
+        }
+      }
+      else if ($("#hasAnyTag").is(":checked")) {
+        for (let i of checkedTags) {
+          for (let w of tags[i]){
+            if (!words.includes(w)) {
+              words.push(w);
+            }
+          }
+        }
+      }
+    }
+    $("#numOfItems").text(`(${words.length}) ${words}`);
+  }
+
+  $("#tags input").on('change', ()=>{
+    updateWordList();
+  });
+
+  $("#hasAllTags").on('change', ()=>{
+    updateWordList();
+  });
+
+  $("#hasAnyTag").on('change', ()=>{
+    updateWordList();
+  });
+
+  $("#imgOnly").on('change', ()=>{
+    updateWordList();
+  });
+
+});
+</script>
