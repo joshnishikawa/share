@@ -80,8 +80,9 @@ const game_share = {
            //square      star    diamond      heart      rect       tri    circle      arrow
 
   "weekdays":['<div class="spinit">&#127183;</div>',
-               'Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+               'Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
               // includes a joker because 16 cards is easier to layout than 14
+  "weather": ["cloudy","rainy","sunny","windy","snowy","stormy","hot","cold"],
 }
 
 module.exports = game_share;

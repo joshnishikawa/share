@@ -1,12 +1,13 @@
 <%- include('head'); -%>
 <body>
 
-<div style="min-height:100vh;">
-  <div id="exit" class="btn btn-sm btn-outline-info">
-    <i class="material-icons md-small">close</i>
+  <div class="d-flex">
+    <a href="/" class="btn btn-sm btn-outline-secondary p-0">
+      <i class="material-icons">close</i>
+    </a>
   </div>
 
-  <div id="match" class="container-fluid">
+  <div id="match" class="container-fluid" style="min-height:100vh;">
 
 <%  var cols = deck.length / 4; %>
 <%  for (var row = 0; row < 4; row++){ %>
@@ -33,10 +34,6 @@
 
 <script>
 $(function(){
-  $("#exit").on('click', ()=>{
-    window.location.replace('/');
-  });
-
   $(".flip").on('click', function(){
     $(this).toggleClass('flipped');
   });

@@ -94,6 +94,25 @@ router.get('/match', (req, res)=>{
         backClass = FYshuffle( decks.colors.slice(0, 12) );
         break;
 
+      case 'weather':
+        for (let i = 0; i < 8; i++){
+          deck.push(`<img class="img-flash mx-auto d-block" 
+                          src="/image/svg/${decks.weather[i]}.svg">`);
+          deck.push(`<img class="img-flash mx-auto d-block" 
+                          src="/image/svg/${decks.weather[i]}.svg">`);
+        }
+        var nums1 = FYshuffle( [0,1,2,3,4,5,6,7] );
+        var nums2 = FYshuffle( [0,1,2,3,4,5,6,7] );
+        backContent = nums1.concat(nums2);
+        var colors = decks.colors.slice(0, 8);
+        for (let i = 0; i < colors.length; i++){
+          colors[i] += 'Text alert-primary';//use .redText class instead of .red
+          backClass.push(colors[i]);
+          backClass.push(colors[i]);
+        }
+        parallelShuffle(backClass, backContent);
+        break;
+  
       case 'animals 1':
         for (let i = 0; i < 10; i++){
           deck.push(`<img class="img-flash mx-auto d-block" 
@@ -215,11 +234,8 @@ router.get('/bingo', (req, res)=>{
 
 // RECALL //////////////////////////////////////////////////////////////////////
 router.get('/recall', (req, res)=>{
-  try{
-    let list = JSON.parse(req.query.words);
-    list = FYshuffle( list );
-    res.render('recall', {list});
-  } catch(err){ console.error(err); }
+  try{ res.render('recall'); }
+  catch(err){ console.error(err); }
 });
 
 // apply the exact same shuffle to two arrays of the same length (in place)

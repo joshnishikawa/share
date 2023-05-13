@@ -17,6 +17,12 @@
 TAGS
 <div id="tags" class="d-flex flex-wrap"></div>
 <div id="numOfItems"></div>
+<hr>
+LIST
+<div class="input-group">
+  <input type="text" id="list" class="form-control" placeholder="vocab" aria-label="list">
+  <button id="listBtn" class="btn btn-outline-secondary" type="button">Go</button>
+</div>
 
 <script>
 $(function(){
@@ -30,6 +36,14 @@ $(function(){
     </div>`);
   }
 
+  $("#listBtn").on('click', ()=>{
+    words = $("#list").val().split(',');
+    for (let i in words) {
+      words[i] = words[i].trim().replace(/\s/g, '_');
+    }
+  });
+
+  
   function updateWordList(){
     words = [];
     let imgOnly = $("#imgOnly").prop("checked");

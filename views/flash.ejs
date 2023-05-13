@@ -1,21 +1,16 @@
 <%- include('head'); -%>
 <body>
-  <div class="container-fluid" style="min-height:100vh;margin:0px;">
-
-  <div class="row">
-    <div class="col d-flex p-0">
-      <a href="/" class="btn btn-sm btn-outline-info">
-        <i class="material-icons md-small">close</i>
-      </a>
-      <button id="start" class="btn btn-sm btn-outline-info py-0 mx-1" style="width:150px;">Start</button>
-      <div>
-        <input type="checkbox" id="shuffle" name="shuffle">
-        <label for="shuffle">Shuffle</label>
-      </div>
-    </div>
+  <div class="d-flex">
+    <a href="/" class="btn btn-sm btn-outline-secondary p-0">
+      <i class="material-icons">close</i>
+    </a>
+    <button id="start" class="btn btn-sm btn-outline-info">START</button>
+    <input type="checkbox" id="shuffle" name="shuffle" class="mx-2">
+    <label for="shuffle">Shuffle</label>
   </div>
-    
-  <div id="flash" class="row"></div>
+  
+  <div id="flash" class="container-fluid" style="min-height:100vh;margin:0px;">
+
 </div>
 
 <script>
