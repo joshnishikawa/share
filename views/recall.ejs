@@ -21,24 +21,28 @@
 <script>
 $(function(){
   let vocab = JSON.parse( new URLSearchParams(window.location.search).get('words') );
-
+console.log(vocab);
   let cols = 0;
   let rowheight = "";
 
   let size = vocab.length;
-  if (size > 30){
+  if (size >= 30){
     vocab = vocab.slice(0, 30);
     cols = 2;
     rowheight = "19vh";
-  } else if (size > 24){
+  } else if (size >= 24){
     vocab = vocab.slice(0, 24);
     cols = 2;
     rowheight = "24vh";
-  } else if (size > 18){
+  } else if (size >= 20){
+    vocab = vocab.slice(0, 20);
+    cols = 3;
+    rowheight = "19vh";
+  } else if (size >= 18){
     vocab = vocab.slice(0, 18);
     cols = 2;
     rowheight = "32vh";
-  } else if (size > 12){
+  } else if (size >= 12){
     vocab = vocab.slice(0, 12);
     cols = 3;
     rowheight = "32vh";
@@ -51,7 +55,7 @@ $(function(){
   for (let v of vocab){
     $('#display').append(
      `<div class="rounded-3 bg-white border display-1">
-        <div style="font-size:3rem;">${v.replace('_', " ")}
+        <div style="font-size:3rem;">${v.replace(/_/g, ' ')}
           <div style="height:15rem;width:15rem;position:relative;">
             <img src="image/svg/${v}.svg" class="img-fluid" alt="${v}" style="height:100%;">
           </div>
@@ -96,7 +100,7 @@ $(function(){
     }
     else{
       $(".vocab").removeClass('bg-warning');
-      let input = $(this).val().toLowerCase();
+      let input = $(this).val().replace(/ /g, '_');
       if (input == ""){return;}
       let matches = vocab.filter((v)=>{return v.startsWith(input);});
       for (let v of matches){
