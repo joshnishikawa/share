@@ -1,28 +1,28 @@
-<div class="d-flex flex-wrap">
-  <div class="form-check mx-1">
-    <input id="hasAllTags" class="form-check-input" type="radio" name="type" value="all" checked>
-    <label class="form-check-label" for="hasAllTags">Has ALL Tags</label>
-  </div>
-  <div class="form-check mx-1">
-    <input id="hasAnyTag" class="form-check-input" type="radio" name="type" value="any">
-    <label class="form-check-label" for="hasAnyTag">Has ANY Tag</label>
-  </div>
+<div class="container-fluid g-0">
+  <div class="row">
+    <div class="col">
+      <div class="form-check mx-1">
+        <input id="hasAllTags" class="form-check-input" type="radio" name="type" value="all" checked>
+        <label class="form-check-label" for="hasAllTags">Has ALL Tags</label>
+      </div>
+      <div class="form-check mx-1">
+        <input id="hasAnyTag" class="form-check-input" type="radio" name="type" value="any">
+        <label class="form-check-label" for="hasAnyTag">Has ANY Tag</label>
+      </div>
+      <hr>
+      TAGS
+      <div id="tags"></div>
+    </div>
 
-  <div class="form-check mx-1">
-    <input class="form-check-input" type="checkbox" name="imgOnly" id="imgOnly">
-    <label class="form-check-label me-3" for="imgOnly">Require Images</label>
+    <div class="col g-0">
+      <div class="d-flex">LIST<div id="numOfItems"></div></div>
+      <div class="input-group" style="height:100vh;">
+        <textarea id="list" class="form-control" style="height: 100%;"></textarea>
+      </div>
+    </div>
   </div>
 </div>
-<hr>
-TAGS
-<div id="tags" class="d-flex flex-wrap"></div>
-<div id="numOfItems"></div>
-<hr>
-LIST
-<div class="input-group">
-  <input type="text" id="list" class="form-control" placeholder="vocab" aria-label="list">
-  <button id="listBtn" class="btn btn-outline-secondary" type="button">Go</button>
-</div>
+
 
 <script>
 $(function(){
@@ -32,29 +32,38 @@ $(function(){
   for (let t in tags) {
     $("#tags").append(`<div class="form-check">
       <input class="form-check-input" type="checkbox" name="tags" id="tag_${t}" value="${t}" aria-label="tags">
-      <label class="form-check-label me-3" style="margin-left:-5px;" for="tag_${t}">${t}</label>
+      <label class="form-check-label me-3" style="margin-left:-5px;" for="tag_${t}">${t} (${tags[t].length})</label>
     </div>`);
   }
 
-  $("#listBtn").on('click', ()=>{
+  $("#list").on('input', ()=>{
     words = $("#list").val().split(',');
+    $("#numOfItems").html(`&nbsp;&nbsp;&nbsp;(${words.length})`);
     for (let i in words) {
       words[i] = words[i].trim().replace(/\s/g, '_');
     }
   });
 
-  
+
   function updateWordList(){
     words = [];
-    let imgOnly = $("#imgOnly").prop("checked");
     let checkedTags = $("#tags input:checked").toArray().map(e => e.value);
 
-    if (imgOnly) {
-      if ($("#hasAllTags").is(":checked")) {
-        for (let i in items) {
+    if ($("#hasAllTags").is(":checked")) {
+      let shortestTag = '';
+      let shortestTagLength = 0;
+      for (let i of checkedTags) {
+        let tagLength = tags[i].length;
+        if (shortestTagLength == 0 || tagLength < shortestTagLength) {
+          shortestTag = i;
+          shortestTagLength = tagLength;
+        }
+      }
+      if (shortestTag){
+        for (let i of tags[shortestTag]){
           let hasAllTags = true;
-          for (let j of checkedTags) {
-            if (!items[i].includes(j)) {
+          for (let t of checkedTags) {
+            if (i != shortestTag && !tags[t].includes(i)) {
               hasAllTags = false;
               break;
             }
@@ -63,54 +72,21 @@ $(function(){
             words.push(i);
           }
         }
-      } else if ($("#hasAnyTag").is(":checked")) {
-        for (let i in items) {
-          for (let j of checkedTags) {
-            if (items[i].includes(j)) {
-              words.push(i);
-              break;
-            }
-          }
-        }
       }
-    } 
-    else {
-      if ($("#hasAllTags").is(":checked")) {
-        let shortestTag = '';
-        let shortestTagLength = 0;
-        for (let i of checkedTags) {
-          let tagLength = tags[i].length;
-          if (shortestTagLength == 0 || tagLength < shortestTagLength) {
-            shortestTag = i;
-            shortestTagLength = tagLength;
-          }
-        }
-        if (shortestTag){
-          for (let i of tags[shortestTag]){
-            let hasAllTags = true;
-            for (let t of checkedTags) {
-              if (i != shortestTag && !tags[t].includes(i)) {
-                hasAllTags = false;
-                break;
-              }
-            }
-            if (hasAllTags) {
-              words.push(i);
-            }
-          }
-        }
-      }
-      else if ($("#hasAnyTag").is(":checked")) {
-        for (let i of checkedTags) {
-          for (let w of tags[i]){
-            if (!words.includes(w)) {
-              words.push(w);
-            }
+    }
+    else if ($("#hasAnyTag").is(":checked")) {
+      for (let i of checkedTags) {
+        for (let w of tags[i]){
+          if (!words.includes(w)) {
+            words.push(w);
           }
         }
       }
     }
-    $("#numOfItems").text(`(${words.length}) ${words}`);
+
+    // set the list value to the words array
+    $("#list").val(words.join(', '));
+    $("#numOfItems").html(`&nbsp;&nbsp;&nbsp;(${words.length})`);
   }
 
   $("#tags input").on('change', ()=>{
@@ -122,10 +98,6 @@ $(function(){
   });
 
   $("#hasAnyTag").on('change', ()=>{
-    updateWordList();
-  });
-
-  $("#imgOnly").on('change', ()=>{
     updateWordList();
   });
 
