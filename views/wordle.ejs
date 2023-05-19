@@ -45,7 +45,7 @@
 
 
 <script>
-  var words = <%- JSON.stringify(words) %>;
+  var words = <%- JSON.stringify(list) %>;
   var place = 0;
   var guess = '';
   var correct = true; // just to get things started
@@ -121,8 +121,8 @@ resetAnswer = ()=>{
 
   word = words.pop();
   if (word){
-    $("#image").html(`<div class="m-3 p-3 border border-dark bg-white rounded-lg display-1" 
-                            style="position:relative;height:300px;">
+    $("#image").html(`<div class="m-3 p-3 bg-white rounded-lg display-1" 
+                            style="position:relative;height:200px;">
                         <img src="image/svg/${word}.svg" alt="${word}" style="height:100%;"> 
                       </div>`);
 
@@ -174,7 +174,6 @@ $(function(){
 
 
   // set or reset everything
-
   $("#start").on('click', ()=>{
     resetAnswer();
   });

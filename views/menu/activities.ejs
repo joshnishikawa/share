@@ -71,20 +71,15 @@
   
     <div class="col">
 
-      <div class="rounded-3 border p-3 shadow">
+      <div class="rounded-3 border p-3 shadow d-flex">
         <strong class="text-primary h3">WORDLE</strong>
         <button class="btn btn-sm btn-outline-info mb-2" 
                 data-bs-toggle="modal" data-bs-target="#wordle_modal">
           <i class="material-icons md-small">info</i>
         </button>
-        <form action="wordle" method="GET" class="form-group d-flex mb-0 mx-0">
-          <select id="wordledeck" class="form-control" name="tag" required>
-            <option value="" disabled selected>Choose a Set</option>
-<% for (let t of Object.keys(tags) ) { %>
-            <option value="<%- t %>"><%- `${t} (${tags[t].length})` %></option>
-<% } %>
-          </select>
-          <button type="submit" class="btn btn-primary">Start</button>
+        <form id="wordle" action="wordle" method="GET" class="d-flex justify-content-end w-100 mb-2">
+          <input type="hidden" name="words" value="">
+          <button id="wordleButton" type="submit" class="btn btn-primary">Start</button>
         </form>
       </div>
 
@@ -159,6 +154,12 @@
 
 <script>
 $(function(){
+
+  $("#wordleButton").on('click', ()=>{
+
+    $("#wordle input[name='words']").val(JSON.stringify(words));
+    $("#wordle").submit();
+  });
 
   $("#bingoButton").on('click', ()=>{
     $("#bingo input[name='words']").val(JSON.stringify(words));

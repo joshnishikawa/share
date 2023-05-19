@@ -214,9 +214,10 @@ router.get('/match', (req, res)=>{
 // WORDLE //////////////////////////////////////////////////////////////////////
 router.get('/wordle', (req, res)=>{
   try{
-    var words = FYshuffle( tags[req.query.tag] );
-    words = words.filter(word => word.match(/^[a-z_\-']+$/)); // wordle can't handle capital letters
-    res.render('wordle', {words});
+    let list = JSON.parse(req.query.words);
+    list = FYshuffle( list );
+    list = list.filter(word => word.match(/^[a-z_\-']+$/)); // wordle can't handle capital letters
+    res.render('wordle', {list});
   }
   catch(err){ console.error(err); }
 });
