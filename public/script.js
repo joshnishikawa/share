@@ -15,3 +15,41 @@ FYshuffle = (myArray) => {
   }
   return myArray;
 }
+
+
+getGrid = (vocab) => {
+  if (vocab.length >= 36){
+    vocab = vocab.slice(0, 36);
+    colspan = 2;
+    rowheight = "15vh";
+  } else if (vocab.length >= 30){
+    vocab = vocab.slice(0, 30);
+    colspan = 2;
+    rowheight = "19vh";
+  } else if (vocab.length >= 24){
+    vocab = vocab.slice(0, 24);
+    colspan = 2;
+    rowheight = "24vh";
+  } else if (vocab.length >= 18){
+    vocab = vocab.slice(0, 18);
+    colspan = 2;
+    rowheight = "32vh";
+  } else if (vocab.length >= 16){
+    vocab = vocab.slice(0, 16);
+    colspan = 3;
+    rowheight = "24vh";
+  } else if (vocab.length >= 12){
+    vocab = vocab.slice(0, 12);
+    colspan = 3;
+    rowheight = "32vh";
+  } else if (vocab.length >= 9){
+    vocab = vocab.slice(0, 9);
+    colspan = 4;
+    rowheight = "32vh";
+  } else if (vocab.length >= 6){
+    vocab = vocab.slice(0, 6);
+    colspan = 4;
+    rowheight = "49vh";
+  }
+  return {vocab, colspan, rowheight};
+}

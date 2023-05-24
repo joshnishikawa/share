@@ -20,37 +20,9 @@
 
 <script>
 $(function(){
-  let vocab = JSON.parse( new URLSearchParams(window.location.search).get('words') );
-console.log(vocab);
-  let cols = 0;
-  let rowheight = "";
-
-  let size = vocab.length;
-  if (size >= 30){
-    vocab = vocab.slice(0, 30);
-    cols = 2;
-    rowheight = "19vh";
-  } else if (size >= 24){
-    vocab = vocab.slice(0, 24);
-    cols = 2;
-    rowheight = "24vh";
-  } else if (size >= 20){
-    vocab = vocab.slice(0, 20);
-    cols = 3;
-    rowheight = "19vh";
-  } else if (size >= 18){
-    vocab = vocab.slice(0, 18);
-    cols = 2;
-    rowheight = "32vh";
-  } else if (size >= 12){
-    vocab = vocab.slice(0, 12);
-    cols = 3;
-    rowheight = "32vh";
-  } else if (size >= 6){
-    vocab = vocab.slice(0, 6);
-    cols = 4;
-    rowheight = "49vh";
-  }
+  let list = JSON.parse( new URLSearchParams(window.location.search).get('words') );
+  list = FYshuffle(list); // Shuffle first so that cards left out are random.
+  let {vocab, colspan, rowheight} = getGrid(list);
 
   for (let v of vocab){
     $('#display').append(
@@ -65,11 +37,9 @@ console.log(vocab);
 
   $("#display").show();
 
-  vocab = FYshuffle(vocab);
-
   for (let v of vocab){
     $("#grid").append(
-     `<div id="${v}" class="col-${cols} vocab p-0" style="height:${rowheight};">
+     `<div id="${v}" class="col-${colspan} vocab p-0" style="height:${rowheight};">
         <div class="flip m-3" style="height:80%;">
           <div class="flip-card shadow">
             <div class="flip-front bg-white rounded border">

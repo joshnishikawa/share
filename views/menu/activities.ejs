@@ -52,14 +52,23 @@
             <option value="" disabled selected>Choose a Set</option>
             <option value="1~4">1~4</option>
             <option value="5~10">5~10</option>
-            <option value="weather">weather</option>
             <option value="animals 1">animals 1</option>
             <option value="animals 2">animals 2</option>
             <option value="letters 1">letters 1</option>
             <option value="letters 2">letters 2</option>
             <option value="shapes">shapes</option>
-            <option value="weekdays">weekdays</option>
+            <option value="list" selected>Use List</option>
           </select>
+          <select class="form-control" name="back">
+            <option value="" disabled selected>Card Backs</option>
+            <option value="colors">Colors</option>
+            <option value="numbers">Numbers</option>
+            <option value="colorsNumbers">Color & Num.</option>
+            <option value="colorsShapes">Color & Shape</option>
+            <option value="animals">Animals</option>
+            <option value="objects">Objects</option>
+          </select>
+          <input type="hidden" value="" name="list">
           <button type="submit" class="btn btn-primary">Start</button>
         </form>
       </div>
@@ -154,6 +163,12 @@
 
 <script>
 $(function(){
+
+  $("select[name='deck']").on('change', function(){
+    if($(this).val() == "list"){
+      $("input[name='list']").val(JSON.stringify(words));
+    }
+  });
 
   $("#wordleButton").on('click', ()=>{
 

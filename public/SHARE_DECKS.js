@@ -76,7 +76,7 @@ const game_share = {
            'van','violin','watch','worm','yarn','yo-yo',
            'zebra','zipper'],
 
-  "shapes":['&#9724;','&#9733;','&#11047;','&#10084;','&#9646;','&#9650;','&#9679;','&#10142;'],
+  "shapes":['&#9632;','&#9733;','&#11047;','&#9829;','&#9646;','&#9650;','&#9679;','&#8594;'],
            //square      star    diamond      heart      rect       tri    circle      arrow
 
   "weekdays":['<div class="spinit">&#127183;</div>',

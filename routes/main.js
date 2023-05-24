@@ -26,19 +26,34 @@ router.get('/', (req, res)=>{
       if (err) throw err;
       res.render('menu/main', {session: req.session, decks, diagrams, items, tags});
     });
-  }catch(err){ console.error(err); }
+  }catch(err){
+    res.send(err);
+    console.error(err);
+  }
 });
 
 
 // TYPE ////////////////////////////////////////////////////////////////////////
 router.get('/type', (req, res)=>{ 
-  res.render('type', {session: req.session});
+  try{
+    res.render('type', {session: req.session});
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
 });
 
 
 // WRITE ///////////////////////////////////////////////////////////////////////
 router.get('/write', (req, res)=>{
-  res.render('write', {session: req.session});
+  try{
+    res.render('write', {session: req.session});
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
 });
 
 
@@ -62,7 +77,10 @@ router.get('/flash', (req, res)=>{
                                         deckName: req.query.deck, 
                                         session: req.session});
   }
-  catch(err){ console.error(err); }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
 });
 
 
@@ -79,135 +97,147 @@ router.get('/diagram', (req, res)=>{
 // MATCH ///////////////////////////////////////////////////////////////////////
 router.get('/match', (req, res)=>{
   try{
-    var deck = [];
+    let deck = req.query.deck;
+    let backs = req.query.back;
+    var cards = [];
     var backContent = [];
     var backClass = [];
     
-    switch(req.query.deck){
+    switch(deck){
+      case 'list':
+        let list = JSON.parse(req.query.list);
+        for (let i = 0; i < list.length; i++){
+          cards.push(`<img class="img-flash mx-auto d-block" 
+                          src="/image/svg/${list[i]}.svg">`);
+          cards.push(`<img class="img-flash mx-auto d-block" 
+                          src="/image/svg/${list[i]}.svg">`);
+        }
+        break;
+
       case '1~4':
-        deck = [1,2,3,4,1,2,3,4];
-        backClass = FYshuffle( decks.colors.slice(0, 8) );
+        cards = [1,2,3,4,1,2,3,4];
         break;
 
       case '5~10':
-        deck = [5,6,7,8,9,10,5,6,7,8,9,10];
-        backClass = FYshuffle( decks.colors.slice(0, 12) );
+        cards = [5,6,7,8,9,10,5,6,7,8,9,10];
         break;
 
-      case 'weather':
-        for (let i = 0; i < 8; i++){
-          deck.push(`<img class="img-flash mx-auto d-block" 
-                          src="/image/svg/${decks.weather[i]}.svg">`);
-          deck.push(`<img class="img-flash mx-auto d-block" 
-                          src="/image/svg/${decks.weather[i]}.svg">`);
-        }
-        var nums1 = FYshuffle( [0,1,2,3,4,5,6,7] );
-        var nums2 = FYshuffle( [0,1,2,3,4,5,6,7] );
-        backContent = nums1.concat(nums2);
-        var colors = decks.colors.slice(0, 8);
-        for (let i = 0; i < colors.length; i++){
-          colors[i] += 'Text alert-primary';//use .redText class instead of .red
-          backClass.push(colors[i]);
-          backClass.push(colors[i]);
-        }
-        parallelShuffle(backClass, backContent);
-        break;
-  
       case 'animals 1':
         for (let i = 0; i < 10; i++){
-          deck.push(`<img class="img-flash mx-auto d-block" 
+          cards.push(`<img class="img-flash mx-auto d-block" 
                           src="/image/svg/${decks.animals[i]}.svg">`);
-          deck.push(`<img class="img-flash mx-auto d-block" 
+          cards.push(`<img class="img-flash mx-auto d-block" 
                           src="/image/svg/${decks.animals[i]}.svg">`);
         }
-        var nums1 = FYshuffle( [0,1,2,3,4,5,6,7,8,9] );
-        var nums2 = FYshuffle( [0,1,2,3,4,5,6,7,8,9] );
-        backContent = nums1.concat(nums2);
-        var colors = decks.colors.slice(0, 10);
-        for (let i = 0; i < colors.length; i++){
-          colors[i] += 'Text alert-primary';//use .redText class instead of .red
-          backClass.push(colors[i]);
-          backClass.push(colors[i]);
-        }
-        parallelShuffle(backClass, backContent);
         break;
 
       case 'animals 2':
         for (let i = 10; i < 20; i++){
-          deck.push(`<img class="img-flash mx-auto d-block" 
-                          src="/image/svg/${decks.animals[i]}.svg">`);
-          deck.push(`<img class="img-flash mx-auto d-block" 
-                          src="/image/svg/${decks.animals[i]}.svg">`);
+          cards.push(`<img class="img-flash mx-auto d-block" src="/image/svg/${decks.animals[i]}.svg">`);
+          cards.push(`<img class="img-flash mx-auto d-block" src="/image/svg/${decks.animals[i]}.svg">`);
         }
-        var nums1 = FYshuffle( [1,2,3,4,5,6,7,8,9,10] );
-        var nums2 = FYshuffle( [1,2,3,4,5,6,7,8,9,10] );
-        backContent = nums1.concat(nums2);
-        var colors = decks.colors.slice(0, 10);
+        break;
+
+      case 'letters 1':
+        for (let i = 0; i < 10; i++){
+          cards.push(decks.lower_case_mix[i]);
+          cards.push(decks.lower_case_mix[i]);
+        }
+        break;
+
+      case 'letters 2':
+        for (let i = 10; i < 20; i++){
+          cards.push(decks.lower_case_mix[i]);
+          cards.push(decks.lower_case_mix[i]);
+        }
+        break;
+
+      case 'shapes':
+        cards = decks.shapes.concat(decks.shapes);
+        break;
+
+      case 'weekdays':
+        cards = decks.weekdays.concat(decks.weekdays);
+        break;
+
+      default:
+        throw 'ERROR: invalid deck type.'
+    }
+
+    var len = cards.length;
+
+    switch(backs){
+      case 'colors':
+        if (len > decks.colors.length) throw 'ERROR: not enough colors for this deck.'
+        else backClass = FYshuffle( decks.colors.slice(0, len) );
+        break;
+
+      case 'colorsNumbers':
+        console.log(decks.colors.length);
+        console.log(len);
+        if (len > decks.colors.length * 2) throw 'ERROR: not enough colors for this deck.'
+        let nums = [];
+        for (let i = 0; i < len / 2; i++){
+          nums.push(i);
+        }
+
+        nums = FYshuffle(nums);
+        backContent = nums.concat( FYshuffle(nums) );
+
+        var colors = decks.colors.slice(0, len / 2);
+        for (let i = 0; i < colors.length; i++){
+          colors[i] += 'Text alert-primary';//use .redText class instead of .red
+          backClass.push(colors[i]);
+          backClass.push(colors[i]);
+        }
+        parallelShuffle(backClass, backContent);
+        break;
+
+      case 'colorsShapes':
+        var shapes = FYshuffle(decks.shapes.slice(0, len / 2));
+        backContent = shapes.concat( FYshuffle(shapes) );
+      
+        var colors = decks.colors.slice(0, len / 2);
         for (let i = 0; i < colors.length; i++){
           colors[i] += 'Text alert-primary'; // use .redText class instead of .red
           backClass.push(colors[i]);
           backClass.push(colors[i]);
         }
-        parallelShuffle(backClass, backContent);
         break;
 
-      case 'letters 1':
-        for (let i = 0; i < 10; i++){
-          deck.push(decks.lower_case_mix[i]);
-          deck.push(decks.lower_case_mix[i]);
-        }
-
-        for (let i = 0; i < 10; i++){
+      case 'animals':
+        for (let i = 0; i < len; i++){
           backContent.push(`<img class="img-flash" src="/image/svg/${decks.animals[i]}.svg">`);
           backContent.push(`<img class="img-flash" src="/image/svg/${decks.animals[i + 10]}.svg">`);
           backClass.push('alert-primary');
           backClass.push('alert-primary');
         }
-        parallelShuffle(deck, backContent);
         break;
 
-      case 'letters 2':
-        for (let i = 10; i < 20; i++){
-          deck.push(decks.lower_case_mix[i]);
-          deck.push(decks.lower_case_mix[i]);
-        }
-
-        for (let i = 0; i < decks.vocab.length; i++){
-          backContent.push(`<img class="img-flash" 
-                                src="/image/svg/${decks.vocab[i]}.svg">`);
+      case 'objects':
+        for (let i = 0; i < len; i++){
+          backContent.push(`<img class="img-flash" src="/image/svg/${decks.vocab[i]}.svg">`);
           backClass.push('alert-primary');
         }
-        parallelShuffle(deck, backContent);
         break;
 
-      case 'shapes':
-        deck = decks.shapes.concat(decks.shapes);
-        backClass = FYshuffle( decks.colors.slice(0, 16) );
-        break;
-
-      case 'weekdays':
-        deck = decks.weekdays.concat(decks.weekdays);
-        var shapes1 = FYshuffle(decks.shapes);
-        var shapes2 = FYshuffle(decks.shapes);
-        backContent = shapes1.concat(shapes2);
-      
-        var colors = decks.colors.slice(0, 8);
-        for (let i = 0; i < colors.length; i++){
-          colors[i] += 'Text alert-primary'; // use .redText class instead of .red
-          backClass.push(colors[i]);
-          backClass.push(colors[i]);
-        }
-        parallelShuffle(backClass, backContent);
+      default:
+        throw 'ERROR: invalid back type.'
     }
 
     // letters need to be shuffled in parallel with the objects they represent
-    if ( !["letters 1", "letters 2"].includes(req.query.deck) ){
-      deck = FYshuffle(deck);
+    if ( ["letters 1", "letters 2"].includes(req.query.deck) ){
+      parallelShuffle(cards, backContent);
     }
-
-    res.render('match', {deck, backClass, backContent});
+    else{
+      cards = FYshuffle(cards);
+    }
+    res.render('match', {cards, backClass, backContent});
   }
-  catch(err){ console.error(err); }
+  catch(err){ 
+    res.send(err);
+    console.error(err);
+  }
 });
 
 
@@ -219,7 +249,10 @@ router.get('/wordle', (req, res)=>{
     list = list.filter(word => word.match(/^[a-z_\-']+$/)); // wordle can't handle capital letters
     res.render('wordle', {list});
   }
-  catch(err){ console.error(err); }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
 });
 
 
@@ -230,13 +263,19 @@ router.get('/bingo', (req, res)=>{
     list = FYshuffle( list );
     res.render('bingo', {list});
   }
-  catch(err){ console.error(err); }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
 });
 
 // RECALL //////////////////////////////////////////////////////////////////////
 router.get('/recall', (req, res)=>{
   try{ res.render('recall'); }
-  catch(err){ console.error(err); }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
 });
 
 // apply the exact same shuffle to two arrays of the same length (in place)
