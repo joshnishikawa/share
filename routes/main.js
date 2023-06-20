@@ -12,19 +12,9 @@ const path = require('path');
 ////////////////////////////////////////////////////////////////////////////////
 router.get('/', (req, res)=>{
   try{
-    fs.readdir( path.join(__dirname, '../public/image/svg'), (err, files)=>{
-      if (err) throw err;
-      let str = '';
-      for (let f of files){
-        if ( f.split('.')[0].length == 5 ){
-          str += `"${f.split('.')[0]}", `;
-        }
-      }
-    });
-
     fs.readdir( path.join(__dirname, '../public/image/diagrams'), (err, diagrams)=>{
       if (err) throw err;
-      res.render('menu/main', {session: req.session, decks, diagrams, items, tags});
+      res.render('menu/main', {decks, diagrams, items, tags});
     });
   }catch(err){
     res.send(err);
@@ -120,6 +110,10 @@ router.get('/match', (req, res)=>{
 
       case '5~10':
         cards = [5,6,7,8,9,10,5,6,7,8,9,10];
+        break;
+
+      case '11~16':
+        cards = [11,12,13,14,15,16,11,12,13,14,15,16];
         break;
 
       case 'animals 1':
@@ -271,7 +265,8 @@ router.get('/bingo', (req, res)=>{
 
 // RECALL //////////////////////////////////////////////////////////////////////
 router.get('/recall', (req, res)=>{
-  try{ res.render('recall'); }
+  try{
+    res.render('recall'); }
   catch(err){
     res.send(err);
     console.error(err);

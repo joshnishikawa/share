@@ -16,6 +16,21 @@ FYshuffle = (myArray) => {
   return myArray;
 }
 
+// apply the exact same shuffle to two arrays of the same length (in place)
+parallelShuffle = (a, b)=>{
+  var i, j, k, l;
+  for ( i = a.length -1; i > 0; i--) {
+    j = Math.floor(Math.random() * i)
+
+    k = a[i]
+    a[i] = a[j]
+    a[j] = k
+
+    l = b[i]
+    b[i] = b[j]
+    b[j] = l
+  }
+}
 
 getGrid = (vocab) => {
   if (vocab.length >= 36){
