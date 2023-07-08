@@ -5,7 +5,8 @@ const app = express();
 const createError = require('http-errors');
 const logger = require('morgan');
 const path = require('path');
-const router = require('./routes/main');
+const teachersRouter = require('./routes/teachers');
+const studentsRouter = require('./routes/students');
 const port = process.env.PORT || 5000;
 
 FYshuffle = (myArray) => {
@@ -41,7 +42,8 @@ app.set('views', path.join(__dirname, 'views'));
 // PROCESS USER REQUESTS *IN ORDER* ////////////////////////////////////////////
 app.use( logger('dev') );
 app.use(  express.static( path.join(__dirname, 'public') )  );
-app.use('/', router);
+app.use('/teachers', teachersRouter);
+app.use('/students', studentsRouter);
 
 app.use( (req, res, next)=> { next(createError(404)); });
 app.use( (err, req, res, next)=> {

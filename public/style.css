@@ -1,3 +1,21 @@
+.square {
+  position: relative;
+}
+
+.square::after {
+  content: "";
+  display: block;
+  padding-bottom: 100%;
+}
+
+.square img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+}
+
 .write{
   background-image: url(../image/abc/lines.png);
   background-size: contain;
@@ -89,9 +107,9 @@
 .lightBrown{background-color: SandyBrown;
   background-image: -webkit-linear-gradient(left top, Tan, BurlyWood);
 }
-.darkBlue{background-color: DarkBlue;}
-.darkGreen{ background-color: DarkGreen;}
-.darkBrown{background-color: SaddleBrown;}
+.darkBlue{background-color: Navy;}
+.darkGreen{ background-color: #004800;}
+.darkBrown{background-color: #702400;}
 
 /*TEXT COLORS/////////////////////////////////////////////////////////////////*/
 .redText{color:Red;}

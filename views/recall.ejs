@@ -9,7 +9,6 @@
     <input id="searchInput" class="form-control form-control-sm" type="text" placeholder="Search" aria-label="Search" style="display:none;">
   </div>
 
-
   <div style="min-height:100vh;">
     <div id="display" class="col d-flex flex-wrap justify-content-center text-center" style="display:none;"></div>
     <div id="gridContainer" style="display:none;">
@@ -17,33 +16,75 @@
     </div>
   </div>
 
+<script src="/vocab_decks.js"></script>
+<script src="/NH_vocab.js"></script>
 
 <script>
 $(function(){
-  let list = JSON.parse( new URLSearchParams(window.location.search).get('words') );
-  list = FYshuffle(list); // Shuffle first so that cards left out are random.
-  let {vocab, colspan, rowheight} = getGrid(list);
+  var url = window.location.href;
+  const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
+  const deckName = searchParams.get('deckName');
+  const deckType = searchParams.get('deckType');
+  var deck = [];
 
-  for (let v of vocab){
-    $('#display').append(
-     `<div class="rounded-3 bg-white border display-1">
-        <div style="font-size:3rem;">${v.replace(/_/g, ' ')}
-          <div style="height:15rem;width:15rem;position:relative;">
-            <img src="image/svg/${v}.svg" class="img-fluid" alt="${v}" style="height:100%;">
-          </div>
-        </div>
-      </div>`);
+  // We need an array of objects. Objects have info and arrays can be shuffled.
+  switch (deckType){
+    case 'vocab':
+      list = vocab_decks[deckName];
+      for (let i of list){
+        deck.push({name: i, image: `<div style="font-size:3rem;position:absolute;z-index:-1;">${i}</div>`});
+      }
+      break;
+    case 'NH':
+      for (let i in NH_vocab[deckName]){
+        deck.push({name: i, image: `<img src="/image/${NH_vocab[deckName][i].image}" alt="${i}" 
+                                         style="position:absolute;margin: auto;
+                                         left: 0;right: 0;text-align: center;
+                                         max-width:90%;max-height:90%">`});
+      }
+      break;
+    case 'images':
+      list = JSON.parse(deckName);
+      for (let i of list){
+        deck.push({name: i.replace(/_/g, ' '), image: `<img src="/image/svg/${i}.svg" alt="${i}" 
+                                         style="position:absolute;margin: auto;
+                                         left: 0;right: 0;text-align: center;
+                                         max-width:90%;max-height:90%">`});
+      }
+      break;
+    default:
+      console.log('whu?');
   }
+
+
+  deck = FYshuffle(deck); // Shuffle first so that cards left out are random.
+  let {length, colspan, rowheight} = getGrid({length: deck.length, even: false});
+  deck = deck.slice(0, length); // Slice the deck to the correct length.
+
+// PREPARE THE DISPLAY /////////////////////////////////////////////////////////
+for (let i of deck){
+    $('#display').append(
+       `<div class="rounded-3 px-3 bg-white border display-1">
+          <div style="font-size:3rem;">${i.name}
+            <div style="height:8rem;width:8rem;position:relative;">
+              ${i.image}
+            </div>
+          </div>
+        </div>`);
+  }
+
+  deck = FYshuffle(deck);
+
 
   $("#display").show();
 
-  for (let v of vocab){
+  for (let i of deck){
     $("#grid").append(
-     `<div id="${v}" class="col-${colspan} vocab p-0" style="height:${rowheight};">
+     `<div id="${i.name}" class="col-${colspan} vocab p-0" style="height:${rowheight};">
         <div class="flip m-3" style="height:80%;">
           <div class="flip-card shadow">
             <div class="flip-front bg-white rounded border">
-              <img src="image/svg/${v}.svg" alt="${v}" class="img-fluid" style="height:100%;">
+              ${i.image}
               </div>
             <div class="flip-back rounded border border-primary text-center alert-primary">
             </div>
@@ -70,11 +111,11 @@ $(function(){
     }
     else{
       $(".vocab").removeClass('bg-warning');
-      let input = $(this).val().replace(/ /g, '_');
+      let input = $(this).val();
       if (input == ""){return;}
-      let matches = vocab.filter((v)=>{return v.startsWith(input);});
-      for (let v of matches){
-        $(`#${v}`).addClass('bg-warning');
+      let matches = deck.filter((v)=>{return v.name.startsWith(input);});
+      for (let i of matches){
+        $(`#${i.name}`).addClass('bg-warning');
       }
     }
   });

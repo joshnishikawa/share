@@ -1,0 +1,258 @@
+<%- include('head'); -%>
+<style>
+  :root{
+    --cursorX: 50%;
+    --cursorY: 50%;
+    --light: 5px;
+    --dark: 50px;
+  }
+  #mask {
+    cursor: none;
+    width: 100%;
+    height: 100%;
+    background-color: hsla(0, 0%, 0%, 1);
+    mask:radial-gradient(
+      circle at var(--cursorX) var(--cursorY),
+      transparent var(--light),
+      black var(--dark)
+    );
+    -webkit-mask:radial-gradient(
+      circle at var(--cursorX) var(--cursorY),
+      transparent var(--light),
+      black var(--dark)
+    );
+  }
+</style>
+
+<div class="d-flex">
+  <a href="/" class="btn btn-sm btn-outline-secondary p-0">
+    <i class="material-icons">close</i>
+  </a>
+</div>
+
+<div id="blurme" class="text-center" style="height:100vh;position:relative;"></div>
+<div id="loadme" class="text-center" style="height:100vh;"></div>
+
+<script src="/vocab_decks.js"></script>
+<script src="/NH_vocab.js"></script>
+
+<script>
+$(function() {
+// PREPARE THE DECK ////////////////////////////////////////////////////////////
+  var url = window.location.href;
+  const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
+  const deckName = searchParams.get('deckName');
+  const deckType = searchParams.get('deckType');
+  const style = searchParams.get('style');
+  var deck = [];
+  var list = [];
+  var index = 0;
+
+  // We need an array of objects. Objects have info and arrays can be shuffled.
+  switch (deckType){
+    case 'vocab':
+      list = vocab_decks[deckName];
+      for (let i of list){
+        deck.push({name: i, image: `<div id="flash" style="position:absolute;z-index:-1;">${i}</div>`});
+      }
+      break;
+    case 'NH':
+      for (let i in NH_vocab[deckName]){
+        deck.push({name: i, image: `<img src="/image/${NH_vocab[deckName][i].image}" alt="${i}" 
+                                         style="position:absolute;margin: auto;
+                                         left: 0;right: 0;text-align: center;
+                                         height:90vh;z-index:-1;">`});
+      }
+      break;
+    case 'images':
+      list = JSON.parse(deckName);
+      for (let i of list){
+        deck.push({name: i, image: `<img src="/image/svg/${i}.svg" alt="${i}" 
+                                         style="position:absolute;margin: auto;
+                                         left: 0;right: 0;text-align: center;
+                                         width:90vw;z-index:-1;">`});
+      }
+      break;
+    default:
+      console.log('whu?');
+  }
+
+  deck = FYshuffle(deck);
+
+
+// FUNCTIONS ///////////////////////////////////////////////////////////////////
+  var factor = 8; // how big a pixel is in the pixelate style
+
+// these are for the spotlight style
+  var light = 5;
+  var dark = 9;
+  var x = document.clientX;// || e.touches[0].clientX
+  var y = document.clientY;// || e.touches[0].clientY
+
+  renderPixelated = (f)=>{
+    let img1 = $("#loadme img")[0];
+
+    img1.onload = ()=>{
+      let c = document.createElement("canvas");
+      let w = img1.width;
+      let h = img1.height;
+      c.width = w*1.2;
+      c.height = h*1.2;
+
+      if (f >= w){}
+      else {
+        $("#loadme img").css("visibility", "hidden");
+        let ctx = c.getContext('2d');
+        ctx.drawImage(img1, 0, 0);
+        
+        let img2 = new Image();
+        var pixelArr = ctx.getImageData(0, 0, w, h).data;
+        var sample_size = Math.floor(w / factor);
+
+        for (let y = 0; y < h; y += sample_size) {
+          for (let x = 0; x < w; x += sample_size) {
+            let p = (x + (y*w)) * 4;
+
+            ctx.fillStyle = pixelArr[p+3] < 1 
+                          ? 'rgba(255,255,255,1)' 
+                          : `rgba(${pixelArr[p]},${pixelArr[p+1]},${pixelArr[p+2]},1)`;
+            ctx.fillRect(x*3, y*3, sample_size*3, sample_size*3);
+          }
+        }
+
+        img2.src = c.toDataURL("image/jpeg");
+        $(img2).css({"position":"absolute",
+                     "margin":"auto",
+                     "left":"0",
+                     "right":"0",
+                     "text-align":"center",
+                     "height":"100%",
+                     "max-height":"90%",
+                     "max-width":"90%",
+                     "z-index":"-1"});
+        $("#blurme").html(img2);
+      }
+    }
+  }
+
+
+  renderSpotlight = ()=>{
+    $("#blurme").html(deck[index].image + `<div id="mask"></div>`);
+      document.documentElement.style.setProperty('--cursorX', x + 'px')
+      document.documentElement.style.setProperty('--cursorY', y + 'px')
+      document.documentElement.style.setProperty('--light', light + 'px')
+      document.documentElement.style.setProperty('--dark', dark + 'px')
+  }
+
+
+  growSpotlight = (e)=>{
+    light *= 1.01;
+    dark *= 1.01;
+    x = e.clientX;// || e.touches[0].clientX
+    y = e.clientY;// || e.touches[0].clientY
+    document.documentElement.style.setProperty('--cursorX', x + 'px')
+    document.documentElement.style.setProperty('--cursorY', y + 'px')
+    document.documentElement.style.setProperty('--light', light + 'px')
+    document.documentElement.style.setProperty('--dark', dark + 'px')
+  }
+
+
+  setBlur = (blr)=>{
+    // map a blr of 0-100 to a size of 90-10
+    let size = 90 - (blr/100)*80;
+    let margin = (100 - size)/2;
+
+    $("#blurme img").css({
+      "filter": `blur(${blr}px)`, 
+      "-webkit-filter": `blur(${blr}px)`,
+      "height": `${size}vh`,
+      "margin-top": `${margin}vh`,
+    });
+  }
+
+// PICK A STYLE ////////////////////////////////////////////////////////////////
+  switch (style){
+    case 'blur':
+      var blr = 100;
+
+      $(document).off('keydown').on('keydown', (e)=>{
+        if (e.keyCode == 13){
+          e.preventDefault();
+          blr = 100;
+          index++;
+          $("#blurme").html(deck[index].image);
+        }
+        else if (e.keyCode == 37){
+          e.preventDefault();
+          blr = blr == 100 ? 100 : blr +1;
+        }
+        else if (e.keyCode == 39){
+          e.preventDefault();
+          blr = blr == 0 ? 0 : blr -1;
+        }
+        setBlur(blr);
+      });
+
+      $("#blurme").html(deck[index].image);
+      setBlur(blr);
+      break;
+
+    case 'pixelate':
+      $("#loadme").html(deck[0].image);
+
+      $(document).off('keydown').on('keydown', (e)=>{
+        if (e.keyCode == 13){
+          e.preventDefault();
+          index++;
+          if (index < Object.keys(deck).length){
+            factor = 8;
+            $("#loadme").html(deck[index].image); // load the image
+          }
+        }
+        else if (e.keyCode == 37){
+          e.preventDefault();
+          factor = factor <= 8 ? 8 : factor/2;
+          $("#loadme").html(deck[index].image); // load the image
+        }
+        else if (e.keyCode == 39){
+          if (e.repeat) return;
+          e.preventDefault();
+          factor = factor*2;
+          $("#loadme").html(deck[index].image); // load the image
+        }
+        renderPixelated(factor);
+      });
+
+      $("#loadme").html(deck[index].image); // load the image
+      renderPixelated(factor);
+      break;
+
+    case 'spotlight':
+      $(document).off('kedown').on('keydown', (e)=>{
+        if (e.keyCode == 13){
+          e.preventDefault();
+          index++;
+          if (index < Object.keys(deck).length){
+            light = 5;
+            dark = 9;
+            renderSpotlight();
+          }
+        }
+      });
+      $(document).on('mousemove', growSpotlight);
+      renderSpotlight();
+      break;
+
+    case 'blinder':
+      console.log('blinder');
+      break;
+    default:
+      console.log('whu?');
+  }
+
+
+
+});
+</script>
+
+<%- include('foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->

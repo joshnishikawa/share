@@ -7,33 +7,26 @@
 
   <div class="container" style="min-height:100vh;">
   
-    <div class="row my-3">
-      <div class="col text-center">
-        <div id="image"></div>
+    <div class="row g-0">
+
+      <!-- image -->
+      <div class="col-5 text-center">
+        <div id="image" class="p-5"></div>
+      </div>
+
+      <!-- answer -->
+      <div class="col-7">
+        <div id="guess" class="my-3"></div>
+        <div class="d-flex my-3">
+          <div id="answer"></div>
+          <button id="start" aria-label="next" class="btn btn-lg btn-success" style="display:none;">
+            <i class="material-icons">arrow_forward</i>
+          </button>
+        </div>
       </div>
     </div>
 
-    <div class="row mb-3">
-      <div class="text-center">
-        <div id="answer"></div>
-      </div>
-    </div>
-
-    <div class="row mb-3">
-      <div class="col text-center">
-        <button id="start" aria-label="start" class="btn btn-lg btn-success" style="display:none;">
-          START
-        </button>
-      </div>
-    </div>
-
-    <div class="row mb-3">
-      <div class="col text-center">
-        <div id="guess"></div>
-      </div>
-    </div>
-
-    <div class="row">
+    <div class="row g-0">
       <div id="keyboard" class="container">
         <div id="keyrow1" class="row justify-content-center"></div>
         <div id="keyrow2" class="row justify-content-center"></div>
@@ -43,9 +36,50 @@
     </div>
   </div>
 
-
+<script src="/vocab_decks.js"></script>
+<script src="/NH_vocab.js"></script>
+  
 <script>
-  var words = <%- JSON.stringify(list) %>;
+$(function(){
+  // PREPARE THE DECK ////////////////////////////////////////////////////////////
+  var url = window.location.href;
+  const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
+  const deckName = searchParams.get('deckName');
+  const deckType = searchParams.get('deckType');
+  const style = searchParams.get('style');
+  var deck = [];
+
+  // We need an array of objects. Objects have info and arrays can be shuffled.
+  switch (deckType){
+    case 'vocab':
+      list = vocab_decks[deckName];
+      for (let i of list){
+        deck.push({name: i, image: `<div id="flash" style="position:absolute;z-index:-1;">${i}</div>`});
+      }
+      break;
+    case 'NH':
+      for (let i in NH_vocab[deckName]){
+        deck.push({name: i, image: `<img src="/image/${NH_vocab[deckName][i].image}" alt="${i}" 
+                                         style="margin: auto;
+                                         left: 0;right: 0;text-align: center;
+                                         max-width:100%;max-height:50vh;">`});
+      }
+      break;
+    case 'images':
+      list = JSON.parse(deckName);
+      for (let i of list){
+        deck.push({name: i, image: `<img src="/image/svg/${i}.svg" alt="${i}" 
+                                         style="margin: auto;
+                                         left: 0;right: 0;text-align: center;
+                                         max-width:100%;max-height:50vh;">`});
+      }
+      break;
+    default:
+      console.log('whu?');
+  }
+
+  deck = FYshuffle(deck);
+
   var place = 0;
   var guess = '';
   var correct = true; // just to get things started
@@ -55,122 +89,88 @@
                   " "];
 
   // input handlers
-inputLetter = (letter)=>{
-  if(place < word.length){
-    $("#place"+place).html(letter == '_' ? '&nbsp;' : letter);
-    place++;
-    guess += letter;
-  }
-  $("#enter").prop('disabled', place < word.length);
-}
-
-
-backspace = ()=>{
-  if(place > 0){
-    place--;
-    guess = guess.slice(0, -1);
-    $("#place"+place).text('_');
-  }
-  $("#enter").prop('disabled', true);
-}
-
-
-submitAnswer = ()=>{
-  $("#enter").prop('disabled', true);
-  if (guess === word){
-    $("#guess").hide();
-    $("#answer").html(`<div class="btn btn-primary" style="font-size:5em;">${guess.replace('_', ' ')}</div>`);
-    $("#start").show().focus();
-    correct = true;
+  inputLetter = (letter)=>{
+    if(place < word.name.length){
+      $("#place"+place).html(letter == ' ' ? '&nbsp;' : letter);
+      place++;
+      guess += letter;
+    }
+    $("#enter").prop('disabled', place < word.name.length);
   }
 
-  var html = `<div>`;
-  for(let l = 0; l < word.length; l++){
-    let spaceOrChar = guess[l] == '_' ? '&nbsp;' : guess[l];
-    if(guess[l] === word[l]){
-      html += `<div class="btn btn-lg bg-primary text-white" 
-                    style="font-size:2em; width:60px;">${spaceOrChar}</div>`;
-      $(`[data-value=${guess[l]}]`).removeClass('bg-warning text-body').addClass('bg-primary text-white');
+
+  backspace = ()=>{
+    if(place > 0){
+      place--;
+      guess = guess.slice(0, -1);
+      $("#place"+place).text('_');
     }
-    else if (word.includes(guess[l])){
-      html += `<div class="btn btn-lg bg-warning" 
-                    style="font-size:2em; width:60px;">${spaceOrChar}</div>`;
-      $(`[data-value=${guess[l]}]`).addClass('bg-warning text-body');
-    }
-    else{
-      html += `<div class="btn btn-lg bg-secondary text-white" 
-                    style="font-size:2em; width:60px;">${spaceOrChar}</div>`;
-      $(`[data-value=${guess[l]}]`).addClass('bg-secondary text-white');
-    }
+    $("#enter").prop('disabled', true);
   }
-  html += `</div>`;
-
-  $("#guess").html(html);
-  guess = '';
-  place = 0;
-  $(".place").text('_');
-}
 
 
-resetAnswer = ()=>{
-  correct = false;
-  place = 0;
-  guess = '';
-  $("#guess").html('').show();
-  $("#answer").html('');
-
-  word = words.pop();
-  if (word){
-    $("#image").html(`<div class="m-3 p-3 bg-white rounded-lg display-1" 
-                            style="position:relative;height:200px;">
-                        <img src="image/svg/${word}.svg" alt="${word}" style="height:100%;"> 
-                      </div>`);
-
-    for (let l = 0; l < word.length; l++){
-      $("#answer").append(`<div id="place${l}" 
-                                class="place btn btn-lg alert-primary" 
-                                style="font-size:2em;width:60px;">_</div>`); 
+  submitAnswer = ()=>{
+    $("#enter").prop('disabled', true);
+    console.log(guess);
+    if (guess === word.name){
+      $("#guess").hide();
+      $("#answer").html(`<div class="btn btn-primary" style="font-size:5em;">${guess}</div>`);
+      $("#start").show().focus();
+      correct = true;
     }
-    $("#answer").show();
 
-    $("#start").text('NEXT').hide();
-    $(".letter").removeClass('bg-primary bg-warning bg-secondary text-white');
-  } else { window.location.replace('/'); }
-}
+    var html = `<div>`;
+    for(let l = 0; l < word.name.length; l++){
+      let spaceOrChar = guess[l] == '_' ? '&nbsp;' : guess[l];
+      if(guess[l] === word.name[l]){
+        html += `<div class="btn btn-lg bg-primary text-white" 
+                      style="font-size:2em; width:60px;">${spaceOrChar}</div>`;
+        $(`[data-value=${guess[l]}]`).removeClass('bg-warning text-body').addClass('bg-primary text-white');
+      }
+      else if (word.name.includes(guess[l])){
+        html += `<div class="btn btn-lg bg-warning" 
+                      style="font-size:2em; width:60px;">${spaceOrChar}</div>`;
+        $(`[data-value=${guess[l]}]`).addClass('bg-warning text-body');
+      }
+      else{
+        html += `<div class="btn btn-lg bg-secondary text-white" 
+                      style="font-size:2em; width:60px;">${spaceOrChar}</div>`;
+        $(`[data-value=${guess[l]}]`).addClass('bg-secondary text-white');
+      }
+    }
+    html += `</div>`;
+
+    $("#guess").html(html);
+    guess = '';
+    place = 0;
+    $(".place").text('_');
+  }
 
 
-$(function(){
+  resetAnswer = ()=>{
+    correct = false;
+    place = 0;
+    guess = '';
+    $("#guess").html('').show();
+    $("#answer").html('');
+
+    word = deck.pop();
+    if (word){
+      $("#image").html(word.image);
+
+      for (let l = 0; l < word.name.length; l++){
+        $("#answer").append(`<div id="place${l}" 
+                                  class="place btn btn-lg alert-primary" 
+                                  style="font-size:2em;width:60px;">_</div>`); 
+      }
+      $("#answer").show();
+
+      $("#start").hide();
+      $(".letter").removeClass('bg-primary bg-warning bg-secondary text-white');
+    } else { window.location.replace('/'); }
+  }
+
   resetAnswer();
-
-  // set up the keyboard after page load
-  for ( let key of letters.slice( 0, 10)){
-    $("#keyrow1").append(
-      `<div data-value="${key}" class="letter btn btn-lg border shadow m-1" 
-                                style="width:50px;">${key}</div>`);
-  }
-  for ( let key of letters.slice( 10, 19)){
-    $("#keyrow2").append(
-      `<div data-value="${key}" class="letter btn btn-lg border shadow m-1" 
-                                style="width:50px;">${key}</div>`);
-  }
-  for ( let key of letters.slice( 19, letters[-1] )){
-    $("#keyrow3").append(
-      `<div data-value="${key}" class="letter btn btn-lg border shadow m-1" 
-                                style="width:50px;">${key}</div>`);
-  }
-
-  $("#keyrow4").html(`<div data-value="_" class="letter btn btn-lg border shadow m-1" 
-                                style="width:300px;">&nbsp;</div>`)
-
-  $("#keyrow1").append(
-    `<div id="backspace" class="btn btn-lg shadow border m-1" style="width:50px;">
-        <i class="material-icons-outlined">backspace</i>
-      </div>`);
-
-  $("#keyrow2").append(
-    `<button id="enter" class="btn btn-lg shadow border m-1" style="width:50px;" disabled>
-        <i class="material-icons-outlined">keyboard_return</i>
-      </button>`);
 
 
   // set or reset everything
@@ -179,6 +179,62 @@ $(function(){
   });
 
   // input
+  $(window).on('keydown', function(e){
+    if (e.key == ' ' && e.target == document.body){
+      e.preventDefault();
+    }
+  });
+
+  $(window).on('keyup', function(e){
+    if(e.key.length == 1 && letters.includes(e.key)){
+      inputLetter(e.key);
+    }
+    else if(e.key == 'Backspace'){
+      backspace();
+    }
+    else if(e.key == 'Enter'){
+      if(correct){
+        resetAnswer();
+      }else if (place === word.name.length){
+        submitAnswer();
+      }
+    }
+  });
+
+
+
+
+
+// KEYBOARD ////////////////////////////////////////////////////////////////////
+  for ( let key of letters.slice( 0, 10)){
+    $("#keyrow1").append(
+      `<div data-value="${key}" class="letter btn btn-sm border shadow-sm me-1 mb-1" 
+                                style="width:50px;">${key}</div>`);
+  }
+  for ( let key of letters.slice( 10, 19)){
+    $("#keyrow2").append(
+      `<div data-value="${key}" class="letter btn btn-sm border shadow-sm me-1 mb-1" 
+                                style="width:50px;">${key}</div>`);
+  }
+  for ( let key of letters.slice( 19, 28 )){
+    $("#keyrow3").append(
+      `<div data-value="${key}" class="letter btn btn-sm border shadow-sm me-1 mb-1" 
+                                style="width:50px;">${key}</div>`);
+  }
+
+  $("#keyrow4").html(`<div data-value="_" class="letter btn btn-sm border shadow-sm me-1 mb-1" 
+                                style="width:360px;">&nbsp;</div>`)
+
+  $("#keyrow1").append(
+    `<div id="backspace" class="btn btn-sm shadow-sm border me-1 mb-1" style="width:50px;">
+        <i class="material-icons-outlined" style="font-size:1rem;">backspace</i>
+      </div>`);
+
+  $("#keyrow2").append(
+    `<button id="enter" class="btn btn-sm shadow-sm border me-1 mb-1" style="width:50px;" disabled>
+        <i class="material-icons-outlined" style="font-size:1rem;">keyboard_return</i>
+      </button>`);
+
   $(".letter").on('click', function(){
     inputLetter( $(this).attr('data-value') );
   });
@@ -191,27 +247,6 @@ $(function(){
     submitAnswer();
   });
 
-  $(window).on('keydown', function(e){
-    if (e.key == ' ' && e.target == document.body){
-      e.preventDefault();
-    }
-  });
-
-  $(window).on('keyup', function(e){
-    if(e.key.length == 1 && letters.includes(e.key)){
-      inputLetter(e.key == ' ' ? '_' : e.key);
-    }
-    else if(e.key == 'Backspace'){
-      backspace();
-    }
-    else if(e.key == 'Enter'){
-      if(correct){
-        resetAnswer();
-      }else if (place === word.length){
-        submitAnswer();
-      }
-    }
-  });
 });
 </script>
 

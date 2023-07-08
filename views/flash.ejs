@@ -1,24 +1,64 @@
 <%- include('head'); -%>
 <body>
-  <div class="d-flex">
-    <a href="/" class="btn btn-sm btn-outline-secondary p-0">
-      <i class="material-icons">close</i>
-    </a>
-    <button id="start" class="btn btn-sm btn-outline-info">START</button>
-    <input type="checkbox" id="shuffle" name="shuffle" class="mx-2">
-    <label for="shuffle">Shuffle</label>
-  </div>
-  
-  <div id="flash" class="container-fluid" style="min-height:100vh;margin:0px;">
 
+<div class="d-flex">
+  <a href="/" class="btn btn-sm btn-outline-secondary p-0">
+    <i class="material-icons">close</i>
+  </a>
+  <button id="start" class="btn btn-sm btn-outline-info">START</button>
+  <input type="checkbox" id="shuffle" name="shuffle" class="mx-2">
+  <label for="shuffle">Shuffle</label>
 </div>
 
+<div id="flash" class="text-center pt-3" style="position:relative;height:100vh;width:90%">
+
+
+<script src="/vocab_decks.js"></script>
+<script src="/NH_vocab.js"></script>
+
+
 <script>
+$(function(){
+  var url = window.location.href;
+  const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
+  const deckName = searchParams.get('deckName');
+  const deckType = searchParams.get('deckType');
+  var isNum = deckName.match(/^\d/) ? true : false;
+  var deck = [];
+
+  // We need an array of objects. Objects have info and arrays can be shuffled.
+  switch (deckType){
+    case 'vocab':
+      list = vocab_decks[deckName];
+      for (let i of list){
+        deck.push({name: i, image: `<div id="flash" style="position:absolute;z-index:-1;">${i}</div>`});
+      }
+      break;
+    case 'NH':
+      for (let i in NH_vocab[deckName]){
+        deck.push({name: i, image: `<img src="/image/${NH_vocab[deckName][i].image}" alt="${i}" 
+                                         style="position:absolute;margin: auto;
+                                         left: 0;right: 0;text-align: center;
+                                         height:90vh;z-index:-1;">`});
+      }
+      break;
+    case 'images':
+      list = JSON.parse(deckName);
+      for (let i of list){
+        deck.push({name: i, image: `<img src="/image/svg/${i}.svg" alt="${i}" 
+                                         style="position:absolute;margin: auto;
+                                         left: 0;right: 0;text-align: center;
+                                         width:90vw;z-index:-1;">`});
+      }
+      break;
+    default:
+      console.log('whu?');
+  }
+
   var started = false;
-  var deckName = '<%- deckName %>';
-  var originalDeck = <%- deck %>;
+  var originalDeck = deck;
+  var deckLength = originalDeck.length;
   var deck = originalDeck;
-  var deckLength = deck.length;
   var review = [];
   var card = 0;
   var current = 0;
@@ -29,13 +69,13 @@
       deck = review.slice();
       review = [];
     }
-    
+
     if(card == 0){
       if (started){
         if (deck.length != deckLength){ // reviewing, return to the full deck
           deck = originalDeck;
           started = true;
-          flash.innerHTML = deck[card];
+          flash.innerHTML = deck[card].image;
         }
         else{ // using a full deck, clear screen
           started = false;
@@ -47,13 +87,13 @@
         if (checkBox.checked == true){ // shuffle if checked
           deck = FYshuffle(deck);
         }
-        flash.innerHTML = deck[card];
+        flash.innerHTML = deck[card].image;
         started = true;
       }
     }
     else{
       card = 0;
-      flash.innerHTML = deck[card];
+      flash.innerHTML = deck[card].image;
     }
 
     if(deck.length == deckLength){
@@ -96,7 +136,6 @@
     }
   }
 
-$(function(){
   $("#shuffle").on('click', ()=>{
     var checkBox = document.getElementById("shuffle");
 
@@ -105,9 +144,9 @@ $(function(){
       card = 0;
     }
     else {
-      if(deckName == "zero_ten" 
-      || deckName == "zero_twenty" 
-      || deckName == "tens_teens"){
+      if(isNum == "zero_ten" 
+      || isNum == "zero_twenty" 
+      || isNum == "tens_teens"){
         deck.sort(function(a, b){return a - b}); // sort numeric
       }
       else{ // sort alphabetical
@@ -120,27 +159,27 @@ $(function(){
 
   // HANDLE "UP" "DOWN" "LEFT" AND "RIGHT" KEY PRESSES
   $(document).on('keyup',function(e) {
-    var obj = document.getElementById("deckname");
+    var obj = document.getElementById("start");
     var selecting = (document.activeElement === obj);
 
-    if(!selecting && started){
+    if(selecting && started){
       if(e.key == "ArrowRight" || e.key == "ArrowUp"){
 
         if(e.key == "ArrowUp"){ //save card before advancing
-          review.push(deck[card]);
+          review.push(deck[card]); // push entire
         }
 
         if (card < deck.length - 1) {
           card += 1;
-          current = deck[card];
-          document.getElementById("flash").innerHTML = deck[card];
+          current = deck[card].image;
+          document.getElementById("flash").innerHTML = deck[card].image;
         }
       }
       else if(e.key == "ArrowLeft"){
         if (card > 0 && deck.length > 0) {
           card -= 1;
-          current = deck[card];
-          document.getElementById("flash").innerHTML = deck[card];
+          current = deck[card].image;
+          document.getElementById("flash").innerHTML = deck[card].image;
         }
         else{
         }
@@ -153,14 +192,14 @@ $(function(){
   });
 
 
-  // ADVANCE THROUGH THE DECK WHEN THE WINDOW IS CLICKED (OR TAPPED) /////////////
+// ADVANCE THROUGH THE DECK WHEN THE WINDOW IS CLICKED (OR TAPPED) /////////////
   window.onclick = function(event){
     if (started && !event.target.matches('button') && !event.target.matches('select') &&
         !event.target.matches('input') && !event.target.matches('label')) {
       if(card < deck.length -1){
           card += 1;
-          current = deck[card];
-          document.getElementById("flash").innerHTML = deck[card];
+          current = deck[card].image;
+          document.getElementById("flash").innerHTML = deck[card].image;
       }
       else{
         document.getElementById("flash").innerHTML = " ";

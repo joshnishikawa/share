@@ -32,39 +32,46 @@ parallelShuffle = (a, b)=>{
   }
 }
 
-getGrid = (vocab) => {
-  if (vocab.length >= 36){
-    vocab = vocab.slice(0, 36);
+getGrid = (data) => {
+  let length = data.length;
+  let even = data.even;
+  let colspan, rowheight;
+  if (length >= 36 && even){
+    length = 36;
     colspan = 2;
     rowheight = "15vh";
-  } else if (vocab.length >= 30){
-    vocab = vocab.slice(0, 30);
+  } else if (length >= 30){
+    length = 30;
     colspan = 2;
     rowheight = "19vh";
-  } else if (vocab.length >= 24){
-    vocab = vocab.slice(0, 24);
+  } else if (length >= 24){
+    length = 24;
     colspan = 2;
     rowheight = "24vh";
-  } else if (vocab.length >= 18){
-    vocab = vocab.slice(0, 18);
+  } else if (length >= 18){
+    length = 18;
     colspan = 2;
     rowheight = "32vh";
-  } else if (vocab.length >= 16){
-    vocab = vocab.slice(0, 16);
+  } else if (length >= 16){
+    length = 16;
     colspan = 3;
     rowheight = "24vh";
-  } else if (vocab.length >= 12){
-    vocab = vocab.slice(0, 12);
+  } else if (length >= 12){
+    length = 12;
     colspan = 3;
     rowheight = "32vh";
-  } else if (vocab.length >= 9){
-    vocab = vocab.slice(0, 9);
+  } else if (length >= 9 && !even){
+    length = 9;
     colspan = 4;
     rowheight = "32vh";
-  } else if (vocab.length >= 6){
-    vocab = vocab.slice(0, 6);
+  } else if (length >= 8){
+    length = 8;
+    colspan = 3;
+    rowheight = "49vh";
+  } else if (length >= 6){
+    length = 6;
     colspan = 4;
     rowheight = "49vh";
   }
-  return {vocab, colspan, rowheight};
+  return {length, colspan, rowheight};
 }

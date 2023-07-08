@@ -1,7 +1,7 @@
 // These are simple collections of numbers, letters, words which are used for
 // screen-share activities. In some cases they are used as references to media.
 
-const game_share = {
+const vocab_decks = {
   // THE ORDER OF MOST OF THESE ARRAYS IS IMPORTANT TO HOW SCRIPTS FUNCTION
   // DO NOT CHANGE
   "colors":['red','orange','yellow','green','blue','purple','black','pink',
@@ -78,11 +78,4 @@ const game_share = {
 
   "shapes":['&#9632;','&#9733;','&#11047;','&#9829;','&#9646;','&#9650;','&#9679;','&#8594;'],
            //square      star    diamond      heart      rect       tri    circle      arrow
-
-  "weekdays":['<div class="spinit">&#127183;</div>',
-               'Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
-              // includes a joker because 16 cards is easier to layout than 14
-  "weather": ["cloudy","rainy","sunny","windy","snowy","stormy","hot","cold"],
 }
-
-module.exports = game_share;

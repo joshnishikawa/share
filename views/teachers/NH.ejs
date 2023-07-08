@@ -1,0 +1,35 @@
+<%- include('../head.ejs') -%>
+<%- include('menu.ejs') -%>
+
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <div id="tags" class="d-flex flex-wrap"></div>
+      <div id="numOfItems"></div>
+      <%- include('vocab_activities.ejs') -%>
+    </div>
+  </div>
+</div>
+
+<script src="/NH_vocab.js"></script>
+
+<script>
+$(function(){
+  $(`#NH-tab`).addClass("active");
+  window.deckType = "NH";
+  
+  for (let t in NH_vocab) {
+    $("#tags").append(`<div class="form-check">
+      <input class="form-check-input" type="checkbox" name="tags" id="tag_${t}" value="${t}" aria-label="tags">
+      <label class="form-check-label me-3" style="margin-left:-5px;" for="tag_${t}">${t} (${Object.keys(NH_vocab[t]).length})</label>
+    </div>`);
+  }
+
+  $("#tags").on("change", (e)=>{
+    window.deckName = e.target.value;
+  });
+
+});
+</script>
+
+<%- include('../foot.ejs') -%>

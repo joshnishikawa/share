@@ -22,7 +22,7 @@
       </div>
 
       <div class="col-10" style="height:80vh">
-        <div id="currentSlide" class="justify-content-center text-center display-1" style="height:100%;position:relative;"></div>
+        <div id="currentSlide" class="justify-content-center text-center display-1" style="height:90%;position:relative;"></div>
       </div>
 
       <div class="col-1 text-center">
@@ -34,25 +34,66 @@
 
   </div>
 
+<script src="/vocab_decks.js"></script>
+<script src="/NH_vocab.js"></script>
 
 <script>
 $(function(){
-  let i = 0;
-  let vocab = <%- JSON.stringify(list) %>;
-  let images = {};
+// PREPARE THE DECK ////////////////////////////////////////////////////////////
+var url = window.location.href;
+  const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
+  const deckName = searchParams.get('deckName');
+  const deckType = searchParams.get('deckType');
+  const style = searchParams.get('style');
+  var deck = [];
+  var list = [];
+  var index = 0;
 
-  for (let v of vocab){
-    $('#display').append(`<div class="rounded-3 bg-white border display-1">
-                            <div style="font-size:3rem;">${v.replace('_', " ")}
-                              <div style="height:15rem;width:15rem;position:relative;">
-                                <img src="image/svg/${v}.svg" class="img-fluid" alt="${v}" style="height:100%;">
-                              </div>
-                            </div>
-                          </div>`);
+  // We need an array of objects. Objects have info and arrays can be shuffled.
+  switch (deckType){
+    case 'vocab':
+      list = vocab_decks[deckName];
+      for (let i of list){
+        deck.push({name: i, image: `<div id="flash" style="position:absolute;z-index:-1;">${i}</div>`});
+      }
+      break;
+    case 'NH':
+      for (let i in NH_vocab[deckName]){
+        deck.push({name: i, image: `<img src="/image/${NH_vocab[deckName][i].image}" alt="${i}" 
+                                         style="position:absolute;margin: auto;
+                                         left: 0;right: 0;text-align: center;
+                                         max-width:90%;max-height:90%">`});
+      }
+      break;
+    case 'images':
+      list = JSON.parse(deckName);
+      for (let i of list){
+        deck.push({name: i, image: `<img src="/image/svg/${i}.svg" alt="${i}" 
+                                         style="position:absolute;margin: auto;
+                                         left: 0;right: 0;text-align: center;
+                                         max-width:90%;max-height:90%">`});
+      }
+      break;
+    default:
+      console.log('whu?');
   }
 
-  vocab = FYshuffle(vocab);
-  $("#currentSlide").html(`<img src="image/svg/${vocab[0]}.svg" class="img-fluid" alt="${vocab[0]}" style="height:100%;">`);
+// PREPARE THE DISPLAY /////////////////////////////////////////////////////////
+  for (let i of deck){
+    $('#display').append(
+       `<div class="rounded-3 px-3 bg-white border display-1">
+          <div style="font-size:3rem;">${i.name.replace('_', " ")}
+            <div style="height:8rem;width:8rem;position:relative;">
+              ${i.image}
+            </div>
+          </div>
+        </div>`);
+  }
+
+  deck = FYshuffle(deck);
+
+  $("#currentSlide").html(deck[0].image);
+
   $("#display").show();
 
   $("#start").on('click', ()=>{
@@ -61,21 +102,17 @@ $(function(){
   });
 
   $("#prev").on('click', ()=>{
-    if (i > 0) {
-      i--;
-      $("#currentSlide").html(`<img src="image/svg/${vocab[i]}.svg" class="img-fluid" alt="${vocab[i]}" style="height:100%;">`);
+    if (index > 0) {
+      index--;
+      $("#currentSlide").html(deck[index].image);
     }
   });
 
   $("#next").on('click', ()=>{
-    if (i < vocab.length-1) {
-      i++;
-      $("#currentSlide").html(`<img src="image/svg/${vocab[i]}.svg" class="img-fluid" alt="${vocab[i]}" style="height:100%;">`);
+    if (index < deck.length-1) {
+      index++;
+      $("#currentSlide").html(deck[index].image);
     }
-  });
-
-  $(".flip").on('click', function(){
-    $(this).toggleClass('flipped');
   });
 
 });

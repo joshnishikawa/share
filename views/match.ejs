@@ -7,36 +7,174 @@
     </a>
   </div>
 
-  <div id="match" class="container-fluid" style="min-height:100vh;">
-
-<%  var cols = cards.length / 4; %>
-<%  for (var row = 0; row < 4; row++){ %>
-    <div class="row">
-<%    for (var col = 0; col < cols; col++){ %>
-<%    var index = row * cols + col; %>
-      <div class="col p-0">
-        <div class="flip m-3" style="height:20vh;">
-          <div class="flip-card shadow">
-            <div class="flip-front bg-white rounded border"><%- cards[index] %></div>
-            <div class="flip-back rounded border border-primary text-center <%- backClass[index] %>">
-              <% if(backContent.length > 0){ %>
-                <%-backContent[index] %>
-              <% } %>
-            </div>
-          </div>
-        </div>
-      </div>
-<%    } %>
+  <div style="min-height:100vh;">
+    <div id="gridContainer">
+      <div id="grid" class="d-flex flex-wrap"></div>
     </div>
-<% } %>
-</div>
+  </div>
+
+<script src="/vocab_decks.js"></script>
+<script src="/NH_vocab.js"></script>
 
 
 <script>
 $(function(){
+  var url = window.location.href;
+  const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
+  const deckName = searchParams.get('deckName');
+  const deckType = searchParams.get('deckType');
+  const backs = searchParams.get('backs');
+  let max_num_of_cards = {
+    'colors': 20,
+    'colorsNumbers': 40,
+    'colorsShapes': 16,
+    'animals': 20,
+    'objects': 20,
+  }
+  var deck = [];
+  var backContent = [];
+  var backClass = [];
+
+
+  // We need an array of objects. Objects have info and arrays can be shuffled.
+  switch (deckType){
+    case 'vocab':
+      let list = vocab_decks[deckName];
+      for (let i in list){
+        deck.push({name: i, image: `<div style="font-size:3rem;position:absolute;z-index:-1;">${list[i]}</div>`});
+      }
+      break;
+    case 'NH':
+      for (let i in NH_vocab[deckName]){
+        deck.push({name: i, image: `<img src="/image/${NH_vocab[deckName][i].image}" alt="${i}" 
+                                         style="position:absolute;margin: auto;
+                                         left: 0;right: 0;text-align: center;
+                                         max-width:90%;max-height:90%">`});
+      }
+      break;
+    case 'images':
+      list = JSON.parse(deckName);
+      for (let i of list){
+        deck.push({name: i.replace(/_/g, ' '), image: `<img src="/image/svg/${i}.svg" alt="${i}" 
+                                          style="position:absolute;margin: auto;
+                                          left: 0;right: 0;text-align: center;
+                                          max-width:90%;max-height:90%">`});
+      }
+      break;
+
+    default:
+      console.log('whu?');
+  }
+
+// SET UP THE DECK /////////////////////////////////////////////////////////////
+  // Shuffle first so that cards left out are random.
+  deck = FYshuffle(deck);
+
+  // FIRST whittle down the deck to half the number of card backs available.
+  while (deck.length * 2 > max_num_of_cards[backs]){
+    console.log(max_num_of_cards[backs]);
+    deck.pop();
+  }
+  // LAST whittle down the deck to the number of items that fit into a grid.
+  let {length, colspan, rowheight} = getGrid({length: deck.length * 2, even: true});
+  deck = deck.slice(0, length / 2); // Slice the deck to the correct length.
+
+  // Then double the deck to make pairs.
+  deck = deck.concat(deck);
+
+
+// THEN SET UP THE CARD BACKS //////////////////////////////////////////////////
+  switch(backs){
+    case 'colors':
+      backClass = FYshuffle( vocab_decks.colors.slice(0, deck.length) );
+      break;
+
+    case 'numbers':
+      backContent = FYshuffle( vocab_decks['0~100'].slice(0, deck.length) );
+      break;
+
+    case 'colorsNumbers':
+      let nums = [];
+      for (let i = 0; i < deck.length / 2; i++){
+        nums.push(i);
+      }
+
+      nums = FYshuffle(nums);
+      backContent = nums.concat( FYshuffle(nums) );
+
+      var colors = vocab_decks.colors.slice(0, deck.length);
+      for (let i = 0; i < colors.length; i++){
+        colors[i] += 'Text alert-primary'; //use .redText class instead of .red
+        backClass.push(colors[i]);
+        backClass.push(colors[i]);
+      }
+      parallelShuffle(backClass, backContent);
+      break;
+
+    case 'colorsShapes':
+      var shapes = FYshuffle(vocab_decks.shapes.slice(0, deck.length / 2));
+      backContent = shapes.concat( FYshuffle(shapes) );
+    
+      var colors = vocab_decks.colors.slice(0, deck.length / 2);
+      for (let i = 0; i < colors.length; i++){
+        colors[i] += 'Text alert-primary'; // use .redText class instead of .red
+        backClass.push(colors[i]);
+        backClass.push(colors[i]);
+      }
+      break;
+
+    case 'animals':
+      for (let i = 0; i < deck.length; i++){
+        backContent.push(`<img class="img-flash" src="/image/svg/${vocab_decks.animals[i]}.svg">`);
+        backContent.push(`<img class="img-flash" src="/image/svg/${vocab_decks.animals[i + 10]}.svg">`);
+        backClass.push('alert-primary');
+        backClass.push('alert-primary');
+      }
+      break;
+
+    case 'objects':
+      for (let i = 0; i < deck.length; i++){
+        backContent.push(`<img class="img-flash" src="/image/svg/${vocab_decks.vocab[i]}.svg">`);
+        backClass.push('alert-primary');
+      }
+      break;
+
+    default:
+      console.log('whu?');
+  }
+
+
+  // letters need to be shuffled in parallel with the objects they represent
+  if ( ["letters 1", "letters 2"].includes(deckName) ){
+    parallelShuffle(deck, backContent);
+  }
+  else{
+    deck = FYshuffle(deck);
+  }
+
+
+// NOW BUILD THE GRID //////////////////////////////////////////////////////////
+  for (let i = 0; i < deck.length; i++){
+    $("#grid").append(
+     `<div id="${deck[i].name}" class="col-${colspan} vocab p-0" style="height:${rowheight};">
+        <div class="flip m-3" style="height:80%;">
+          <div class="flip-card shadow">
+
+            <div class="flip-front bg-white rounded border">
+              ${deck[i].image}
+              </div>
+            <div class="flip-back rounded border border-primary text-center ${backClass[i]}">
+              ${backContent[i] ? backContent[i] : ''}
+            </div>
+          </div>
+        </div>
+      </div>`);
+  }
+
   $(".flip").on('click', function(){
     $(this).toggleClass('flipped');
   });
+
 });
 </script>
 
