@@ -1,4 +1,30 @@
 <%- include('head'); -%>
+<style>
+  #flash{
+    position:relative;
+    font-family: "UD Digi Kyokasho NP-B", sans-serif;
+    font-size: 30vw;
+    font-weight:bold;
+    display:inline-block;
+    text-shadow: 5px 5px 10px #99c;
+    -webkit-text-stroke: 5px DarkSlateBlue;
+    color:SlateBlue;
+  }
+
+  #flash .color{
+    font-size: 10vw;
+    color: white;
+    text-shadow: none;
+    -webkit-text-stroke: 3px black;
+  }
+
+  .review{
+    color:LimeGreen !important;
+    text-shadow: 5px 5px 10px #9c9 !important;
+    -webkit-text-stroke: 5px ForestGreen !important;
+  }
+</style>
+
 <body>
 
 <div class="d-flex">
@@ -10,12 +36,12 @@
   <label for="shuffle">Shuffle</label>
 </div>
 
-<div id="flash" class="text-center pt-3" style="position:relative;height:100vh;width:90%">
+<div id="flash" class="text-center p-3" style="height:100vh;width:100%;">
 
 
 <script src="/vocab_decks.js"></script>
 <script src="/NH_vocab.js"></script>
-
+<script src="/script.js"></script>
 
 <script>
 $(function(){
@@ -25,13 +51,19 @@ $(function(){
   const deckType = searchParams.get('deckType');
   var isNum = deckName.match(/^\d/) ? true : false;
   var deck = [];
+  var list = [];
 
   // We need an array of objects. Objects have info and arrays can be shuffled.
   switch (deckType){
-    case 'vocab':
+    case 'text':
       list = vocab_decks[deckName];
       for (let i of list){
-        deck.push({name: i, image: `<div id="flash" style="position:absolute;z-index:-1;">${i}</div>`});
+        if (deckName == "colors"){
+          deck.push({name: i, image: `<div class="color ${i} shadow" style="height:90%;width:100%;">${i}</div>`});
+        }
+        else{
+          deck.push({name: i, image: i});
+        }
       }
       break;
     case 'NH':
@@ -39,7 +71,7 @@ $(function(){
         deck.push({name: i, image: `<img src="/image/${NH_vocab[deckName][i].image}" alt="${i}" 
                                          style="position:absolute;margin: auto;
                                          left: 0;right: 0;text-align: center;
-                                         height:90vh;z-index:-1;">`});
+                                         width:100%;z-index:-1;">`});
       }
       break;
     case 'images':
@@ -48,7 +80,7 @@ $(function(){
         deck.push({name: i, image: `<img src="/image/svg/${i}.svg" alt="${i}" 
                                          style="position:absolute;margin: auto;
                                          left: 0;right: 0;text-align: center;
-                                         width:90vw;z-index:-1;">`});
+                                         width:100%;z-index:-1;">`});
       }
       break;
     default:

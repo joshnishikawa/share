@@ -1,0 +1,55 @@
+<div class="rounded-3 border p-3 shadow d-flex">
+  <strong class="text-primary h3">BINGO</strong>
+  <button class="btn btn-sm btn-outline-info mb-2" 
+          data-bs-toggle="modal" data-bs-target="#bingo_modal">
+    <i class="material-icons md-small">info</i>
+  </button>
+  <form id="bingoForm" action="bingo" method="GET" class="d-flex justify-content-end w-100 mb-2">
+    <input type="hidden" value="" name="deckName">
+    <input type="hidden" value="" name="deckType">
+    <button id="bingoButton" type="submit" class="btn btn-primary">Start</button>
+  </form>
+</div>
+
+
+<div id="bingo_modal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+    
+      <div class="modal-header">
+        <h3 class="modal-title">BINGO</h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>Have the students choose a random selection of words on the screen 
+          and write them on a sheet of paper in a grid. Have them use a...
+          <ul>
+            <li>5x5 grid if there are at least 25 words</li>
+            <li>4x4 grid if there are at least 16 words</li>
+            <li>3x3 grid if there are at least 9 words</li>
+          </ul>
+          Then click start. The words will appear in random order. Click next to
+          proceed or back to verify. When a word is called, the student can cross
+          it off. The first student to cross off all the words in a row wins.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+$(function(){
+  $("#bingoButton").on('click', (e)=>{
+    e.preventDefault();
+    if (!window.deckName) {
+      alert("Please select a deck.");
+    }
+    else {
+      $("#bingoForm input[name='deckName']").val(window.deckName);
+      $("#bingoForm input[name='deckType']").val(window.deckType);
+      $("#bingoForm").submit();
+    }
+  });
+});
+</script>

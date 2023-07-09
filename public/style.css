@@ -1,3 +1,9 @@
+body {
+  user-select: none; /* Standard syntax */
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10+ and Edge */
+}
+
 .square {
   position: relative;
 }
@@ -31,23 +37,6 @@
   outline: 0px solid transparent;
 }
 
-#flash{
-  position:relative;
-  font-family: "UD Digi Kyokasho NP-B", sans-serif;
-  font-size: 30vw;
-  font-weight:bold;
-  display:inline-block;
-  margin-left:20px;
-  text-shadow: 5px 5px 10px #99c;
-  -webkit-text-stroke: 5px DarkSlateBlue;
-  color:SlateBlue;
-}
-
-.review{
-  color:LimeGreen !important;
-  text-shadow: 5px 5px 10px #9c9 !important;
-  -webkit-text-stroke: 5px ForestGreen !important;
-}
 
 /*BACKGROUND COLORS///////////////////////////////////////////////////////////*/
 .red{
@@ -112,38 +101,29 @@
 .darkBrown{background-color: #702400;}
 
 /*TEXT COLORS/////////////////////////////////////////////////////////////////*/
-.redText{color:Red;}
-.orangeText{color:Orange;}
-.yellowText{color:Yellow;}
-.greenText{color:DarkGreen;}
-.blueText{color:#0d6efd;}
-.purpleText{color:Purple;}
-.blackText{color:Black;}
+.redText{color:Red !important;}
+.orangeText{color:Orange !important;}
+.yellowText{color:Yellow !important;}
+.greenText{color:DarkGreen !important;}
+.blueText{color:#0d6efd !important;}
+.purpleText{color:Purple !important;}
+.blackText{color:Black !important;}
 .whiteText{-webkit-text-stroke: 2px Gray;
-  color:White;
+  color:White !important;
 }
-.grayText{color:#999;}
-.pinkText{color:Pink;}
-.brownText{color:SaddleBrown;}
+.grayText{color:#999 !important;}
+.pinkText{color:Pink !important;}
+.brownText{color:SaddleBrown !important;}
+.violetText{color:#c9f !important;}
+.lightBlueText{color:LightSkyBlue !important;}
+.lightGreenText{color:SpringGreen !important;}
+.lightBrownText{color:BurlyWood !important;}
+.darkBlueText{color:Navy !important;}
+.darkGreenText{color:#004800 !important;}
+.darkBrownText{color:#702400 !important;}
+
 
 /*////////////////////////////////////////////////////////////////////////////*/
-
-#match{
-  height: 100vh;
-  color:SlateBlue;
-  font-weight:bold;
-  text-shadow: 
-    -1px -1px 0 #666,
-    1px -1px 0 #666,
-    -1px 1px 0 #666,
-    1px 1px 0 #666; 
-  font-size: 17vh;
-  line-height:20vh;
-  user-select: none; /* Standard syntax */
-  -webkit-user-select: none; /* Safari */
-  -ms-user-select: none; /* IE 10+ and Edge */
-}
-
 .card{
   cursor:pointer;
 }
@@ -151,15 +131,6 @@
 .img-flash{
   max-width: 70%;
   max-height:70%;
-}
-
-.spinit {
-  transform: rotate(-90deg);
-  -webkit-transform: rotate(-90deg);
-  -moz-transform: rotate(-90deg);
-  -ms-transform: rotate(-90deg);
-  -o-transform: rotate(-90deg);
-  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
 }
 
 /* ////////////////////////////////////////////////////////////////////////// */

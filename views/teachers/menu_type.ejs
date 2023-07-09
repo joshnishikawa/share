@@ -1,0 +1,35 @@
+<div class="rounded-3 border p-3 shadow d-flex">
+  <strong class="text-primary h3">TYPE</strong>
+  <button class="btn btn-sm btn-outline-info mb-2" 
+          data-bs-toggle="modal" data-bs-target="#type_modal">
+    <i class="material-icons md-small">info</i>
+  </button>
+  <form action="type" method="GET" class="d-flex justify-content-end w-100 mb-2">
+    <button type="submit" class="btn btn-primary">Start</button>
+  </form>
+</div>
+
+
+<div id="type_modal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h3 class="modal-title">Type</h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>This is a simple rich text editor. It's still buggy but you can click
+          COPY to copy an html version of what's in the editor to the clipboard.
+          You can also save it as an html file.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+$(function(){
+});
+</script>

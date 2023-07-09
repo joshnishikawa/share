@@ -1,17 +1,48 @@
 <%- include('../head.ejs') -%>
-<%- include('menu.ejs') -%>
+<%- include('navbar.ejs') -%>
 
 <div class="container">
   <div class="row">
     <div class="col">
       <div id="tags" class="d-flex flex-wrap"></div>
       <div id="numOfItems"></div>
-      <%- include('vocab_activities.ejs') -%>
+      <div class="row">
+
+        <div class="col">
+          <%- include('menu_flash.ejs') -%>
+        </div>
+      
+        <div class="col">
+          <%- include('menu_match.ejs') -%>
+        </div>
+      
+        <div class="col">
+          <%- include('menu_recall.ejs') -%>
+        </div>
+      
+      </div>
+      <div class="row pt-3">
+      
+        <div class="col">
+          <%- include('menu_bingo.ejs') -%>
+        </div>
+      
+        <div class="col">
+          <%- include('menu_wordle.ejs') -%>
+        </div>
+      
+        <div class="col">
+          <%- include('menu_reveal.ejs') -%>
+        </div>
+      
+      </div>
+      
     </div>
   </div>
 </div>
 
 <script src="/NH_vocab.js"></script>
+<script src="/script.js"></script>
 
 <script>
 $(function(){

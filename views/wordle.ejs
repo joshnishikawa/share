@@ -38,7 +38,8 @@
 
 <script src="/vocab_decks.js"></script>
 <script src="/NH_vocab.js"></script>
-  
+<script src="/script.js"></script>
+
 <script>
 $(function(){
   // PREPARE THE DECK ////////////////////////////////////////////////////////////
@@ -48,10 +49,11 @@ $(function(){
   const deckType = searchParams.get('deckType');
   const style = searchParams.get('style');
   var deck = [];
+  var list = [];
 
   // We need an array of objects. Objects have info and arrays can be shuffled.
   switch (deckType){
-    case 'vocab':
+    case 'text':
       list = vocab_decks[deckName];
       for (let i of list){
         deck.push({name: i, image: `<div id="flash" style="position:absolute;z-index:-1;">${i}</div>`});

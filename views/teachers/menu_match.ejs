@@ -1,0 +1,70 @@
+<div class="rounded-3 border p-3 shadow d-flex">
+  <strong class="text-primary h3">MATCH</strong>
+  <button class="btn btn-sm btn-outline-info mb-2" 
+          data-bs-toggle="modal" data-bs-target="#match_modal">
+    <i class="material-icons md-small">info</i>
+  </button>
+  <form id="matchForm" action="match" method="GET" class="d-flex justify-content-end form-group w-100 mb-2">
+
+    <select class="form-control" name="backs">
+      <option value="" disabled selected>Card Backs</option>
+      <option value="colors">Colors</option>
+      <option value="numbers">Numbers</option>
+      <option value="colorsNumbers">Color & Num.</option>
+      <option value="colorsShapes">Color & Shape</option>
+      <option value="animals">Animals</option>
+      <option value="objects">Objects</option>
+    </select>
+    <input type="hidden" value="" name="deckName">
+    <input type="hidden" value="" name="deckType">
+    <button id="matchButton" type="submit" class="btn btn-primary">Start</button>
+  </form>
+
+</div>
+
+
+<div id="match_modal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+    
+      <div class="modal-header">
+        <h3 class="modal-title">Match</h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <ul>
+          <li>Share this screen via any video conferencing software.</li>
+          <li>Students must choose two cards by telling the teacher what's on the back.</li>
+          <li>The teacher flips them.</li>
+          <li>If they match, leave them face up and continue with another student.</li>
+          <li>Everyone wins!</li>
+        </ul>
+        <br/>
+        Students can study numbers by calling out the colors on the backs of the number cards.
+        Then colored numbers appear on the backs of the animal cards.
+        Once they've learned the animals, they can study letters by calling out 
+        the two animals that start with each letter.
+        Other letters are covered with simple objects.
+        They can then study shapes by calling out more colors.
+        Colored shapes will become the backs of the next sets.
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+$(function(){
+  $("#matchButton").on('click', (e)=>{
+    e.preventDefault();
+    if (!window.deckName) {
+      alert("Please select a deck.");
+    }
+    else {
+      $("#matchForm input[name='deckName']").val(window.deckName);
+      $("#matchForm input[name='deckType']").val(window.deckType);
+      $("#matchForm").submit();
+    }
+  });
+});
+</script>

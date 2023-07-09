@@ -1,0 +1,37 @@
+<div class="rounded-3 border p-3 shadow d-flex">
+  <strong class="text-primary h3">WRITE</strong>
+  <button class="btn btn-sm btn-outline-info mb-2" 
+          data-bs-toggle="modal" data-bs-target="#write_modal">
+    <i class="material-icons md-small">info</i>
+  </button>
+  <form action="write" method="GET" class="d-flex justify-content-end w-100 mb-2">
+    <button type="submit" class="btn btn-primary">Start</button>
+  </form>
+</div>
+
+
+<div id="write_modal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h3 class="modal-title">Write</h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>This is just a simple demonstration of how to write lower-case
+          letters. You can click ALL to display all letters at once. You can
+          also click on a letter or hit a key on the keyboard to display an
+          animated gif of how to write the letter. Hit Backspace to clear the
+          animation.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+$(function(){
+});
+</script>

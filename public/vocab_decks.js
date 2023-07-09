@@ -4,15 +4,10 @@
 const vocab_decks = {
   // THE ORDER OF MOST OF THESE ARRAYS IS IMPORTANT TO HOW SCRIPTS FUNCTION
   // DO NOT CHANGE
-  "colors":['red','orange','yellow','green','blue','purple','black','pink',
-            'gray','brown','gold','silver','violet',
-            'lightBlue','lightGreen','lightBrown',
-            'darkBlue','darkGreen','darkBrown','white'],
-
+  "1~4":[1,2,3,4],
+  "5-10":[5,6,7,8,9,10],
   "0~10":[0,1,2,3,4,5,6,7,8,9,10],
-
   "0~20":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],
-
   "0~100":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,
            21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,
            41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,
@@ -66,16 +61,17 @@ const vocab_decks = {
                   "cube","cure","dune","fuse","June","lure","lute","mule",
                   "mute","pure","rule","tune","tube"],
 
-  "animals":['bear', 'dog', 'fish', 'goat', 'kangaroo', 
-             'monkey', 'pig', 'rabbit', 'snake', 'tiger', 
-             'bat','duck','frog', 'gorilla', 'koala', 
-             'mouse', 'penguin', 'raccoon', 'seal', 'turtle'],
+  "animals":['bear', 'dog', 'fish', 'goat', 'kangaroo','monkey', 'pig', 'rabbit', 'snake', 'tiger', 
+             'bat','duck','frog', 'gorilla', 'koala','mouse', 'penguin', 'raccoon', 'seal', 'turtle'],
 
-  "vocab":['car','cat','hat','horse','jelly','juice',
-           'lemon','lion','net','nail','question','quilt',
-           'van','violin','watch','worm','yarn','yo-yo',
-           'zebra','zipper'],
+  "objects":['car','hat','jelly','lemon','net','question','van','watch','yarn','zebra',
+           'cat','horse','juice','lion','nail','quilt','violin','worm','yo-yo','zipper'],
 
-  "shapes":['&#9632;','&#9733;','&#11047;','&#9829;','&#9646;','&#9650;','&#9679;','&#8594;'],
-           //square      star    diamond      heart      rect       tri    circle      arrow
+  "shapes":['&#9632;','&bigstar;','&#9830;','&#9829;','&#9644;','&#9650;','&#9679;','&#8594;'],
+           //square    star        diamond   heart     rectangle triangle  circle    arrow
+
+  "colors":['red','orange','yellow','green','blue','purple','black','pink',
+           'gray','brown','gold','silver','violet',
+           'lightBlue','lightGreen','lightBrown',
+           'darkBlue','darkGreen','darkBrown','white']
 }

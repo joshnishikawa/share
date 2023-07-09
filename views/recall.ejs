@@ -18,6 +18,7 @@
 
 <script src="/vocab_decks.js"></script>
 <script src="/NH_vocab.js"></script>
+<script src="/script.js"></script>
 
 <script>
 $(function(){
@@ -29,10 +30,10 @@ $(function(){
 
   // We need an array of objects. Objects have info and arrays can be shuffled.
   switch (deckType){
-    case 'vocab':
+    case 'text':
       list = vocab_decks[deckName];
       for (let i of list){
-        deck.push({name: i, image: `<div style="font-size:3rem;position:absolute;z-index:-1;">${i}</div>`});
+        deck.push({name: i, image: `<div style="font-size:3rem;">${i}</div>`});
       }
       break;
     case 'NH':
@@ -80,13 +81,14 @@ for (let i of deck){
 
   for (let i of deck){
     $("#grid").append(
-     `<div id="${i.name}" class="col-${colspan} vocab p-0" style="height:${rowheight};">
+     `<div id="${i.name}" class="col-${colspan} vocab p-0" style="height:${rowheight}vh;">
         <div class="flip m-3" style="height:80%;">
           <div class="flip-card shadow">
             <div class="flip-front bg-white rounded border">
               ${i.image}
               </div>
             <div class="flip-back rounded border border-primary text-center alert-primary">
+              &nbsp;
             </div>
           </div>
         </div>

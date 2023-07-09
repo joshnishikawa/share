@@ -1,55 +1,25 @@
 <%- include('../head.ejs') -%>
-<%- include('menu.ejs') -%>
+<%- include('navbar.ejs') -%>
 
 <div class="container g-0">
   <div class="row pt-3">
 
     <div class="col">
-      <div class="rounded-3 border p-3 shadow d-flex">
-        <strong class="text-primary h3">TYPE</strong>
-        <button class="btn btn-sm btn-outline-info mb-2" 
-                data-bs-toggle="modal" data-bs-target="#type_modal">
-          <i class="material-icons md-small">info</i>
-        </button>
-        <form action="type" method="GET" class="d-flex justify-content-end w-100 mb-2">
-          <button type="submit" class="btn btn-primary">Start</button>
-        </form>
-      </div>
+      <%- include('menu_type.ejs') -%>
     </div>
 
     <div class="col">
-      <div class="rounded-3 border p-3 shadow d-flex">
-        <strong class="text-primary h3">WRITE</strong>
-        <button class="btn btn-sm btn-outline-info mb-2" 
-                data-bs-toggle="modal" data-bs-target="#write_modal">
-          <i class="material-icons md-small">info</i>
-        </button>
-        <form action="write" method="GET" class="d-flex justify-content-end w-100 mb-2">
-          <button type="submit" class="btn btn-primary">Start</button>
-        </form>
-      </div>
+      <%- include('menu_write.ejs') -%>
     </div>
 
     <div class="col">
-      <div class="rounded-3 border p-3 shadow">
-        <strong class="text-primary h3">Q & A</strong>
-        <button class="btn btn-sm btn-outline-info mb-2" 
-                data-bs-toggle="modal" data-bs-target="#diagrams_modal">
-          <i class="material-icons md-small">info</i>
-        </button>
-        <form action="diagram" method="GET" class="form-group d-flex mb-0 mx-0">
-          <select class="form-control" name="diagram" required>
-<% for (let d of diagrams ) { %>
-            <option value="<%- d %>"><%- d %></option>
-<% } %>
-          </select>
-          <button type="submit" class="btn btn-primary">Start</button>
-        </form>
-      </div>
+      <%- include('menu_Q&A.ejs') -%>
     </div>
 
   </div>
 </div>
+
+<script src="/script.js"></script>
 
 <script>
 $(function(){

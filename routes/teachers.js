@@ -16,9 +16,9 @@ router.get('/', (req, res)=>{
 });
 
 
-router.get('/vocab', (req, res)=>{
+router.get('/text', (req, res)=>{
   try{
-    res.render('teachers/vocab');
+    res.render('teachers/text');
   }
   catch(err){
     res.send(err);

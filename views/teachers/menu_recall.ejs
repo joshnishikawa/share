@@ -1,0 +1,54 @@
+<div class="rounded-3 border p-3 shadow d-flex">
+  <strong class="text-primary h3">RECALL</strong>
+  <button class="btn btn-sm btn-outline-info mb-2" 
+          data-bs-toggle="modal" data-bs-target="#recall_modal">
+    <i class="material-icons md-small">info</i>
+  </button>
+
+  <form id="recall" action="recall" method="GET" class="d-flex justify-content-end w-100 mb-2">
+    <input type="hidden" value="" name="deckName">
+    <input type="hidden" value="" name="deckType">
+    <button id="recallButton" type="submit" class="btn btn-primary">Start</button>
+  </form>
+</div>
+
+
+<div id="recall_modal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+    
+      <div class="modal-header">
+        <h3 class="modal-title">RECALL</h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>All words will be displayed with images. Go over them until the class
+          feels like they remember them fairly well. Then click START and a grid
+          of cards will be shown face down below a search bar. Students call out 
+          words and you type them into the search box. As you type, all words 
+          that match will be highlighted. When there is only one, hit enter to 
+          reveal the card. Continue untill all cards are revealed.</p>
+        <p>You might also flip all cards that start with a certain letter. You
+          can also flip a card by clicking on it.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+$(function(){
+  $("#recallButton").on('click', (e)=>{
+    e.preventDefault();
+    if (!window.deckName) {
+      alert("Please select a deck.");
+    }
+    else {
+      $("#recall input[name='deckName']").val(window.deckName);
+      $("#recall input[name='deckType']").val(window.deckType);
+      $("#recall").submit();
+    }
+  });
+});
+</script>

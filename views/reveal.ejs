@@ -1,11 +1,22 @@
 <%- include('head'); -%>
 <style>
+  #blurme img{
+    position:absolute;
+    margin: auto;
+    left: 0;
+    right: 0;
+    text-align: center;
+    height:90vh;
+    z-index:-1;
+  }
+
   :root{
     --cursorX: 50%;
     --cursorY: 50%;
     --light: 5px;
     --dark: 50px;
   }
+
   #mask {
     cursor: none;
     width: 100%;
@@ -30,14 +41,15 @@
   </a>
 </div>
 
-<div id="blurme" class="text-center" style="height:100vh;position:relative;"></div>
+<div id="blurme" class="justify-content-center text-center" style="height:100vh;position:relative;"></div>
 <div id="loadme" class="text-center" style="height:100vh;"></div>
 
 <script src="/vocab_decks.js"></script>
 <script src="/NH_vocab.js"></script>
+<script src="/script.js"></script>
 
 <script>
-$(function() {
+$(function(){
 // PREPARE THE DECK ////////////////////////////////////////////////////////////
   var url = window.location.href;
   const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
@@ -50,27 +62,15 @@ $(function() {
 
   // We need an array of objects. Objects have info and arrays can be shuffled.
   switch (deckType){
-    case 'vocab':
-      list = vocab_decks[deckName];
-      for (let i of list){
-        deck.push({name: i, image: `<div id="flash" style="position:absolute;z-index:-1;">${i}</div>`});
-      }
-      break;
     case 'NH':
       for (let i in NH_vocab[deckName]){
-        deck.push({name: i, image: `<img src="/image/${NH_vocab[deckName][i].image}" alt="${i}" 
-                                         style="position:absolute;margin: auto;
-                                         left: 0;right: 0;text-align: center;
-                                         height:90vh;z-index:-1;">`});
+        deck.push({name: i, image: `<img src="/image/${NH_vocab[deckName][i].image}" alt="${i}">`});
       }
       break;
     case 'images':
       list = JSON.parse(deckName);
       for (let i of list){
-        deck.push({name: i, image: `<img src="/image/svg/${i}.svg" alt="${i}" 
-                                         style="position:absolute;margin: auto;
-                                         left: 0;right: 0;text-align: center;
-                                         width:90vw;z-index:-1;">`});
+        deck.push({name: i, image: `<img src="/image/svg/${i}.svg" alt="${i}">`});
       }
       break;
     default:
@@ -81,7 +81,7 @@ $(function() {
 
 
 // FUNCTIONS ///////////////////////////////////////////////////////////////////
-  var factor = 8; // how big a pixel is in the pixelate style
+  var factor = 2; // how big a pixel is in the pixelate style
 
 // these are for the spotlight style
   var light = 5;
@@ -96,12 +96,13 @@ $(function() {
       let c = document.createElement("canvas");
       let w = img1.width;
       let h = img1.height;
-      c.width = w*1.2;
-      c.height = h*1.2;
+      c.width = w*2;
+      c.height = h*2;
+
+      $("#loadme img").css("display", "none");
 
       if (f >= w){}
       else {
-        $("#loadme img").css("visibility", "hidden");
         let ctx = c.getContext('2d');
         ctx.drawImage(img1, 0, 0);
         
@@ -116,20 +117,11 @@ $(function() {
             ctx.fillStyle = pixelArr[p+3] < 1 
                           ? 'rgba(255,255,255,1)' 
                           : `rgba(${pixelArr[p]},${pixelArr[p+1]},${pixelArr[p+2]},1)`;
-            ctx.fillRect(x*3, y*3, sample_size*3, sample_size*3);
+            ctx.fillRect(x*2, y*2, sample_size*2, sample_size*2);
           }
         }
 
         img2.src = c.toDataURL("image/jpeg");
-        $(img2).css({"position":"absolute",
-                     "margin":"auto",
-                     "left":"0",
-                     "right":"0",
-                     "text-align":"center",
-                     "height":"100%",
-                     "max-height":"90%",
-                     "max-width":"90%",
-                     "z-index":"-1"});
         $("#blurme").html(img2);
       }
     }
@@ -205,13 +197,13 @@ $(function() {
           e.preventDefault();
           index++;
           if (index < Object.keys(deck).length){
-            factor = 8;
+            factor = 2;
             $("#loadme").html(deck[index].image); // load the image
           }
         }
         else if (e.keyCode == 37){
           e.preventDefault();
-          factor = factor <= 8 ? 8 : factor/2;
+          factor = factor <= 2 ? 2 : factor/2;
           $("#loadme").html(deck[index].image); // load the image
         }
         else if (e.keyCode == 39){
@@ -249,9 +241,6 @@ $(function() {
     default:
       console.log('whu?');
   }
-
-
-
 });
 </script>
 

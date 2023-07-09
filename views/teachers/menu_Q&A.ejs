@@ -1,0 +1,38 @@
+<div class="rounded-3 border p-3 shadow">
+  <strong class="text-primary h3">Q & A</strong>
+  <button class="btn btn-sm btn-outline-info mb-2" 
+          data-bs-toggle="modal" data-bs-target="#diagrams_modal">
+    <i class="material-icons md-small">info</i>
+  </button>
+  <form action="diagram" method="GET" class="form-group d-flex mb-0 mx-0">
+    <select class="form-control" name="diagram" required>
+<% for (let d of diagrams ) { %>
+      <option value="<%- d %>"><%- d %></option>
+<% } %>
+    </select>
+    <button type="submit" class="btn btn-primary">Start</button>
+  </form>
+</div>
+
+
+<div id="diagrams_modal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+    
+      <div class="modal-header">
+        <h3 class="modal-title">Diagrams</h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        This is simply a set of images take from the A-GO brain box. 
+        The cards are too small for more than one person to see at a time so
+        this is a way to let the whole class see what you're talking about.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+$(function(){
+});
+</script>

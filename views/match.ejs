@@ -1,4 +1,12 @@
 <%- include('head'); -%>
+<style>
+  .flip-back{
+    font-weight: bold;
+    -webkit-text-stroke: 1px black;
+    color: slateblue
+  }
+</style>
+
 <body>
 
   <div class="d-flex">
@@ -7,7 +15,7 @@
     </a>
   </div>
 
-  <div style="min-height:100vh;">
+  <div style="min-height:100vh;user-select: none;">
     <div id="gridContainer">
       <div id="grid" class="d-flex flex-wrap"></div>
     </div>
@@ -15,10 +23,9 @@
 
 <script src="/vocab_decks.js"></script>
 <script src="/NH_vocab.js"></script>
-
+<script src="/script.js"></script>
 
 <script>
-$(function(){
   var url = window.location.href;
   const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
   const deckName = searchParams.get('deckName');
@@ -32,18 +39,21 @@ $(function(){
     'objects': 20,
   }
   var deck = [];
+  var list = [];
   var backContent = [];
   var backClass = [];
 
-
   // We need an array of objects. Objects have info and arrays can be shuffled.
   switch (deckType){
-    case 'vocab':
-      let list = vocab_decks[deckName];
-      for (let i in list){
-        deck.push({name: i, image: `<div style="font-size:3rem;position:absolute;z-index:-1;">${list[i]}</div>`});
+    case 'text':
+      list = deckName == "lower_case_mix" && backs == "animals" ? vocab_decks["lower_case_mix"].slice(0, 10) 
+               : deckName == "lower_case_mix" && backs == "objects" ? vocab_decks["lower_case_mix"].slice(10, 20)
+               : vocab_decks[deckName];
+      for (let i of list){
+        deck.push({name: i, image: `<div style="font-size:3rem;position:absolute;z-index:-1;">${i}</div>`});
       }
       break;
+
     case 'NH':
       for (let i in NH_vocab[deckName]){
         deck.push({name: i, image: `<img src="/image/${NH_vocab[deckName][i].image}" alt="${i}" 
@@ -52,6 +62,7 @@ $(function(){
                                          max-width:90%;max-height:90%">`});
       }
       break;
+
     case 'images':
       list = JSON.parse(deckName);
       for (let i of list){
@@ -66,21 +77,19 @@ $(function(){
       console.log('whu?');
   }
 
-// SET UP THE DECK /////////////////////////////////////////////////////////////
-  // Shuffle first so that cards left out are random.
-  deck = FYshuffle(deck);
 
+  // SET UP THE DECK /////////////////////////////////////////////////////////////
+  // Shuffle first so that cards left out are random (unless doing letters).
+  if ( deckName != "lower_case_mix" ) FYshuffle(deck);
   // FIRST whittle down the deck to half the number of card backs available.
-  while (deck.length * 2 > max_num_of_cards[backs]){
-    console.log(max_num_of_cards[backs]);
-    deck.pop();
-  }
+  while (deck.length * 2 > max_num_of_cards[backs]) deck.pop();
+
   // LAST whittle down the deck to the number of items that fit into a grid.
   let {length, colspan, rowheight} = getGrid({length: deck.length * 2, even: true});
-  deck = deck.slice(0, length / 2); // Slice the deck to the correct length.
+  deck = deck.slice(0, length / 2);
 
   // Then double the deck to make pairs.
-  deck = deck.concat(deck);
+  deck = deck.concat( deck );
 
 
 // THEN SET UP THE CARD BACKS //////////////////////////////////////////////////
@@ -90,24 +99,22 @@ $(function(){
       break;
 
     case 'numbers':
-      backContent = FYshuffle( vocab_decks['0~100'].slice(0, deck.length) );
+      backContent = FYshuffle( vocab_decks['0~100'].slice(1, deck.length+1) );
       break;
 
     case 'colorsNumbers':
       let nums = [];
       for (let i = 0; i < deck.length / 2; i++){
-        nums.push(i);
+        nums.push(i.toString());
+        backClass.push(vocab_decks.colors[i] + 'Text alert-primary'); //use .redText class instead of .red
+        backClass.push(vocab_decks.colors[i] + 'Text alert-primary');
       }
 
-      nums = FYshuffle(nums);
-      backContent = nums.concat( FYshuffle(nums) );
-
+      backContent = FYshuffle(nums);
+      FYshuffle(nums);
+      backContent = backContent.concat( nums );
       var colors = vocab_decks.colors.slice(0, deck.length);
-      for (let i = 0; i < colors.length; i++){
-        colors[i] += 'Text alert-primary'; //use .redText class instead of .red
-        backClass.push(colors[i]);
-        backClass.push(colors[i]);
-      }
+
       parallelShuffle(backClass, backContent);
       break;
 
@@ -125,45 +132,49 @@ $(function(){
 
     case 'animals':
       for (let i = 0; i < deck.length; i++){
-        backContent.push(`<img class="img-flash" src="/image/svg/${vocab_decks.animals[i]}.svg">`);
-        backContent.push(`<img class="img-flash" src="/image/svg/${vocab_decks.animals[i + 10]}.svg">`);
-        backClass.push('alert-primary');
+        backContent.push(`<img class="img-flash" 
+                               src="/image/svg/${vocab_decks.animals[i]}.svg" 
+                               alt="${vocab_decks.animals[i]}">`);
         backClass.push('alert-primary');
       }
       break;
 
     case 'objects':
       for (let i = 0; i < deck.length; i++){
-        backContent.push(`<img class="img-flash" src="/image/svg/${vocab_decks.vocab[i]}.svg">`);
+        backContent.push(`<img class="img-flash" 
+                               src="/image/svg/${vocab_decks.objects[i]}.svg" 
+                               alt="${vocab_decks.animals[i]}">`);
         backClass.push('alert-primary');
       }
       break;
 
     default:
-      console.log('whu?');
+      backContent = FYshuffle( vocab_decks['0~100'].slice(1, deck.length+1) );
   }
 
 
-  // letters need to be shuffled in parallel with the objects they represent
-  if ( ["letters 1", "letters 2"].includes(deckName) ){
-    parallelShuffle(deck, backContent);
-  }
-  else{
-    deck = FYshuffle(deck);
-  }
+// letters need to be shuffled in parallel with the objects they represent
+if ( deckName == "lower_case_mix" ) {
+  parallelShuffle(deck, backContent);
+}
+else {
+  FYshuffle(deck);
+}
 
-
+$(function(){
+  console.log(deck);
 // NOW BUILD THE GRID //////////////////////////////////////////////////////////
   for (let i = 0; i < deck.length; i++){
     $("#grid").append(
-     `<div id="${deck[i].name}" class="col-${colspan} vocab p-0" style="height:${rowheight};">
+     `<div id="${deck[i].name}" class="col-${colspan} vocab p-0" style="height:${rowheight}vh;">
         <div class="flip m-3" style="height:80%;">
           <div class="flip-card shadow">
 
             <div class="flip-front bg-white rounded border">
               ${deck[i].image}
               </div>
-            <div class="flip-back rounded border border-primary text-center ${backClass[i]}">
+            <div class="flip-back rounded border border-primary text-center ${backClass[i]}"
+                 style="font-size:${Math.floor(rowheight * 0.8)}vh;">
               ${backContent[i] ? backContent[i] : ''}
             </div>
           </div>
