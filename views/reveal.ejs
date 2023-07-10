@@ -36,13 +36,13 @@
 </style>
 
 <div class="d-flex">
-  <a href="/" class="btn btn-sm btn-outline-secondary p-0">
+  <a href="/teachers" class="btn btn-sm btn-outline-secondary p-0">
     <i class="material-icons">close</i>
   </a>
 </div>
 
 <div id="blurme" class="justify-content-center text-center" style="height:100vh;position:relative;"></div>
-<div id="loadme" class="text-center" style="height:100vh;"></div>
+<div id="loadme" class="text-center" style="height:100vh;display:none;"></div>
 
 <script src="/vocab_decks.js"></script>
 <script src="/NH_vocab.js"></script>
@@ -98,8 +98,6 @@ $(function(){
       let h = img1.height;
       c.width = w*2;
       c.height = h*2;
-
-      $("#loadme img").css("display", "none");
 
       if (f >= w){}
       else {
@@ -170,9 +168,12 @@ $(function(){
       $(document).off('keydown').on('keydown', (e)=>{
         if (e.keyCode == 13){
           e.preventDefault();
-          blr = 100;
           index++;
-          $("#blurme").html(deck[index].image);
+          if (index < Object.keys(deck).length){
+            blr = 100;
+            $("#blurme").html(deck[index].image);
+          }
+          else window.location.replace(`/teachers/${deckName}`);
         }
         else if (e.keyCode == 37){
           e.preventDefault();
@@ -200,6 +201,7 @@ $(function(){
             factor = 2;
             $("#loadme").html(deck[index].image); // load the image
           }
+          else window.location.replace(`/teachers/${deckName}`);
         }
         else if (e.keyCode == 37){
           e.preventDefault();
@@ -229,6 +231,7 @@ $(function(){
             dark = 9;
             renderSpotlight();
           }
+          else window.location.replace(`/teachers/${deckName}`);
         }
       });
       $(document).on('mousemove', growSpotlight);

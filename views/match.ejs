@@ -10,7 +10,7 @@
 <body>
 
   <div class="d-flex">
-    <a href="/" class="btn btn-sm btn-outline-secondary p-0">
+    <a href="/teachers" class="btn btn-sm btn-outline-secondary p-0">
       <i class="material-icons">close</i>
     </a>
   </div>
@@ -34,7 +34,7 @@
   let max_num_of_cards = {
     'colors': 20,
     'colorsNumbers': 40,
-    'colorsShapes': 16,
+    'colorsShapes': 18,
     'animals': 20,
     'objects': 20,
   }
@@ -95,11 +95,11 @@
 // THEN SET UP THE CARD BACKS //////////////////////////////////////////////////
   switch(backs){
     case 'colors':
-      backClass = FYshuffle( vocab_decks.colors.slice(0, deck.length) );
+      backClass = vocab_decks.colors.slice(0, deck.length);
       break;
 
     case 'numbers':
-      backContent = FYshuffle( vocab_decks['0~100'].slice(1, deck.length+1) );
+      backContent = vocab_decks['0~100'].slice(1, deck.length+1);
       break;
 
     case 'colorsNumbers':
@@ -110,10 +110,10 @@
         backClass.push(vocab_decks.colors[i] + 'Text alert-primary');
       }
 
-      backContent = FYshuffle(nums);
+      // It has to be this way becuase FYshuffle shuffles in place.
       FYshuffle(nums);
+      backContent = nums;
       backContent = backContent.concat( nums );
-      var colors = vocab_decks.colors.slice(0, deck.length);
 
       parallelShuffle(backClass, backContent);
       break;
@@ -156,13 +156,15 @@
 // letters need to be shuffled in parallel with the objects they represent
 if ( deckName == "lower_case_mix" ) {
   parallelShuffle(deck, backContent);
+  FYshuffle(backClass);
 }
 else {
   FYshuffle(deck);
+  FYshuffle(backContent);
+  FYshuffle(backClass);
 }
 
 $(function(){
-  console.log(deck);
 // NOW BUILD THE GRID //////////////////////////////////////////////////////////
   for (let i = 0; i < deck.length; i++){
     $("#grid").append(

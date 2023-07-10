@@ -1,8 +1,21 @@
 <%- include('head'); -%>
+
+<style>
+  #grid img{
+    position:absolute;
+    margin: auto;
+    left: 0;
+    right: 0;
+    text-align: center;
+    max-width:90%;
+    max-height:90%;
+  }
+</style>
+
 <body>
 
   <div class="d-flex">
-    <a href="/" class="btn btn-sm btn-outline-secondary p-0">
+    <a href="/teachers" class="btn btn-sm btn-outline-secondary p-0">
       <i class="material-icons">close</i>
     </a>
     <div id="start" class="btn btn-sm btn-outline-info">START</div>
@@ -27,6 +40,7 @@ $(function(){
   const deckName = searchParams.get('deckName');
   const deckType = searchParams.get('deckType');
   var deck = [];
+  var list = [];
 
   // We need an array of objects. Objects have info and arrays can be shuffled.
   switch (deckType){
@@ -38,19 +52,15 @@ $(function(){
       break;
     case 'NH':
       for (let i in NH_vocab[deckName]){
-        deck.push({name: i, image: `<img src="/image/${NH_vocab[deckName][i].image}" alt="${i}" 
-                                         style="position:absolute;margin: auto;
-                                         left: 0;right: 0;text-align: center;
-                                         max-width:90%;max-height:90%">`});
+        deck.push({name: i, 
+                   image: `<img src="/image/${NH_vocab[deckName][i].image}" alt="${i}">`});
       }
       break;
     case 'images':
       list = JSON.parse(deckName);
       for (let i of list){
-        deck.push({name: i.replace(/_/g, ' '), image: `<img src="/image/svg/${i}.svg" alt="${i}" 
-                                         style="position:absolute;margin: auto;
-                                         left: 0;right: 0;text-align: center;
-                                         max-width:90%;max-height:90%">`});
+        deck.push({name: i.replace(/_/g, ' '), 
+                   image: `<img src="/image/svg/${i}.svg" alt="${i}">`});
       }
       break;
     default:
@@ -73,15 +83,13 @@ for (let i of deck){
           </div>
         </div>`);
   }
+  $("#display").show();
 
   deck = FYshuffle(deck);
 
-
-  $("#display").show();
-
   for (let i of deck){
     $("#grid").append(
-     `<div id="${i.name}" class="col-${colspan} vocab p-0" style="height:${rowheight}vh;">
+     `<div id="${i.name.replace(/ /g, '_')}" class="col-${colspan} vocab p-0" style="height:${rowheight}vh;">
         <div class="flip m-3" style="height:80%;">
           <div class="flip-card shadow">
             <div class="flip-front bg-white rounded border">
@@ -117,7 +125,7 @@ for (let i of deck){
       if (input == ""){return;}
       let matches = deck.filter((v)=>{return v.name.startsWith(input);});
       for (let i of matches){
-        $(`#${i.name}`).addClass('bg-warning');
+        $(`#${i.name.replace(/ /g, '_')}`).addClass('bg-warning');
       }
     }
   });

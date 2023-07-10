@@ -18,6 +18,16 @@
     -webkit-text-stroke: 3px black;
   }
 
+  #flash img{
+    position:absolute;
+    margin: auto;
+    left: 0;
+    right: 0;
+    text-align: center;
+    height:90%;
+    z-index:-1;
+  }
+
   .review{
     color:LimeGreen !important;
     text-shadow: 5px 5px 10px #9c9 !important;
@@ -28,7 +38,7 @@
 <body>
 
 <div class="d-flex">
-  <a href="/" class="btn btn-sm btn-outline-secondary p-0">
+  <a href="/teachers" class="btn btn-sm btn-outline-secondary p-0">
     <i class="material-icons">close</i>
   </a>
   <button id="start" class="btn btn-sm btn-outline-info">START</button>
@@ -36,7 +46,7 @@
   <label for="shuffle">Shuffle</label>
 </div>
 
-<div id="flash" class="text-center p-3" style="height:100vh;width:100%;">
+<div id="flash" class="text-center p-5" style="height:100vh;width:100%;">
 
 
 <script src="/vocab_decks.js"></script>
@@ -68,19 +78,13 @@ $(function(){
       break;
     case 'NH':
       for (let i in NH_vocab[deckName]){
-        deck.push({name: i, image: `<img src="/image/${NH_vocab[deckName][i].image}" alt="${i}" 
-                                         style="position:absolute;margin: auto;
-                                         left: 0;right: 0;text-align: center;
-                                         width:100%;z-index:-1;">`});
+        deck.push({name: i.replace(/ /g, '_'), image: `<img src="/image/${NH_vocab[deckName][i].image}" alt="${i}">`});
       }
       break;
     case 'images':
       list = JSON.parse(deckName);
       for (let i of list){
-        deck.push({name: i, image: `<img src="/image/svg/${i}.svg" alt="${i}" 
-                                         style="position:absolute;margin: auto;
-                                         left: 0;right: 0;text-align: center;
-                                         width:100%;z-index:-1;">`});
+        deck.push({name: i, image: `<img src="/image/svg/${i}.svg" alt="${i}">`});
       }
       break;
     default:

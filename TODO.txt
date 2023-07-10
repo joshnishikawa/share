@@ -1,0 +1,6 @@
+caps for wordle
+better list selection
+NH list selection
+body/family for NH
+flash image and word
+update modals

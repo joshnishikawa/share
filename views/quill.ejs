@@ -5,11 +5,20 @@
 <style>.ql-code:after {font-size:0.7em;vertical-align:top;content:"kbd";}</style>
 
 <!-- THE editor DIV NEEDS A FIXED HEIGHT OR EMBEDS WILL BREAK -->
-<button id="save" class="btn btn-sm btn-outline-primary">SAVE</button>
-<button id="copy" class="btn btn-sm btn-outline-primary">COPY</button>
+<div id="save" class="btn btn-sm btn-outline-primary">SAVE</div>
+<div id="copy" class="btn btn-sm btn-outline-primary">COPY</div>
 <div id="editor" class="bg-white" style="height:100vh;font-size:1rem;padding:50px;z-index:1;" autofocus></div>
 
 <script>
+  formatHTML = (html)=>{
+    html = html == '<p><br></p>' ? ''
+         : html.replace(/<p><br><\/p>/gm, '<br>')
+               .replace(/ target="_blank"/gm, '')
+               .replace(/<\/li>|<ul>|<\/ul>|<ol>|<\/ol>|<\/head>|<\/title>|<\/body>|<\/h1>|<\/h2>|<\/h3>|<\/h4>|<\/h5>|<\/h6>|<hr>|<\/p>|<\/pre>|<\/tr>|<table>|<\/table>|<\/summary>|<\/details>|<br>|<\/option>|<\/optgroup>|<\/select>|<\/form>|<\/map>|<\/iframe>|<\/audio>|<\/video>|<\/meter>|<\/blockquote>|<\/html>/gm, '$&\n');
+    return html;
+  }
+
+
 $(function(){
   $('#save').click(function(){
     var title = $("#postRichText input[name=title]").val() || Date.now();

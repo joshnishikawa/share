@@ -67,8 +67,8 @@ const vocab_decks = {
   "objects":['car','hat','jelly','lemon','net','question','van','watch','yarn','zebra',
            'cat','horse','juice','lion','nail','quilt','violin','worm','yo-yo','zipper'],
 
-  "shapes":['&#9632;','&bigstar;','&#9830;','&#9829;','&#9644;','&#9650;','&#9679;','&#8594;'],
-           //square    star        diamond   heart     rectangle triangle  circle    arrow
+  "shapes":['&#10010;', '&#9632;','&#9733;','&#9830;','&#9829;','&#9644;','&#9650;','&#9679;','&#8594;'],
+           //square    star     diamond   heart     rectangle triangle  circle    arrow
 
   "colors":['red','orange','yellow','green','blue','purple','black','pink',
            'gray','brown','gold','silver','violet',

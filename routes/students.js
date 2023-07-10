@@ -8,7 +8,7 @@ const path = require('path');
 
 router.get('/', (req, res)=>{
   try{
-    res.render('students/students', {session: req.session});
+    res.render('students/students');
   }
   catch(err){
     res.send(err);

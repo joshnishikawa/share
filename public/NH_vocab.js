@@ -1247,25 +1247,25 @@ const NH_vocab = {
 
   // spring summer fall winter
   "seasons": {
-    "spring": {
+    "Spring": {
       "meaning": "春",
-      "image": "gif/seasons_spring.gif",
-      "audio": "https://members.englishjones.com/audio/words/spring.mp3"
+      "image": "gif/seasons_Spring.gif",
+      "audio": "https://members.englishjones.com/audio/words/Spring.mp3"
     },
-    "summer": {
+    "Summer": {
       "meaning": "夏",
-      "image": "gif/seasons_summer.gif",
-      "audio": "https://members.englishjones.com/audio/words/summer.mp3"
+      "image": "gif/seasons_Summer.gif",
+      "audio": "https://members.englishjones.com/audio/words/Summer.mp3"
     },
-    "fall": {
+    "Fall": {
       "meaning": "秋",
-      "image": "gif/seasons_fall.gif",
-      "audio": "https://members.englishjones.com/audio/words/fall.mp3"
+      "image": "gif/seasons_Fall.gif",
+      "audio": "https://members.englishjones.com/audio/words/Fall.mp3"
     },
-    "winter": {
+    "Winter": {
       "meaning": "冬",
-      "image": "gif/seasons_winter.gif",
-      "audio": "https://members.englishjones.com/audio/words/winter.mp3"
+      "image": "gif/seasons_Winter.gif",
+      "audio": "https://members.englishjones.com/audio/words/Winter.mp3"
     }
   },
 
@@ -2969,28 +2969,28 @@ const NH_vocab = {
     },
     "New Year's Day": {
       "meaning": "元日",
-      "image": "gif/holidays_new_years_day.gif",
-      "audio": "https://members.englishjones.com/audio/words/new_years_day.mp3"
+      "image": "gif/holidays_New_Years_Day.gif",
+      "audio": "https://members.englishjones.com/audio/words/New_Years_Day.mp3"
     },
     "Dolls' Festival": {
       "meaning": "ひな祭り",
-      "image": "gif/holidays_dolls_festival.gif",
-      "audio": "https://members.englishjones.com/audio/words/dolls_festival.mp3"
+      "image": "gif/holidays_Dolls_Festival.gif",
+      "audio": "https://members.englishjones.com/audio/words/Dolls_Festival.mp3"
     },
     "April Fool's Day": {
       "meaning": "愚か者の日",
-      "image": "gif/holidays_april_fools_day.gif",
-      "audio": "https://members.englishjones.com/audio/words/april_fools_day.mp3"
+      "image": "gif/holidays_April_Fools_Day.gif",
+      "audio": "https://members.englishjones.com/audio/words/April_Fools_Day.mp3"
     },
     "Children's Day": {
       "meaning": "こどもの日",
-      "image": "gif/holidays_childrens_day.gif",
-      "audio": "https://members.englishjones.com/audio/words/childrens_day.mp3"
+      "image": "gif/holidays_Childrens_Day.gif",
+      "audio": "https://members.englishjones.com/audio/words/Childrens_Day.mp3"
     },
     "Star Festival": {
       "meaning": "お盆",
-      "image": "gif/holidays_star_festival.gif",
-      "audio": "https://members.englishjones.com/audio/words/star_festival.mp3"
+      "image": "gif/holidays_Star_Festival.gif",
+      "audio": "https://members.englishjones.com/audio/words/Star_Festival.mp3"
     },
     "fireworks": {
       "meaning": "花火",
@@ -2999,18 +2999,18 @@ const NH_vocab = {
     },
     "Halloween": {
       "meaning": "ハロウィン",
-      "image": "gif/holidays_halloween.gif",
-      "audio": "https://members.englishjones.com/audio/words/halloween.mp3"
+      "image": "gif/holidays_Halloween.gif",
+      "audio": "https://members.englishjones.com/audio/words/Halloween.mp3"
     },
     "Christmas": {
       "meaning": "クリスマス",
-      "image": "gif/holidays_christmas.gif",
-      "audio": "https://members.englishjones.com/audio/words/christmas.mp3"
+      "image": "gif/holidays_Christmas.gif",
+      "audio": "https://members.englishjones.com/audio/words/Christmas.mp3"
     },
     "New Year's Eve": {
       "meaning": "大晦日",
-      "image": "gif/holidays_new_years_eve.gif",
-      "audio": "https://members.englishjones.com/audio/words/new_years_eve.mp3"
+      "image": "gif/holidays_New_Years_Eve.gif",
+      "audio": "https://members.englishjones.com/audio/words/New_Years_Eve.mp3"
     }
   },
 

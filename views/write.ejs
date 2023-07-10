@@ -1,24 +1,22 @@
 <%- include('head'); -%>
-
 <body>
 
   <div class="d-flex">
-    <a href="/" class="btn btn-sm btn-outline-secondary p-0">
+    <a href="/teachers" class="btn btn-sm btn-outline-secondary p-0">
       <i class="material-icons">close</i>
     </a>
-    <button id="showall" class="btn btn-outline-primary py-0">All</button>
-    <div id="lc" class="d-flex flex-wrap"></div>
   </div>
 
   <div class="container" style="min-height:100vh;">
     <div class="row">
       <div class="col">
-        <div id="all" class="d-flex flex-wrap d-none"></div>
+        <div id="all" class="d-flex flex-wrap"></div>
       </div>
 
       <div class="col">
         <div id="penmanship" class="mx-auto" style="min-height:400px;width:400px;"></div>
       </div>
+
     </div>
   </div>
 
@@ -40,14 +38,8 @@ $(function(){
   };
 
   for(let i of letters){
-    $("#cap").append(`<button class="l btn btn-outline-primary">${i.toUpperCase()}</div>`);
-    $("#lc").append(`<button class="lc btn btn-outline-success py-0">${i}</div>`);
-    $("#all").append(`<div class="write letter" style="font-size:80px;line-height:105px;width:100px;height:100px;">${i}</div>`);
+    $("#all").append(`<div class="write letter lc" style="cursor:pointer;font-size:80px;line-height:105px;width:100px;height:100px;">${i}</div>`);
   }
-
-  $("#showall").on("click", ()=>{
-    $("#all").toggleClass("d-none");
-  });
 
   $(".lc").on("click", function(){
     let letter = $(this).text();

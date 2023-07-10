@@ -36,7 +36,7 @@ getGrid = (data) => {
   let length = data.length;
   let even = data.even;
   let colspan, rowheight;
-  if (length >= 36 && even){
+  if (length >= 36){
     length = 36;
     colspan = 2;
     rowheight = 15;

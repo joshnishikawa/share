@@ -7,7 +7,7 @@ const path = require('path');
 
 router.get('/', (req, res)=>{
   try{
-    res.redirect('teachers/vocab');
+    res.redirect('/teachers/text');
   }
   catch(err){
     res.send(err);
