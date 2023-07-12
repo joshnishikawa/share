@@ -1,4 +1,4 @@
-caps for wordle
+CLOSE buttons need to go to different pages for students and teachers
 better list selection
 NH list selection
 body/family for NH

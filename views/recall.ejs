@@ -10,6 +10,17 @@
     max-width:90%;
     max-height:90%;
   }
+
+  #display img{
+    position:absolute;
+    margin: auto;
+    left: 0;
+    right: 0;
+    text-align: center;
+    max-width:90%;
+    max-height:90%;
+  }
+
 </style>
 
 <body>
@@ -23,7 +34,7 @@
   </div>
 
   <div style="min-height:100vh;">
-    <div id="display" class="col d-flex flex-wrap justify-content-center text-center" style="display:none;"></div>
+    <div id="display" class="col d-flex flex-wrap justify-content-center" style="display:none;"></div>
     <div id="gridContainer" style="display:none;">
       <div id="grid" class="d-flex flex-wrap"></div>
     </div>
@@ -75,8 +86,9 @@ $(function(){
 // PREPARE THE DISPLAY /////////////////////////////////////////////////////////
 for (let i of deck){
     $('#display').append(
-       `<div class="rounded-3 px-3 bg-white border display-1">
-          <div style="font-size:3rem;">${i.name}
+       `<div class="rounded-3 px-3 bg-white border">
+          <div style="font-size:3rem;">
+            ${i.name}
             <div style="height:8rem;width:8rem;position:relative;">
               ${i.image}
             </div>
@@ -92,9 +104,9 @@ for (let i of deck){
      `<div id="${i.name.replace(/ /g, '_')}" class="col-${colspan} vocab p-0" style="height:${rowheight}vh;">
         <div class="flip m-3" style="height:80%;">
           <div class="flip-card shadow">
-            <div class="flip-front bg-white rounded border">
+            <div class="flip-front bg-white rounded border"">
               ${i.image}
-              </div>
+            </div>
             <div class="flip-back rounded border border-primary text-center alert-primary">
               &nbsp;
             </div>

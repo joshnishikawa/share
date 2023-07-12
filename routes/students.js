@@ -16,4 +16,15 @@ router.get('/', (req, res)=>{
   }
 });
 
+router.get('/wordle', (req, res)=>{
+  try{
+    console.log('wordle');
+    res.render('wordle');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
 module.exports = router;

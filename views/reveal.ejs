@@ -1,5 +1,16 @@
 <%- include('head'); -%>
 <style>
+  #blurme{
+    font-family: "UD Digi Kyokasho NP-B", sans-serif;
+    font-size: 10rem;
+    font-weight:bold;
+    text-shadow: 5px 5px 10px #99c;
+    -webkit-text-stroke: 5px DarkSlateBlue;
+    color:SlateBlue;
+    height:100vh;
+    position:relative;
+  }
+
   #blurme img{
     position:absolute;
     margin: auto;
@@ -41,7 +52,7 @@
   </a>
 </div>
 
-<div id="blurme" class="justify-content-center text-center" style="height:100vh;position:relative;"></div>
+<div id="blurme" class="text-center"></div>
 <div id="loadme" class="text-center" style="height:100vh;display:none;"></div>
 
 <script src="/vocab_decks.js"></script>
@@ -173,7 +184,9 @@ $(function(){
             blr = 100;
             $("#blurme").html(deck[index].image);
           }
-          else window.location.replace(`/teachers/${deckName}`);
+          else {
+            $("#blurme").html("All done!");
+          }
         }
         else if (e.keyCode == 37){
           e.preventDefault();
@@ -201,7 +214,9 @@ $(function(){
             factor = 2;
             $("#loadme").html(deck[index].image); // load the image
           }
-          else window.location.replace(`/teachers/${deckName}`);
+          else {
+            $("#blurme").html("All done!");
+          }
         }
         else if (e.keyCode == 37){
           e.preventDefault();
@@ -231,7 +246,10 @@ $(function(){
             dark = 9;
             renderSpotlight();
           }
-          else window.location.replace(`/teachers/${deckName}`);
+          else {
+            $("#mask").hide();
+            $("#blurme").html("All done!");
+          }
         }
       });
       $(document).on('mousemove', growSpotlight);

@@ -1,5 +1,16 @@
 <%- include('head'); -%>
 <style>
+  #alldone{
+    font-family: "UD Digi Kyokasho NP-B", sans-serif;
+    font-size: 10rem;
+    font-weight:bold;
+    text-shadow: 5px 5px 10px #99c;
+    -webkit-text-stroke: 5px DarkSlateBlue;
+    color:SlateBlue;
+    height:100vh;
+    position:relative;
+  }
+
   #image img{
     margin: auto;
     left: 0;
@@ -15,17 +26,17 @@
     <i class="material-icons">close</i>
   </a>
 
-  <div class="container" style="min-height:100vh;">
+  <div id="content" class="container" style="min-height:100vh;">
   
     <div class="row g-0">
 
       <!-- image -->
-      <div class="col-5 text-center">
-        <div id="image" class="p-5"></div>
+      <div class="col-4 text-center">
+        <div id="image" class="p-4"></div>
       </div>
 
       <!-- answer -->
-      <div class="col-7">
+      <div class="col-8">
         <div id="guess" class="my-3"></div>
         <div class="d-flex my-3">
           <div id="answer"></div>
@@ -57,7 +68,6 @@ $(function(){
   const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
   const deckName = searchParams.get('deckName');
   const deckType = searchParams.get('deckType');
-  const style = searchParams.get('style');
   var deck = [];
   var list = [];
 
@@ -89,10 +99,14 @@ $(function(){
   var place = 0;
   var guess = '';
   var correct = true; // just to get things started
+
   const letters = ["q","w","e","r","t","y","u","i","o","p",
                   "a","s","d","f","g","h","j","k","l",
                   "z","x","c","v","b","n","m","-","'",
-                  " "];
+                  " ",
+                  "Q","W","E","R","T","Y","U","I","O","P",
+                  "A","S","D","F","G","H","J","K","L",
+                  "Z","X","C","V","B","N","M","_"];
 
   // input handlers
   inputLetter = (letter)=>{
@@ -118,39 +132,47 @@ $(function(){
   submitAnswer = ()=>{
     $("#enter").prop('disabled', true);
     if (guess === word.name){
-      $("#guess").hide();
+      $("#guess").html('');
       $("#answer").html(`<div class="btn btn-primary" style="font-size:5em;">${guess}</div>`);
       $("#start").show().focus();
       correct = true;
     }
+    else {
+      let remaining = []; // keep track of letters not yet guessed
+      for(let i = 0; i < word.name.length; i++){
+        let l = guess[i] == ' ' ? '_' : guess[i];      // for data-value
+        let d = guess[i] == ' ' ? '&nbsp;' : guess[i]; // for display
 
-    var html = `<div>`;
-    for(let i = 0; i < word.name.length; i++){
-      let l = guess[i] == ' ' ? '_' : guess[i]; // for data-value
-      let d = guess[i] == ' ' ? '&nbsp;' : guess[i]; // for display
+        if(guess[i] === word.name[i]){
+          $("#guess").append(`<div class="btn btn-lg bg-primary text-white" 
+                                  style="font-size:2em; width:60px;">${d}</div>`);
+          $(`[data-value=${l}]`).removeClass('bg-warning text-body').addClass('bg-primary text-white');
+        }
+        else if (word.name.includes(guess[i])){
+          remaining.push(word.name[i]);
 
-      if(guess[i] === word.name[i]){
-        html += `<div class="btn btn-lg bg-primary text-white" 
-                      style="font-size:2em; width:60px;">${d}</div>`;
-        $(`[data-value=${l}]`).removeClass('bg-warning text-body').addClass('bg-primary text-white');
+          $("#guess").append(`<div class="btn btn-lg bg-warning" 
+                                  style="font-size:2em; width:60px;">${d}</div>`);
+          $(`[data-value=${l}]`).addClass('bg-warning text-body');
+        }
+        else{
+          $("#guess").append(`<div class="btn btn-lg bg-secondary text-white" 
+                                  style="font-size:2em; width:60px;">${d}</div>`);
+          $(`[data-value=${l}]`).addClass('bg-secondary text-white');
+        }
       }
-      else if (word.name.includes(guess[i])){
-        html += `<div class="btn btn-lg bg-warning" 
-                      style="font-size:2em; width:60px;">${d}</div>`;
-        $(`[data-value=${l}]`).addClass('bg-warning text-body');
-      }
-      else{
-        html += `<div class="btn btn-lg bg-secondary text-white" 
-                      style="font-size:2em; width:60px;">${d}</div>`;
-        $(`[data-value=${l}]`).addClass('bg-secondary text-white');
-      }
+
+      $("#guess .bg-warning").each(function(){
+        console.log(remaining);
+        if(  !remaining.includes( $(this).text() )  ){
+          $(this).removeClass('bg-warning text-body').addClass('bg-secondary text-white');
+        }
+      });
+
+      guess = '';
+      place = 0;
+      $(".place").text('_');
     }
-    html += `</div>`;
-
-    $("#guess").html(html);
-    guess = '';
-    place = 0;
-    $(".place").text('_');
   }
 
 
@@ -158,7 +180,7 @@ $(function(){
     correct = false;
     place = 0;
     guess = '';
-    $("#guess").html('').show();
+    $("#guess").html('');
     $("#answer").html('');
 
     word = deck.pop();
@@ -174,7 +196,10 @@ $(function(){
 
       $("#start").hide();
       $(".letter").removeClass('bg-primary bg-warning bg-secondary text-white');
-    } else { window.location.replace(`/teachers/${deckName}`); }
+    } 
+    else {
+      $("#content").html('<div id="alldone">All done!</div>');
+    }
   }
 
   resetAnswer();
@@ -185,21 +210,24 @@ $(function(){
     resetAnswer();
   });
 
-  // input
-  $(window).on('keydown', function(e){
-    if (e.key == ' ' && e.target == document.body){
-      e.preventDefault();
-    }
-  });
 
-  $(window).on('keyup', function(e){
-    if(e.key.length == 1 && letters.includes(e.key)){
+  // input
+
+  let fired = false;
+
+  $(window).on('keydown', function(e){
+    if (e.key === fired && e.key !== ' ') return;
+    if (e.key === ' ') e.preventDefault();
+
+    if(e.key.length == 1 && e.key !== fired && letters.includes(e.key)){
+      fired = e.key;
       inputLetter(e.key);
     }
     else if(e.key == 'Backspace'){
       backspace();
     }
     else if(e.key == 'Enter'){
+      e.preventDefault();
       if(correct){
         resetAnswer();
       }else if (place === word.name.length){
@@ -208,8 +236,9 @@ $(function(){
     }
   });
 
-
-
+  $(window).on('keyup', function(e){
+    fired = false;
+  });
 
 
 // KEYBOARD ////////////////////////////////////////////////////////////////////
