@@ -138,6 +138,7 @@ $(function(){
       correct = true;
     }
     else {
+      $("#guess").html('');
       let remaining = []; // keep track of letters not yet guessed
       for(let i = 0; i < word.name.length; i++){
         let l = guess[i] == ' ' ? '_' : guess[i];      // for data-value
