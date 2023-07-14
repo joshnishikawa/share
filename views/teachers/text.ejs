@@ -9,22 +9,22 @@
     <div class="row">
 
       <div class="col">
-        <%- include('menu_flash.ejs') -%>
+        <%- include('../menu/menu_flash.ejs') -%>
       </div>
     
       <div class="col">
-        <%- include('menu_match.ejs') -%>
+        <%- include('../menu/menu_match.ejs') -%>
       </div>
     
       <div class="col">
-        <%- include('menu_recall.ejs') -%>
+        <%- include('../menu/menu_recall.ejs') -%>
       </div>
     
     </div>
     <div class="row pt-3">
     
       <div class="col">
-        <%- include('menu_bingo.ejs') -%>
+        <%- include('../menu/menu_bingo.ejs') -%>
       </div>
     
       <div class="col">
@@ -55,7 +55,7 @@ $(function(){
   }
 
   $("#tags").on("change", (e)=>{
-    window.deckName = e.target.value;
+    window.setName = e.target.value;
   });
 
 });

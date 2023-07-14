@@ -1,4 +1,4 @@
-<%- include('head'); -%>
+<%- include('../head'); -%>
 <style>
   #blurme{
     font-family: "UD Digi Kyokasho NP-B", sans-serif;
@@ -64,8 +64,9 @@ $(function(){
 // PREPARE THE DECK ////////////////////////////////////////////////////////////
   var url = window.location.href;
   const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
-  const deckName = searchParams.get('deckName');
+  const setName = searchParams.get('setName');
   const deckType = searchParams.get('deckType');
+  const NHpage = searchParams.get('NHpage');
   const style = searchParams.get('style');
   var deck = [];
   var list = [];
@@ -74,12 +75,12 @@ $(function(){
   // We need an array of objects. Objects have info and arrays can be shuffled.
   switch (deckType){
     case 'NH':
-      for (let i in NH_vocab[deckName]){
-        deck.push({name: i, image: `<img src="/image/${NH_vocab[deckName][i].image}" alt="${i}">`});
+      for (let i in NH_vocab[NHpage][setName]){
+        deck.push({name: i, image: `<img src="/image/${NH_vocab[NHpage][setName][i].image}" alt="${i}">`});
       }
       break;
     case 'images':
-      list = JSON.parse(deckName);
+      list = JSON.parse(setName);
       for (let i of list){
         deck.push({name: i, image: `<img src="/image/svg/${i}.svg" alt="${i}">`});
       }
@@ -265,4 +266,4 @@ $(function(){
 });
 </script>
 
-<%- include('foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->
+<%- include('../foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->

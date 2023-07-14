@@ -18,8 +18,7 @@ router.get('/', (req, res)=>{
 
 router.get('/wordle', (req, res)=>{
   try{
-    console.log('wordle');
-    res.render('wordle');
+    res.render('activities/wordle');
   }
   catch(err){
     res.send(err);

@@ -1,249 +1,250 @@
 const NH_vocab = {
 // fine good great happy sad tired sleepy busy hungry thirsty
-"feelings": {
-  "fine": {
-    "meaning": "いい",
-    "image": "gif/feelings_fine.gif",
-    "audio": "https://members.englishjones.com/audio/words/fine.mp3"
-    },
-  "good": {
-    "meaning": "よい",
-    "image": "gif/feelings_good.gif",
-    "audio": "https://members.englishjones.com/audio/words/good.mp3"
-    },
-  "great": {
-    "meaning": "すばらしい",
-    "image": "gif/feelings_great.gif",
-    "audio": "https://members.englishjones.com/audio/words/great.mp3"
-    },
-  "happy": {
-    "meaning": "うれしい",
-    "image": "gif/feelings_happy.gif",
-    "audio": "https://members.englishjones.com/audio/words/happy.mp3"
-    },
-  "sad": {
-    "meaning": "かなしい",
-    "image": "gif/feelings_sad.gif",
-    "audio": "https://members.englishjones.com/audio/words/sad.mp3"
-    },
-  "tired": {
-    "meaning": "つかれた",
-    "image": "gif/feelings_tired.gif",
-    "audio": "https://members.englishjones.com/audio/words/tired.mp3"
-    },
-  "sleepy": {
-    "meaning": "ねむい",
-    "image": "gif/feelings_sleepy.gif",
-    "audio": "https://members.englishjones.com/audio/words/sleepy.mp3"
-    },
-  "busy": {
-    "meaning": "いそがしい",
-    "image": "gif/feelings_busy.gif",
-    "audio": "https://members.englishjones.com/audio/words/busy.mp3"
-    },
-  "hungry": {
-    "meaning": "おなかがすいた",
-    "image": "gif/feelings_hungry.gif",
-    "audio": "https://members.englishjones.com/audio/words/hungry.mp3"
-    },
-  "thirsty": {
-    "meaning": "のどがかわいた",
-    "image": "gif/feelings_thirsty.gif",
-    "audio": "https://members.englishjones.com/audio/words/thirsty.mp3"
+"p4_5" : {
+  "feelings": {
+    "fine": {
+      "meaning": "いい",
+      "image": "gif/feelings_fine.gif",
+      "audio": "https://members.englishjones.com/audio/words/fine.mp3"
+      },
+    "good": {
+      "meaning": "よい",
+      "image": "gif/feelings_good.gif",
+      "audio": "https://members.englishjones.com/audio/words/good.mp3"
+      },
+    "great": {
+      "meaning": "すばらしい",
+      "image": "gif/feelings_great.gif",
+      "audio": "https://members.englishjones.com/audio/words/great.mp3"
+      },
+    "happy": {
+      "meaning": "うれしい",
+      "image": "gif/feelings_happy.gif",
+      "audio": "https://members.englishjones.com/audio/words/happy.mp3"
+      },
+    "sad": {
+      "meaning": "かなしい",
+      "image": "gif/feelings_sad.gif",
+      "audio": "https://members.englishjones.com/audio/words/sad.mp3"
+      },
+    "tired": {
+      "meaning": "つかれた",
+      "image": "gif/feelings_tired.gif",
+      "audio": "https://members.englishjones.com/audio/words/tired.mp3"
+      },
+    "sleepy": {
+      "meaning": "ねむい",
+      "image": "gif/feelings_sleepy.gif",
+      "audio": "https://members.englishjones.com/audio/words/sleepy.mp3"
+      },
+    "busy": {
+      "meaning": "いそがしい",
+      "image": "gif/feelings_busy.gif",
+      "audio": "https://members.englishjones.com/audio/words/busy.mp3"
+      },
+    "hungry": {
+      "meaning": "おなかがすいた",
+      "image": "gif/feelings_hungry.gif",
+      "audio": "https://members.englishjones.com/audio/words/hungry.mp3"
+      },
+    "thirsty": {
+      "meaning": "のどがかわいた",
+      "image": "gif/feelings_thirsty.gif",
+      "audio": "https://members.englishjones.com/audio/words/thirsty.mp3"
     },
   },
 
-// one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty twenty-one twenty-two twenty-three twenty-four twenty-five twenty-six twenty-seven twenty-eight twenty-nine thirty forty fifty sixty seventy eighty ninety hundred zero
-"numbers": {
-  "one": {
-    "meaning": "いち",
-    "image": "gif/numbers_01.gif",
-    "audio": "https://members.englishjones.com/audio/words/one.mp3"
+  // one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty twenty-one twenty-two twenty-three twenty-four twenty-five twenty-six twenty-seven twenty-eight twenty-nine thirty forty fifty sixty seventy eighty ninety hundred zero
+  "numbers": {
+    "one": {
+      "meaning": "いち",
+      "image": "gif/numbers_01.gif",
+      "audio": "https://members.englishjones.com/audio/words/one.mp3"
+      },
+    "two": {
+      "meaning": "に",
+      "image": "gif/numbers_02.gif",
+      "audio": "https://members.englishjones.com/audio/words/two.mp3"
+      },
+    "three": {
+      "meaning": "さん",
+      "image": "gif/numbers_03.gif",
+      "audio": "https://members.englishjones.com/audio/words/three.mp3"
+      },
+    "four": {
+      "meaning": "よん",
+      "image": "gif/numbers_04.gif",
+      "audio": "https://members.englishjones.com/audio/words/four.mp3"
+      },
+    "five": {
+      "meaning": "ご",
+      "image": "gif/numbers_05.gif",
+      "audio": "https://members.englishjones.com/audio/words/five.mp3"
+      },
+    "six": {
+      "meaning": "ろく",
+      "image": "gif/numbers_06.gif",
+      "audio": "https://members.englishjones.com/audio/words/six.mp3"
+      },
+    "seven": {
+      "meaning": "なな",
+      "image": "gif/numbers_07.gif",
+      "audio": "https://members.englishjones.com/audio/words/seven.mp3"
+      },
+    "eight": {
+      "meaning": "はち",
+      "image": "gif/numbers_08.gif",
+      "audio": "https://members.englishjones.com/audio/words/eight.mp3"
+      },
+    "nine": {
+      "meaning": "きゅう",
+      "image": "gif/numbers_09.gif",
+      "audio": "https://members.englishjones.com/audio/words/nine.mp3"
+      },
+    "ten": {
+      "meaning": "じゅう",
+      "image": "gif/numbers_10.gif",
+      "audio": "https://members.englishjones.com/audio/words/ten.mp3"
+      },
+    "eleven": {
+      "meaning": "じゅういち",
+      "image": "gif/numbers_11.gif",
+      "audio": "https://members.englishjones.com/audio/words/eleven.mp3"
+      },
+    "twelve": {
+      "meaning": "じゅうに",
+      "image": "gif/numbers_12.gif",
+      "audio": "https://members.englishjones.com/audio/words/twelve.mp3"
+      },
+    "thirteen": {
+      "meaning": "じゅうさん",
+      "image": "gif/numbers_13.gif",
+      "audio": "https://members.englishjones.com/audio/words/thirteen.mp3"
+      },
+    "fourteen": {
+      "meaning": "じゅうよん",
+      "image": "gif/numbers_14.gif",
+      "audio": "https://members.englishjones.com/audio/words/fourteen.mp3"
+      },
+    "fifteen": {
+      "meaning": "じゅうご",
+      "image": "gif/numbers_15.gif",
+      "audio": "https://members.englishjones.com/audio/words/fifteen.mp3"
+      },
+    "sixteen": {
+      "meaning": "じゅうろく",
+      "image": "gif/numbers_16.gif",
+      "audio": "https://members.englishjones.com/audio/words/sixteen.mp3"
+      },
+    "seventeen": {
+      "meaning": "じゅうなな",
+      "image": "gif/numbers_17.gif",
+      "audio": "https://members.englishjones.com/audio/words/seventeen.mp3"
+      },
+    "eighteen": {
+      "meaning": "じゅうはち",
+      "image": "gif/numbers_18.gif",
+      "audio": "https://members.englishjones.com/audio/words/eighteen.mp3"
+      },
+    "nineteen": {
+      "meaning": "じゅうきゅう",
+      "image": "gif/numbers_19.gif",
+      "audio": "https://members.englishjones.com/audio/words/nineteen.mp3"
+      },
+    "twenty": {
+      "meaning": "にじゅう",
+      "image": "gif/numbers_20.gif",
+      "audio": "https://members.englishjones.com/audio/words/twenty.mp3"
+      },
+    "twenty-one": {
+      "meaning": "にじゅういち",
+      "image": "gif/numbers_21.gif",
+      "audio": "https://members.englishjones.com/audio/words/twenty_one.mp3"
+      },
+    "twenty-two": {
+      "meaning": "にじゅうに",
+      "image": "gif/numbers_22.gif",
+      "audio": "https://members.englishjones.com/audio/words/twenty_two.mp3"
+      },
+    "twenty-three": {
+      "meaning": "にじゅうさん",
+      "image": "gif/numbers_23.gif",
+      "audio": "https://members.englishjones.com/audio/words/twenty_three.mp3"
+      },
+    "twenty-four": {
+      "meaning": "にじゅうよん",
+      "image": "gif/numbers_24.gif",
+      "audio": "https://members.englishjones.com/audio/words/twenty_four.mp3"
+      },
+    "twenty-five": {
+      "meaning": "にじゅうご",
+      "image": "gif/numbers_25.gif",
+      "audio": "https://members.englishjones.com/audio/words/twenty_five.mp3"
+      },
+    "twenty-six": {
+      "meaning": "にじゅうろく",
+      "image": "gif/numbers_26.gif",
+      "audio": "https://members.englishjones.com/audio/words/twenty_six.mp3"
+      },
+    "twenty-seven": {
+      "meaning": "にじゅうなな",
+      "image": "gif/numbers_27.gif",
+      "audio": "https://members.englishjones.com/audio/words/twenty_seven.mp3"
+      },
+    "twenty-eight": {
+      "meaning": "にじゅうはち",
+      "image": "gif/numbers_28.gif",
+      "audio": "https://members.englishjones.com/audio/words/twenty_eight.mp3"
+      },
+    "twenty-nine": {
+      "meaning": "にじゅうきゅう",
+      "image": "gif/numbers_29.gif",
+      "audio": "https://members.englishjones.com/audio/words/twenty_nine.mp3"
     },
-  "two": {
-    "meaning": "に",
-    "image": "gif/numbers_02.gif",
-    "audio": "https://members.englishjones.com/audio/words/two.mp3"
-    },
-  "three": {
-    "meaning": "さん",
-    "image": "gif/numbers_03.gif",
-    "audio": "https://members.englishjones.com/audio/words/three.mp3"
-    },
-  "four": {
-    "meaning": "よん",
-    "image": "gif/numbers_04.gif",
-    "audio": "https://members.englishjones.com/audio/words/four.mp3"
-    },
-  "five": {
-    "meaning": "ご",
-    "image": "gif/numbers_05.gif",
-    "audio": "https://members.englishjones.com/audio/words/five.mp3"
-    },
-  "six": {
-    "meaning": "ろく",
-    "image": "gif/numbers_06.gif",
-    "audio": "https://members.englishjones.com/audio/words/six.mp3"
-    },
-  "seven": {
-    "meaning": "なな",
-    "image": "gif/numbers_07.gif",
-    "audio": "https://members.englishjones.com/audio/words/seven.mp3"
-    },
-  "eight": {
-    "meaning": "はち",
-    "image": "gif/numbers_08.gif",
-    "audio": "https://members.englishjones.com/audio/words/eight.mp3"
-    },
-  "nine": {
-    "meaning": "きゅう",
-    "image": "gif/numbers_09.gif",
-    "audio": "https://members.englishjones.com/audio/words/nine.mp3"
-    },
-  "ten": {
-    "meaning": "じゅう",
-    "image": "gif/numbers_10.gif",
-    "audio": "https://members.englishjones.com/audio/words/ten.mp3"
-    },
-  "eleven": {
-    "meaning": "じゅういち",
-    "image": "gif/numbers_11.gif",
-    "audio": "https://members.englishjones.com/audio/words/eleven.mp3"
-    },
-  "twelve": {
-    "meaning": "じゅうに",
-    "image": "gif/numbers_12.gif",
-    "audio": "https://members.englishjones.com/audio/words/twelve.mp3"
-    },
-  "thirteen": {
-    "meaning": "じゅうさん",
-    "image": "gif/numbers_13.gif",
-    "audio": "https://members.englishjones.com/audio/words/thirteen.mp3"
-    },
-  "fourteen": {
-    "meaning": "じゅうよん",
-    "image": "gif/numbers_14.gif",
-    "audio": "https://members.englishjones.com/audio/words/fourteen.mp3"
-    },
-  "fifteen": {
-    "meaning": "じゅうご",
-    "image": "gif/numbers_15.gif",
-    "audio": "https://members.englishjones.com/audio/words/fifteen.mp3"
-    },
-  "sixteen": {
-    "meaning": "じゅうろく",
-    "image": "gif/numbers_16.gif",
-    "audio": "https://members.englishjones.com/audio/words/sixteen.mp3"
-    },
-  "seventeen": {
-    "meaning": "じゅうなな",
-    "image": "gif/numbers_17.gif",
-    "audio": "https://members.englishjones.com/audio/words/seventeen.mp3"
-    },
-  "eighteen": {
-    "meaning": "じゅうはち",
-    "image": "gif/numbers_18.gif",
-    "audio": "https://members.englishjones.com/audio/words/eighteen.mp3"
-    },
-  "nineteen": {
-    "meaning": "じゅうきゅう",
-    "image": "gif/numbers_19.gif",
-    "audio": "https://members.englishjones.com/audio/words/nineteen.mp3"
-    },
-  "twenty": {
-    "meaning": "にじゅう",
-    "image": "gif/numbers_20.gif",
-    "audio": "https://members.englishjones.com/audio/words/twenty.mp3"
-    },
-  "twenty-one": {
-    "meaning": "にじゅういち",
-    "image": "gif/numbers_21.gif",
-    "audio": "https://members.englishjones.com/audio/words/twenty_one.mp3"
-    },
-  "twenty-two": {
-    "meaning": "にじゅうに",
-    "image": "gif/numbers_22.gif",
-    "audio": "https://members.englishjones.com/audio/words/twenty_two.mp3"
-    },
-  "twenty-three": {
-    "meaning": "にじゅうさん",
-    "image": "gif/numbers_23.gif",
-    "audio": "https://members.englishjones.com/audio/words/twenty_three.mp3"
-    },
-  "twenty-four": {
-    "meaning": "にじゅうよん",
-    "image": "gif/numbers_24.gif",
-    "audio": "https://members.englishjones.com/audio/words/twenty_four.mp3"
-    },
-  "twenty-five": {
-    "meaning": "にじゅうご",
-    "image": "gif/numbers_25.gif",
-    "audio": "https://members.englishjones.com/audio/words/twenty_five.mp3"
-    },
-  "twenty-six": {
-    "meaning": "にじゅうろく",
-    "image": "gif/numbers_26.gif",
-    "audio": "https://members.englishjones.com/audio/words/twenty_six.mp3"
-    },
-  "twenty-seven": {
-    "meaning": "にじゅうなな",
-    "image": "gif/numbers_27.gif",
-    "audio": "https://members.englishjones.com/audio/words/twenty_seven.mp3"
-    },
-  "twenty-eight": {
-    "meaning": "にじゅうはち",
-    "image": "gif/numbers_28.gif",
-    "audio": "https://members.englishjones.com/audio/words/twenty_eight.mp3"
-    },
-  "twenty-nine": {
-    "meaning": "にじゅうきゅう",
-    "image": "gif/numbers_29.gif",
-    "audio": "https://members.englishjones.com/audio/words/twenty_nine.mp3"
-  },
-  "thirty": {
-    "meaning": "さんじゅう",
-    "image": "gif/numbers_30.gif",
-    "audio": "https://members.englishjones.com/audio/words/thirty.mp3"
-    },
-  "forty": {
-    "meaning": "よんじゅう",
-    "image": "gif/numbers_40.gif",
-    "audio": "https://members.englishjones.com/audio/words/forty.mp3"
-    },
-  "fifty": {
-    "meaning": "ごじゅう",
-    "image": "gif/numbers_50.gif",
-    "audio": "https://members.englishjones.com/audio/words/fifty.mp3"
-    },
-  "sixty": {
-    "meaning": "ろくじゅう",
-    "image": "gif/numbers_60.gif",
-    "audio": "https://members.englishjones.com/audio/words/sixty.mp3"
-    },
-  "seventy": {
-    "meaning": "ななじゅう",
-    "image": "gif/numbers_70.gif",
-    "audio": "https://members.englishjones.com/audio/words/seventy.mp3"
-    },
-  "eighty": {
-    "meaning": "はちじゅう",
-    "image": "gif/numbers_80.gif",
-    "audio": "https://members.englishjones.com/audio/words/eighty.mp3"
-    },
-  "ninety": {
-    "meaning": "きゅうじゅう",
-    "image": "gif/numbers_90.gif",
-    "audio": "https://members.englishjones.com/audio/words/ninety.mp3"
-    },
-  "hundred": {
-    "meaning": "ひゃく",
-    "image": "gif/numbers_100.gif",
-    "audio": "https://members.englishjones.com/audio/words/hundred.mp3"
-    },
-  "zero": {
-    "meaning": "れい",
-    "image": "gif/numbers_0.gif",
-    "audio": "https://members.englishjones.com/audio/words/zero.mp3"
+    "thirty": {
+      "meaning": "さんじゅう",
+      "image": "gif/numbers_30.gif",
+      "audio": "https://members.englishjones.com/audio/words/thirty.mp3"
+      },
+    "forty": {
+      "meaning": "よんじゅう",
+      "image": "gif/numbers_40.gif",
+      "audio": "https://members.englishjones.com/audio/words/forty.mp3"
+      },
+    "fifty": {
+      "meaning": "ごじゅう",
+      "image": "gif/numbers_50.gif",
+      "audio": "https://members.englishjones.com/audio/words/fifty.mp3"
+      },
+    "sixty": {
+      "meaning": "ろくじゅう",
+      "image": "gif/numbers_60.gif",
+      "audio": "https://members.englishjones.com/audio/words/sixty.mp3"
+      },
+    "seventy": {
+      "meaning": "ななじゅう",
+      "image": "gif/numbers_70.gif",
+      "audio": "https://members.englishjones.com/audio/words/seventy.mp3"
+      },
+    "eighty": {
+      "meaning": "はちじゅう",
+      "image": "gif/numbers_80.gif",
+      "audio": "https://members.englishjones.com/audio/words/eighty.mp3"
+      },
+    "ninety": {
+      "meaning": "きゅうじゅう",
+      "image": "gif/numbers_90.gif",
+      "audio": "https://members.englishjones.com/audio/words/ninety.mp3"
+      },
+    "hundred": {
+      "meaning": "ひゃく",
+      "image": "gif/numbers_100.gif",
+      "audio": "https://members.englishjones.com/audio/words/hundred.mp3"
+      },
+    "zero": {
+      "meaning": "れい",
+      "image": "gif/numbers_0.gif",
+      "audio": "https://members.englishjones.com/audio/words/zero.mp3"
     }
   },
 
@@ -279,10 +280,11 @@ const NH_vocab = {
       "image": "gif/weather_hot.gif",
       "audio": "https://members.englishjones.com/audio/words/hot.mp3"
     }
-  },
+  }
+},
 
-  // black blue brown green orange pink purple red white yellow
-"colors": {
+"p6_7" : {
+  "colors": {
     "black": {
       "meaning": "くろ",
       "image": "gif/colors_black.gif",
@@ -336,7 +338,7 @@ const NH_vocab = {
   },
 
   // circle cross diamond heart rectangle square star triangle
-"shapes": {
+  "shapes": {
     "circle": {
       "meaning": "まる",
       "image": "gif/shapes_circle.gif",
@@ -380,7 +382,7 @@ const NH_vocab = {
   },
 
   // baseball softball basketball volleyball dodgeball soccer tennis 'table tennis' badminton 'track and field' swimming skating skiing
-"sports": {
+  "sports": {
     "baseball": {
       "meaning": "やきゅう",
       "image": "gif/sports_baseball.gif",
@@ -446,10 +448,11 @@ const NH_vocab = {
       "image": "gif/sports_skiing.gif",
       "audio": "https://members.englishjones.com/audio/words/skiing.mp3"
     }
-  },
+  }
+},
 
-  // rice 'rice ball' 'curry and rice' 'grilled fish' bread sandwich pancakes pizza hamburger 'hot dog' 'French fries' 'fried chicken' sausage stak omelet spaghetti pie salad soup
-"food": {
+"p8_9" : {
+  "food": {
     "rice": {
       "meaning": "ご飯",
       "image": "gif/food_rice.gif",
@@ -548,7 +551,7 @@ const NH_vocab = {
   },
 
   // coffee tea 'green tea' juice soda milk water 'mineral water'
-"drinks": {
+  "drinks": {
     "coffee": {
       "meaning": "コーヒー",
       "image": "gif/drinks_coffee.gif",
@@ -591,8 +594,7 @@ const NH_vocab = {
     }
   },
 
-  // cake parfait  pudding 'ice cream' 'shaved ice' chocolate popcorn 'snack food'
-"desserts": {
+  "desserts": {
     "cake": {
       "meaning": "ケーキ",
       "image": "gif/dessert_cake.gif",
@@ -633,9 +635,10 @@ const NH_vocab = {
       "image": "gif/dessert_snack_food.gif",
       "audio": "https://members.englishjones.com/audio/words/snack_food.mp3"
     }
-  },
+  }
+},
 
-  // apple banana bean broccoli cabbage carrot cherry corn cucumber eggplant grapes 'green pepper' 'kiwi fruit' lemon lettuce melon mushroom nut onion orange peach pineapple potato spinach strawberry tomato watermelon
+"p10_11" : {
   "produce": {
     "apple": {
       "meaning": "りんご",
@@ -899,9 +902,10 @@ const NH_vocab = {
       "image": "gif/flavors_hot.gif",
       "audio": "https://members.englishjones.com/audio/words/hot.mp3"
     }
-  },
+  }
+},
 
-  // bear 'polar bear' elephant tiger lion zebra gorilla monkey horse camel cow sheep pig panda koala penguin dog cat rabbit mouse snake frog bird eagle
+"p12_13" : {
   "animals": {
     "bear": {
       "meaning": "クマ",
@@ -1155,9 +1159,10 @@ const NH_vocab = {
       "image": "gif/insects_spider.gif",
       "audio": "https://members.englishjones.com/audio/words/spider.mp3"
     }
-  },
+  }
+},
 
-  // January February March April May June July August September October November December
+"p14_15" : {
   "months": {
     "January": {
       "meaning": "1月",
@@ -1245,7 +1250,6 @@ const NH_vocab = {
     }
   },
 
-  // spring summer fall winter
   "seasons": {
     "Spring": {
       "meaning": "春",
@@ -1269,7 +1273,6 @@ const NH_vocab = {
     }
   },
 
-  // Sunday Monday Tuesday Wednesday Thursday Friday Saturday
   "weekdays": {
     "Sunday": {
       "meaning": "日曜日",
@@ -1465,9 +1468,10 @@ const NH_vocab = {
       "image": "gif/ordinals_31st.gif",
       "audio": "https://members.englishjones.com/audio/words/thirty_first.mp3"
     }
-  },
+  }
+},
 
-  // America Australia Brazil Canada China Egypt France Germany Ghana India italy Japan Kenya Korea Mongolia Morocco Norway Peru Russia Singapore Spain Sweden Thailand Turkey U.K. Vietnam
+"p16_17" : {
   "countries": {
     "America": {
       "meaning": "アメリカ",
@@ -1645,7 +1649,6 @@ const NH_vocab = {
     }
   },
 
-  // boy girl friends classmates
   "people": {
     "boy": {
       "meaning": "男の子",
@@ -1669,7 +1672,6 @@ const NH_vocab = {
     }
   },
 
-  // active brave friendly funny gentle kind strong
   "personalities": {
     "active": {
       "meaning": "活発",
@@ -1706,9 +1708,10 @@ const NH_vocab = {
       "image": "gif/personalities_strong.gif",
       "audio": "https://members.englishjones.com/audio/words/strong.mp3"
     }
-  },
+  }
+},
 
-  // sing run jump dance swim skate go stop turn eat drink cook bake clean buy ride travel study teach speak listen read write talk draw
+"p18_19" : {
   "verbs": {
     "sing": {
       "meaning": "歌う",
@@ -1837,7 +1840,6 @@ const NH_vocab = {
     }
   },
 
-  // went ate saw enjoyed had
   "past": {
     "went": {
       "meaning": "行った",
@@ -1866,7 +1868,6 @@ const NH_vocab = {
     }
   },
 
-  // like want look see play practice try enjoy get have make help join live think
   "verbs2": {
     "like": {
       "meaning": "好き",
@@ -1943,9 +1944,10 @@ const NH_vocab = {
       "image": "gif/verbs2_think.gif",
       "audio": "https://members.englishjones.com/audio/words/think.mp3"
     }
-  },
+  }
+},
 
-  // 'get up' 'brush my teeth' 'take out the garbage' 'get the newspaper' 'have breakfast' 'go to school' 'study English' 'have lunch' 'go home' 'play soccer' 'walk the dog' 'do my homework' 'have dinner' 'wash the dishes' 'take a bath' 'watch TV' 'go to bed'
+"p20_21" : {
   "daily": {
     "get up": {
       "meaning": "起きる",
@@ -2179,9 +2181,10 @@ const NH_vocab = {
       "image": "gif/body_toe.gif",
       "audio": "https://members.englishjones.com/audio/words/toe.mp3"
     }
-  },
+  }
+},
 
-  // house 'elementary school' 'junior high school' park library museum 'city hall' hospital 'bus stop' station 'police station' 'fire station' 'gas station' 'post office' bookstore 'convenience store' 'department store' restaurant supermarken 'flower shop' castle shrine temple 'amusement park' aquarium stadium zoo bridge street
+"p22_23" : {
   "places": {
     "house": {
       "meaning": "家",
@@ -2369,7 +2372,6 @@ const NH_vocab = {
     }
   },
   
-  // by in on under
   "prepositions": {
     "by": {
       "meaning": "～のそばに",
@@ -2393,7 +2395,6 @@ const NH_vocab = {
     }
   },
 
-  // bus car taxi truck train subway ship boat airplane bike
   "transportation": {
     "bus": {
       "meaning": "バス",
@@ -2445,9 +2446,10 @@ const NH_vocab = {
       "image": "gif/transportation_bike.gif",
       "audio": "https://members.englishjones.com/audio/words/bike.mp3"
     }
-  },
-  
-  // English Japanese calligraphy 'social studies' math science music 'arts and crafts' 'home economics' P.E. 'moral education'
+  }
+},
+
+"p24_25" : {
   "subjects": {
     "English": {
       "meaning": "英語",
@@ -2629,7 +2631,6 @@ const NH_vocab = {
     }
   },
 
-  // recorder harmonica triangle piano guitar violin drum xylophone
   "instruments": {
     "recorder": {
       "meaning": "リコーダー",
@@ -2671,9 +2672,10 @@ const NH_vocab = {
       "image": "gif/instruments_xylophone.gif",
       "audio": "https://members.englishjones.com/audio/words/xylophone.mp3"
     }
-  },
+  }
+},
 
-  // ball bat racket bag 'plastic bag' basket box cup watch clock book 'comic book' computer calendar map picture present treasure desk chair wheelchair table bath bed wall window
+"p26_27" : {
   "daily objects": {
     "ball": {
       "meaning": "ボール",
@@ -2817,7 +2819,6 @@ const NH_vocab = {
     }
   },
 
-  // camping fishing hiking shopping reading running jogging 'kite flying' 'top spinning' cards 'rock, paper, scissors' tag 'jump rope' unicycle
   "play": {
     "camping": {
       "meaning": "キャンプ",
@@ -2889,9 +2890,10 @@ const NH_vocab = {
       "image": "gif/play_unicycle.gif",
       "audio": "https://members.englishjones.com/audio/words/unicycle.mp3"
     }
-  },
+  }
+},
   
-  // 'field trip' 'school trip' 'chorus contest' 'drama festival' 'music festival' 'school festival' 'volunteer day' 'sports day' 'swimming meet' 'fire drill' 'summer vacation' 'entrance ceremony' 'graduation ceremony'
+"p28_29" : {
   "school events": {
     "field trip": {
       "meaning": "遠足",
@@ -2960,7 +2962,6 @@ const NH_vocab = {
     }
   },
 
-  // birthday 'New Years Day' 'Dolls Festival' 'April Fools Day' 'Childrens Day' 'Star Festival' fireworks Halloween Christmas 'New Years Eve'
   "holidays": {
     "birthday": {
       "meaning": "誕生日",
@@ -3014,7 +3015,6 @@ const NH_vocab = {
     }
   },
 
-  // good great nice fantastic wonderful beautiful cool cute favorite interesting exciting famous popular international fun
   "adjectives": {
     "good": {
       "meaning": "いい",
@@ -3093,7 +3093,6 @@ const NH_vocab = {
     }
   },
 
-  // big small long short new old easy difficult same different fast slow
   "adjectives2": {
     "big": {
       "meaning": "大きい",
@@ -3155,9 +3154,10 @@ const NH_vocab = {
       "image": "gif/adjectives2_slow.gif",
       "audio": "https://members.englishjones.com/audio/words/slow.mp3"
     }
-  },
+  }
+},
 
-  // artist musician singer comedian doctor nurse dentist vet zookeeper cook baker florist farmer 'police officer' 'fire fighter' pilot 'flight attendant' 'bus driver' astronaut teacher scientist programmer 'baseball player' 'soccer player' 'figure skater'
+"p30_31" :{
   "jobs": {
     "artist": {
       "meaning": "芸術家",
@@ -3286,7 +3286,6 @@ const NH_vocab = {
     }
   },
 
-  // baseball team, softball team, basketball team, volleyball team, soccer team, tennis team, table, tennis team, badminton, team, track and field team, gymnastics team, art club, drama club, broadcasting club, cooking club, newspaper club, photography club, brass band, chorus
   "club": {
     "baseball team": {
       "meaning": "野球部",
@@ -3379,4 +3378,5 @@ const NH_vocab = {
       "audio": "https://members.englishjones.com/audio/words/chorus.mp3"
     }
   }
+}
 }

@@ -1,0 +1,43 @@
+<div id="tags" class="d-flex flex-wrap"></div>
+
+<script src="/NH_vocab.js"></script>
+
+<script>
+$(function(){
+  var color = "white";
+  var colors = {
+  "Orchid" : ["p4_5", "p14_15"],
+  "PaleGreen" : ["p6_7", "p12_13", "p26_27", "p30_31"],
+  "Gold" : ["p8_9", "p16_17", "p22_23"],
+  "Pink" : ["p10_11", "p28_29"],
+  "SkyBlue" : ["p18_19"],
+  "Salmon" : ["p20_21", "p24_25"],
+  }
+
+  for (let p in NH_vocab) {
+
+    for (let c in colors) {
+      if (colors[c].includes(p)) {
+        color = c;
+        break;
+      }
+    }
+
+    $("#tags").append(`<div id="${p}" class="rounded-3 m-1 p-1" style="background-color:${color}"><h5>${p}</h5></div>`);
+
+    for (let t in NH_vocab[p]) {
+      let id = t.replace(/ /g, "_");
+      $(`#${p}`).append(`<div id="${t}" class="form-check">
+        <input class="form-check-input" type="radio" name="tags" id="tag_${t}" value="${t}" aria-label="tags">
+        <label class="form-check-label me-3" style="margin-left:-5px;" for="tag_${t}">${t} (${Object.keys(NH_vocab[p][t]).length})</label>
+      </div>`);
+    }
+  }
+
+  $("#tags").on("change", (e)=>{
+    window.NHpage = $(e.target).parent().parent().attr("id");
+    window.setName = e.target.value;
+  });
+
+});
+</script>

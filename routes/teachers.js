@@ -65,7 +65,7 @@ router.get('/tools', (req, res)=>{
 
 router.get('/type', (req, res)=>{ 
   try{
-    res.render('type');
+    res.render('activities/type');
   }
   catch(err){
     res.send(err);
@@ -76,7 +76,7 @@ router.get('/type', (req, res)=>{
 
 router.get('/write', (req, res)=>{
   try{
-    res.render('write');
+    res.render('activities/write');
   }
   catch(err){
     res.send(err);
@@ -87,7 +87,7 @@ router.get('/write', (req, res)=>{
 
 router.get('/flash', (req, res)=>{
   try{
-    res.render('flash');
+    res.render('activities/flash');
   }
   catch(err){
     res.send(err);
@@ -99,7 +99,7 @@ router.get('/flash', (req, res)=>{
 router.get('/diagram', (req, res)=>{
   try{
     let diagram = `/image/diagrams/${req.query.diagram}`;
-    res.render('diagram', {diagram});
+    res.render('activities/diagram', {diagram});
   }
   catch(err){ console.error(err); }
 });
@@ -107,7 +107,7 @@ router.get('/diagram', (req, res)=>{
 
 router.get('/match', (req, res)=>{
   try{
-    res.render('match');
+    res.render('activities/match');
   }
   catch(err){ 
     res.send(err);
@@ -118,7 +118,7 @@ router.get('/match', (req, res)=>{
 
 router.get('/wordle', (req, res)=>{
   try{
-    res.render('wordle');
+    res.render('activities/wordle');
   }
   catch(err){
     res.send(err);
@@ -129,7 +129,7 @@ router.get('/wordle', (req, res)=>{
 
 router.get('/bingo', (req, res)=>{
   try{
-    res.render('bingo');
+    res.render('activities/bingo');
   }
   catch(err){
     res.send(err);
@@ -140,7 +140,7 @@ router.get('/bingo', (req, res)=>{
 
 router.get('/recall', (req, res)=>{
   try{
-    res.render('recall'); }
+    res.render('activities/recall'); }
   catch(err){
     res.send(err);
     console.error(err);
@@ -150,7 +150,7 @@ router.get('/recall', (req, res)=>{
 
 router.get('/reveal', (req, res)=>{
   try{
-    res.render('reveal');
+    res.render('activities/reveal');
   }
   catch(err){
     res.send(err);

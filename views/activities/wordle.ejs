@@ -1,4 +1,4 @@
-<%- include('head'); -%>
+<%- include('../head'); -%>
 <style>
   #alldone{
     font-family: "UD Digi Kyokasho NP-B", sans-serif;
@@ -22,7 +22,7 @@
 </style>
 
 <body>
-  <a href="/teachers" class="btn btn-sm btn-outline-secondary p-0">
+  <a href="/" class="btn btn-sm btn-outline-secondary p-0">
     <i class="material-icons">close</i>
   </a>
 
@@ -66,32 +66,28 @@ $(function(){
   // PREPARE THE DECK ////////////////////////////////////////////////////////////
   var url = window.location.href;
   const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
-  const deckName = searchParams.get('deckName');
+  const setName = searchParams.get('setName');
   const deckType = searchParams.get('deckType');
+  const NHpage = searchParams.get('NHpage');
   var deck = [];
   var list = [];
 
   // We need an array of objects. Objects have info and arrays can be shuffled.
+  
   switch (deckType){
-    case 'text':
-      list = vocab_decks[deckName];
-      for (let i of list){
-        deck.push({name: i, image: `<div id="flash" style="position:absolute;z-index:-1;">${i}</div>`});
-      }
-      break;
     case 'NH':
-      for (let i in NH_vocab[deckName]){
-        deck.push({name: i, image: `<img src="/image/${NH_vocab[deckName][i].image}" alt="${i}">`});
+      for (let i in NH_vocab[NHpage][setName]){
+        deck.push({name: i, image: `<img src="/image/${NH_vocab[NHpage][setName][i].image}" alt="${i}">`});
       }
       break;
     case 'images':
-      list = JSON.parse(deckName);
+      list = JSON.parse(setName);
       for (let i of list){
         deck.push({name: i.replace(/_/g, ' '), image: `<img src="/image/svg/${i}.svg" alt="${i}">`});
       }
       break;
     default:
-      console.log('whu?');
+      console.log('wordle.ejs: deckType not found');
   }
 
   deck = FYshuffle(deck);
@@ -132,6 +128,11 @@ $(function(){
   submitAnswer = ()=>{
     $("#enter").prop('disabled', true);
     if (guess === word.name){
+      for (let i = 0; i < word.name.length; i++){
+        $(`[data-value=${word.name[i]}]`)
+            .removeClass('bg-warning text-body')
+            .addClass('bg-primary text-white');
+      }
       $("#guess").html('');
       $("#answer").html(`<div class="btn btn-primary" style="font-size:5em;">${guess}</div>`);
       $("#start").show().focus();
@@ -140,33 +141,41 @@ $(function(){
     else {
       $("#guess").html('');
       let remaining = []; // keep track of letters not yet guessed
+
       for(let i = 0; i < word.name.length; i++){
         let l = guess[i] == ' ' ? '_' : guess[i];      // for data-value
         let d = guess[i] == ' ' ? '&nbsp;' : guess[i]; // for display
 
         if(guess[i] === word.name[i]){
           $("#guess").append(`<div class="btn btn-lg bg-primary text-white" 
-                                  style="font-size:2em; width:60px;">${d}</div>`);
-          $(`[data-value=${l}]`).removeClass('bg-warning text-body').addClass('bg-primary text-white');
+                                   style="font-size:2em; width:60px;">${d}</div>`);
+          $(`[data-value=${l}]`)
+            .removeClass('bg-warning bg-secondary text-body')
+            .addClass('bg-primary text-white');
         }
         else if (word.name.includes(guess[i])){
           remaining.push(word.name[i]);
-
           $("#guess").append(`<div class="btn btn-lg bg-warning" 
                                   style="font-size:2em; width:60px;">${d}</div>`);
           $(`[data-value=${l}]`).addClass('bg-warning text-body');
         }
         else{
+          remaining.push(word.name[i]);
           $("#guess").append(`<div class="btn btn-lg bg-secondary text-white" 
                                   style="font-size:2em; width:60px;">${d}</div>`);
-          $(`[data-value=${l}]`).addClass('bg-secondary text-white');
+          $(`[data-value=${l}]`)
+            .removeClass('bg-warning text-body')
+            .addClass('bg-secondary text-white');
         }
       }
 
       $("#guess .bg-warning").each(function(){
-        console.log(remaining);
-        if(  !remaining.includes( $(this).text() )  ){
+        let l = $(this).text();
+        if( !remaining.includes(l) ){
           $(this).removeClass('bg-warning text-body').addClass('bg-secondary text-white');
+          $(`[data-value=${l}]`)
+            .removeClass('bg-warning text-body')
+            .addClass('bg-primary text-white');
         }
       });
 
@@ -287,4 +296,4 @@ $(function(){
 });
 </script>
 
-<%- include('foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->
+<%- include('../foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->

@@ -1,3 +1,10 @@
+<%- include('../head'); -%>
+<a href="/teachers" class="btn btn-sm btn-outline-secondary p-0">
+  <i class="material-icons">close</i>
+</a>
+
+<script src="/script.js"></script>
+
 <link href="https://cdn.quilljs.com/1.0.0/quill.snow.css" rel="stylesheet">
 <script src="https://cdn.quilljs.com/1.0.0/quill.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/quill-image-resize-module@3.0.0/image-resize.min.js" defer></script>
@@ -139,3 +146,7 @@ ${formatHTML(editor.root.innerHTML)}
 
 });
 </script>
+
+
+
+<%- include('../foot'); -%>

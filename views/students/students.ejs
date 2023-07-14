@@ -1,21 +1,42 @@
 <%- include('../head'); -%>
 
-<div class="container">
+<div class="container pt-5">
   <div class="row">
-    <div class="col p-5">
-      <%- include('../teachers/menu_wordle.ejs') -%>
-    </div>
     <div class="col">
-    </div>
-    <div class="col">
+      <%- include('../menu/select_NH.ejs') -%>
     </div>
   </div>
+
+  <div class="row">
+    <div class="col">
+      <%- include('../menu/menu_wordle.ejs') -%>
+    </div>
+    <div class="col">
+    </div>
+  
+    <div class="col">
+    </div>
+  
+  </div>
+      
 </div>
 
+<script src="/script.js"></script>
+
 <script>
-  $(function(){
-    window.deckName = "months";
-    window.deckType = "NH";
-  });
+  var colors = {
+    "Orchid" : ["feelings", "numbers", "weather", "months", "times", "seasons", "weekdays", "ordinals"],
+    "PaleGreen" : ["colors", "shapes", "sports", "animals", "nature", "sealife", "insects", "daily", "frequency", "clothes", "clothes", "body", "daily objects", "play", "jobs", "club"],
+    "Gold" : ["countries", "family", "people", "personalities", "food", "drinks", "desserts", "places", "direction", "prepositions", "transportation"],
+    "Pink" : ["produce", "ingredients", "meals", "flavors", "school events", "holidays", "adjectives", "adjectives2"],
+    "SkyBlue" : ["verbs", "past", "verbs2"],
+    "Salmon" : ["subjects", "school", "stationery", "instruments"]
+  }
+
+$(function(){
+  window.deckType = "NH";
+
+});
   
 </script>
+  <%- include('../foot.ejs') -%>

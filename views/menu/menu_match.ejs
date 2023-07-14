@@ -15,8 +15,9 @@
       <option value="animals">Animals</option>
       <option value="objects">Objects</option>
     </select>
-    <input type="hidden" value="" name="deckName">
+    <input type="hidden" value="" name="setName">
     <input type="hidden" value="" name="deckType">
+    <input type="hidden" value="" name="NHpage">
     <button id="matchButton" type="submit" class="btn btn-primary">Start</button>
   </form>
 
@@ -57,11 +58,12 @@
 $(function(){
   $("#matchButton").on('click', (e)=>{
     e.preventDefault();
-    if (!window.deckName) {
+    if (!window.setName) {
       alert("Please select a deck.");
     }
     else {
-      $("#matchForm input[name='deckName']").val(window.deckName);
+      $("#matchForm input[name='NHpage']").val(window.NHpage);
+      $("#matchForm input[name='setName']").val(window.setName);
       $("#matchForm input[name='deckType']").val(window.deckType);
       $("#matchForm").submit();
     }

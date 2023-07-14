@@ -1,65 +1,61 @@
 <%- include('../head.ejs') -%>
 <%- include('navbar.ejs') -%>
 
-<div class="container">
+<div class="container-fluid">
   <div class="row">
     <div class="col">
-      <div id="tags" class="d-flex flex-wrap"></div>
-      <div id="numOfItems"></div>
-      <div class="row">
-
-        <div class="col">
-          <%- include('menu_flash.ejs') -%>
-        </div>
-      
-        <div class="col">
-          <%- include('menu_match.ejs') -%>
-        </div>
-      
-        <div class="col">
-          <%- include('menu_recall.ejs') -%>
-        </div>
-      
-      </div>
-      <div class="row pt-3">
-      
-        <div class="col">
-          <%- include('menu_bingo.ejs') -%>
-        </div>
-      
-        <div class="col">
-          <%- include('menu_wordle.ejs') -%>
-        </div>
-      
-        <div class="col">
-          <%- include('menu_reveal.ejs') -%>
-        </div>
-      
-      </div>
-      
+      <%- include('../menu/select_NH.ejs') -%>
     </div>
+  </div>
+
+  <div class="row">
+
+    <div class="col">
+      <%- include('../menu/menu_flash.ejs') -%>
+    </div>
+  
+    <div class="col">
+      <%- include('../menu/menu_match.ejs') -%>
+    </div>
+  
+    <div class="col">
+      <%- include('../menu/menu_recall.ejs') -%>
+    </div>
+  
+  </div>
+  <div class="row pt-3">
+  
+    <div class="col">
+      <%- include('../menu/menu_bingo.ejs') -%>
+    </div>
+  
+    <div class="col">
+      <%- include('../menu/menu_wordle.ejs') -%>
+    </div>
+  
+    <div class="col">
+      <%- include('../menu/menu_reveal.ejs') -%>
+    </div>
+  
   </div>
 </div>
 
-<script src="/NH_vocab.js"></script>
 <script src="/script.js"></script>
 
 <script>
 $(function(){
   $(`#NH-tab`).addClass("active");
+
   window.deckType = "NH";
-  
-  for (let t in NH_vocab) {
-    $("#tags").append(`<div class="form-check">
-      <input class="form-check-input" type="checkbox" name="tags" id="tag_${t}" value="${t}" aria-label="tags">
-      <label class="form-check-label me-3" style="margin-left:-5px;" for="tag_${t}">${t} (${Object.keys(NH_vocab[t]).length})</label>
-    </div>`);
+  var color = "white";
+  var colors = {
+  "Orchid" : ["p4_5", "p14_15"],
+  "PaleGreen" : ["p6_7", "p12_13", "p26_27", "p30_31"],
+  "Gold" : ["p8_9", "p16_17", "p22_23"],
+  "Pink" : ["p10_11", "p28_29"],
+  "SkyBlue" : ["p18_19"],
+  "Salmon" : ["p20_21", "p24_25"],
   }
-
-  $("#tags").on("change", (e)=>{
-    window.deckName = e.target.value;
-  });
-
 });
 </script>
 

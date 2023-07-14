@@ -1,9 +1,9 @@
-<%- include('head'); -%>
+<%- include('../head'); -%>
 <style>
   #flash{
     position:relative;
     font-family: "UD Digi Kyokasho NP-B", sans-serif;
-    font-size: 10rem;
+    font-size: 20rem;
     font-weight:bold;
     display:inline-block;
     text-shadow: 5px 5px 10px #99c;
@@ -25,6 +25,7 @@
     right: 0;
     text-align: center;
     height:90%;
+    max-width:90%;
     z-index:-1;
   }
 
@@ -57,18 +58,19 @@
 $(function(){
   var url = window.location.href;
   const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
-  const deckName = searchParams.get('deckName');
+  const setName = searchParams.get('setName');
   const deckType = searchParams.get('deckType');
-  var isNum = deckName.match(/^\d/) ? true : false;
+  const NHpage = searchParams.get('NHpage');
+  var isNum = setName.match(/^\d/) ? true : false;
   var deck = [];
   var list = [];
 
   // We need an array of objects. Objects have info and arrays can be shuffled.
   switch (deckType){
     case 'text':
-      list = vocab_decks[deckName];
+      list = vocab_decks[setName];
       for (let i of list){
-        if (deckName == "colors"){
+        if (setName == "colors"){
           deck.push({name: i, image: `<div class="color ${i} shadow" style="height:90%;width:100%;">${i}</div>`});
         }
         else{
@@ -77,12 +79,12 @@ $(function(){
       }
       break;
     case 'NH':
-      for (let i in NH_vocab[deckName]){
-        deck.push({name: i.replace(/ /g, '_'), image: `<img src="/image/${NH_vocab[deckName][i].image}" alt="${i}">`});
+      for (let i in NH_vocab[NHpage][setName]){
+        deck.push({name: i.replace(/ /g, '_'), image: `<img src="/image/${NH_vocab[NHpage][setName][i].image}" alt="${i}">`});
       }
       break;
     case 'images':
-      list = JSON.parse(deckName);
+      list = JSON.parse(setName);
       for (let i of list){
         deck.push({name: i, image: `<img src="/image/svg/${i}.svg" alt="${i}">`});
       }
@@ -211,7 +213,7 @@ $(function(){
           document.getElementById("flash").innerHTML = deck[card].image;
         }
         else{
-          $("#flash").html("All done!");
+          $("#flash").html("Done!");
         }
       }
       else if(e.key == "ArrowLeft"){
@@ -260,4 +262,4 @@ $(function(){
 </script>
 
 
-<%- include('foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->
+<%- include('../foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->
