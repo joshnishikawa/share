@@ -1,0 +1,107 @@
+<%- include('../head.ejs') -%>
+
+<div class="container-fluid">
+  <div id="select" class="row mb-3">
+    <div id="phonics" class="col-3 ps-1 d-flex flex-wrap">
+      <div class="w-100">
+        Short Vowels
+        <div id="short" class="d-flex flex-wrap"></div>
+        Long Vowels
+        <div id="long" class="d-flex flex-wrap mb-2"></div>
+      </div>
+    </div>
+    <div id="themes" class="col-9 d-flex flex-wrap ps-1"></div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <div id="list" class="d-flex flex-wrap"></div>
+    </div>
+  </div>
+</div>
+
+<button id="updateTags" class="btn btn-primary">Update Tags</button>
+<input id="newTags" type="text" class="form-control" placeholder="new tag">
+
+<script src="/script.js"></script>
+
+<script>
+$(function(){
+  // get all selected tags and files and post them to /tags
+  $("#updateTags").click(function(){
+
+    var selectedTags = [];
+    $("input[name='tags']:checked").each(function(){
+      selectedTags.push($(this).val());
+    });
+    let newTags = $("#newTags").val().split(',').map(e => e.trim()).filter(e => e);
+    if (newTags.length > 0){
+      selectedTags = selectedTags.concat(newTags);
+    }
+
+    var selectedFiles = [];
+    $("input[name='files']:checked").each(function(){
+      selectedFiles.push($(this).val().split('.')[0]);
+    });
+
+    $.post("tags", {selectedTags, selectedFiles}, function(data){
+      if (data == 'success');
+        setTimeout(function(){ window.location.reload(); }, 3000);
+    });
+  });
+
+  var tags = {};
+  var files = <%- JSON.stringify(files) %>;
+
+  for (let f of files){
+    // continue if f starts with [a, b, c, d, e, f, g]
+    if ( ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l"].includes(f[0]) )continue;
+
+    $("#list").append(`
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="files" id="tag_${f}" value="${f}" aria-label="tags">
+        <label class="form-check-label me-2" style="margin-left:-5px;" for="tag_${f}">${f.split('.')[0]}</label>
+      </div>`);
+  }
+
+  $.getJSON('/image/svg/_tags.json', function(data) {
+    tags = data;
+
+    // FIXME: Dry up this for loop
+    for (let t in tags) {
+      if ( ["short_a", "short_e", "short_i", "short_o", "short_u"].includes(t) ){
+        $(`#short`).append(`
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="tags" id="tag_${t}" value="${t}" aria-label="tags">
+            <label class="form-check-label me-2" style="margin-left:-5px;" for="tag_${t}">${t.split('_')[1]}</label>
+          </div>`);
+      }
+      else if ( ["long_a", "long_e", "long_i", "long_o", "long_u"].includes(t) ){
+        $(`#long`).append(`
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="tags" id="tag_${t}" value="${t}" aria-label="tags">
+            <label class="form-check-label me-2" style="margin-left:-5px;" for="tag_${t}">${t.split('_')[1]}</label>
+          </div>`);
+      }
+      else if ( ["soft c", "soft g", "blends", "magic e", "friendly h", "bossy r", "sneaky y", "oo", "silent letters"].includes(t) ){
+        $(`#phonics`).append(`
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="tags" id="tag_${t}" value="${t}" aria-label="tags">
+            <label class="form-check-label me-2" style="margin-left:-5px;" for="tag_${t}">${t} (${tags[t].length})</label>
+          </div>`);
+      }
+      else {
+        $(`#themes`).append(`
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="tags" id="tag_${t}" value="${t}" aria-label="tags">
+            <label class="form-check-label me-2" style="margin-left:-5px;" for="tag_${t}">${t} (${tags[t].length})</label>
+          </div>`);
+      }
+    }
+
+  });
+
+
+});
+</script>
+
+<%- include('../foot.ejs') -%>

@@ -1,6 +1,26 @@
 CLOSE buttons need to go to different pages for students and teachers
-better list selection
 NH list selection
 body/family for NH
 flash image and word
 update modals
+allow related things (not just exact matches for MATCH)
+
+ACTIVITIES
+spot-it (for letters or pictures)
+spot'em (Both sides have all the same things (or cap/lc). Eliminate by tapping the same thing on both sides.)
+
+Tap on all occurrences of 'd' (or any letter)
+  bbbdbdbbb
+  dbbbbbdbd
+  baddadbad
+  dabdbadab
+
+Put letter parts together like a puzzle?
+Letter reveal (Type what you see. A series of letters will make a word).
+Choose the next letter (Alphabetical)
+
+find the given word among a group of like words
+word find
+find all letters that (sound like 'p', have a descender, are tall, etc.)
+
+English vs. Romaji spelling

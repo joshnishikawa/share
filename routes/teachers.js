@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const items = require('../public/image/svg/_items.json');
-const tags = require('../public/image/svg/_tags.json');
 const fs = require('fs');
 const path = require('path');
+const tagsRouter = require('./tags');
+router.use('/tags', tagsRouter);
 
 router.get('/', (req, res)=>{
   try{
@@ -40,7 +40,7 @@ router.get('/New_Horizons', (req, res)=>{
 
 router.get('/images', (req, res)=>{
   try{
-    res.render('teachers/images', {items, tags});
+    res.render('teachers/images');
   }
   catch(err){
     res.send(err);

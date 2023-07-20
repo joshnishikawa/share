@@ -76,7 +76,7 @@ $(function(){
       }
       break;
     default:
-      console.log('whu?');
+      console.log('ERROR: deckType not recognized.');
   }
 
 
@@ -89,7 +89,7 @@ for (let i of deck){
     $('#display').append(
        `<div class="rounded-3 px-3 bg-white border">
           <div style="font-size:3rem;">
-            ${i.name}
+            ${i.name.split('(')[0].replace('_', " ")}
             <div style="height:8rem;width:8rem;position:relative;">
               ${i.image}
             </div>

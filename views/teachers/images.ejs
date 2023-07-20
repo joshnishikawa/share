@@ -1,25 +1,54 @@
 <%- include('../head.ejs') -%>
 <%- include('navbar.ejs') -%>
-<div class="container g-0">
+
+<div class="container-fluid">
   <div class="row">
-    <div class="col-10">
-      <div class="form-check mx-1">
-        <input id="hasAllTags" class="form-check-input" type="radio" name="type" value="all" checked>
-        <label class="form-check-label" for="hasAllTags">Has ALL Tags</label>
-      </div>
-      <div class="form-check mx-1">
-        <input id="hasAnyTag" class="form-check-input" type="radio" name="type" value="any">
-        <label class="form-check-label" for="hasAnyTag">Has ANY Tag</label>
-      </div>
-      <hr>
-      TAGS
-      <div id="tags" class="d-flex flex-wrap"></div>
+
+    <div class="col-2">PHONICS</div>
+    <div class="col-6">THEMES</div>
+    <div class="col-2">NO. OF LETTERS</div>
+    <div class="col-2 d-flex justify-content-between">
+      <div>LIST<span id="numOfItems"> (0)</span></div>
+      <div class="small text-danger">Edit this last!</div>
     </div>
 
-    <div class="col-2">
-      LIST<span id="numOfItems"></span>
-      <textarea id="list" class="form-control" style="height: 90%;"></textarea>
+  </div>
+  <div id="select" class="row mb-3">
+    <div id="phonics" class="col-2 ps-1" style="height:300px;overflow-y:scroll;">
+      <div class="d-flex">
+        <div>Starts&nbsp;with&nbsp;</div>
+        <input id="startsWith" type="text" pattern="[A-Za-z,]"  placeholder="b,dr,..."
+               class="form-control form-control-sm" aria-label="starts with">
+      </div>
+  
+      Short Vowels
+      <div id="short" class="d-flex flex-wrap"></div>
+      Long Vowels
+      <div id="long" class="d-flex flex-wrap mb-2"></div>
     </div>
+    
+    <div id="themes" class="col-6 d-flex flex-wrap ps-1" style="height:300px;overflow-y:scroll;"></div>
+    
+    <div id="numbers" class="col-2" style="height:300px;overflow-y:scroll;">
+      <div class="d-flex">
+        <input id="numGTE" type="number" min="3" value="3" 
+               class="form-control form-control-sm" style="width:50px;">
+        <div>&nbsp;at least</div>
+      </div>
+
+      <div class="d-flex">
+        <input id="numLTE" type="number" 
+               class="form-control form-control-sm" style="width:50px;">
+        <div>&nbsp;at most</div>
+      </div>
+
+    </div>
+
+    <div class="col-2" style="display: flex;flex-direction: column;">
+      <textarea id="list" class="form-control" style="min-height:300px"></textarea>
+    </div>
+
+
   </div>
   <div class="row">
     <div class="col">
@@ -63,16 +92,114 @@
 $(function(){
   $(`#images-tab`).addClass("active");
   window.deckType = "images";
+  var tags = {};
+  var allWords = []; // in case only selecting 'Starts with' and/or 'No. of letters'
+  var words = [];
 
-  let tags = <%- JSON.stringify(tags) %>;
-  let items = <%- JSON.stringify(items) %>;
 
-  for (let t in tags) {
-    $("#tags").append(`<div class="form-check">
-      <input class="form-check-input" type="checkbox" name="tags" id="tag_${t}" value="${t}" aria-label="tags">
-      <label class="form-check-label me-3" style="margin-left:-5px;" for="tag_${t}">${t} (${tags[t].length})</label>
-    </div>`);
+  function updateWordList(){
+    let checkedPhonics = $("#phonics input:checked").toArray().map(e => e.value).join(',').split(',');
+    let checkedThemes = $("#themes input:checked").toArray().map(e => e.value).join(',').split(',');
+    let sw = $("#startsWith").val().split(',').map(e => e.trim()).filter(e => e);
+    let gt = $("#numGTE").val();
+    let lt = $("#numLTE").val();
+
+    checkedPhonics = checkedPhonics.filter(e => e);// remove empty strings
+    checkedThemes = checkedThemes.filter(e => e);  // remove empty strings
+
+    // Then get the intersection of checkedPhonics and checkedThemes
+    if (checkedPhonics.length != 0 && checkedThemes.length != 0)
+      words = checkedPhonics.filter(value => checkedThemes.includes(value));
+    else if (checkedPhonics.length == 0 && checkedThemes.length != 0)
+      words = checkedThemes;
+    else if (checkedPhonics.length != 0 && checkedThemes.length == 0)
+      words = checkedPhonics;
+    else words = [];
+
+    if (words.length == 0 && (gt || lt || sw.length > 0) ) words = allWords;
+
+    // filter for words that start with anything in sw array
+    if (sw.length > 0) {
+      words = words.filter(value => {
+        for (let i in sw) {
+          if (value.startsWith(sw[i])) return true;
+        }
+        return false; 
+      });
+    }
+
+    // filter words array for number of letters
+    words = words.filter(value => {
+      let len = value.length;
+
+      if ( (!gt || gt == 0) && (!lt || lt == 0) ) return true;
+      else if (gt && gt != 0 && len >= gt) 
+        if (!lt || lt == 0) return true;
+        else if (lt && lt != 0 && len <= lt) return true;
+        else return false;
+      else return false;
+    });
+
+    words = words.filter(e => e);// remove empty strings
+    words = [...new Set(words)]; // remove duplicates
+
+    $("#list").val(words.join(', '));
+    window.setName = JSON.stringify(words);
+    $("#numOfItems").html(`&nbsp;(${words.length})`);
   }
+
+
+  $.getJSON('/image/svg/_tags.json', function(data) {
+    tags = data;
+
+    // FIXME: Dry up this for loop
+    for (let t in tags) {
+      allWords = allWords.concat(tags[t]);
+      if ( ["short_a", "short_e", "short_i", "short_o", "short_u"].includes(t) ){
+        $(`#short`).append(`
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="tags" id="tag_${t}" value="${tags[t]}" aria-label="tags">
+            <label class="form-check-label me-2" style="margin-left:-5px;" for="tag_${t}">${t.split('_')[1]}</label>
+          </div>`);
+      }
+      else if ( ["long_a", "long_e", "long_i", "long_o", "long_u"].includes(t) ){
+        $(`#long`).append(`
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="tags" id="tag_${t}" value="${tags[t]}" aria-label="tags">
+            <label class="form-check-label me-2" style="margin-left:-5px;" for="tag_${t}">${t.split('_')[1]}</label>
+          </div>`);
+      }
+      else if ( ["soft c", "soft g", "blends", "magic e", "friendly h", "bossy r", "sneaky y", "oo", "silent letters"].includes(t) ){
+        $(`#phonics`).append(`
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="tags" id="tag_${t}" value="${tags[t]}" aria-label="tags">
+            <label class="form-check-label me-2" style="margin-left:-5px;" for="tag_${t}">${t} (${tags[t].length})</label>
+          </div>`);
+      }
+      else {
+        $(`#themes`).append(`
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="tags" id="tag_${t}" value="${tags[t]}" aria-label="tags">
+            <label class="form-check-label me-2" style="margin-left:-5px;" for="tag_${t}">${t} (${tags[t].length})</label>
+          </div>`);
+      }
+    }
+    allWords = [...new Set(allWords)]; // remove duplicates
+
+
+    $("#select input").on('change', (e)=>{
+      updateWordList();
+    });
+  });
+
+  $("#numLTE").on('change', function(){
+    let minval = $("#numGTE").val();
+    let thisval = $(this).val();
+    if ( thisval && thisval < minval ) {
+      $(this).attr('min', minval);
+      $(this).val( Math.max( minval, thisval) );
+    }
+  });
 
   $("#list").on('input', ()=>{
     words = $("#list").val().split(',');
@@ -81,64 +208,6 @@ $(function(){
       words[i] = words[i].trim().replace(/\s/g, '_');
     }
     window.setName = JSON.stringify(words);
-  });
-
-
-  function updateWordList(){
-    words = [];
-    let checkedTags = $("#tags input:checked").toArray().map(e => e.value);
-
-    if ($("#hasAllTags").is(":checked")) {
-      let shortestTag = '';
-      let shortestTagLength = 0;
-      for (let i of checkedTags) {
-        let tagLength = tags[i].length;
-        if (shortestTagLength == 0 || tagLength < shortestTagLength) {
-          shortestTag = i;
-          shortestTagLength = tagLength;
-        }
-      }
-      if (shortestTag){
-        for (let i of tags[shortestTag]){
-          let hasAllTags = true;
-          for (let t of checkedTags) {
-            if (i != shortestTag && !tags[t].includes(i)) {
-              hasAllTags = false;
-              break;
-            }
-          }
-          if (hasAllTags) {
-            words.push(i);
-          }
-        }
-      }
-    }
-    else if ($("#hasAnyTag").is(":checked")) {
-      for (let i of checkedTags) {
-        for (let w of tags[i]){
-          if (!words.includes(w)) {
-            words.push(w);
-          }
-        }
-      }
-    }
-
-    // set the list value to the words array
-    $("#list").val(words.join(', '));
-    window.setName = JSON.stringify(words);
-    $("#numOfItems").html(`&nbsp;&nbsp;&nbsp;(${words.length})`);
-  }
-
-  $("#tags input").on('change', ()=>{
-    updateWordList();
-  });
-
-  $("#hasAllTags").on('change', ()=>{
-    updateWordList();
-  });
-
-  $("#hasAnyTag").on('change', ()=>{
-    updateWordList();
   });
 
 });
