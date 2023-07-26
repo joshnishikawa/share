@@ -13,7 +13,7 @@ router.get('/', (req, res)=>{
     let files = fs.readdirSync( path.join(__dirname, '../public/image/svg') );
     // remove _items.json and _tags.json
     files = files.filter( file => 
-      !['_items.json', '_tags.json', 'README.md', '.git'].includes(file)
+      !['_tags.json', 'README.md', '.git'].includes(file)
     );
     res.render('teachers/updateTags', {files});
   }
@@ -24,18 +24,39 @@ router.get('/', (req, res)=>{
 });
 
 
-router.post('/', (req, res)=>{
+router.post('/add', (req, res)=>{
+  try{
+    let tags = JSON.parse( fs.readFileSync( path.join(__dirname, '../public/image/svg/_tags.json') ) );
+    let newTags = req.body.newTags;
+    let selectedFiles = req.body.selectedFiles;
+
+    for (let t of newTags){
+      for (let f of selectedFiles){
+        if ( !tags[t] ) tags[t] = [];
+        if ( !tags[t].includes(f) ) tags[t].push(f);
+      }
+    }
+
+    fs.writeFileSync( path.join(__dirname, '../public/image/svg/_tags.json'), JSON.stringify(tags) );
+
+    res.send('success');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
+
+router.post('/remove', (req, res)=>{
   try{
     let tags = JSON.parse( fs.readFileSync( path.join(__dirname, '../public/image/svg/_tags.json') ) );
     let selectedTags = req.body.selectedTags;
     let selectedFiles = req.body.selectedFiles;
-    console.log(selectedTags);
-    console.log(selectedFiles);
-    
+
     for (let t of selectedTags){
       for (let f of selectedFiles){
-        if ( !tags[t] ) tags[t] = [];
-        if ( !tags[t].includes(f) ) tags[t].push(f);
+        if ( tags[t].includes(f) ) tags[t].splice( tags[t].indexOf(f), 1 );
       }
     }
 

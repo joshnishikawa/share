@@ -2116,11 +2116,6 @@ const NH_vocab = {
 
   // head face shoulder hand knee eye ear nose mouth teeth leg toe
   "body": {
-    "body": {
-      "meaning": "体",
-      "image": "",
-      "audio": "https://members.englishjones.com/audio/words/body.mp3"
-    },    
     "head": {
       "meaning": "頭",
       "image": "gif/body_head.gif",

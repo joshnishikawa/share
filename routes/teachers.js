@@ -3,7 +3,7 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 const tagsRouter = require('./tags');
-router.use('/tags', tagsRouter);
+// router.use('/tags', tagsRouter); // uncomment to update tags
 
 router.get('/', (req, res)=>{
   try{
