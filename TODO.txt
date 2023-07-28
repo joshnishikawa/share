@@ -1,11 +1,12 @@
-CLOSE buttons need to go to different pages for students and teachers
-NH list selection
-body/family for NH
-flash image and word
 update modals
-allow related things (not just exact matches for MATCH)
+RECALL peek
+BINGO keybinds
+FLASH image and word
+MATCH allow related things (not just exact matches)
+image menu: empty list when all unchecked
 
-ACTIVITIES
+
+ACTIVITY IDEAS
 spot-it (for letters or pictures)
 spot'em (Both sides have all the same things (or cap/lc). Eliminate by tapping the same thing on both sides.)
 

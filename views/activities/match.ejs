@@ -57,7 +57,7 @@
 
     case 'NH':
       for (let i in NH_vocab[NHpage][setName]){
-        deck.push({name: i, image: `<img src="/image/${NH_vocab[NHpage][setName][i].image}" alt="${i}" 
+        deck.push({name: i, image: `<img src="/image/gif/${NH_vocab[NHpage][setName][i].image}" alt="${i}" 
                                          style="position:absolute;margin: auto;
                                          left: 0;right: 0;text-align: center;
                                          max-width:90%;max-height:90%">`});
@@ -82,6 +82,7 @@
   // SET UP THE DECK /////////////////////////////////////////////////////////////
   // Shuffle first so that cards left out are random (unless doing letters).
   if ( setName != "lower_case_mix" ) FYshuffle(deck);
+  
   // FIRST whittle down the deck to half the number of card backs available.
   while (deck.length * 2 > max_num_of_cards[backs]) deck.pop();
 

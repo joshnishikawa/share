@@ -22,49 +22,53 @@
 </style>
 
 <body>
-  <a href="/" class="btn btn-sm btn-outline-secondary p-0">
+  <a id="closeButton" href="/" class="btn btn-sm btn-outline-secondary p-0">
     <i class="material-icons">close</i>
   </a>
 
-  <div id="content" class="container" style="min-height:100vh;">
+  <div id="content" class="container g-0" style="min-height:100vh;">
   
     <div class="row g-0">
 
-      <!-- image -->
-      <div class="col-4 text-center">
-        <div id="image" class="p-4"></div>
-      </div>
-
       <!-- answer -->
-      <div class="col-8">
-        <div id="guess" class="my-3"></div>
+      <div class="col">
+        <div id="guess" class="d-flex flex-wrap my-3"></div>
         <div class="d-flex my-3">
-          <div id="answer"></div>
+          <div id="answer" class="d-flex flex-wrap"><!-- populated dynamically by resetAnswer() --></div>
           <button id="start" aria-label="next" class="btn btn-lg btn-success" style="display:none;">
             <i class="material-icons">arrow_forward</i>
           </button>
         </div>
       </div>
-    </div>
 
+    </div>
     <div class="row g-0">
-      <div id="keyboard" class="container">
-        <div id="keyrow1" class="row justify-content-center"></div>
-        <div id="keyrow2" class="row justify-content-center"></div>
-        <div id="keyrow3" class="row justify-content-center"></div>
-        <div id="keyrow4" class="row justify-content-center"></div>
+      <!-- image -->
+      <div class="col-4 text-center">
+        <div id="image" class="p-4"></div>
+      </div>
+
+      <div class="col-8 d-flex justify-content-end flex-column">
+        <div id="keyboard" class="container g-0">
+          <div id="keyrow1" class="row g-0 justify-content-center"></div>
+          <div id="keyrow2" class="row g-0 justify-content-center"></div>
+          <div id="keyrow3" class="row g-0 justify-content-center"></div>
+          <div id="keyrow4" class="row g-0 justify-content-center"></div>
+        </div>
       </div>
     </div>
   </div>
 
 <script src="/vocab_decks.js"></script>
-<script src="/NH_vocab.js"></script>
 <script src="/script.js"></script>
 
 <script>
 $(function(){
   // PREPARE THE DECK ////////////////////////////////////////////////////////////
   var url = window.location.href;
+  var returnto = url.substring(0, url.lastIndexOf('/'));
+  $("#closeButton").attr('href', returnto);
+
   const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
   const setName = searchParams.get('setName');
   const deckType = searchParams.get('deckType');
@@ -76,8 +80,9 @@ $(function(){
   
   switch (deckType){
     case 'NH':
-      for (let i in NH_vocab[NHpage][setName]){
-        deck.push({name: i, image: `<img src="/image/${NH_vocab[NHpage][setName][i].image}" alt="${i}">`});
+      list = JSON.parse(setName); // {"vocab word": "file name", "other word": "other file name"}
+      for (let i in list){
+        deck.push({name: i, image: `<img src="/image/gif/${list[i]}" alt="${i}">`});
       }
       break;
     case 'images':
@@ -107,7 +112,7 @@ $(function(){
   // input handlers
   inputLetter = (letter)=>{
     if(place < word.name.length){
-      $("#place"+place).html(letter == ' ' ? '&nbsp;' : letter);
+      $("#place"+place ).html(letter == ' ' ? '&nbsp;' : letter);
       place++;
       guess += letter;
     }
@@ -129,7 +134,7 @@ $(function(){
     $("#enter").prop('disabled', true);
     if (guess === word.name){
       for (let i = 0; i < word.name.length; i++){
-        $(`[data-value=${word.name[i]}]`)
+        $(`[data-value=${word.name[i] == ' ' ? '_' : word.name[i]}]`)
             .removeClass('bg-warning text-body')
             .addClass('bg-primary text-white');
       }
@@ -139,15 +144,16 @@ $(function(){
       correct = true;
     }
     else {
-      $("#guess").html('');
+      $("#guess").html(`<div class="word d-flex"></div>`);
       let remaining = []; // keep track of letters not yet guessed
 
       for(let i = 0; i < word.name.length; i++){
+        let wordwrap = [' ', '-'].includes( word.name[i] ) ? true : false;
         let l = guess[i] == ' ' ? '_' : guess[i];      // for data-value
         let d = guess[i] == ' ' ? '&nbsp;' : guess[i]; // for display
 
         if(guess[i] === word.name[i]){
-          $("#guess").append(`<div class="btn btn-lg bg-primary text-white" 
+          $("#guess .word:last-child").append(`<div class="btn btn-lg bg-primary text-white" 
                                    style="font-size:2em; width:60px;">${d}</div>`);
           $(`[data-value=${l}]`)
             .removeClass('bg-warning bg-secondary text-body')
@@ -155,19 +161,21 @@ $(function(){
         }
         else if (word.name.includes(guess[i])){
           remaining.push(word.name[i]);
-          $("#guess").append(`<div class="btn btn-lg bg-warning" 
+          $("#guess .word:last-child").append(`<div class="btn btn-lg bg-warning" 
                                   style="font-size:2em; width:60px;">${d}</div>`);
           $(`[data-value=${l}]`).addClass('bg-warning text-body');
         }
         else{
           remaining.push(word.name[i]);
-          $("#guess").append(`<div class="btn btn-lg bg-secondary text-white" 
+          $("#guess .word:last-child").append(`<div class="btn btn-lg bg-secondary text-white" 
                                   style="font-size:2em; width:60px;">${d}</div>`);
           $(`[data-value=${l}]`)
             .removeClass('bg-warning text-body')
             .addClass('bg-secondary text-white');
         }
+        if (wordwrap) $("#guess").append(`<div class="word d-flex"></div>`);
       }
+
 
       $("#guess .bg-warning").each(function(){
         let l = $(this).text();
@@ -190,18 +198,23 @@ $(function(){
     correct = false;
     place = 0;
     guess = '';
-    $("#guess").html('');
-    $("#answer").html('');
+    $("#guess").empty();
+    $("#answer").html(`<div class="word d-flex"></div>`);
 
     word = deck.pop();
     if (word){
       $("#image").html(word.image);
 
       for (let l = 0; l < word.name.length; l++){
-        $("#answer").append(`<div id="place${l}" 
-                                  class="place btn btn-lg alert-primary" 
-                                  style="font-size:2em;width:60px;">_</div>`); 
+        let wordwrap = [' ', '-'].includes( word.name[l] ) ? true : false;
+
+        $("#answer .word:last-child").append(`<div id="place${l}"
+                                  class="place btn btn-lg alert-primary"
+                                  style="font-size:2em;width:60px;">_</div>`);
+
+        if (wordwrap) $("#answer").append(`<div class="word d-flex"></div>`);
       }
+
       $("#answer").show();
 
       $("#start").hide();

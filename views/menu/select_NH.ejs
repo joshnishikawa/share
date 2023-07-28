@@ -1,4 +1,36 @@
-<div id="tags" class="d-flex flex-wrap"></div>
+<style>
+  .vertical-label {
+      text-align: right;
+      font-weight: bold;
+      writing-mode: vertical-lr;
+      transform: rotate(180deg);
+      white-space: nowrap;
+      padding: 0.5rem 0;
+    }
+</style>
+
+<div class="container-fluid pb-3">
+  <div class="row">
+
+    <div class="col-10">THEMES</div>
+
+    <div class="col-2 d-flex justify-content-between">
+      <div>LIST<span id="numOfItems"> (0)</span></div>
+      <div class="small text-danger">Edit this last!</div>
+    </div>
+
+  </div>
+  <div class="row">
+
+    <div class="col-10"><div id="themes" class="d-flex flex-wrap"></div></div>
+
+    <div class="col-2" style="display: flex;flex-direction: column;">
+      <div id="list" class="d-flex flex-wrap"></div>
+    </div>
+
+  </div>
+
+</div>
 
 <script src="/NH_vocab.js"></script>
 
@@ -14,8 +46,43 @@ $(function(){
   "Salmon" : ["p20_21", "p24_25"],
   }
 
-  for (let p in NH_vocab) {
 
+  function updateWordList(){
+    $("#list").empty();
+
+    let checkedThemes = $("#themes input:checked").toArray().map(e => e.value);
+    checkedThemes = checkedThemes.filter(e => e);  // remove empty strings
+
+    let words = {};
+
+    for (let t of checkedThemes) {
+      let p = $(`input:checked[value="${t}"]`).parent().parent().attr('id');
+
+      for (let w in NH_vocab[p][t]) {
+        words[w] = NH_vocab[p][t][w].image;
+        $("#list").append(`
+          <div class="alert-primary rounded-3 mb-1 me-1 ps-1 d-flex justify-content-between">
+            <div>${w}</div>
+            <div id="${w}" class="list btn btn-close" style="font-size:10px;"></div>
+          </div>
+        `);
+      }
+    }
+
+    $(".list").on('click', function(){
+      let word = $(this).attr('id');
+      delete words[word];
+      $(this).parent().remove();
+      $("#numOfItems").html(`&nbsp;(${Object.keys(words).length})`);
+      window.setName = JSON.stringify(words);
+    });
+
+    $("#numOfItems").html(`&nbsp;(${Object.keys(words).length})`);
+    window.setName = JSON.stringify(words);
+  }
+
+
+  for (let p in NH_vocab) {
     for (let c in colors) {
       if (colors[c].includes(p)) {
         color = c;
@@ -23,20 +90,22 @@ $(function(){
       }
     }
 
-    $("#tags").append(`<div id="${p}" class="rounded-3 m-1 p-1" style="background-color:${color}"><h5>${p}</h5></div>`);
+    $("#themes").append(`<div class="rounded-3 p-1 d-flex" style="margin:1px;background-color:${color}">
+                           <div class="vertical-label">${p}</div>
+                           <div id="${p}" style="width:170px;"></div>
+                         </div>`);
 
     for (let t in NH_vocab[p]) {
       let id = t.replace(/ /g, "_");
-      $(`#${p}`).append(`<div id="${t}" class="form-check">
-        <input class="form-check-input" type="radio" name="tags" id="tag_${t}" value="${t}" aria-label="tags">
-        <label class="form-check-label me-3" style="margin-left:-5px;" for="tag_${t}">${t} (${Object.keys(NH_vocab[p][t]).length})</label>
+      $(`#${p}`).append(`<div class="form-check">
+        <input class="form-check-input" type="checkbox" name="themes" id="${id}" value="${t}" aria-label="themes">
+        <label class="form-check-label me-3" style="margin-left:-5px;" for="${id}">${t} (${Object.keys(NH_vocab[p][t]).length})</label>
       </div>`);
     }
   }
 
-  $("#tags").on("change", (e)=>{
-    window.NHpage = $(e.target).parent().parent().attr("id");
-    window.setName = e.target.value;
+  $("#themes input").on('change', ()=>{
+    updateWordList();
   });
 
 });
