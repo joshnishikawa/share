@@ -1,15 +1,32 @@
+<style>
+  .spell{
+    min-width:40px;
+    min-height:40px;
+    font-size:2rem;
+    line-height:2rem;
+    vertical-align:bottom;
+  }
+</style>
 <div class="rounded-3 border p-3 shadow d-flex">
-  <strong class="text-primary h3">WORDLE</strong>
-  <button class="btn btn-sm btn-outline-info mb-2" 
-          data-bs-toggle="modal" data-bs-target="#wordle_modal">
-    <i class="material-icons md-small">info</i>
-  </button>
-  <form id="wordleForm" action="wordle" method="GET" class="d-flex justify-content-end w-100 mb-2">
-    <input type="hidden" value="" name="setName">
-    <input type="hidden" value="" name="deckType">
-    <input type="hidden" value="" name="NHpage">
-    <button id="wordleButton" type="submit" class="btn btn-primary">Start</button>
-  </form>
+  <div class="spell rounded-3 bg-secondary text-white text-center">s</div>
+  <div class="spell rounded-3 bg-primary text-white text-center">p</div>
+  <div class="spell rounded-3 bg-warning text-white text-center">e</div>
+  <div class="spell rounded-3 bg-primary text-white text-center">l</div>
+  <div class="spell rounded-3 bg-secondary text-white text-center">l</div>
+
+  <div  class="d-flex justify-content-end w-100">
+
+    <button class="btn btn-outline-info" 
+            data-bs-toggle="modal" data-bs-target="#wordle_modal">
+      <i class="material-icons" style="line-height:1rem;">info</i>
+    </button>
+
+    <form id="wordleForm" action="wordle" method="GET">
+      <input type="hidden" value="" name="setName">
+      <input type="hidden" value="" name="deckType">
+      <button id="wordleButton" type="submit" class="btn btn-primary" style="height:100%;">Start</button>
+    </form>
+  </div>
 </div>
 
 
@@ -18,16 +35,50 @@
     <div class="modal-content">
 
       <div class="modal-header">
-        <h3 class="modal-title">Wordle for Spelling</h3>
+        <div class="modal-title d-flex">
+          <div class="spell rounded-3 bg-secondary text-white text-center">s</div>
+          <div class="spell rounded-3 bg-primary text-white text-center">p</div>
+          <div class="spell rounded-3 bg-warning text-white text-center">e</div>
+          <div class="spell rounded-3 bg-primary text-white text-center">l</div>
+          <div class="spell rounded-3 bg-secondary text-white text-center">l</div>
+        </div>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <p>You know the word. Do you know how to spell it?</p>
-        <span class="btn btn-warning">Yellow</span> = the letter is somewhere in the word.<br>
-        <span class="btn btn-primary">Blue</span> = the letter is in the correct place in the word.<br>
-        <span class="btn btn-secondary">Gray</span> = the letter is <em>not</em> in the word.
-        <br/>
-      </div>
+        <p><%- __('menu.modal.spell.1') %></p>
+        <p><%- __('menu.modal.spell.2') %></p>
+        <span class="btn btn-primary" style="width:80px;">Blue</span> <%- __('menu.modal.spell.blue') %><br>
+        <span class="btn btn-warning" style="width:80px;">Yellow</span> <%- __('menu.modal.spell.yellow') %><br>
+        <span class="btn btn-secondary" style="width:80px;">Gray</span> <%- __('menu.modal.spell.gray') %>
+        <hr/>
+
+        <p><%- __('menu.modal.spell.3') %></p>
+        <div class="d-flex">
+          <div class="spell rounded-3 bg-secondary text-white text-center">s</div>
+          <div class="spell rounded-3 bg-primary text-white text-center">p</div>
+          <div class="spell rounded-3 bg-warning text-white text-center">e</div>
+          <div class="spell rounded-3 bg-primary text-white text-center">l</div>
+          <div class="spell rounded-3 bg-secondary text-white text-center">l</div>
+        </div>
+        <div class="d-flex">
+          <div class="spell rounded-3 alert-primary text-center">a</div>
+          <div class="spell rounded-3 alert-primary text-center">p</div>
+          <div class="spell rounded-3 alert-primary text-center">p</div>
+          <div class="spell rounded-3 alert-primary text-center">l</div>
+          <div class="spell rounded-3 alert-primary text-center">e</div>
+        </div>
+
+        <div id="answer" class="d-flex flex-wrap mt-5">
+          <div class="spell rounded-3 bg-primary text-white text-center p-3" style="font-size:3em;">apple</div>
+
+          <div class="spell rounded-3 bg-success text-white text-center p-3" style="font-size:3em;">
+            <i class="material-icons">arrow_forward</i>
+          </div>
+        </div>
+
+        <p><%- __('menu.modal.spell.4') %></p>
+
+    </div>
     </div>
   </div>
 </div>
@@ -61,7 +112,6 @@ $(function(){
       alert("Please select a deck.");
     }
     else {
-      $("#wordleForm input[name='NHpage']").val(window.NHpage);
       $("#wordleForm input[name='setName']").val(window.setName);
       $("#wordleForm input[name='deckType']").val(window.deckType);
       $("#wordleForm").submit();

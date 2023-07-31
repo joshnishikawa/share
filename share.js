@@ -9,6 +9,16 @@ const teachersRouter = require('./routes/teachers');
 const studentsRouter = require('./routes/students');
 const port = process.env.PORT || 5000;
 
+const { I18n } = require('i18n');
+const i18n = new I18n({
+  locales: ['en', 'ja'],
+  directory: path.join(__dirname, 'locales'),
+  retryInDefaultLocale: true,
+  objectNotation: true,
+  autoReload: true
+});
+
+
 app.listen(port, (err)=>{
   if(err) {
     console.error(err);
@@ -24,6 +34,7 @@ app.set('views', path.join(__dirname, 'views'));
 // PROCESS USER REQUESTS *IN ORDER* ////////////////////////////////////////////
 app.use( logger('dev') );
 app.use(  express.static( path.join(__dirname, 'public') )  );
+app.use( i18n.init );
 app.use('/', studentsRouter);
 app.use('/teachers', teachersRouter);
 

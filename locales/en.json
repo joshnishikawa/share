@@ -1,0 +1,15 @@
+{
+	"menu": {
+		"modal": {
+			"spell": {
+				"1": "You know the word. Do you know how to spell it?",
+				"2": "Make your best guess and press <kbd>Enter</kbd>. The letters will change colors to give you hints.",
+				"blue": "Great! This is the correct letter for this position.",
+				"yellow": "This letter is needed, but not in this position.",
+				"gray": "This letter is <strong>not</strong> needed in the word.",
+				"3": "Think carefully and try again.",
+				"4": "You got it! Now hit the green arrow or <kbd>Enter</kbd> to continue."
+			}
+		}
+	}
+}
