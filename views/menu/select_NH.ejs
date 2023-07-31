@@ -22,7 +22,24 @@
   </div>
   <div class="row">
 
-    <div class="col-10"><div id="themes" class="d-flex flex-wrap"></div></div>
+    <div class="col-10">
+      <div id="themes" class="d-flex flex-wrap">
+<% for (let p in NH_vocab) { let color = ''; for (let c in colors) { if (colors[c].includes(p)) { color = c; break;}} %>
+        <div class="rounded-3 p-1 d-flex" style="margin:1px;background-color:<%- color %>">
+          <div class="vertical-label"><%- p %></div>
+          <div id="<%- p %>" style="width:170px;">
+
+  <% for (let t in NH_vocab[p]) { let id = t.replace(/ /g, "_"); %>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="themes" id="<%- id %>" value="<%- t %>" aria-label="themes">
+              <label class="form-check-label me-3" style="margin-left:-5px;" for="<%- id %>"><%- __(t) %> (<%- Object.keys(NH_vocab[p][t]).length %>)</label>
+            </div>
+  <% } %>
+          </div>
+        </div>
+<% } %>
+      </div>
+    </div>
 
     <div class="col-2" style="display: flex;flex-direction: column;">
       <div id="list" class="d-flex flex-wrap"></div>
@@ -32,20 +49,10 @@
 
 </div>
 
-<script src="/NH_vocab.js"></script>
 
 <script>
 $(function(){
-  var color = "white";
-  var colors = {
-  "Orchid" : ["p4_5", "p14_15"],
-  "PaleGreen" : ["p6_7", "p12_13", "p26_27", "p30_31"],
-  "Gold" : ["p8_9", "p16_17", "p22_23"],
-  "Pink" : ["p10_11", "p28_29"],
-  "SkyBlue" : ["p18_19"],
-  "Salmon" : ["p20_21", "p24_25"],
-  }
-
+  let NH_vocab = <%- JSON.stringify(NH_vocab) %>;
 
   function updateWordList(){
     $("#list").empty();
@@ -81,28 +88,6 @@ $(function(){
     window.setName = JSON.stringify(words);
   }
 
-
-  for (let p in NH_vocab) {
-    for (let c in colors) {
-      if (colors[c].includes(p)) {
-        color = c;
-        break;
-      }
-    }
-
-    $("#themes").append(`<div class="rounded-3 p-1 d-flex" style="margin:1px;background-color:${color}">
-                           <div class="vertical-label">${p}</div>
-                           <div id="${p}" style="width:170px;"></div>
-                         </div>`);
-
-    for (let t in NH_vocab[p]) {
-      let id = t.replace(/ /g, "_");
-      $(`#${p}`).append(`<div class="form-check">
-        <input class="form-check-input" type="checkbox" name="themes" id="${id}" value="${t}" aria-label="themes">
-        <label class="form-check-label me-3" style="margin-left:-5px;" for="${id}">${t} (${Object.keys(NH_vocab[p][t]).length})</label>
-      </div>`);
-    }
-  }
 
   $("#themes input").on('change', ()=>{
     updateWordList();

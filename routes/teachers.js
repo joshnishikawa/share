@@ -3,6 +3,8 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 const tagsRouter = require('./tags');
+const NH_vocab = require('../public/NH_vocab.js');
+
 // router.use('/tags', tagsRouter); // uncomment to update tags
 
 router.get('/', (req, res)=>{
@@ -29,7 +31,16 @@ router.get('/text', (req, res)=>{
 
 router.get('/New_Horizons', (req, res)=>{
   try{
-    res.render('teachers/NH');
+    var colors = {
+      "Orchid" : ["p4_5", "p14_15"],
+      "PaleGreen" : ["p6_7", "p12_13", "p26_27", "p30_31"],
+      "Gold" : ["p8_9", "p16_17", "p22_23"],
+      "Pink" : ["p10_11", "p28_29"],
+      "SkyBlue" : ["p18_19"],
+      "Salmon" : ["p20_21", "p24_25"],
+      }
+
+    res.render('teachers/NH', {NH_vocab: NH_vocab, colors: colors});
   }
   catch(err){
     res.send(err);

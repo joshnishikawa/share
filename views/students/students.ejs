@@ -19,31 +19,8 @@
 
 <script>
 $(function(){
-  let shapes = [];
-  let colors = [];
-    for (let i = 0; i < 3; i++){
-      shapes.push(i+3);
-      colors.push(i);
-      colors.push(i);
-    }
-
-    let shapes2 = shapes.slice(0);
-    FYshuffle(shapes);
-    FYshuffle(shapes2);
-
-    if (shapes[shapes.length-1] == shapes2[0]) {
-      shapes2.push(shapes2.shift());
-      console.log(shapes[shapes.length-1], shapes2[0]);
-    }
-
-    shapes = shapes.concat(shapes2);
-
-    parallelShuffle(shapes, colors);
-    console.log(shapes);
-    console.log(colors);
-
   window.deckType = "NH";
 });
-  
 </script>
-  <%- include('../foot.ejs') -%>
+
+<%- include('../foot.ejs') -%>

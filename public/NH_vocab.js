@@ -3375,3 +3375,5 @@ const NH_vocab = {
   }
 }
 }
+
+module.exports = NH_vocab;
