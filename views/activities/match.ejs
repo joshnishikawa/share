@@ -26,12 +26,15 @@
 <script src="/script.js"></script>
 
 <script>
+$(function(){
+
   var url = window.location.href;
   const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
   const setName = searchParams.get('setName');
   const deckType = searchParams.get('deckType');
   const NHpage = searchParams.get('NHpage');
   const backs = searchParams.get('backs');
+
   let max_num_of_cards = {
     'colors': 20,
     'colorsNumbers': 40,
@@ -39,6 +42,7 @@
     'animals': 20,
     'objects': 20,
   }
+
   var deck = [];
   var list = [];
   var backContent = [];
@@ -94,14 +98,16 @@
   deck = deck.concat( deck );
 
 
-// THEN SET UP THE CARD BACKS //////////////////////////////////////////////////
+  // THEN SET UP THE CARD BACKS //////////////////////////////////////////////////
   switch(backs){
     case 'colors':
       backClass = vocab_decks.colors.slice(0, deck.length);
+      FYshuffle(backClass);
       break;
 
     case 'numbers':
       backContent = vocab_decks['0~100'].slice(1, deck.length+1);
+      FYshuffle(backContent);
       break;
 
     case 'colorsNumbers':
@@ -112,24 +118,40 @@
         backClass.push(vocab_decks.colors[i] + 'Text alert-primary');
       }
 
-      // It has to be this way becuase FYshuffle shuffles in place.
+      let nums2 = nums.slice(0); // Do this way because FYshuffle shuffles in place.
       FYshuffle(nums);
-      backContent = nums;
-      backContent = backContent.concat( nums );
+      FYshuffle(nums2);
 
+      // This prevents dupes that may occur when half the deck is an odd number.
+      // i.e. ["r", "r", "g", "g", "b", "b"]
+      //      [ 3,   1,   2,   2,   3,   1 ] would produce two green "2"s
+      if (nums[nums.length-1] == nums2[0]) nums2.pop( nums2.unshift() );
+
+      backContent = nums.concat(nums2);
       parallelShuffle(backClass, backContent);
       break;
 
     case 'colorsShapes':
-      var shapes = FYshuffle(vocab_decks.shapes.slice(0, deck.length / 2));
-      backContent = shapes.concat( FYshuffle(shapes) );
-    
-      var colors = vocab_decks.colors.slice(0, deck.length / 2);
-      for (let i = 0; i < colors.length; i++){
-        colors[i] += 'Text alert-primary'; // use .redText class instead of .red
-        backClass.push(colors[i]);
-        backClass.push(colors[i]);
+      let shapes = [];
+      for (let i = 0; i < deck.length / 2; i++){
+        shapes.push(vocab_decks.shapes[i]);
+        backClass.push(vocab_decks.colors[i] + 'Text alert-primary'); //use .redText class instead of .red
+        backClass.push(vocab_decks.colors[i] + 'Text alert-primary');
       }
+
+      let shapes2 = shapes.slice(0); // Do this way because FYshuffle shuffles in place.
+      FYshuffle(shapes);
+      FYshuffle(shapes2);
+
+      // This prevents dupes that may occur when half the length of the deck is an odd number.
+      // i.e. ["r", "r", "g", "g", "b", "b"]
+      //      [ 3,   1,   2,   2,   3,   1 ] would produce two green "2"s
+      if (shapes[shapes.length-1] == shapes2[0]) {
+        shapes2.pop(shapes2.unshift());
+      }
+
+      backContent = shapes.concat(shapes2);
+      parallelShuffle(backClass, backContent);
       break;
 
     case 'animals':
@@ -139,6 +161,8 @@
                                alt="${vocab_decks.animals[i]}">`);
         backClass.push('alert-primary');
       }
+
+      FYshuffle(backContent);
       break;
 
     case 'objects':
@@ -148,6 +172,8 @@
                                alt="${vocab_decks.animals[i]}">`);
         backClass.push('alert-primary');
       }
+
+      FYshuffle(backContent);
       break;
 
     default:
@@ -155,19 +181,17 @@
   }
 
 
-// letters need to be shuffled in parallel with the objects they represent
-if ( setName == "lower_case_mix" ) {
-  parallelShuffle(deck, backContent);
-  FYshuffle(backClass);
-}
-else {
-  FYshuffle(deck);
-  FYshuffle(backContent);
-  FYshuffle(backClass);
-}
+  // letters need to be shuffled in parallel with the objects they represent
+  if ( setName == "lower_case_mix" ) {
+    parallelShuffle(deck, backContent);
+    FYshuffle(backClass);
+  }
+  else {
+    FYshuffle(deck);
+    // In other cases, the backContent is already shuffled
+  }
 
-$(function(){
-// NOW BUILD THE GRID //////////////////////////////////////////////////////////
+  // NOW BUILD THE GRID //////////////////////////////////////////////////////////
   for (let i = 0; i < deck.length; i++){
     $("#grid").append(
      `<div id="${deck[i].name}" class="col-${colspan} vocab p-0" style="height:${rowheight}vh;">

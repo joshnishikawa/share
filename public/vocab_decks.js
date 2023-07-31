@@ -68,7 +68,7 @@ const vocab_decks = {
            'cat','horse','juice','lion','nail','quilt','violin','worm','yo-yo','zipper'],
 
   "shapes":['&#10010;', '&#9632;','&#9733;','&#9830;','&#9829;','&#9644;','&#9650;','&#9679;','&#8594;'],
-           //square    star     diamond   heart     rectangle triangle  circle    arrow
+            //square     star      diamond   heart     rectangle triangle  circle    arrow     cross
 
   "colors":['red','orange','yellow','green','blue','purple','black','pink',
            'gray','brown','gold','silver','violet',
