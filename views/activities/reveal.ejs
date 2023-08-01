@@ -56,7 +56,6 @@
 <div id="loadme" class="text-center" style="height:100vh;display:none;"></div>
 
 <script src="/vocab_decks.js"></script>
-<script src="/NH_vocab.js"></script>
 <script src="/script.js"></script>
 
 <script>
@@ -66,7 +65,6 @@ $(function(){
   const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
   const setName = searchParams.get('setName');
   const deckType = searchParams.get('deckType');
-  const NHpage = searchParams.get('NHpage');
   const style = searchParams.get('style');
   var deck = [];
   var list = [];
@@ -75,8 +73,9 @@ $(function(){
   // We need an array of objects. Objects have info and arrays can be shuffled.
   switch (deckType){
     case 'NH':
-      for (let i in NH_vocab[NHpage][setName]){
-        deck.push({name: i, image: `<img src="/image/gif/${NH_vocab[NHpage][setName][i].image}" alt="${i}">`});
+      list = JSON.parse(setName); // {"vocab word": "file name", "other word": "other file name"}
+      for (let i in list){
+        deck.push({name: i, image: `<img src="/image/gif/${list[i]}" alt="${i}">`});
       }
       break;
     case 'images':
@@ -93,7 +92,7 @@ $(function(){
 
 
 // FUNCTIONS ///////////////////////////////////////////////////////////////////
-  var factor = 2; // how big a pixel is in the pixelate style
+  var factor = 4; // how big a pixel is in the pixelate style
 
 // these are for the spotlight style
   var light = 5;
@@ -212,7 +211,7 @@ $(function(){
           e.preventDefault();
           index++;
           if (index < Object.keys(deck).length){
-            factor = 2;
+            factor = 4;
             $("#loadme").html(deck[index].image); // load the image
           }
           else {
@@ -221,7 +220,7 @@ $(function(){
         }
         else if (e.keyCode == 37){
           e.preventDefault();
-          factor = factor <= 2 ? 2 : factor/2;
+          factor = factor <= 4 ? 4 : factor/2;
           $("#loadme").html(deck[index].image); // load the image
         }
         else if (e.keyCode == 39){

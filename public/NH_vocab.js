@@ -1,6 +1,6 @@
 const NH_vocab = {
 // fine good great happy sad tired sleepy busy hungry thirsty
-"p4_5" : {
+"page_4_5" : {
   "feelings": {
     "fine": {
       "meaning": "いい",
@@ -283,7 +283,7 @@ const NH_vocab = {
   }
 },
 
-"p6_7" : {
+"page_6_7" : {
   "colors": {
     "black": {
       "meaning": "くろ",
@@ -451,7 +451,7 @@ const NH_vocab = {
   }
 },
 
-"p8_9" : {
+"page_8_9" : {
   "food": {
     "rice": {
       "meaning": "ご飯",
@@ -638,7 +638,7 @@ const NH_vocab = {
   }
 },
 
-"p10_11" : {
+"page_10_11" : {
   "produce": {
     "apple": {
       "meaning": "りんご",
@@ -905,7 +905,7 @@ const NH_vocab = {
   }
 },
 
-"p12_13" : {
+"page_12_13" : {
   "animals": {
     "bear": {
       "meaning": "クマ",
@@ -1094,7 +1094,7 @@ const NH_vocab = {
   },
 
   // whale shark dolphin 'sea turtle' fish squid jellyfish shrimp
-  "sealife": {
+  "sea animals": {
     "whale": {
       "meaning": "クジラ",
       "image": "sea_animals_whale.gif",
@@ -1138,7 +1138,7 @@ const NH_vocab = {
   },
 
   // ant butterfly grasshopper spider
-  "insects": {
+  "bugs": {
     "ant": {
       "meaning": "アリ",
       "image": "insects_ant.gif",
@@ -1162,7 +1162,7 @@ const NH_vocab = {
   }
 },
 
-"p14_15" : {
+"page_14_15" : {
   "months": {
     "January": {
       "meaning": "1月",
@@ -1273,7 +1273,7 @@ const NH_vocab = {
     }
   },
 
-  "weekdays": {
+  "days": {
     "Sunday": {
       "meaning": "日曜日",
       "image": "weekdays_Sunday.gif",
@@ -1312,7 +1312,7 @@ const NH_vocab = {
   },
 
   // first second third fourth fifth sixth seventh eighth ninth tenth eleventh twelfth thirteenth fourteenth fifteenth sixteenth seventeenth eighteenth nineteenth twentieth twenty-first twenty-second twenty-third twenty-fourth twenty-fifth twenty-sixth twenty-seventh twenty-eighth twenty-ninth thirtieth thirty-first
-  "ordinals": {
+  "dates": {
     "first": {
       "meaning": "1番目",
       "image": "ordinals_1st.gif",
@@ -1471,7 +1471,7 @@ const NH_vocab = {
   }
 },
 
-"p16_17" : {
+"page_16_17" : {
   "countries": {
     "America": {
       "meaning": "アメリカ",
@@ -1711,7 +1711,7 @@ const NH_vocab = {
   }
 },
 
-"p18_19" : {
+"page_18_19" : {
   "verbs": {
     "sing": {
       "meaning": "歌う",
@@ -1947,7 +1947,7 @@ const NH_vocab = {
   }
 },
 
-"p20_21" : {
+"page_20_21" : {
   "daily": {
     "get up": {
       "meaning": "起きる",
@@ -2179,7 +2179,7 @@ const NH_vocab = {
   }
 },
 
-"p22_23" : {
+"page_22_23" : {
   "places": {
     "house": {
       "meaning": "家",
@@ -2444,7 +2444,7 @@ const NH_vocab = {
   }
 },
 
-"p24_25" : {
+"page_24_25" : {
   "subjects": {
     "English": {
       "meaning": "英語",
@@ -2670,7 +2670,7 @@ const NH_vocab = {
   }
 },
 
-"p26_27" : {
+"page_26_27" : {
   "daily objects": {
     "ball": {
       "meaning": "ボール",
@@ -2888,7 +2888,7 @@ const NH_vocab = {
   }
 },
   
-"p28_29" : {
+"page_28_29" : {
   "school events": {
     "field trip": {
       "meaning": "遠足",
@@ -3152,7 +3152,7 @@ const NH_vocab = {
   }
 },
 
-"p30_31" :{
+"page_30_31" :{
   "jobs": {
     "artist": {
       "meaning": "芸術家",
@@ -3281,7 +3281,7 @@ const NH_vocab = {
     }
   },
 
-  "club": {
+  "club activities": {
     "baseball team": {
       "meaning": "野球部",
       "image": "club_baseball_team.gif",

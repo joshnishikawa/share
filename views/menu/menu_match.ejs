@@ -1,26 +1,31 @@
 <div class="rounded-3 border p-3 shadow d-flex">
   <strong class="text-primary h3">MATCH</strong>
-  <button class="btn btn-sm btn-outline-info mb-2" 
-          data-bs-toggle="modal" data-bs-target="#match_modal">
-    <i class="material-icons md-small">info</i>
-  </button>
-  <form id="matchForm" action="match" method="GET" class="d-flex justify-content-end form-group w-100 mb-2">
 
-    <select class="form-control" name="backs">
-      <option value="" disabled selected>Card Backs</option>
-      <option value="colors">Colors</option>
-      <option value="numbers">Numbers</option>
-      <option value="colorsNumbers">Color & Num.</option>
-      <option value="colorsShapes">Color & Shape</option>
-      <option value="animals">Animals</option>
-      <option value="objects">Objects</option>
-    </select>
-    <input type="hidden" value="" name="setName">
-    <input type="hidden" value="" name="deckType">
-    <input type="hidden" value="" name="NHpage">
-    <button id="matchButton" type="submit" class="btn btn-primary">Start</button>
-  </form>
+  <div class="d-flex justify-content-end w-100">
 
+    <button class="btn btn-outline-info" 
+            data-bs-toggle="modal" data-bs-target="#match_modal">
+      <i class="material-icons" style="line-height:1rem;vertical-align:middle;">info</i>
+    </button>
+
+    <form id="matchForm" action="match" method="GET">
+      <div class="d-flex" style="height:100%;">
+        <select class="form-control" name="backs">
+          <option value="" disabled selected>Card Backs</option>
+          <option value="colors">Colors</option>
+          <option value="numbers">Numbers</option>
+          <option value="colorsNumbers">Color & Num.</option>
+          <option value="colorsShapes">Color & Shape</option>
+          <option value="animals">Animals</option>
+          <option value="objects">Objects</option>
+        </select>
+        <input type="hidden" value="" name="setName">
+        <input type="hidden" value="" name="deckType">
+        <button id="matchButton" type="submit" class="btn btn-primary">Start</button>
+      </div>
+    </form>
+  
+  </div>
 </div>
 
 
@@ -58,11 +63,10 @@
 $(function(){
   $("#matchButton").on('click', (e)=>{
     e.preventDefault();
-    if (!window.setName) {
+    if (!window.setName || window.setName == '{}') {
       alert("Please select a deck.");
     }
     else {
-      $("#matchForm input[name='NHpage']").val(window.NHpage);
       $("#matchForm input[name='setName']").val(window.setName);
       $("#matchForm input[name='deckType']").val(window.deckType);
       $("#matchForm").submit();

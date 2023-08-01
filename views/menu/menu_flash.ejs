@@ -1,15 +1,19 @@
 <div class="rounded-3 border p-3 shadow d-flex">
   <strong class="text-primary h3">FLASH</strong>
-  <button class="btn btn-sm btn-outline-info mb-2" 
-          data-bs-toggle="modal" data-bs-target="#flash_modal">
-    <i class="material-icons md-small">info</i>
-  </button>
-  <form id="flashForm" action="flash" method="GET" class="d-flex justify-content-end w-100 mb-2">
-    <input type="hidden" value="" name="setName">
-    <input type="hidden" value="" name="deckType">
-    <input type="hidden" value="" name="NHpage">
-    <button id="flashButton" type="submit" class="btn btn-primary">Start</button>
-  </form>
+
+  <div class="d-flex justify-content-end w-100">
+
+    <button class="btn btn-outline-info" 
+            data-bs-toggle="modal" data-bs-target="#flash_modal">
+      <i class="material-icons" style="line-height:1rem;vertical-align:middle;">info</i>
+    </button>
+
+    <form id="flashForm" action="flash" method="GET">
+      <input type="hidden" value="" name="setName">
+      <input type="hidden" value="" name="deckType">
+      <button id="flashButton" type="submit" class="btn btn-primary" style="height:100%;">Start</button>
+    </form>
+  </div>
 </div>
 
 
@@ -32,12 +36,6 @@
         <b>'Restart Set'</b> appears at the first card in the review deck. Clicking this will remove the review deck.<br/>
         <b>'Restart Review'</b> appears after you've started proceeding through the review deck.<br/>
         <b>'Review'</b> and the number of items selected for review will appear again if you select items for further review from the review deck.<br/><br/>
-        <ul>
-          <li>Pro Tip 1: Some decks are sorted into pairs. Sort them alphabetically by 
-          unchecking "Shuffle" when the deck is selected.</li>
-          <li>Pro Tip 2: Some decks are large. Cherry pick a review deck before your
-          students see them. You could even have multiple tabs set up.</li>
-        </ul>
       </div>
     </div>
   </div>
@@ -49,11 +47,10 @@
 $(function(){
   $("#flashButton").on('click', (e)=>{
     e.preventDefault();
-    if (!window.setName) {
+    if (!window.setName || window.setName == '{}') {
       alert("Please select a deck.");
     }
     else {
-      $("#flashForm input[name='NHpage']").val(window.NHpage);
       $("#flashForm input[name='setName']").val(window.setName);
       $("#flashForm input[name='deckType']").val(window.deckType);
       $("#flashForm").submit();

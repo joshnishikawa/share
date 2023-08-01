@@ -32,12 +32,12 @@ router.get('/text', (req, res)=>{
 router.get('/New_Horizons', (req, res)=>{
   try{
     var colors = {
-      "Orchid" : ["p4_5", "p14_15"],
-      "PaleGreen" : ["p6_7", "p12_13", "p26_27", "p30_31"],
-      "Gold" : ["p8_9", "p16_17", "p22_23"],
-      "Pink" : ["p10_11", "p28_29"],
-      "SkyBlue" : ["p18_19"],
-      "Salmon" : ["p20_21", "p24_25"],
+      "#c5b3e6" : ["page_4_5", "page_14_15"],
+      "#a3cfbb" : ["page_6_7", "page_12_13", "page_26_27", "page_30_31"],
+      "#ffe69c" : ["page_8_9", "page_16_17", "page_22_23"],
+      "#f1aeb5" : ["page_10_11", "page_28_29"],
+      "#9ec5fe" : ["page_18_19"],
+      "#fecba1" : ["page_20_21", "page_24_25"],
       }
 
     res.render('teachers/NH', {NH_vocab: NH_vocab, colors: colors});
@@ -118,7 +118,7 @@ router.get('/diagram', (req, res)=>{
 
 router.get('/match', (req, res)=>{
   try{
-    res.render('activities/match');
+    res.render('activities/match', {NH_vocab: NH_vocab});
   }
   catch(err){ 
     res.send(err);

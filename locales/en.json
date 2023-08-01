@@ -27,13 +27,13 @@
 	"flavors": "flavors",
 	"animals": "animals",
 	"nature": "nature",
-	"sealife": "sealife",
-	"insects": "insects",
+	"sea animals": "sea animals",
+	"bugs": "bugs",
 	"months": "months",
 	"times": "times",
 	"seasons": "seasons",
-	"weekdays": "weekdays",
-	"ordinals": "ordinals",
+	"days": "days",
+	"dates": "dates",
 	"countries": "countries",
 	"family": "family",
 	"people": "people",
@@ -60,5 +60,8 @@
 	"adjectives": "adjectives",
 	"adjectives2": "adjectives2",
 	"jobs": "jobs",
-	"club": "club"
+	"club activities": "club activities",
+	"editThisLast": "Edit this last!",
+	"themes": "THEMES",
+	"list": "LIST"
 }

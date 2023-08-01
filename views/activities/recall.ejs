@@ -41,7 +41,6 @@
   </div>
 
 <script src="/vocab_decks.js"></script>
-<script src="/NH_vocab.js"></script>
 <script src="/script.js"></script>
 
 <script>
@@ -50,7 +49,6 @@ $(function(){
   const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
   const setName = searchParams.get('setName');
   const deckType = searchParams.get('deckType');
-  const NHpage = searchParams.get('NHpage');
   var deck = [];
   var list = [];
 
@@ -63,9 +61,9 @@ $(function(){
       }
       break;
     case 'NH':
-      for (let i in NH_vocab[NHpage][setName]){
-        deck.push({name: i, 
-                   image: `<img src="/image/gif/${NH_vocab[NHpage][setName][i].image}" alt="${i}">`});
+      list = JSON.parse(setName); // {"vocab word": "file name", "other word": "other file name"}
+      for (let i in list){
+        deck.push({name: i, image: `<img src="/image/gif/${list[i]}" alt="${i}">`});
       }
       break;
     case 'images':
@@ -76,7 +74,7 @@ $(function(){
       }
       break;
     default:
-      console.log('ERROR: deckType not recognized.');
+      throw 'ERROR: deckType not recognized.';
   }
 
 

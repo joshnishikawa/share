@@ -1,24 +1,29 @@
 <div class="rounded-3 border p-3 shadow d-flex">
   <strong class="text-primary h3">REVEAL</strong>
-  <button class="btn btn-sm btn-outline-info mb-2" 
-          data-bs-toggle="modal" data-bs-target="#reveal_modal">
-    <i class="material-icons md-small">info</i>
-  </button>
-  <form id="reveal" action="reveal" method="GET" class="d-flex justify-content-end w-100 mb-2">
 
-    <select class="form-control" name="style" required>
-      <option value="" disabled selected>Style</option>
-      <option value="spotlight">Spotlight</option>
-      <option value="blur">Blur</option>
-      <option value="pixelate">Pixelate</option>
-      <!-- <option value="blinder">Blinder</option> -->
-    </select>
+  <div class="d-flex justify-content-end w-100">
 
-    <input type="hidden" value="" name="setName">
-    <input type="hidden" value="" name="deckType">
-    <input type="hidden" value="" name="NHpage">
-    <button id="revealButton" type="submit" class="btn btn-primary">Start</button>
-  </form>
+    <button class="btn btn-outline-info" 
+            data-bs-toggle="modal" data-bs-target="#reveal_modal">
+      <i class="material-icons" style="line-height:1rem;vertical-align:middle;">info</i>
+    </button>
+
+    <form id="reveal" action="reveal" method="GET">
+      <div class="d-flex" style="height:100%;">
+        <select class="form-control" name="style" required>
+          <option value="" disabled selected>Style</option>
+          <option value="spotlight">Spotlight</option>
+          <option value="blur">Blur</option>
+          <option value="pixelate">Pixelate</option>
+          <!-- <option value="blinder">Blinder</option> -->
+        </select>
+
+        <input type="hidden" value="" name="setName">
+        <input type="hidden" value="" name="deckType">
+        <button id="revealButton" type="submit" class="btn btn-primary">Start</button>
+      </div>
+    </form>
+  </div>
 </div>
 
 
@@ -43,11 +48,13 @@
 $(function(){
   $("#revealButton").on('click', (e)=>{
     e.preventDefault();
-    if (!window.setName) {
+    if (!window.setName || window.setName == '{}') {
       alert("Please select a deck.");
     }
+    else if (!$("#reveal select[name='style']").val()) {
+      alert("Please select a style.");
+    }
     else {
-      $("#reveal input[name='NHpage']").val(window.NHpage);
       $("#reveal input[name='setName']").val(window.setName);
       $("#reveal input[name='deckType']").val(window.deckType);
       $("#reveal").submit();

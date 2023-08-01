@@ -1,17 +1,24 @@
-<div class="rounded-3 border p-3 shadow">
-  <strong class="text-primary h3">Q & A</strong>
-  <button class="btn btn-sm btn-outline-info mb-2" 
-          data-bs-toggle="modal" data-bs-target="#diagrams_modal">
-    <i class="material-icons md-small">info</i>
-  </button>
-  <form action="diagram" method="GET" class="form-group d-flex mb-0 mx-0">
-    <select class="form-control" name="diagram" required>
+<div class="rounded-3 border p-3 shadow d-flex">
+  <strong class="text-primary h3">Q&A</strong>
+  <div class="d-flex justify-content-end w-100">
+
+    <button class="btn btn-outline-info" 
+            data-bs-toggle="modal" data-bs-target="#diagrams_modal">
+      <i class="material-icons" style="line-height:1rem;vertical-align:middle;">info</i>
+    </button>
+
+    <form action="diagram" method="GET">
+      <div class="d-flex" style="height:100%;">
+        <select class="form-control" name="diagram" required>
 <% for (let d of diagrams ) { %>
-      <option value="<%- d %>"><%- d %></option>
+          <option value="<%- d %>"><%- d %></option>
 <% } %>
-    </select>
-    <button type="submit" class="btn btn-primary">Start</button>
-  </form>
+        </select>
+        <button type="submit" class="btn btn-primary">Start</button>
+      </div>
+    </form>
+  </div>
+
 </div>
 
 

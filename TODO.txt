@@ -1,3 +1,4 @@
+keep spellings out of the URL
 update modals
 RECALL peek
 BINGO keybinds
@@ -25,3 +26,12 @@ word find
 find all letters that (sound like 'p', have a descender, are tall, etc.)
 
 English vs. Romaji spelling
+
+Trash or Treasure (a la Bamboozle)
+
+Missing Game
+
+Time Bomb: Pause for 3 seconds = die. Don't finish in 1 minute = die. Three strikes = die.
+
+Phonics: Click to listen. Drag into groups.
+Sentences: Listen to the sentence. Click each word to listen. Drag the words into order.

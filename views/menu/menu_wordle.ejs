@@ -14,11 +14,11 @@
   <div class="spell rounded-3 bg-primary text-white text-center">l</div>
   <div class="spell rounded-3 bg-secondary text-white text-center">l</div>
 
-  <div  class="d-flex justify-content-end w-100">
+  <div class="d-flex justify-content-end w-100">
 
     <button class="btn btn-outline-info" 
             data-bs-toggle="modal" data-bs-target="#wordle_modal">
-      <i class="material-icons" style="line-height:1rem;">info</i>
+      <i class="material-icons" style="line-height:1rem;vertical-align:middle;">info</i>
     </button>
 
     <form id="wordleForm" action="wordle" method="GET">
@@ -108,7 +108,7 @@
 $(function(){
   $("#wordleButton").on('click', (e)=>{
     e.preventDefault();
-    if (!window.setName) {
+    if (!window.setName || window.setName == '{}') {
       alert("Please select a deck.");
     }
     else {

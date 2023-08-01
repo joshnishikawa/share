@@ -12,11 +12,11 @@
 <div class="container-fluid pb-3">
   <div class="row">
 
-    <div class="col-10">THEMES</div>
+    <div class="col-10"><%- __('themes') %></div>
 
     <div class="col-2 d-flex justify-content-between">
-      <div>LIST<span id="numOfItems"> (0)</span></div>
-      <div class="small text-danger">Edit this last!</div>
+      <div><%- __('list') %><span id="numOfItems"> (0)</span></div>
+      <div class="small text-danger"><%- __('editThisLast') %></div>
     </div>
 
   </div>
@@ -26,7 +26,7 @@
       <div id="themes" class="d-flex flex-wrap">
 <% for (let p in NH_vocab) { let color = ''; for (let c in colors) { if (colors[c].includes(p)) { color = c; break;}} %>
         <div class="rounded-3 p-1 d-flex" style="margin:1px;background-color:<%- color %>">
-          <div class="vertical-label"><%- p %></div>
+          <div class="vertical-label"><%- p.replace(/_/g, ' ') %></div>
           <div id="<%- p %>" style="width:170px;">
 
   <% for (let t in NH_vocab[p]) { let id = t.replace(/ /g, "_"); %>
@@ -53,6 +53,7 @@
 <script>
 $(function(){
   let NH_vocab = <%- JSON.stringify(NH_vocab) %>;
+  window.deckType = "NH";
 
   function updateWordList(){
     $("#list").empty();

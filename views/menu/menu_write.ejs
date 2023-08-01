@@ -1,12 +1,17 @@
 <div class="rounded-3 border p-3 shadow d-flex">
   <strong class="text-primary h3">WRITE</strong>
-  <button class="btn btn-sm btn-outline-info mb-2" 
-          data-bs-toggle="modal" data-bs-target="#write_modal">
-    <i class="material-icons md-small">info</i>
-  </button>
-  <form action="write" method="GET" class="d-flex justify-content-end w-100 mb-2">
-    <button type="submit" class="btn btn-primary">Start</button>
-  </form>
+  
+  <div class="d-flex justify-content-end w-100">
+
+    <button class="btn btn-outline-info" 
+            data-bs-toggle="modal" data-bs-target="#write_modal">
+      <i class="material-icons" style="line-height:1rem;vertical-align:middle;">info</i>
+    </button>
+
+    <form action="write" method="GET">
+      <button type="submit" class="btn btn-primary" style="height:100%;">Start</button>
+    </form>
+  </div>
 </div>
 
 
