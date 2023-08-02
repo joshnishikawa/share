@@ -3,7 +3,7 @@
 
   <div class="d-flex justify-content-end w-100">
 
-    <button class="btn btn-outline-info" 
+    <button class="btn btn-outline-info me-1" 
             data-bs-toggle="modal" data-bs-target="#recall_modal">
       <i class="material-icons" style="line-height:1rem;vertical-align:middle;">info</i>
     </button>
@@ -26,15 +26,39 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <p>All words will be displayed with images. Go over them until the class
-          feels like they remember them fairly well. Then click START and a grid
-          of cards will be shown face down below a search bar. Students call out 
-          words and you type them into the search box. As you type, all words 
-          that match will be highlighted. When there is only one, hit enter to 
-          reveal the card. Continue untill all cards are revealed.</p>
-        <p>You might also flip all cards that start with a certain letter. You
-          can also flip a card by clicking on it.
+        <p>Choose a number of cards to hide.</p>
+          <ul>
+            <li>You could choose only a few to hide and ask "What's missing?"</li>
+            <li>You could hide them all to see how many the class can remember.</li>
+          </ul>
+        <p>Click <strong>START</strong>. A search bar and the images (flipped or 
+          not) will appear in a grid. Students will call out words and you type
+          them into the search bar. As you type, all words that match the input
+          will be highlighted. Hit <kbd>Enter</kbd> at any time to flip
+          highlighted cards. </p>
+          <ul>
+            <li>You could have students call out one letter and flip all cards
+              that begin with that letter.</li>
+            <li>You could have students give you words, type them in and flip them one at a time.</li>
+            <li>You could have students spell out the word at least until only 
+              one is highlighted.</li>
+            <li>You could have students spell out the whole word themselves and,
+              if it's still highlighted when they finish, it's correct. Flip it!</li>
+          </ul>
+        <hr/>
+        <p>
+          <strong>NOTE:</strong> If the students need a hint you can either...
+          <ul>
+            <li>Click on an individual image to flip it until you release the 
+              mouese button.</li>
+            <li>Press the <kbd>?/</kbd> button to flip all unflipped images
+            until you release it.</li>
+          </ul>
         </p>
+        <hr/>
+        <p class="small">I'm not sure how to handle words that start with other 
+          words yet. For example, If someone says "rice", both 'rice' and 
+          'rice ball' will be highlighted since they both begin with 'rice'.</p>
       </div>
     </div>
   </div>

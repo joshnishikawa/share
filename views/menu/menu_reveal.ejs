@@ -3,7 +3,7 @@
 
   <div class="d-flex justify-content-end w-100">
 
-    <button class="btn btn-outline-info" 
+    <button class="btn btn-outline-info me-1" 
             data-bs-toggle="modal" data-bs-target="#reveal_modal">
       <i class="material-icons" style="line-height:1rem;vertical-align:middle;">info</i>
     </button>
@@ -13,8 +13,8 @@
         <select class="form-control" name="style" required>
           <option value="" disabled selected>Style</option>
           <option value="spotlight">Spotlight</option>
-          <option value="blur">Blur</option>
-          <option value="pixelate">Pixelate</option>
+          <option value="blur">Fog</option>
+          <option value="pixelate">Pixels</option>
           <!-- <option value="blinder">Blinder</option> -->
         </select>
 
@@ -36,7 +36,31 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <p>Here are several ways you can slowly reveal an image.
+        <p>Here are several ways you can slowly reveal an image. Choose a set of 
+          images and a style (Spotlight, Fog, Pixels). Then click START.
+        </p>
+        <hr/>
+        <p><strong>Spotlight:</strong> The screen is dark except for a small 
+          circle of light at the mouse pointer. The light will slowly get larger 
+          as you move the pointer. Try to avoid anything that will give the
+          image away too quickly.</p>
+        <p><strong>Fog:</strong> The image will not be visible at first. Press 
+          &rarr; and something will slowly appear out of the fog. You can tap 
+          the &rarr; key as slowly as you like or hold it down.</p>
+        <p><strong>Pixels:</strong> There will be only large pixels on the
+          screen. Press &rarr; and the pixels will get smaller and smaller
+          until the image is revealed.</p>
+          <hr/>
+          <p>When someone thinks they know what the image is, they say 'stop' 
+            and says the word or any piece of target language - 
+          <br/><strong>"I (don't) like <span class="text-primary">tomatoes</span>."</strong>
+          <br/><strong>"I study <span class="text-primary">English</span> on 
+          Wednesday."</strong>
+          <br/>
+          Get as many answers as possible even if it's the 
+          same answer (The more winners, the better!) If working in groups, have 
+          them tell the rest of their group members so they can say it together.
+          Then, reveal, rejoice and hit <kbd>Enter</kbd> repeat!
         </p>
       </div>
     </div>

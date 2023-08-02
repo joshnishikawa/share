@@ -29,7 +29,15 @@
     <a href="/teachers" class="btn btn-sm btn-outline-secondary p-0">
       <i class="material-icons">close</i>
     </a>
-    <div id="start" class="btn btn-sm btn-outline-info">START</div>
+
+    <div id="numselect" class="form-group d-flex">
+      <div class="d-flex mx-1 rounded-3 border border-info">
+        <label for="numCards" class="form-label mx-1 mt-1 mb-0">Hide</label>
+        <input id="numCards" type="number" class="form-control form-control-sm border-0 pe-0" min="1" style="width:3rem;" aria-label="number of cards">
+      </div>
+      <div id="start" class="btn btn-sm btn-outline-info">START</div>
+    </div>
+
     <input id="searchInput" class="form-control form-control-sm" type="text" placeholder="Search" aria-label="Search" style="display:none;">
   </div>
 
@@ -77,10 +85,12 @@ $(function(){
       throw 'ERROR: deckType not recognized.';
   }
 
-
   deck = FYshuffle(deck); // Shuffle first so that cards left out are random.
   let {length, colspan, rowheight} = getGrid({length: deck.length, even: false});
   deck = deck.slice(0, length); // Slice the deck to the correct length.
+
+  $("#numCards").val(deck.length);
+  $("#numCards").attr('max', deck.length);
 
 // PREPARE THE DISPLAY /////////////////////////////////////////////////////////
 for (let i of deck){
@@ -117,15 +127,32 @@ for (let i of deck){
 
   $("#start").on('click', ()=>{
     $("#display").empty();
-    $("#start").hide();
+    $("#numselect").removeClass('d-flex').hide();
     $("#searchInput").show().focus();
+
+    let numCards = deck.length - $("#numCards").val(); // Hide (not show) this many cards.
+    let cards = $(".vocab");
+    let flipped = [];
+    for (let i = 0; i < numCards; i++){
+      let rand = Math.floor(Math.random() * cards.length);
+      flipped.push(cards[rand]);
+      cards.splice(rand, 1);
+    }
+    for (let i of flipped){
+      $(i).addClass('flipped').removeClass('flip').off('mousedown');
+    }
+
     $("#gridContainer").show();
   });
 
 
   $("#searchInput").on('keyup', function(e){
     if (e.key == "Enter"){
-      $(".vocab.bg-warning > .flip").addClass('flipped').promise().done(()=>{
+      $(".vocab.bg-warning > .flip")
+        .addClass('flipped')
+        .removeClass('flip')
+        .off('mousedown')
+        .promise().done(()=>{
         $(".vocab.bg-warning").removeClass('bg-warning');
       });
       $("#searchInput").val("");
@@ -141,9 +168,23 @@ for (let i of deck){
     }
   });
 
+  $(document).on('keydown', function(e){
+    if (e.key == "/"){
+      e.preventDefault();
+      $(".flip:not(.flipped)").addClass('flipped');
+      $(document).on('keyup', function(e){
+        if (e.key == "/"){
+          $(".flip.flipped").removeClass('flipped');
+          $(document).off('keyup');
+        }
+      });
+    }
+  });
 
-  $(".flip").on('click', function(){
-    $(this).toggleClass('flipped');
+  $(".flip").on('mousedown', function(){
+    $(this).toggleClass('flipped').on('mouseup', function(){
+      $(this).removeClass('flipped').off('mouseup');
+    });
   });
 
 

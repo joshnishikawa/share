@@ -162,7 +162,7 @@ $(function(){
         backClass.push('alert-primary');
       }
 
-      FYshuffle(backContent);
+      if (setName != 'lower_case_mix') FYshuffle(backContent);
       break;
 
     case 'objects':
@@ -173,7 +173,7 @@ $(function(){
         backClass.push('alert-primary');
       }
 
-      FYshuffle(backContent);
+      if (setName != "lower_case_mix") FYshuffle(backContent);
       break;
 
     default:
@@ -191,11 +191,11 @@ $(function(){
     // In other cases, the backContent is already shuffled
   }
 
-  // NOW BUILD THE GRID //////////////////////////////////////////////////////////
+  // NOW BUILD THE GRID ////////////////////////////////////////////////////////
   for (let i = 0; i < deck.length; i++){
     $("#grid").append(
-     `<div id="${deck[i].name}" class="col-${colspan} vocab p-0" style="height:${rowheight}vh;">
-        <div class="flip m-3" style="height:80%;">
+     `<div class="col-${colspan} vocab p-0" style="height:${rowheight}vh;">
+        <div data-value="${deck[i].name}" class="flip m-3" style="height:80%;">
           <div class="flip-card shadow">
 
             <div class="flip-front bg-white rounded border">
@@ -210,8 +210,29 @@ $(function(){
       </div>`);
   }
 
+
+  var pause = false;
+
   $(".flip").on('click', function(){
+    if (pause) return;
+
     $(this).toggleClass('flipped');
+
+    if ($('.flip.flipped').length == 2){
+      if ($('.flip.flipped').first().data('value') == $('.flip.flipped').last().data('value')){
+        $('.flip.flipped').removeClass('flip').off('click');
+      }
+      else {
+        pause = true;
+        setTimeout(()=>{ // this doesn't work unless there's a delay
+          $(document).on('click',()=>{
+            $('.flip.flipped').removeClass('flipped');
+            pause = false;
+            $(document).off('click');
+          });
+        }, 100);
+      }
+    }
   });
 
 });
