@@ -21,6 +21,11 @@
     max-height:90%;
   }
 
+  .highlight{
+    border: 10px solid #ffc107;
+    border-radius: 10px;
+  }
+
 </style>
 
 <body>
@@ -95,11 +100,11 @@ $(function(){
 // PREPARE THE DISPLAY /////////////////////////////////////////////////////////
 for (let i of deck){
     $('#display').append(
-       `<div class="rounded-3 px-3 bg-white border">
+       `<div class="rounded-3 px-3 bg-white border display-1">
           <div style="font-size:3rem;">
             ${i.name.split('(')[0].replace('_', " ")}
-            <div style="height:8rem;width:8rem;position:relative;">
-              ${i.image}
+            <div style="${deckType == "text" ? '' : "height:8rem;width:8rem;"} position:relative;">
+              ${ deckType == 'text' ? '' : i.image}
             </div>
           </div>
         </div>`);
@@ -148,22 +153,22 @@ for (let i of deck){
 
   $("#searchInput").on('keyup', function(e){
     if (e.key == "Enter"){
-      $(".vocab.bg-warning > .flip")
+      $(".flip.highlight")
         .addClass('flipped')
         .removeClass('flip')
         .off('mousedown')
         .promise().done(()=>{
-        $(".vocab.bg-warning").removeClass('bg-warning');
+        $(".highlight").removeClass('highlight');
       });
       $("#searchInput").val("");
     }
     else{
-      $(".vocab").removeClass('bg-warning');
+      $(".flip").removeClass('highlight');
       let input = $(this).val();
       if (input == ""){return;}
       let matches = deck.filter((v)=>{return v.name.startsWith(input);});
       for (let i of matches){
-        $(`#${i.name.replace(/ /g, '_')}`).addClass('bg-warning');
+        $(`#${i.name.replace(/ /g, '_')} > .flip`).addClass('highlight');
       }
     }
   });

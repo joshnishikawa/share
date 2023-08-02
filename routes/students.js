@@ -33,4 +33,15 @@ router.get('/wordle', (req, res)=>{
   }
 });
 
+
+router.get('/haystack', (req, res)=>{
+  try{
+    res.render('activities/abc/haystack');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
 module.exports = router;

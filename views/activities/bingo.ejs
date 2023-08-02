@@ -108,7 +108,8 @@ $(function(){
   for (let i of deck){
     $('#display').append(
        `<div class="rounded-3 px-3 bg-white border display-1">
-          <div style="font-size:3rem;">${i.name.split('(')[0].replace('_', " ")}
+          <div style="font-size:3rem;">
+            ${i.name.split('(')[0].replace('_', " ")}
             <div style="${deckType == "text" ? '' : "height:8rem;width:8rem;"} position:relative;">
               ${deckType == "text" ? '' : i.image}
             </div>
@@ -139,6 +140,11 @@ $(function(){
       index++;
       $("#currentSlide").html(deck[index].image);
     }
+  });
+
+  $(document).on('keydown', (e)=>{
+    if (e.key == "ArrowLeft") $("#prev").click();
+    if (e.key == "ArrowRight") $("#next").click();
   });
 
 });

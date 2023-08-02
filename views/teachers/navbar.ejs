@@ -1,6 +1,98 @@
-<ul class="nav nav-tabs alert-secondary mb-3">
+<ul class="nav nav-tabs alert-secondary d-flex mb-3">
   <li class="nav-item"><a id="text-tab" href="text" class="nav-link" data-toggle="tab">Text</a></li>
   <li class="nav-item"><a id="images-tab" href="images" class="nav-link" data-toggle="tab">Images</a></li>
   <li class="nav-item"><a id="NH-tab" href="New_Horizons" class="nav-link" data-toggle="tab">New Horizons</a></li>
   <li class="nav-item"><a id="tools-tab" href="tools" class="nav-link" data-toggle="tab">Tools</a></li>
+  <button class="btn btn-outline-info ms-auto" data-bs-toggle="modal" data-bs-target="#menu_modal">
+    <i class="material-icons" style="line-height:1rem;vertical-align:middle;">info</i>
+  </button>
 </ul>
+
+<div id="menu_modal" class="modal fade">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+    
+      <div class="modal-header">
+        <h3 class="modal-title">Info</h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          This is a set of tools for teaching English in class or remote lessons.
+          Most of the tools are currently focused on vocabulary, phonics and 
+          spelling. Eventually there will be more tools for grammar, listening
+          and - most importantly - speaking.
+        </p>
+        <ul>
+          <li>Use the 'Text' tab focus only on numbers and letters.</li>
+          <li>Use the 'Images' tab to select a set to study from almost 600 
+            free open-source images. 
+            <ul>
+              <li>
+                The 'Phonics' column allows you to select words that start with 
+                certain letters or include certain sounds.
+              </li>
+              <li>
+                The 'Themes' column allows you to select words based on themes.
+              </li>
+              <li>
+                The list will include the intersection of these two columns.
+              </li>
+              <li>
+                You can then filter for number of letters.
+              </li>
+              <li>
+                Finally, you can edit the list to remove words you don't want to
+                include. You can also add words but be careful. It needs to be
+                a word that there is actually an image for.
+              </li>
+            </ul>
+          </li>
+          <li>
+            Use the 'New Horizons' tab to study the vocabulary from the New
+            Horizons picture dictionary.
+            <ul>
+              <li>
+                The vocabulary from any themes you check will appear on the
+                right.
+              </li>
+              <li>
+                Click the 'x' to remove any words you don't want to include.
+              </li>
+            </ul>
+          </li>
+          <li>
+            The 'Tools' tab has some other useful tools for teaching that don't
+            depend on a list of vocabulary words.
+          </li>
+          
+
+        </ul>
+        <p> Once you start an activity, you should be able to bookmark it so
+          that you can easily return to the same activity with the same
+          vocabulary later.
+        </p>
+      </div>
+
+      <div class="p-3 text-center" style="width:180px;white-space:normal;position:relative;display:none;">
+
+        <a class="btn btn-light" href="https://paypal.me/joshnishikawa?country.x=JP&locale.x=en_US">
+          <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal Logo">
+        </a>
+        <a class="btn btn-danger" href="https://patreon.com/joshnishikawa?utm_medium=clipboard_copy&utm_source=copyLink&utm_campaign=creatorshare_creator">
+          <img src="/image/Digital-Patreon-Wordmark_Black.png" class="w-100 image-fluid">
+        </a>
+        <a class="btn" href="https://www.buymeacoffee.com/joshnishikawa" target="_blank">
+          <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 40px !important;width: 123px !important;" >
+        </a>
+
+        <a href="javascript:void(0)" class="btn btn-warning w-100" id="BTC" value="33CDpd5Wpp4QQpHmkXf1HbefzfPeUVuW7W">Copy BTC</a>
+
+      </div>
+
+
+
+
+    </div>
+  </div>
+</div>

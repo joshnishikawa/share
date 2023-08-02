@@ -192,15 +192,25 @@ $(function(){
     });
   });
 
+
   $("#numLTE").on('change', function(){
-    let minval = $("#numGTE").val();
-    let thisval = $(this).val();
+    let minval = parseInt( $("#numGTE").val() );
+    let thisval = parseInt( $(this).val() );
     if ( thisval && thisval < minval ) {
       $(this).attr('min', minval);
       $(this).val( Math.max( minval, thisval) );
     }
   });
 
+  $("#numGTE").on('change', function(){
+    let maxval = parseInt( $("#numLTE").val() );
+    if ( !maxval ) return;
+
+    let minval = parseInt( $(this).val() );
+    if ( minval > maxval ) $("#numLTE").val(minval);
+  });
+
+  
   $("#list").on('input', ()=>{
     words = $("#list").val().split(',');
     $("#numOfItems").html(`&nbsp;&nbsp;&nbsp;(${words.length})`);

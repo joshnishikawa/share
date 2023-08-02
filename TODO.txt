@@ -1,21 +1,19 @@
-keep spellings out of the URL
-update modals
-RECALL peek
-BINGO keybinds
+////////// BUGS ////////////////////////////////////////////////////////////////
+Text menu is ugly
 FLASH image and word
 MATCH allow related things (not just exact matches)
-image menu: empty list when all unchecked
 
 
-ACTIVITY IDEAS
-spot-it (for letters or pictures)
-spot'em (Both sides have all the same things (or cap/lc). Eliminate by tapping the same thing on both sides.)
-
+////////// IDEAS FOR STUDENT ACTIVITIES ////////////////////////////////////////
 Tap on all occurrences of 'd' (or any letter)
   bbbdbdbbb
   dbbbbbdbd
   baddadbad
   dabdbadab
+
+spot-it (for letters or pictures)
+spot'em (Both sides have all the same things (or cap/lc). Eliminate by tapping the same thing on both sides.)
+
 
 Put letter parts together like a puzzle?
 Letter reveal (Type what you see. A series of letters will make a word).
@@ -27,11 +25,12 @@ find all letters that (sound like 'p', have a descender, are tall, etc.)
 
 English vs. Romaji spelling
 
+Phonics: Click to listen. Drag into groups.
+
+Sentences: Listen to the sentence. Click each word to listen. Drag the words into order.
+
+
+////////// IDEAS FOR TEACHER ACTIVITIES ////////////////////////////////////////
 Trash or Treasure (a la Bamboozle)
 
-Missing Game
-
 Time Bomb: Pause for 3 seconds = die. Don't finish in 1 minute = die. Three strikes = die.
-
-Phonics: Click to listen. Drag into groups.
-Sentences: Listen to the sentence. Click each word to listen. Drag the words into order.
