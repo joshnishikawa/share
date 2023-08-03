@@ -63,5 +63,15 @@
 	"club activities": "club activities",
 	"editThisLast": "Edit this last!",
 	"themes": "THEMES",
-	"list": "LIST"
+	"list": "LIST",
+	"activity": {
+		"pairs": {
+			"title": "Find Pairs",
+			"description": "Click on two matching cards to flip them. See how fast you can find all the pairs."
+		},
+		"haystack": {
+			"title": "Haystack",
+			"description": "Choose a letter. Then click on all of the same letters. How fast can you find all six?"
+		}
+	}
 }

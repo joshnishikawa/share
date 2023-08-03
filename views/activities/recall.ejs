@@ -20,12 +20,6 @@
     max-width:90%;
     max-height:90%;
   }
-
-  .highlight{
-    border: 10px solid #ffc107;
-    border-radius: 10px;
-  }
-
 </style>
 
 <body>
@@ -113,6 +107,8 @@ for (let i of deck){
 
   deck = FYshuffle(deck);
 
+  let fontsize = Math.floor( deck.length / 6 );
+
   for (let i of deck){
     $("#grid").append(
      `<div id="${i.name.replace(/[ ()]/g, '_')}" class="col-${colspan} vocab p-0" style="height:${rowheight}vh;">
@@ -121,7 +117,7 @@ for (let i of deck){
             <div class="flip-front bg-white rounded border"">
               ${i.image}
             </div>
-            <div class="flip-back rounded border border-primary text-center alert-primary display-1">
+            <div class="flip-back rounded border border-primary text-center alert-primary display-${fontsize}">
               &nbsp;
             </div>
           </div>

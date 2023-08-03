@@ -34,6 +34,17 @@ router.get('/wordle', (req, res)=>{
 });
 
 
+router.get('/pairs', (req, res)=>{
+  try{
+    res.render('activities/abc/pairs');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
+
 router.get('/haystack', (req, res)=>{
   try{
     res.render('activities/abc/haystack');

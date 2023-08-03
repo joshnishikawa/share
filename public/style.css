@@ -32,6 +32,7 @@ body {
   mix-blend-mode: multiply;
 }
 
+.UD{font-family: 'UD Digi Kyokasho NP-B', sans-serif;}
 
 [contenteditable] {
   outline: 0px solid transparent;
@@ -134,6 +135,11 @@ body {
 }
 
 /* ////////////////////////////////////////////////////////////////////////// */
+.highlight{
+  border: 10px solid #ffc107;
+  border-radius: 10px;
+}
+
 .flip {
   background-color: transparent;
   perspective: 1000px;

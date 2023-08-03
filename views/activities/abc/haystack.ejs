@@ -1,0 +1,163 @@
+<%- include('../../head'); -%>
+<body>
+
+  <div class="d-flex">
+    <a href="/teachers" class="btn btn-sm btn-outline-secondary p-0">
+      <i class="material-icons">close</i>
+    </a>
+  </div>
+
+  <div id="menu" class="container-fluid d-block text-center" style="user-select: none;">
+    <div class="row">
+      <div class="col display-1">
+        <%- __('activity.haystack.title') %>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <%- __('activity.haystack.description') %>
+      </div>
+    </div>
+    <div class="row UD">
+      <div id="buttons" class="col d-flex flex-wrap justify-content-center"></div>
+    </div>
+  </div>
+
+  <div id="gridContainer" class="container-fluid">
+    <div id="grid" class="d-flex flex-wrap UD"></div>
+  </div>
+
+<script src="/script.js"></script>
+
+<script>
+$(function(){
+  var letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I",
+                 "J", "K", "L", "M", "N", "O", "P", "Q", "R",
+                 "S", "T", "U", "V", "W", "X", "Y", "Z",
+                 "a", "b", "c", "d", "e", "f", "g", "h", "i",
+                 "j", "k", "l", "m", "n", "o", "p", "q", "r",
+                 "s", "t", "u", "v", "w", "x", "y", "z"];
+  for (let i of letters){
+    $("#buttons").append(
+      `<div data-value="${i}" class="letter m-1 border rounded-3 display-3 text-center rounded-3" style="width:60px;cursor:pointer;">
+          ${i}
+       </div>`);
+  }
+
+  var sets = {
+    "a": ["d", "q", "o"],
+    "b": ["d", "p", "h"],
+    "c": ["e", "o", "u"],
+    "d": ["a", "b", "q"],
+    "e": ["c", "o", "u"],
+    "f": ["t", "j", "h"],
+    "g": ["q", "j", "p"],
+    "h": ["b", "f", "k"],
+    "i": ["j", "l", "k"],
+    "j": ["f", "g", "i"],
+    "k": ["h", "x", "l"],
+    "l": ["i", "k", "h"],
+    "m": ["n", "w", "h"],
+    "n": ["m", "u", "h"],
+    "o": ["a", "c", "e"],
+    "p": ["b", "g", "q"],
+    "q": ["a", "p", "g"],
+    "r": ["n", "h", "u"],
+    "s": ["c", "z", "e"],
+    "t": ["f", "i", "j"],
+    "u": ["w", "n", "r"],
+    "v": ["w", "n", "u"],
+    "w": ["m", "n", "v"],
+    "x": ["k", "y", "v"],
+    "y": ["x", "u", "v"],
+    "z": ["s", "x", "y"],
+    "A": ["V", "Y", "M"],
+    "B": ["D", "P", "R"],
+    "C": ["G", "O", "U"],
+    "D": ["O", "B", "P"],
+    "E": ["F", "H", "L"],
+    "F": ["E", "H", "L"],
+    "G": ["C", "O", "U"],
+    "H": ["F", "E", "L"],
+    "I": ["J", "L", "H"],
+    "J": ["I", "L", "U"],
+    "K": ["X", "H", "R"],
+    "L": ["I", "J", "H"],
+    "M": ["W", "N", "V"],
+    "N": ["M", "W", "V"],
+    "O": ["Q", "D", "C"],
+    "P": ["D", "B", "R"],
+    "Q": ["O", "D", "C"],
+    "R": ["K", "B", "P"],
+    "S": ["Z", "J", "C"],
+    "T": ["F", "I", "L"],
+    "U": ["V", "O", "C"],
+    "V": ["U", "W", "N"],
+    "W": ["M", "N", "V"],
+    "X": ["K", "Y", "V"],
+    "Y": ["V", "U", "X"],
+    "Z": ["S", "X", "Y"]
+  }
+
+  var timer = 0;
+
+  $(".letter").on('click', function(){
+    timer = Date.now(); 
+ 
+    let letter = $(this).data('value');
+    $(".letter").removeClass('alert-success');
+    $(this).addClass('alert-success');
+    $("#grid").empty();
+    let deck = [];
+    for (let i of sets[letter]){
+      deck.push(i);
+      deck.push(i);
+      deck.push(i);
+      deck.push(letter);
+    }
+    deck = deck.concat(deck);
+    FYshuffle(deck);
+
+    // NOW BUILD THE GRID ////////////////////////////////////////////////////////
+    for (let i = 0; i < deck.length; i++){
+      $("#grid").append(
+       `<div class="col-2" style="height:24vh;">
+          <div data-value="${deck[i]}" class="select display-1 text-center rounded-3" style="height:80%;cursor:pointer;">
+            ${deck[i]}
+          </div>
+        </div>`);
+    }
+    $(".select").on('click', function(){
+      if ( $(this).data('value') == letter) {
+        $(this).toggleClass('alert-success');
+        if ($(this).data('value') == letter) $(this).addClass('alert-success');
+        if ($('.select.alert-success').length == 6) {
+
+          let time = (Date.now() - timer) / 1000;
+          $("#menu").removeClass('d-none').addClass('d-block');
+          $("#grid").html(`
+            <div class="mx-auto mt-3 text-center display-1 alert-success rounded-3">
+              ${time} seconds!
+            </div>`);
+        }
+      }
+      else {
+        $(this).addClass('alert-danger');
+        setTimeout(function(){
+          $(".select").removeClass('alert-danger');
+          $(".select").removeClass('alert-success');
+        }, 500);
+      }
+    });
+
+    $("#menu").removeClass('d-block').addClass('d-none');
+    $("#grid").removeClass('d-none').addClass('d-flex');
+
+  });
+
+
+
+});
+</script>
+
+<%- include('../../foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->

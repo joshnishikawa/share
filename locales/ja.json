@@ -63,5 +63,15 @@
 	"club activities": "部活動",
 	"editThisLast": "最後に編集",
 	"themes": "テーマ",
-	"list": "リスト"
+	"list": "リスト",
+	"activity": {
+		"pairs": {
+			"title": "Find Pairs",
+			"description": "同じカードを見つけてクリックしてください。全てのペアを見つけるのにどれだけ早くできるかな？"
+		},
+		"haystack": {
+			"title": "Haystack",
+			"description": "文字を選んでください。そして同じ文字をクリックしてください。全ての文字を見つけるのにどれだけ早くできるかな？"
+		}
+	}
 }

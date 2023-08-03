@@ -1,0 +1,113 @@
+<%- include('../../head'); -%>
+<body>
+
+  <div class="d-flex">
+    <a href="/teachers" class="btn btn-sm btn-outline-secondary p-0">
+      <i class="material-icons">close</i>
+    </a>
+  </div>
+
+  <div style="min-height:100vh;user-select: none;">
+    <div id="buttons" class="container d-block text-center">
+      <div class="row">
+        <div class="col display-1">
+          <%- __('activity.pairs.title') %>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <%- __('activity.pairs.description') %>
+        </div>
+      </div>
+      <div class="row UD">
+        <button data-value="abc" class="col menu p-3 m-5 border rounded-3 alert-primary display-1">abc</button>
+        <button data-value="ABC" class="col menu p-3 m-5 border rounded-3 alert-primary display-1">ABC</button>
+      </div>
+    </div>
+    <div id="gridContainer">
+      <div id="grid" class="d-none flex-wrap UD"></div>
+    </div>
+  </div>
+
+<script src="/script.js"></script>
+
+<script>
+$(function(){
+  // var url = window.location.href;
+  // const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
+  // const setName = searchParams.get('setName');
+  $(".menu").on('click', function(){
+    var setName = $(this).data('value');
+    $("#buttons").removeClass('d-block').addClass('d-none');
+    $("#grid").empty().removeClass('d-none').addClass('d-flex');
+
+    var timer = 0;
+    var deck = [];
+
+    switch (setName){
+      case 'ABC': 
+        deck = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+                'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+                'U', 'V', 'W', 'X', 'Y', 'Z'];
+        break;
+      
+      case 'abc':
+        deck = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
+                'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
+                'u', 'v', 'w', 'x', 'y', 'z'];
+        break;
+      
+      default : 
+        deck = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+                'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+                'U', 'V', 'W', 'X', 'Y', 'Z'];
+        break;
+    }
+
+    FYshuffle(deck);
+    deck = deck.slice(0, 12);
+    deck = deck.concat(deck);
+    FYshuffle(deck);
+    // NOW BUILD THE GRID ////////////////////////////////////////////////////////
+    for (let i = 0; i < deck.length; i++){
+      $("#grid").append(
+      `<div class="col-2 vocab p-0" style="height:24vh;">
+          <div data-value="${deck[i]}" class="flip flipped m-3" style="height:80%;">
+            <div class="flip-card shadow">
+
+              <div class="flip-front bg-white rounded border display-1">
+                ${deck[i]}
+                </div>
+              <div class="flip-back rounded border border-primary text-center alert-primary"
+                  style="font-size:24vh;"></div>
+            </div>
+          </div>
+        </div>`);
+    }
+
+    $(".flip").on('click', function(){
+      $(this).toggleClass('highlight');
+
+      if ($('.flip.highlight').length == 2){
+        if ($('.flip.highlight').first().data('value') == $('.flip.highlight').last().data('value')){
+          $('.flip.highlight').removeClass('flip flipped highlight').off('click');
+          if ($('.flip.flipped').length == 0){
+            var time = (Date.now() - timer) / 1000;
+            $("#buttons").removeClass('d-none').addClass('d-block');
+            $("#grid").html(`
+              <div class="mx-auto mt-3 text-center display-1 alert-success rounded-3">
+                ${time} seconds!
+              </div>`);
+          }
+        }
+        else {
+          $('.flip.highlight').removeClass('highlight');
+        }
+      }
+    });
+    timer = Date.now();
+  });
+});
+</script>
+
+<%- include('../../foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->
