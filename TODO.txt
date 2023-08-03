@@ -1,4 +1,5 @@
 ////////// BUGS ////////////////////////////////////////////////////////////////
+RECALL 'rice ball' persists after 'rice' is entered
 Text menu is ugly
 FLASH image and word
 MATCH allow related things (not just exact matches)

@@ -9,7 +9,7 @@ const NH_vocab = require('../public/NH_vocab.js');
 
 router.get('/', (req, res)=>{
   try{
-    res.redirect('/teachers/text');
+    res.redirect('/teachers/images');
   }
   catch(err){
     res.send(err);

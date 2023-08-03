@@ -115,13 +115,13 @@ for (let i of deck){
 
   for (let i of deck){
     $("#grid").append(
-     `<div id="${i.name.replace(/ /g, '_')}" class="col-${colspan} vocab p-0" style="height:${rowheight}vh;">
+     `<div id="${i.name.replace(/[ ()]/g, '_')}" class="col-${colspan} vocab p-0" style="height:${rowheight}vh;">
         <div class="flip m-3" style="height:80%;">
           <div class="flip-card shadow">
             <div class="flip-front bg-white rounded border"">
               ${i.image}
             </div>
-            <div class="flip-back rounded border border-primary text-center alert-primary">
+            <div class="flip-back rounded border border-primary text-center alert-primary display-1">
               &nbsp;
             </div>
           </div>
@@ -151,6 +151,7 @@ for (let i of deck){
   });
 
 
+  
   $("#searchInput").on('keyup', function(e){
     if (e.key == "Enter"){
       $(".flip.highlight")
@@ -164,27 +165,42 @@ for (let i of deck){
     }
     else{
       $(".flip").removeClass('highlight');
+      $(".flip-back").html('&nbsp;');
+
       let input = $(this).val();
       if (input == ""){return;}
       let matches = deck.filter((v)=>{return v.name.startsWith(input);});
       for (let i of matches){
-        $(`#${i.name.replace(/ /g, '_')} > .flip`).addClass('highlight');
+        $(`#${i.name.replace(/[ ()]/g, '_')} > .flip`).addClass('highlight');
+        $(`#${i.name.replace(/[ ()]/g, '_')} > .flip > .flip-card > .flip-back`).html(input);
       }
     }
   });
 
+
+  let slash = false;
   $(document).on('keydown', function(e){
     if (e.key == "/"){
       e.preventDefault();
-      $(".flip:not(.flipped)").addClass('flipped');
-      $(document).on('keyup', function(e){
-        if (e.key == "/"){
-          $(".flip.flipped").removeClass('flipped');
-          $(document).off('keyup');
-        }
-      });
+      if (slash) return;
+
+      slash = true;
+      if ($(".highlight").length > 0){
+        $(".flip.highlight").addClass('flipped');
+      }
+      else{
+        $(".flip:not(.flipped)").addClass('flipped')
+      }
     }
   });
+
+  $(document).on('keyup', function(e){
+    if (e.key == "/"){
+      $(".flip").removeClass('flipped');
+      slash = false;
+    }
+  });
+
 
   $(".flip").on('mousedown', function(){
     $(this).toggleClass('flipped').on('mouseup', function(){
