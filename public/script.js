@@ -1,7 +1,7 @@
 const vocab_decks = {
   // THE ORDER OF MOST OF THESE ARRAYS IS IMPORTANT TO HOW SCRIPTS FUNCTION
   // DO NOT CHANGE
-  "tens/teens":[12,20,13,30,14,40,15,50,16,60,17,70,18,80,19,90],
+  "tens_teens":["12","20","13","30","14","40","15","50","16","60","17","70","18","80","19","90"],
 
   "ordinals":["1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th",
      "11th","12th","13th","14th","15th","16th","17th","18th","19th","20th",
@@ -87,7 +87,7 @@ getDeck = (data)=>{
               : setName == "lower_case_mix" && backs == "objects" ? vocab_decks["lower_case_mix"].slice(10, 20)
               : vocab_decks[setName];
         for (let i of list){
-          deck.push({name: i, image: `<div style="font-size:3rem;position:absolute;z-index:-1;">${i}</div>`});
+          deck.push({name: i, image: `<div style="position:absolute;z-index:-1;">${i}</div>`});
         }
       }
       break;

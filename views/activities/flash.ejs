@@ -42,13 +42,12 @@
   <a href="/teachers" class="btn btn-sm btn-outline-secondary p-0">
     <i class="material-icons">close</i>
   </a>
-  <button id="start" class="btn btn-sm btn-outline-info">START</button>
-  <input type="checkbox" id="shuffle" name="shuffle" class="mx-2">
+  <button id="review" class="btn btn-sm btn-outline-success" style="display:none;"></button>
+  <input type="checkbox" id="shuffle" class="mx-2">
   <label for="shuffle">Shuffle</label>
 </div>
 
 <div id="flash" class="text-center p-5" style="height:100vh;width:100%;">
-
 
 
 
@@ -58,171 +57,95 @@ $(function(){
   const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
   const setName = searchParams.get('setName');
   const deckType = searchParams.get('deckType');
-  var isNum = setName.match(/^\d/) ? true : false;
+  var isNum = setName.startsWith('_') || setName == "tens_teens"; // for sorting
   var deck = getDeck({setName, deckType});
-  var started = false;
+  
   var originalDeck = deck;
   var deckLength = originalDeck.length;
-  var deck = originalDeck;
   var review = [];
   var card = 0;
-  var current = 0;
+  var reviewing = false;
 
   function start(){
-    var flash = document.getElementById("flash");
-    if(review.length > 0){ // set the review deck as the main deck
-      deck = review.slice();
-      review = [];
-    }
-
-    if(card == 0){
-      if (started){
-        if (deck.length != deckLength){ // reviewing, return to the full deck
-          deck = originalDeck;
-          started = true;
-          flash.innerHTML = deck[card].image;
-        }
-        else{ // using a full deck, clear screen
-          started = false;
-          flash.innerHTML = "";
-        }
-      }
-      else { // start deck
-        var checkBox = document.getElementById("shuffle");
-        if (checkBox.checked == true){ // shuffle if checked
-          deck = FYshuffle(deck);
-        }
-        flash.innerHTML = deck[card].image;
-        started = true;
-      }
-    }
-    else{
+    if (reviewing){
+      deck = originalDeck.slice();
       card = 0;
-      flash.innerHTML = deck[card].image;
+      reviewing = false;
+      $("#review").hide();
+    }
+    else if(review.length > 0){ // set the review deck as the main deck
+      reviewing = true;
+      deck = review.slice();
+      card = 0;
+      review = [];
+      $("#review").html("Restart");
     }
 
     if(deck.length == deckLength){
-      flash.classList.remove("review");
+      $("#flash").removeClass("review");
     }
-    else{flash.classList.add("review");}
+    else{$("#flash").addClass("review")}
 
-    review = [];
-    current = 0;
-    setStartButton();
+    $("#flash").html( deck[card].image );
   }
 
 
-  function setStartButton(){
-    var start = document.getElementById("start");
-    if(review.length > 0){
-      start.innerHTML = "Review " + review.length;
-    }
-
-    else if (card == 0){
-      if(deck.length == deckLength){ // not reviewing
-        if (started){start.innerHTML = "Clear";}
-        else if (deckLength > 0){
-          start.innerHTML = "Start";
-        }
-        else{
-          start.innerHTML = " . . . ";
-        }
-      }
-      else if (deckLength > 0){
-        start.innerHTML = "Restart Set";
-      }
-    }
-    else{
-      
-      if (deck.length == deckLength){ // not reviewing
-        start.innerHTML = "Restart";
-      }
-      else{start.innerHTML = "Restart Review";}
-    }
-  }
-
-  $("#shuffle").on('click', ()=>{
-    var checkBox = document.getElementById("shuffle");
-
-    if (checkBox.checked == true){ // shuffle
+  $("#shuffle").on('click', function(){
+    if ( $(this).prop('checked') ) {
       deck = FYshuffle(deck);
       card = 0;
     }
     else {
-      if(isNum == "zero_ten" 
-      || isNum == "zero_twenty" 
-      || isNum == "tens_teens"){
-        deck.sort(function(a, b){return a - b}); // sort numeric
-      }
-      else{ // sort alphabetical
-        deck.sort();
-      }
-      card = current == 0 ? 0 : deck.indexOf(current);
+      if(isNum) deck.sort(function(a, b){return a.name - b.name}); // sort
+      else deck.sort(); // sort alphabetically
+      card = 0;
     }
+    $("#flash").html( deck[card].image );
+    $(this).blur();
   });
 
+  $(document).on('keydown', (e)=>{
+    if (e.key == "ArrowDown") e.preventDefault();
+  });
 
   // HANDLE "UP" "DOWN" "LEFT" AND "RIGHT" KEY PRESSES
   $(document).on('keyup',function(e) {
-    var obj = document.getElementById("start");
-    var selecting = (document.activeElement === obj);
-
-    if(selecting && started){
-      if(e.key == "ArrowRight" || e.key == "ArrowUp"){
-
-        if(e.key == "ArrowUp"){ //save card before advancing
-          review.push(deck[card]); // push entire
+    
+    switch(e.key){
+      case "Enter":
+        start();
+        break;
+      case "ArrowUp":
+        reviewing = false;
+        review.push(deck[card]);
+        $("#review").html(`Review ${review.length}`).show();
+        break;
+      case "ArrowDown":
+        if(review.length > 0 && review[review.length - 1] == deck[card]){
+          review.pop();
+          if (review.length == 0) $("#review").hide();
+          else $("#review").html(`Review ${review.length}`);
         }
-
+        break;
+      case "ArrowRight":
         if (card < deck.length - 1) {
           card += 1;
-          current = deck[card].image;
-          document.getElementById("flash").innerHTML = deck[card].image;
+          $("#flash").html( deck[card].image );
         }
-        else{
-          $("#flash").html("Done!");
-        }
-      }
-      else if(e.key == "ArrowLeft"){
+        break;
+      case "ArrowLeft":
         if (card > 0 && deck.length > 0) {
           card -= 1;
-          current = deck[card].image;
-          document.getElementById("flash").innerHTML = deck[card].image;
+          $("#flash").html( deck[card].image );
         }
-        else{
-        }
-      }
-      else {
-        // do something with down key
-      }
+        break;
     }
-    setStartButton();
   });
 
-
-// ADVANCE THROUGH THE DECK WHEN THE WINDOW IS CLICKED (OR TAPPED) /////////////
-  window.onclick = function(event){
-    if (started && !event.target.matches('button') && !event.target.matches('select') &&
-        !event.target.matches('input') && !event.target.matches('label')) {
-      if(card < deck.length -1){
-          card += 1;
-          current = deck[card].image;
-          document.getElementById("flash").innerHTML = deck[card].image;
-      }
-      else{
-        document.getElementById("flash").innerHTML = " ";
-      }
-    }
-    setStartButton();
-  }
-
-
-  $("#start").on('click', ()=>{
-    $("#start").focus();
+  $("#review").on('click', function(){
     start();
   });
 
-  $("#start").focus();
   start();
 
 });
