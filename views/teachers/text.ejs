@@ -4,7 +4,16 @@
 <div class="container-fluid">
   <div class="row pb-3">
     <div class="col">
-      <div id="tags" class="d-flex flex-wrap"></div>
+      <div id="tags" class="d-flex flex-wrap">
+        <div class="d-flex border rounded-2 p-0 me-3">
+          <input class="form-check-input me-2" type="radio" name="tags" id="numbers" value="numbers" aria-label="numbers">
+          <label class="form-check-label me-3" style="margin-left:-5px;" for="numbers">No.</label>          
+          <label class="form-check-label" style="margin-left:-5px;" for="firstNum">from</label>
+          <input type="number" id="firstNum" min="0" class="form-control p-0 ms-1 me-3" style="width:45px;" aria-label="first number">
+          <label class="form-check-label" style="margin-left:-5px;" for="lastNum">to</label>
+          <input type="number" id="lastNum" min="0" class="form-control p-0 ms-1" style="width:45px;" aria-label="last number">
+        </div>
+      </div>
       <div id="numOfItems"></div>
     </div>
   </div>
@@ -40,7 +49,7 @@
 </div>
 
 <script src="/vocab_decks.js"></script>
-<script src="/script.js"></script>
+
 
 <script>
 $(function(){
@@ -49,14 +58,36 @@ $(function(){
   window.deckType = "text";
 
   for (let t in vocab_decks) {
+    if ( ["animals", "objects"].includes(t) ) continue;
     $("#tags").append(`<div class="form-check">
       <input class="form-check-input" type="radio" name="tags" id="tag_${t}" value="${t}" aria-label="tags">
       <label class="form-check-label me-3" style="margin-left:-5px;" for="tag_${t}">${t} (${vocab_decks[t].length})</label>
     </div>`);
   }
 
+  $("#firstNum").on("change", (e)=>{
+    let val = parseInt(e.target.value);
+    let max = $("#lastNum").val();
+    max = max ? parseInt(max) : 0;
+    $("#numbers").prop("checked", true);
+    if (max < val) $("#lastNum").val(val);
+  });
+
+  $("#lastNum").on("change", (e)=>{
+    let val = parseInt(e.target.value);
+    let min = $("#firstNum").val();
+    min = min ? parseInt(min) : 0;
+    $("#numbers").prop("checked", true);
+    if (min > val) $("#firstNum").val(val);
+  });
+
   $("#tags").on("change", (e)=>{
-    window.setName = e.target.value;
+    if ( $("#numbers").prop("checked") ) {
+      window.setName = `_${$("#firstNum").val()}_${$("#lastNum").val()}`;
+    }
+    else {
+      window.setName = e.target.value;
+    }
   });
 
 });

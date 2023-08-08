@@ -2,7 +2,7 @@
 <body>
 
   <div class="d-flex">
-    <a href="/teachers" class="btn btn-sm btn-outline-secondary p-0">
+    <a href="/" class="btn btn-sm btn-outline-secondary p-0">
       <i class="material-icons">close</i>
     </a>
   </div>
@@ -29,13 +29,10 @@
     </div>
   </div>
 
-<script src="/script.js"></script>
+
 
 <script>
 $(function(){
-  // var url = window.location.href;
-  // const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
-  // const setName = searchParams.get('setName');
   $(".menu").on('click', function(){
     var setName = $(this).data('value');
     $("#buttons").removeClass('d-block').addClass('d-none');

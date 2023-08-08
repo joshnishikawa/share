@@ -47,8 +47,6 @@
     </div>
   </div>
 
-<script src="/vocab_decks.js"></script>
-<script src="/script.js"></script>
 
 <script>
 $(function(){
@@ -56,34 +54,8 @@ $(function(){
   const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
   const setName = searchParams.get('setName');
   const deckType = searchParams.get('deckType');
-  var deck = [];
-  var list = [];
-
-  // We need an array of objects. Objects have info and arrays can be shuffled.
-  switch (deckType){
-    case 'text':
-      list = vocab_decks[setName];
-      for (let i of list){
-        deck.push({name: i, image: `<div style="font-size:3rem;">${i}</div>`});
-      }
-      break;
-    case 'NH':
-      list = JSON.parse(setName); // {"vocab word": "file name", "other word": "other file name"}
-      for (let i in list){
-        deck.push({name: i, image: `<img src="/image/gif/${list[i]}" alt="${i}">`});
-      }
-      break;
-    case 'images':
-      list = JSON.parse(setName);
-      for (let i of list){
-        deck.push({name: i.replace(/_/g, ' '), 
-                   image: `<img src="/image/svg/${i}.svg" alt="${i}">`});
-      }
-      break;
-    default:
-      throw 'ERROR: deckType not recognized.';
-  }
-
+  var deck = getDeck({setName, deckType});
+  
   deck = FYshuffle(deck); // Shuffle first so that cards left out are random.
   let {length, colspan, rowheight} = getGrid({length: deck.length, even: false});
   deck = deck.slice(0, length); // Slice the deck to the correct length.
@@ -114,7 +86,7 @@ for (let i of deck){
      `<div id="${i.name.replace(/[ ()]/g, '_')}" class="col-${colspan} vocab p-0" style="height:${rowheight}vh;">
         <div class="flip m-3" style="height:80%;">
           <div class="flip-card shadow">
-            <div class="flip-front bg-white rounded border"">
+            <div class="flip-front bg-white rounded border display-1">
               ${i.image}
             </div>
             <div class="flip-back rounded border border-primary text-center alert-primary display-${fontsize}">

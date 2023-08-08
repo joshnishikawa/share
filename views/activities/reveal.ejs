@@ -55,8 +55,7 @@
 <div id="blurme" class="text-center"></div>
 <div id="loadme" class="text-center" style="height:100vh;display:none;"></div>
 
-<script src="/vocab_decks.js"></script>
-<script src="/script.js"></script>
+
 
 <script>
 $(function(){
@@ -66,30 +65,10 @@ $(function(){
   const setName = searchParams.get('setName');
   const deckType = searchParams.get('deckType');
   const style = searchParams.get('style');
-  var deck = [];
-  var list = [];
   var index = 0;
-
-  // We need an array of objects. Objects have info and arrays can be shuffled.
-  switch (deckType){
-    case 'NH':
-      list = JSON.parse(setName); // {"vocab word": "file name", "other word": "other file name"}
-      for (let i in list){
-        deck.push({name: i, image: `<img src="/image/gif/${list[i]}" alt="${i}">`});
-      }
-      break;
-    case 'images':
-      list = JSON.parse(setName);
-      for (let i of list){
-        deck.push({name: i, image: `<img src="/image/svg/${i}.svg" alt="${i}">`});
-      }
-      break;
-    default:
-      console.log('whu?');
-  }
-
+  var deck = getDeck({setName, deckType});
+  
   deck = FYshuffle(deck);
-
 
 // FUNCTIONS ///////////////////////////////////////////////////////////////////
   var factor = 4; // how big a pixel is in the pixelate style
