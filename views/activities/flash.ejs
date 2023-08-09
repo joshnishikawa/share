@@ -43,12 +43,18 @@
     <i class="material-icons">close</i>
   </a>
   <button id="review" class="btn btn-sm btn-outline-success" style="display:none;"></button>
+
   <input type="checkbox" id="shuffle" class="mx-2">
   <label for="shuffle">Shuffle</label>
+
+  <input type="checkbox" id="showtext" class="mx-2">
+  <label for="showtext">Text</label>
 </div>
 
-<div id="flash" class="text-center p-5" style="height:100vh;width:100%;">
-
+<div id="content" style="height:100vh;width:100%;">
+  <div id="flash" class="text-center p-5" style="height:70%;width:100%;"></div>
+  <div id="text" class="text-center display-1" style="height:20%;width:100%;"></div>
+</div> 
 
 
 <script>
@@ -87,7 +93,19 @@ $(function(){
     else{$("#flash").addClass("review")}
 
     $("#flash").html( deck[card].image );
+    if ( $("#showtext").prop('checked') ) $("#text").html( deck[card].name );
   }
+
+
+  $("#showtext").on('click', function(){
+    if ( $(this).prop('checked') ) {
+      $("#text").html( deck[card].name );
+    }
+    else {
+      $("#text").html('');
+    }
+    $(this).blur();
+  });
 
 
   $("#shuffle").on('click', function(){
@@ -101,12 +119,15 @@ $(function(){
       card = 0;
     }
     $("#flash").html( deck[card].image );
+    if ( $("#showtext").prop('checked') ) $("#text").html( deck[card].name );
     $(this).blur();
   });
+
 
   $(document).on('keydown', (e)=>{
     if (e.key == "ArrowDown") e.preventDefault();
   });
+
 
   // HANDLE "UP" "DOWN" "LEFT" AND "RIGHT" KEY PRESSES
   $(document).on('keyup',function(e) {
@@ -131,12 +152,14 @@ $(function(){
         if (card < deck.length - 1) {
           card += 1;
           $("#flash").html( deck[card].image );
+          if ( $("#showtext").prop('checked') ) $("#text").html( deck[card].name );
         }
         break;
       case "ArrowLeft":
         if (card > 0 && deck.length > 0) {
           card -= 1;
           $("#flash").html( deck[card].image );
+          if ( $("#showtext").prop('checked') ) $("#text").html( deck[card].name );
         }
         break;
     }

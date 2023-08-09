@@ -31,8 +31,6 @@
     </div>
   </div>
 
-<script src="/vocab_decks.js"></script>
-
 
 <script>
 $(function(){
@@ -56,7 +54,7 @@ $(function(){
   var backContent = [];
   var backClass = [];
 
-  // SET UP THE DECK /////////////////////////////////////////////////////////////
+  // SET UP THE DECK ///////////////////////////////////////////////////////////
   // Shuffle first so that cards left out are random (unless doing letters).
   if ( setName != "lower_case_mix" ) FYshuffle(deck);
   
@@ -94,14 +92,13 @@ $(function(){
         backClass.push(vocab_decks.colors[i] + 'Text alert-primary');
       }
 
-      let nums2 = nums.slice(0); // Do this way because FYshuffle shuffles in place.
+      let nums2 = nums.slice(); // Do this way because FYshuffle shuffles in place.
       FYshuffle(nums);
       FYshuffle(nums2);
-
       // This prevents dupes that may occur when half the deck is an odd number.
       // i.e. ["r", "r", "g", "g", "b", "b"]
       //      [ 3,   1,   2,   2,   3,   1 ] would produce two green "2"s
-      if (nums[nums.length-1] == nums2[0]) nums2.pop( nums2.unshift() );
+      if (nums[nums.length-1] == nums2[0]) nums2.unshift( nums2.pop() );
 
       backContent = nums.concat(nums2);
       parallelShuffle(backClass, backContent);
