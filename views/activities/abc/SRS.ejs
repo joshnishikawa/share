@@ -1,0 +1,138 @@
+<%- include('../../head'); -%>
+<body class="lightBG">
+<div style="min-height:100vh;" class="noselect"><!-- just for keeping the footer at the bottom-->
+  <div id="rank" style="position:fixed;bottom:0;right:0;"></div>
+
+<!-- CONTROL PANEL IS ALWAYS SHOWN AT THE TOP OF THE PAGE WHEN STUDYING -->
+  <div id="controls" class="container border-bottom mb-3">
+    <div class="row">
+
+      <!-- THE PLAYER IS ALWAYS AVAILABLE -->
+      <audio id="player"><source id="audioSource" type="audio/mpeg"></audio>
+
+      <!-- 'play' button is shown unless reading is required.-->
+      <div id="playbutton" class="col-3 btn text-success border-end" 
+          style="visibility:hidden;text-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important">
+        <i class="material-icons" style="font-size:4em;">
+          record_voice_over
+        </i>
+      </div>
+
+      <!-- display daily progress and difficulty indicator 
+          yellow means you're a bit behind. red means more than a bit -->
+      <div id="feedback" class="col-3 d-flex justify-content-center pt-3 border-end">
+        <div id="progress" class="radial-progress-bar shadow">
+          <div class="right-half"></div>
+          <div class="left-half-mask"></div>
+          <div class="left-half"></div>
+          <div class="inner-circle"></div>
+        </div>
+        <div id="slammer" style="position: absolute;"></div>
+        <div id="confetti" style="position: absolute;top:-2em;"></div>
+      </div>
+
+      <!-- 'exit' button -->
+      <div id="exit" class="col-3 btn text-shadow border-end">
+        <span class="icon-exit text-success text-shadow" style="font-size:4em;"></span>
+      </div>
+
+      <!-- 'next' button appears after you answer correctly -->
+      <div id="next" class="col-3 btn text-primary text-shadow" 
+          style="visibility:hidden;">
+        <i class="material-icons" style="font-size:4em;">
+          forward
+        </i>
+      </div>
+
+    </div>
+  </div>
+
+<!-- CARDS ETC. ARE DISPLAYED HERE -->
+  <div id="content" class="container justify-content-center g-0">
+    <div class="row g-0">
+      <div id="instructions" class="text-warning text-small text-center"></div>
+    </div>
+    <div class="row g-0">
+      <div id="teach" class="d-flex justify-content-center mb-3"></div>
+    </div>
+    <div class="row g-0">
+      <div id="answer" class="d-flex justify-content-center mb-3"></div>
+    </div>
+    <div class="row g-0">
+      <div id="main" class="d-flex flex-wrap flex-row-reverse justify-content-center" style="position:relative;"></div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://members.englishjones.com/javascripts/study_utilities.js"></script>
+<script src="https://members.englishjones.com/javascripts/study_activities.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/bevacqua/dragula@3.7.3/dist/dragula.min.js"></script>
+
+<script>
+  var ranks = [];
+  var aim = [];
+
+  update = (card, success) => {
+    if (success){
+      confetti(); // confetti is for closers...ONLY!
+      if(aim[card] == 0){ // first try
+        ranks[card] = Math.min(ranks[card] + 1, 5);
+        aim[card] = 2;
+      }
+      else { aim[card] += 1; }
+      progressToPercent(aim, 0); //do this after you calculate aim
+    }
+    else { aim[card] = 1; }
+  }
+
+
+  function checkProgress(){
+    if( aim.includes(0) ){ // DO ALL NEW CARDS ONCE FIRST
+      let card = randIndexOf(0, aim);
+      let rank = ranks[card];
+
+      if (rank < 9){
+        // $.get(`/instructions`, {deck, rank}, (data)=>{
+        //   $("#instructions").html(data).fadeIn();
+        // });
+      }
+
+      loadAnActivity(card, rank);
+    }
+
+    else if( aim.includes(1) ){ // THEN REVIEW THE ONES YOU MISSED (w/o rank up)
+      let card = randIndexOf(1, aim); // find a card to do
+      $("#slammer").html(''); // don't worry about the slammer for review
+      let rank = ranks[card] > 0 ? ranks[card]-1 : 0; // there is no rank -1
+      
+      loadAnActivity(card, rank);
+    }
+
+    else{ // TODO: FINISHED! SHOW MESSAGE & DISPLAY STATS
+      window.location.replace('/'); // instead of this, show a message
+    }
+  }
+
+
+$(function(){
+  let deck = abc;
+  for (let i=0; i<10; i++){ ranks.push(0); aim.push(0);} // FIXME: 10 is hard-coded
+
+  window.scrollTo(0,0);
+
+  $("#playbutton").on("click", ()=>{ playaudio(); });
+
+  $("#exit").on("click", ()=>{ 
+    clearTable();
+    window.location.replace('/');
+  });
+
+  checkProgress();
+});
+</script>
+
+<!-- define this after update() and checkProgress() are defined above -->
+<script src="/javascripts/abc.js"></script>
+
+<%- include('../../foot'); -%>

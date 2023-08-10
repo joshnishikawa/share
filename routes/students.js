@@ -23,6 +23,7 @@ router.get('/', (req, res)=>{
   }
 });
 
+
 router.get('/wordle', (req, res)=>{
   try{
     res.render('activities/wordle');
@@ -54,5 +55,16 @@ router.get('/haystack', (req, res)=>{
     console.error(err);
   }
 });
+
+router.get('/SRS', (req, res)=>{
+  try{
+    res.render('activities/abc/SRS');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+    
 
 module.exports = router;

@@ -1,3 +1,5 @@
+Friendly H (3) needs an audio button
+
 ////////// BUGS ////////////////////////////////////////////////////////////////
 RECALL 'rice ball' persists after 'rice' is entered
 MATCH allow related things (not just exact matches)
@@ -35,3 +37,60 @@ Time Bomb: Pause for 3 seconds = die. Don't finish in 1 minute = die. Three stri
 
   if bg-warning is displayed 3 times, bg-danger. press enter to review and try again.
   if they get to the end of the deck, bg-success!
+
+
+
+// LONG TERM GOALS /////////////////////////////////////////////////////////////
+  FUNCTIONS THAT CAN BE SELECTED FROM AN API FOR USE IN TEACHING GRAMMAR.
+
+  Read or listen to a sentence. Choose the type of sentence (or part) it is. 
+
+  A word or part of speech is given in Japanese.
+  Read the sentence and click on the English equivalant or part of speech.
+
+  Choose the word referred to by a pronoun or relative clause.
+
+  Complete the sentence by choosing ONE missing word (multi-choice)
+  Any gramatically correct sentence passes. -> Listen to sentence.
+
+  Complete the translation (of a given Japanese sentence) by choosing word(s) (multiple-choice)
+    -> Listen to sentence
+
+  Drag and drop the correct (of multiple) words where it belongs.
+
+  Sort multiple vocab words into multiple sentences.
+
+  Sort the parts into a sentence. (Japanese model optional)
+
+  Type the missing word(s)
+
+  Read an English sentence. Type the sentence with the indicated change.
+
+  Read a question and type the (indicated) answer.
+
+  Listen to a sentence and look at a picture. Correct the sentence with a spoken response.
+
+  Listen to or read a sentence/question. Select the correct response.
+
+  Listen to the sentence/question. Give a spoken response.
+
+  Read a sentence in Japanese. Type a translation.
+
+  Read a sentence in Japanese. Give a spoken translation.
+
+  Type any sentence using the provided English component(s).
+  Anything grammatically correct that includes all components wins.
+
+  Speak any sentence using the provided English component(s).
+  Anything transcribed as grammatically correct & includes all components wins.
+
+  ALSO COME UP WITH SOME ONE-OFF ACTIVITIES FOR WORD ASSOCIATIONS LIKE
+  singular/plural (chair - chairs, dress - dresses, mouse - mice)
+  noun/pronoun (Josh - he, Bob and I - we, my sisters - they)
+  adj./noun (long - length, dark - darkness, able - ability)
+  verb/prog. (study - studying, use - using, run - running)
+  verb/past (walk - walked, ride - rode, study - studied, read - read)
+  verb/participle "
+  3rd person (like - likes, wish - wishes, have - has)
+  comparative (tall - taller, large - larger, early - earlier, beautiful - more beautiful, good - better)
+  superlative "

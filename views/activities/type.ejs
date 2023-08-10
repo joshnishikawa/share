@@ -3,6 +3,9 @@
   <i class="material-icons">close</i>
 </a>
 
+<button class="btn btn-outline-info p-0" data-bs-toggle="modal" data-bs-target="#type_modal">
+  <i class="material-icons">info</i>
+</button>
 
 
 <link href="https://cdn.quilljs.com/1.0.0/quill.snow.css" rel="stylesheet">
@@ -25,6 +28,8 @@
     return html;
   }
 
+
+<%- include ("../modals/modal_type.ejs") %>
 
 $(function(){
   $('#save').click(function(){

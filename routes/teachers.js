@@ -7,6 +7,7 @@ const NH_vocab = require('../public/NH_vocab.js');
 
 // router.use('/tags', tagsRouter); // uncomment to update tags
 
+
 router.get('/', (req, res)=>{
   try{
     res.redirect('/teachers/images');
@@ -18,9 +19,9 @@ router.get('/', (req, res)=>{
 });
 
 
-router.get('/text', (req, res)=>{
+router.get('/images', (req, res)=>{
   try{
-    res.render('teachers/text');
+    res.render('teachers/images');
   }
   catch(err){
     res.send(err);
@@ -49,9 +50,9 @@ router.get('/New_Horizons', (req, res)=>{
 });
 
 
-router.get('/images', (req, res)=>{
+router.get('/text', (req, res)=>{
   try{
-    res.render('teachers/images');
+    res.render('teachers/text');
   }
   catch(err){
     res.send(err);
@@ -62,9 +63,9 @@ router.get('/images', (req, res)=>{
 
 router.get('/tools', (req, res)=>{
   try{
-    fs.readdir( path.join(__dirname, '../public/image/diagrams'), (err, diagrams)=>{
+    fs.readdir( path.join(__dirname, '../public/image/QnA'), (err, QnA)=>{
       if (err) throw err;
-      res.render('teachers/tools', {diagrams});
+      res.render('teachers/tools', {QnA});
     });
   }
   catch(err){
@@ -107,10 +108,10 @@ router.get('/flash', (req, res)=>{
 });
 
 
-router.get('/diagram', (req, res)=>{
+router.get('/QnA', (req, res)=>{
   try{
-    let diagram = `/image/diagrams/${req.query.diagram}`;
-    res.render('activities/diagram', {diagram});
+    let QnA = `/image/QnA/${req.query.QnA}`;
+    res.render('activities/QnA', {QnA});
   }
   catch(err){ console.error(err); }
 });

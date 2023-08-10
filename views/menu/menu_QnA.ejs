@@ -1,0 +1,29 @@
+<div class="rounded-3 border p-3 shadow d-flex">
+  <strong class="text-primary h3">Q&A</strong>
+  <div class="d-flex justify-content-end w-100">
+
+    <button class="btn btn-outline-info me-1" 
+            data-bs-toggle="modal" data-bs-target="#QnA_modal">
+      <i class="material-icons" style="line-height:1rem;vertical-align:middle;">info</i>
+    </button>
+
+    <form action="QnA" method="GET">
+      <div class="d-flex" style="height:100%;">
+        <select class="form-control" name="QnA" required>
+<% for (let d of QnA ) { %>
+          <option value="<%- d %>"><%- d %></option>
+<% } %>
+        </select>
+        <button type="submit" class="btn btn-primary">Start</button>
+      </div>
+    </form>
+  </div>
+
+</div>
+
+<%- include ("../modals/modal_QnA.ejs") %>
+
+<script>
+$(function(){
+});
+</script>

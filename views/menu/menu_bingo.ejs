@@ -20,33 +20,7 @@
   </div>
 </div>
 
-
-<div id="bingo_modal" class="modal fade">
-  <div class="modal-dialog">
-    <div class="modal-content">
-    
-      <div class="modal-header">
-        <h3 class="modal-title">BINGO</h3>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <p>Have the students choose a random selection of words on the screen 
-          and write them on a sheet of paper in a grid. Have them use a...
-          <ul>
-            <li>5x5 grid if there are at least 25 words</li>
-            <li>4x4 grid if there are at least 16 words</li>
-            <li>3x3 grid if there are at least 9 words</li>
-          </ul>
-          Then click start. The words will appear in random order. Use the
-          navigation buttons or &larr; &rarr; to navigate through the 
-          words/images. The student find and circle the ones they chose. The 
-          first student to cross off all the words in a row wins.
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
-
+<%- include ("../modals/modal_bingo.ejs") %>
 
 <script>
 $(function(){

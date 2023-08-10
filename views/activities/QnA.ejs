@@ -6,16 +6,19 @@
       <i class="material-icons">close</i>
     </a>
   </div>
+
+  <button class="btn btn-outline-info p-0" data-bs-toggle="modal" data-bs-target="#QnA_modal">
+    <i class="material-icons">info</i>
+  </button>
   
   <div class="container-fluid" style="min-height:100vh;">
     <div class="row">
       <div class="col text-center">
-        <img src="<%- diagram %>" alt="diagram" style="height:90vh;" />
+        <img src="<%- QnA %>" alt="QnA" style="height:90vh;" />
       </div>
     </div>
 
   </div>
 
-
-
+<%- include ("../modals/modal_QnA.ejs") %>
 <%- include('../foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->

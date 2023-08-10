@@ -7,13 +7,12 @@ const path = require('path');
 router.use(bodyParser.urlencoded({extended: true}));
 router.use(bodyParser.json());
 
+
 router.get('/', (req, res)=>{
   try{
-    // get list of files in public/image/svg
     let files = fs.readdirSync( path.join(__dirname, '../public/image/svg') );
-    // remove _items.json and _tags.json
     files = files.filter( file => 
-      !['_tags.json', 'README.md', '.git'].includes(file)
+      !['_tags.json', '_synonyms.json', 'README.md', '.git'].includes(file)
     );
     res.render('teachers/updateTags', {files});
   }
@@ -69,5 +68,7 @@ router.post('/remove', (req, res)=>{
     console.error(err);
   }
 });
+
+
 
 module.exports = router;

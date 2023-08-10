@@ -26,6 +26,10 @@
     <i class="material-icons">close</i>
   </a>
 
+  <button class="btn btn-outline-info p-0" data-bs-toggle="modal" data-bs-target="#wordle_modal">
+    <i class="material-icons">info</i>
+  </button>
+
   <div id="content" class="container g-0" style="min-height:100vh;">
   
     <div class="row g-0">
@@ -59,7 +63,7 @@
     </div>
   </div>
 
-
+<%- include ("../modals/modal_wordle.ejs") %>
 
 <script>
 $(function(){

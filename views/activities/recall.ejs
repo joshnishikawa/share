@@ -29,12 +29,16 @@
       <i class="material-icons">close</i>
     </a>
 
+    <button class="btn btn-outline-info p-0" data-bs-toggle="modal" data-bs-target="#recall_modal">
+      <i class="material-icons">info</i>
+    </button>
+
     <div id="numselect" class="form-group d-flex">
-      <div class="d-flex mx-1 rounded-3 border border-info">
+      <div class="d-flex mx-1 rounded-3 border">
         <label for="numCards" class="form-label mx-1 mt-1 mb-0">Hide</label>
         <input id="numCards" type="number" class="form-control form-control-sm border-0 pe-0" min="1" style="width:3rem;" aria-label="number of cards">
       </div>
-      <div id="start" class="btn btn-sm btn-outline-info">START</div>
+      <div id="start" class="btn btn-sm btn-outline-success">START</div>
     </div>
 
     <input id="searchInput" class="form-control form-control-sm" type="text" placeholder="Search" aria-label="Search" style="display:none;">
@@ -47,6 +51,7 @@
     </div>
   </div>
 
+<%- include ("../modals/modal_recall.ejs") %>
 
 <script>
 $(function(){

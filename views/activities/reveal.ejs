@@ -50,12 +50,18 @@
   <a href="/teachers" class="btn btn-sm btn-outline-secondary p-0">
     <i class="material-icons">close</i>
   </a>
+
+  <button class="btn btn-outline-info p-0" data-bs-toggle="modal" data-bs-target="#reveal_modal">
+    <i class="material-icons">info</i>
+  </button>
+
 </div>
+
 
 <div id="blurme" class="text-center"></div>
 <div id="loadme" class="text-center" style="height:100vh;display:none;"></div>
 
-
+<%- include ("../modals/modal_reveal.ejs") %>
 
 <script>
 $(function(){
