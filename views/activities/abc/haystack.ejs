@@ -19,7 +19,8 @@
       </div>
     </div>
     <div class="row UD">
-      <div id="buttons" class="col d-flex flex-wrap justify-content-center"></div>
+      <div id="cap" class="col d-flex flex-wrap justify-content-center"></div>
+      <div id="lc" class="col d-flex flex-wrap justify-content-center"></div>
     </div>
   </div>
 
@@ -31,18 +32,28 @@
 
 <script>
 $(function(){
-  var letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I",
+  var cap = ["A", "B", "C", "D", "E", "F", "G", "H", "I",
                  "J", "K", "L", "M", "N", "O", "P", "Q", "R",
-                 "S", "T", "U", "V", "W", "X", "Y", "Z",
-                 "a", "b", "c", "d", "e", "f", "g", "h", "i",
+                 "S", "T", "U", "V", "W", "X", "Y", "Z"];
+
+  var lc = ["a", "b", "c", "d", "e", "f", "g", "h", "i",
                  "j", "k", "l", "m", "n", "o", "p", "q", "r",
                  "s", "t", "u", "v", "w", "x", "y", "z"];
-  for (let i of letters){
-    $("#buttons").append(
-      `<div data-value="${i}" class="letter m-1 border rounded-3 display-3 text-center rounded-3" style="width:60px;cursor:pointer;">
+
+  for (let i of cap){
+    $("#cap").append(
+      `<button data-value="${i}" class="btn btn-outline-primary letter m-1" style="width:60px;font-size:2.8rem;">
+          ${i}
+       </button>`);
+  }
+  for (let i of lc){
+    $("#lc").append(
+      `<div data-value="${i}" class="btn btn-outline-success letter m-1" style="width:60px;font-size:2.8rem;">
           ${i}
        </div>`);
   }
+
+
 
   var sets = {
     "a": ["d", "q", "o"],
@@ -105,8 +116,12 @@ $(function(){
     timer = Date.now(); 
  
     let letter = $(this).data('value');
-    $(".letter").removeClass('alert-success');
-    $(this).addClass('alert-success');
+
+    $(".letter").removeClass('alert-primary alert-success');
+
+    if ($(this).parent().attr('id') == 'lc') $(this).addClass('alert-success');
+    else $(this).addClass('alert-primary');
+
     $("#grid").empty();
     let deck = [];
     for (let i of sets[letter]){
@@ -129,9 +144,9 @@ $(function(){
     }
     $(".select").on('click', function(){
       if ( $(this).data('value') == letter) {
-        $(this).toggleClass('alert-success');
-        if ($(this).data('value') == letter) $(this).addClass('alert-success');
-        if ($('.select.alert-success').length == 6) {
+        $(this).toggleClass('alert-primary');
+        if ($(this).data('value') == letter) $(this).addClass('alert-primary');
+        if ($('.select.alert-primary').length == 6) {
 
           let time = (Date.now() - timer) / 1000;
           $("#menu").removeClass('d-none').addClass('d-block');
@@ -145,7 +160,7 @@ $(function(){
         $(this).addClass('alert-danger');
         setTimeout(function(){
           $(".select").removeClass('alert-danger');
-          $(".select").removeClass('alert-success');
+          $(".select").removeClass('alert-primary');
         }, 500);
       }
     });

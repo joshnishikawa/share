@@ -11,7 +11,7 @@
       <audio id="player"><source id="audioSource" type="audio/mpeg"></audio>
 
       <!-- 'play' button is shown unless reading is required.-->
-      <div id="playbutton" class="col-3 btn text-success border-end" 
+      <div id="playbutton" class="col-4 btn text-success" 
           style="visibility:hidden;text-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important">
         <i class="material-icons" style="font-size:4em;">
           record_voice_over
@@ -20,7 +20,7 @@
 
       <!-- display daily progress and difficulty indicator 
           yellow means you're a bit behind. red means more than a bit -->
-      <div id="feedback" class="col-3 d-flex justify-content-center pt-3 border-end">
+      <div id="feedback" class="col-4 d-flex justify-content-center pt-3 border-start border-end">
         <div id="progress" class="radial-progress-bar shadow">
           <div class="right-half"></div>
           <div class="left-half-mask"></div>
@@ -31,13 +31,8 @@
         <div id="confetti" style="position: absolute;top:-2em;"></div>
       </div>
 
-      <!-- 'exit' button -->
-      <div id="exit" class="col-3 btn text-shadow border-end">
-        <span class="icon-exit text-success text-shadow" style="font-size:4em;"></span>
-      </div>
-
       <!-- 'next' button appears after you answer correctly -->
-      <div id="next" class="col-3 btn text-primary text-shadow" 
+      <div id="next" class="col-4 btn text-primary text-shadow" 
           style="visibility:hidden;">
         <i class="material-icons" style="font-size:4em;">
           forward
@@ -77,8 +72,13 @@
     if (success){
       confetti(); // confetti is for closers...ONLY!
       if(aim[card] == 0){ // first try
-        ranks[card] = Math.min(ranks[card] + 1, 5);
         aim[card] = 2;
+        ranks[card] = Math.min(ranks[card] + 1, 5);
+        $.post('/abc/SRS', {ranks}, (data)=>{ // post to update cookie w/o reloading
+          if (data = 'success'){
+            document.cookie = `ranks=${ranks.join(',')};path=/;`;
+          }
+        });
       }
       else { aim[card] += 1; }
       progressToPercent(aim, 0); //do this after you calculate aim
@@ -87,17 +87,16 @@
   }
 
 
-  function checkProgress(){
+  checkProgress = ()=>{
     if( aim.includes(0) ){ // DO ALL NEW CARDS ONCE FIRST
       let card = randIndexOf(0, aim);
       let rank = ranks[card];
 
-      if (rank < 9){
+      if (rank < 5){
         // $.get(`/instructions`, {deck, rank}, (data)=>{
         //   $("#instructions").html(data).fadeIn();
         // });
       }
-
       loadAnActivity(card, rank);
     }
 
@@ -116,8 +115,19 @@
 
 
 $(function(){
-  let deck = abc;
-  for (let i=0; i<10; i++){ ranks.push(0); aim.push(0);} // FIXME: 10 is hard-coded
+  // get ranks from cookie
+  let cookie = document.cookie.split(';').find(row => row.startsWith('ranks='));
+  if(cookie){
+    cookie = cookie.split('=')[1];
+    ranks = cookie.split(',').map(x=>parseInt(x));
+  }
+  else {
+    for (let i=0; i<abc.length; i++){ranks.push(0);}
+  }
+
+
+  for (let i=0; i<abc.length; i++){aim.push(0);}
+
 
   window.scrollTo(0,0);
 

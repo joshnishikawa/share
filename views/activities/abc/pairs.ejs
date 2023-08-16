@@ -69,7 +69,7 @@ $(function(){
     for (let i = 0; i < deck.length; i++){
       $("#grid").append(
       `<div class="col-2 vocab p-0" style="height:24vh;">
-          <div data-value="${deck[i]}" class="flip flipped m-3" style="height:80%;">
+          <div data-value="${deck[i]}" class="flip border-primary rounded-3 flipped m-3" style="height:80%;">
             <div class="flip-card shadow">
 
               <div class="flip-front bg-white rounded border display-1">
@@ -83,11 +83,11 @@ $(function(){
     }
 
     $(".flip").on('click', function(){
-      $(this).toggleClass('highlight');
+      $(this).toggleClass('border border-5');
 
-      if ($('.flip.highlight').length == 2){
-        if ($('.flip.highlight').first().data('value') == $('.flip.highlight').last().data('value')){
-          $('.flip.highlight').removeClass('flip flipped highlight').off('click');
+      if ($('.flip.border-5').length == 2){
+        if ($('.flip.border-5').first().data('value') == $('.flip.border-5').last().data('value')){
+          $('.flip.border-5').removeClass('flip flipped border').off('click');
           if ($('.flip.flipped').length == 0){
             var time = (Date.now() - timer) / 1000;
             $("#buttons").removeClass('d-none').addClass('d-block');
@@ -98,7 +98,7 @@ $(function(){
           }
         }
         else {
-          $('.flip.highlight').removeClass('highlight');
+          $('.flip.border-5').removeClass('border border-5');
         }
       }
     });

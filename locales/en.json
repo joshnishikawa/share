@@ -66,7 +66,7 @@
 	"list": "LIST",
 	"activity": {
 		"pairs": {
-			"title": "Find Pairs",
+			"title": "Make Pairs",
 			"description": "Click on two matching cards to flip them. See how fast you can find all the pairs."
 		},
 		"haystack": {

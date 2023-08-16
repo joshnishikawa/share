@@ -66,7 +66,7 @@
 	"list": "リスト",
 	"activity": {
 		"pairs": {
-			"title": "Find Pairs",
+			"title": "Make Pairs",
 			"description": "同じカードを見つけてクリックしてください。全てのペアを見つけるのにどれだけ早くできるかな？"
 		},
 		"haystack": {

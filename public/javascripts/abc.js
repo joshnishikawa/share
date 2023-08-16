@@ -166,6 +166,7 @@ const sounds = {
 
 async function loadAnActivity(card, rank){
   try{
+    console.log("card: ", card, "rank: ", rank);
     let success = true;
     let letter = abc[card].letter;
     let otherLetters = abc[card].otherLetters;
@@ -174,6 +175,7 @@ async function loadAnActivity(card, rank){
     let groups = {};
     let other = [];
     let source = '';
+    let indexes = [];
 
     $("#rank").html(rank);
 
@@ -186,15 +188,10 @@ async function loadAnActivity(card, rank){
         }
 
         await sortWords({groups}, async (data)=>{
-          let source = `/audio/sounds/${sounds[data.word]}.mp3`;
-
           if(!data.success){
-            source = `/audio/letters/${data.word}.mp3`;
             success = false;
             update(card, false);
           }
-
-          playaudio(source);
         });
 
         if (success) update(card, true);
@@ -204,12 +201,12 @@ async function loadAnActivity(card, rank){
       case 1: // show 3 boxes each with different letters and a picture that starts with each letter
               // sort the pictures into the boxes
         let allLetters = [letter, ...otherLetters];
-        
-        for(let card of allLetters){
-          await $.get('/SRS/loadcard', {set, card}, async(data)=>{
-            let w = FYshuffle(data.vocab)[0];
-            groups[card] = w;
-          });
+        // find the index of each item in the array whose letter value is included in allLetters
+        indexes = abc.map((item, index) => allLetters.includes(item.letter) ? index : '').filter(String);
+        for(let i of indexes){
+          let letter = abc[i].letter;
+          let word = FYshuffle( abc[i].vocab )[0];
+          groups[letter] = word;
         }
 
         await sortPics({groups}, async (data)=>{
@@ -248,13 +245,12 @@ async function loadAnActivity(card, rank){
 
       case 3: // see a letter and 6 pictures, drag the three that start with the letter
         groups[letter] = vocab;
+        indexes = abc.map((item, index) => otherLetters.includes(item.letter) ? index : '').filter(String);
 
-        for(let card of otherLetters){
-          await $.get('/SRS/loadcard', {set, card}, async(data)=>{
-            for (let w of data.vocab){
-              other.push(w);
-            }
-          });
+        for(let i of indexes){
+          for (let w of abc[i].vocab){
+            other.push(w);
+          }
         }
 
         other = FYshuffle(other).slice(0,3);
@@ -279,12 +275,12 @@ async function loadAnActivity(card, rank){
         groups[letter] = FYshuffle(vocab).slice(0,2);
 
         let ol = FYshuffle(otherLetters)[0];
+        // find index of ol
+        let index = abc.findIndex((item) => item.letter === ol);
 
-        await $.get('/SRS/loadcard', {set, "card":ol}, async(data)=>{
-          for (let i=0; i<2; i++){
-            other.push(data.vocab[i]);
-          }
-        });
+        for (let i=0; i<2; i++){
+          other.push(abc[index].vocab[i]);
+        }
 
         groups[ol] = other;
 
