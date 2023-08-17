@@ -63,6 +63,20 @@ const vocab_decks = {
            'darkBlue','darkGreen','darkBrown','white']
 }
 
+getCookieObject = ()=>{
+  let cookie = document.cookie;
+  let cookieObject = {};
+
+  if(cookie){
+    let cookieArray = cookie.split(';');
+    for (let i = 0; i < cookieArray.length; i++){
+      let cookiePair = cookieArray[i].split('=');
+      cookieObject[ cookiePair[0] ] = cookiePair[1];
+    }
+  }
+  return cookieObject;
+}
+
 
 getDeck = (data)=>{
   let deckType = data.deckType;

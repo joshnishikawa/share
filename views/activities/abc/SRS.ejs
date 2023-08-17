@@ -32,8 +32,8 @@
       </div>
 
       <!-- 'next' button appears after you answer correctly -->
-      <div id="next" class="col-4 btn text-primary text-shadow" 
-          style="visibility:hidden;">
+      <div id="next" class="col-4 btn text-primary" 
+          style="visibility:hidden;text-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important">
         <i class="material-icons" style="font-size:4em;">
           forward
         </i>
@@ -74,10 +74,7 @@
       if(aim[card] == 0){ // first try
         aim[card] = 2;
         ranks[card] = Math.min(ranks[card] + 1, 5);
-        $.post('/abc/SRS', {ranks}, (data)=>{ // post to update cookie w/o reloading
-          if (data = 'success'){
-            document.cookie = `ranks=${ranks.join(',')};path=/;`;
-          }
+        $.post('/abc/SRS', {ranks}, (data)=>{
         });
       }
       else { aim[card] += 1; }
@@ -115,28 +112,14 @@
 
 
 $(function(){
-  // get ranks from cookie
-  let cookie = document.cookie.split(';').find(row => row.startsWith('ranks='));
-  if(cookie){
-    cookie = cookie.split('=')[1];
-    ranks = cookie.split(',').map(x=>parseInt(x));
-  }
-  else {
-    for (let i=0; i<abc.length; i++){ranks.push(0);}
-  }
-
-
-  for (let i=0; i<abc.length; i++){aim.push(0);}
-
-
   window.scrollTo(0,0);
 
-  $("#playbutton").on("click", ()=>{ playaudio(); });
+  aim = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+  ranks = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+  let {abcranks} = getCookieObject();
+  if (abcranks) ranks = abcranks.split(",").map(Number);
 
-  $("#exit").on("click", ()=>{ 
-    clearTable();
-    window.location.replace('/');
-  });
+  $("#playbutton").on("click", ()=>{ playaudio(); });
 
   checkProgress();
 });

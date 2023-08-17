@@ -73,5 +73,14 @@
 			"title": "Haystack",
 			"description": "Choose a letter. Then click on all of the same letters. How fast can you find all six?"
 		}
+	},
+	"navbar": {
+		"students": {
+			"1": "These are some activities you can use to practice any time.",
+			"2": "Open the <strong>ABC</strong> tab for some activities that can help you learn the alphabet.",
+			"3": "Open the <strong>New Horizons</strong> tab for some activities to practice vocabulary from your Picture Dicionary.",
+			"4": "Keep looking for more activities to be added soon!",
+			"title": "Information"
+		}
 	}
 }

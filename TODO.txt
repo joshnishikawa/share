@@ -1,5 +1,7 @@
 Friendly H (3) needs an audio button
 study page borders between icons are also d-none which is confusing
+           next button text-shadow non-existent
+
 
 ////////// BUGS ////////////////////////////////////////////////////////////////
 RECALL 'rice ball' persists after 'rice' is entered

@@ -53,8 +53,11 @@ router.get('/SRS', (req, res)=>{
 
 
 router.post('/SRS', (req, res)=>{
-  try{ // this could be used to update a database but for now it just
-       // allows the cookie to be set in real time
+  try{
+    // set cookie
+    let cookie = req.body.ranks.join(',');
+    console.log(cookie);
+    res.cookie('abcranks', cookie.toString(), {path: '/abc', maxAge: 252288000, encode: v => v});
     res.send('success');
   }
   catch(err){
@@ -66,7 +69,7 @@ router.post('/SRS', (req, res)=>{
 
 router.post('/reset', (req, res)=>{
   try{
-    res.clearCookie('ranks', {path: '/abc'});
+    res.clearCookie('abcranks', {path: '/abc'});
     res.send('success');
   }
   catch(err){
