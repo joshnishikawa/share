@@ -41,6 +41,17 @@ router.get('/haystack', (req, res)=>{
 });
 
 
+router.get('/sequence', (req, res)=>{
+  try{
+    res.render('activities/abc/sequence');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
+
 router.get('/SRS', (req, res)=>{
   try{
     res.render('activities/abc/SRS');

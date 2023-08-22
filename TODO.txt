@@ -1,30 +1,20 @@
-Friendly H (3) needs an audio button
-study page borders between icons are also d-none which is confusing
-           next button text-shadow non-existent
-
-
 ////////// BUGS ////////////////////////////////////////////////////////////////
 RECALL 'rice ball' persists after 'rice' is entered
 MATCH allow related things (not just exact matches)
 
 
 ////////// IDEAS FOR STUDENT ACTIVITIES ////////////////////////////////////////
-spot-it (for letters or pictures)
-
-Put letter parts together like a puzzle?
-Letter reveal (Type what you see. A series of letters will make a word).
-Choose the next letter (Alphabetical)
+Type what you see.
 
 find the given word among a group of like words
 word find
 
-English vs. Romaji spelling
-
-find all letters that (sound like 'p', have a descender, are tall, etc.)
+Find all letters that (sound like 'p', have a descender, are tall, etc.)
 Phonics: Click to listen. Drag into groups.
-
+Put letter parts together like a puzzle?
+See English and Romaji, type the English version.
 Sentences: Listen to the sentence. Click each word to listen. Drag the words into order.
-
+Speaking Slots: Pull the lever to make a sentence with random parts. Say the sentence to continue.
 
 ////////// IDEAS FOR TEACHER ACTIVITIES ////////////////////////////////////////
 Trash or Treasure (a la Bamboozle)
@@ -41,6 +31,8 @@ Time Bomb: Pause for 3 seconds = die. Don't finish in 1 minute = die. Three stri
   if bg-warning is displayed 3 times, bg-danger. press enter to review and try again.
   if they get to the end of the deck, bg-success!
 
+
+spot-it (for letters or pictures)
 
 
 // LONG TERM GOALS /////////////////////////////////////////////////////////////

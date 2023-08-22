@@ -1,0 +1,134 @@
+<%- include('../../head'); -%>
+
+<style>
+  .gradient{
+  background-image: linear-gradient(to right, 
+                                  #999 5%, 
+                                  rgba(255, 255, 255, 0) 35%, 
+                                  rgba(255, 255, 255, 0) 65%, 
+                                  #999 95%);
+  }
+</style>
+
+<body>
+
+  <div class="d-flex">
+    <a href="/" class="btn btn-sm btn-outline-secondary p-0">
+      <i class="material-icons">close</i>
+    </a>
+  </div>
+
+  <div class="container" style="min-height:100vh;user-select: none;">
+    <div class="row">
+      <div class="col-8 text-center">
+        <div id="result" class="text-center">
+          <div class="display-1">
+            <%- __('activity.sequence.title') %>
+          </div>
+          <%- __('activity.sequence.description') %>
+        </div>
+      </div>
+      <div class="col-4">
+        <div id="timer" class="display-1 UD"></div>
+        <div id="start" class="btn btn-success btn-lg" style="display:none;">Start</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col text-center">
+        <div id="wheel" class="d-flex UD shadow m-5" style="overflow: hidden;"></div>
+    </div>
+  </div>
+
+
+<script>
+$(function(){
+  let finished = false;
+  let timeLimit = 60; // seconds
+  let starttime = 0;  // defined when the user clicks start
+
+  let deck = [];
+  let letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
+              'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
+              'u', 'v', 'w', 'x', 'y', 'z'];
+  let l = '';
+  
+  $("#start").show();
+
+
+  getNextLetter = async (k)=>{
+    if (deck.length == 0){
+      finished = true;
+      return;
+    }
+    else {
+      if (k == l){
+        await $(`#${l}`).text(l).removeClass('text-danger'); // show the letter again
+        l = deck.pop();
+        let wheelwidth = $("#wheel").width();
+        let offset = $("#wheel").scrollLeft();
+        let letterOffset = $(`#${l}`).offset().left;
+        $(`#${l}`).text('_');
+        $("#wheel").animate({ scrollLeft: offset + letterOffset - wheelwidth / 2 }, 100);
+      }
+      else {
+        $(`#${l}`).text(l).addClass('text-danger');
+      }
+    }
+  }
+
+
+  $(document).on('keyup', function(e){
+    getNextLetter(e.key);
+  });
+
+
+  function updateAnimation() {
+    if (!finished && new Date() - starttime < timeLimit * 1000) {
+      $("#timer").text(':'+(timeLimit - Math.floor((new Date() - starttime) / 1000)).toString());
+      requestAnimationFrame(updateAnimation); // Keep the animation going
+    } 
+    else {
+      $("#start").show();
+      if (finished) {
+        $("#wheel").removeClass('d-flex').addClass('d-none');
+        $("#result").html(`
+          <div class="mx-auto mt-3 display-1 alert-success rounded-3">
+            You got them all!
+          </div>`);
+      } else {
+        $("#timer").text(':00');
+        $("#result").html(`
+          <div class="mx-auto mt-3 display-1 alert-primary rounded-3">
+            You got ${26 - deck.length} letters!
+          </div>`);
+      }
+    }
+  }
+
+
+  $("#start").on('click', function(){
+    $("#start").hide();
+    $("#result").html('');
+    $("#wheel").empty().removeClass('d-none').addClass('d-flex');
+    for (let i of letters){
+      $("#wheel").append(`<div id="${i}" class="letter m-3" style="font-size:10rem;">${i}</div>`);
+    }
+
+    deck = letters.slice(0);
+    FYshuffle(deck);
+    console.log(deck);
+    l = deck.pop();
+
+    starttime = new Date();
+    finished = false;
+
+    getNextLetter(l);
+    requestAnimationFrame(updateAnimation);
+  });
+  
+
+});
+
+</script>
+
+<%- include('../../foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->

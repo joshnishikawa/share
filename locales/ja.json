@@ -72,6 +72,10 @@
 		"haystack": {
 			"title": "Haystack",
 			"description": "文字を選んでください。そして同じ文字をクリックしてください。全ての文字を見つけるのにどれだけ早くできるかな？"
+		},
+		"sequence": {
+			"title": "Sequence",
+			"description": "欠けている文字を入力してください。1分間に何個入力できるかな？"
 		}
 	},
 	"navbar": {

@@ -72,6 +72,10 @@
 		"haystack": {
 			"title": "Haystack",
 			"description": "Choose a letter. Then click on all of the same letters. How fast can you find all six?"
+		},
+		"sequence": {
+			"title": "Sequence",
+			"description": "Type the missing letter. How many can you get in 1 minute?"
 		}
 	},
 	"navbar": {
