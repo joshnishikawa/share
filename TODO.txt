@@ -4,7 +4,7 @@ MATCH allow related things (not just exact matches)
 
 
 ////////// IDEAS FOR STUDENT ACTIVITIES ////////////////////////////////////////
-Put UD everywhere it's needed
+Get the spoken picture dictionary working
 
 find the given word among a group of like words
 word find

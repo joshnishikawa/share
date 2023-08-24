@@ -26,7 +26,7 @@ $(function(){
   $("#typeButton").on('click', (e)=>{
     e.preventDefault();
     if (!window.setName || window.setName == '{}') {
-      alert("Please select a deck.");
+      alert("<%- __('pleaseSelect') %>");
     }
     else {
       $("#typeForm input[name='setName']").val(window.setName);

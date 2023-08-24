@@ -23,7 +23,7 @@ $(function(){
   $("#flashButton").on('click', (e)=>{
     e.preventDefault();
     if (!window.setName || window.setName == '{}') {
-      alert("Please select a deck.");
+      alert("<%- __('pleaseSelect') %>");
     }
     else {
       $("#flashForm input[name='setName']").val(window.setName);

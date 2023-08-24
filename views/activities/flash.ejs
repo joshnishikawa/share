@@ -37,24 +37,22 @@
 </style>
 
 <body>
+<a href="/teachers" class="btn btn-sm btn-outline-secondary py-0">
+  <i class="material-icons">close</i>
+</a>
 
-<div class="d-flex">
-  <a href="/teachers" class="btn btn-sm btn-outline-secondary p-0">
-    <i class="material-icons">close</i>
-  </a>
+<button class="btn btn-sm btn-outline-secondary p-0" data-bs-toggle="modal" data-bs-target="#flash_modal">
+  <i class="material-icons">info</i>
+</button>
 
-  <button class="btn btn-outline-secondary p-0" data-bs-toggle="modal" data-bs-target="#flash_modal">
-    <i class="material-icons">info</i>
-  </button>
+<button id="review" class="btn btn-sm btn-outline-success" style="display:none;"></button>
 
-  <button id="review" class="btn btn-sm btn-outline-success" style="display:none;"></button>
+<input type="checkbox" id="shuffle" class="ms-2">
+<label for="shuffle">Shuffle</label>
 
-  <input type="checkbox" id="shuffle" class="mx-2">
-  <label for="shuffle">Shuffle</label>
+<input type="checkbox" id="showtext" class="ms-2">
+<label for="showtext">Text</label>
 
-  <input type="checkbox" id="showtext" class="mx-2">
-  <label for="showtext">Text</label>
-</div>
 
 <div id="content" style="height:100vh;width:100%;">
   <div id="flash" class="text-center p-5" style="height:70%;width:100%;"></div>
