@@ -37,9 +37,9 @@
 
       <!-- answer -->
       <div class="col UD">
-        <div id="guess" class="d-flex justify-content-center my-3"></div>
+        <div id="guess" class="d-flex flex-wrap justify-content-center my-3"></div>
         <div class="d-flex justify-content-center my-3">
-          <div id="answer" class="d-flex flex-wrap"><!-- populated dynamically by resetAnswer() --></div>
+          <div id="answer" class="d-flex flex-wrap justify-content-center"><!-- populated dynamically by resetAnswer() --></div>
           <button id="start" aria-label="next" class="btn btn-lg btn-success" style="display:none;">
             <i class="material-icons">arrow_forward</i>
           </button>
@@ -68,6 +68,7 @@
 
 <script>
 $(function(){
+
 // PREPARE THE DECK ////////////////////////////////////////////////////////////
   var url = window.location.href;
   var returnto = url.substring(0, url.lastIndexOf('/'));
@@ -86,17 +87,17 @@ $(function(){
 
   const letters = ["q","w","e","r","t","y","u","i","o","p",
                   "a","s","d","f","g","h","j","k","l",
-                  "z","x","c","v","b","n","m","-","'",
+                  "z","x","c","v","b","n","m","-","'",".",
                   " ",
                   "Q","W","E","R","T","Y","U","I","O","P",
                   "A","S","D","F","G","H","J","K","L",
-                  "Z","X","C","V","B","N","M","_"];
+                  "Z","X","C","V","B","N","M"];
 
   // input handlers
   inputLetter = (letter)=>{
     if(place < word.name.length){
-      let l = [' ', '_'].includes(letter) ? ' ' :      letter; // for data-value
-      let d = [' ', '_'].includes(letter) ? '&nbsp;' : letter; // for display
+      let l = [' ', '_'].includes(letter) ? ' ' : letter == 'period' ? '.' : letter; // for data-value
+      let d = [' ', '_'].includes(letter) ? '&nbsp;' : letter == 'period' ? '.' : letter; // for display
 
       $("#place"+place ).html(d);
       place++;
@@ -120,7 +121,7 @@ $(function(){
     $("#enter").prop('disabled', true);
     if (guess === word.name){
       for (let i = 0; i < word.name.length; i++){
-        $(`[data-value=${word.name[i] == ' ' ? '_' : word.name[i]}]`)
+        $(`[data-value=${word.name[i] == '.' ? 'period': word.name[i] == ' ' ? '_' : word.name[i]}]`)
             .removeClass('bg-warning text-body')
             .addClass('bg-primary text-white');
       }
@@ -135,7 +136,7 @@ $(function(){
 
       for(let i = 0; i < word.name.length; i++){
         let wordwrap = [' ', '-'].includes( word.name[i] ) ? true : false;
-        let l = guess[i] == ' ' ? '_' : guess[i];      // for data-value
+        let l = guess[i] == '.' ? 'period' : guess[i] == ' ' ? '_' : guess[i];      // for data-value
         let d = guess[i] == ' ' ? '&nbsp;' : guess[i]; // for display
 
         if(guess[i] === word.name[i]){
@@ -165,7 +166,10 @@ $(function(){
 
       $("#guess .bg-warning").each(function(){
         let l = $(this).text();
-        if( !remaining.includes(l) ){
+        let d = l == '\xa0' ? ' ' : l == 'period' ? '.' : l;
+                    //&nbsp; is \xa0 in javascript
+
+        if ( !remaining.includes(d) ){
           $(this).removeClass('bg-warning text-body').addClass('bg-secondary text-white');
           $(`[data-value=${l}]`)
             .removeClass('bg-warning text-body')
@@ -261,9 +265,9 @@ $(function(){
       `<div data-value="${key}" class="letter btn btn-sm border shadow-sm me-1 mb-1" 
                                 style="width:50px;">${key}</div>`);
   }
-  for ( let key of letters.slice( 19, 28 )){
+  for ( let key of letters.slice( 19, 29 )){
     $("#keyrow3").append(
-      `<div data-value="${key}" class="letter btn btn-sm border shadow-sm me-1 mb-1" 
+      `<div data-value="${key == '.' ? 'period' : key}" class="letter btn btn-sm border shadow-sm me-1 mb-1" 
                                 style="width:50px;">${key}</div>`);
   }
 
