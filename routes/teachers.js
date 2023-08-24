@@ -75,20 +75,9 @@ router.get('/tools', (req, res)=>{
 });
 
 
-router.get('/type', (req, res)=>{ 
+router.get('/richtext', (req, res)=>{ 
   try{
-    res.render('activities/type');
-  }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
-
-
-router.get('/write', (req, res)=>{
-  try{
-    res.render('activities/write');
+    res.render('activities/richtext');
   }
   catch(err){
     res.send(err);
@@ -131,6 +120,17 @@ router.get('/match', (req, res)=>{
 router.get('/wordle', (req, res)=>{
   try{
     res.render('activities/wordle');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
+
+router.get('/type', (req, res)=>{
+  try{
+    res.render('activities/type');
   }
   catch(err){
     res.send(err);

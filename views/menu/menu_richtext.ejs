@@ -1,20 +1,22 @@
 <div class="rounded-3 border p-3 shadow d-flex">
-  <strong class="text-primary h3">WRITE</strong>
+  <strong class="text-primary h3">RICH&nbsp;TEXT</strong>
   
   <div class="d-flex justify-content-end w-100">
 
     <button class="btn btn-outline-secondary me-1" 
-            data-bs-toggle="modal" data-bs-target="#write_modal">
+            data-bs-toggle="modal" data-bs-target="#richtext_modal">
       <i class="material-icons" style="line-height:1rem;vertical-align:middle;">info</i>
     </button>
 
-    <form action="write" method="GET">
-      <button type="submit" class="btn btn-primary" style="height:100%;">Start</button>
+    <form action="richtext" method="GET">
+      <button type="submit" class="btn btn-primary" style="height:100%">
+        Start
+      </button>
     </form>
   </div>
 </div>
 
-<%- include ("../modals/modal_write.ejs") %>
+<%- include ("../modals/modal_richtext.ejs") %>
 
 <script>
 $(function(){

@@ -63,6 +63,17 @@ router.get('/SRS', (req, res)=>{
 });
 
 
+router.get('/write', (req, res)=>{
+  try{
+    res.render('activities/abc/write');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
+
 router.post('/SRS', (req, res)=>{
   try{
     // set cookie

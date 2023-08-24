@@ -1,157 +1,240 @@
 <%- include('../head'); -%>
-<a href="/teachers" class="btn btn-sm btn-outline-secondary p-0">
-  <i class="material-icons">close</i>
-</a>
-
-<button class="btn btn-outline-info p-0" data-bs-toggle="modal" data-bs-target="#type_modal">
-  <i class="material-icons">info</i>
-</button>
-
-
-<link href="https://cdn.quilljs.com/1.0.0/quill.snow.css" rel="stylesheet">
-<script src="https://cdn.quilljs.com/1.0.0/quill.js" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/quill-image-resize-module@3.0.0/image-resize.min.js" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js" defer></script>
-<style>.ql-code:after {font-size:0.7em;vertical-align:top;content:"kbd";}</style>
-
-<!-- THE editor DIV NEEDS A FIXED HEIGHT OR EMBEDS WILL BREAK -->
-<div id="save" class="btn btn-sm btn-outline-primary">SAVE</div>
-<div id="copy" class="btn btn-sm btn-outline-primary">COPY</div>
-<div id="editor" class="bg-white" style="height:100vh;font-size:1rem;padding:50px;z-index:1;" autofocus></div>
-
-<script>
-  formatHTML = (html)=>{
-    html = html == '<p><br></p>' ? ''
-         : html.replace(/<p><br><\/p>/gm, '<br>')
-               .replace(/ target="_blank"/gm, '')
-               .replace(/<\/li>|<ul>|<\/ul>|<ol>|<\/ol>|<\/head>|<\/title>|<\/body>|<\/h1>|<\/h2>|<\/h3>|<\/h4>|<\/h5>|<\/h6>|<hr>|<\/p>|<\/pre>|<\/tr>|<table>|<\/table>|<\/summary>|<\/details>|<br>|<\/option>|<\/optgroup>|<\/select>|<\/form>|<\/map>|<\/iframe>|<\/audio>|<\/video>|<\/meter>|<\/blockquote>|<\/html>/gm, '$&\n');
-    return html;
+<style>
+  #alldone{
+    font-family: "UD Digi Kyokasho NP-B", sans-serif;
+    font-size: 10rem;
+    font-weight:bold;
+    text-shadow: 5px 5px 10px #99c;
+    -webkit-text-stroke: 5px DarkSlateBlue;
+    color:SlateBlue;
+    height:100vh;
+    position:relative;
   }
 
+  #image img{
+    margin: auto;
+    left: 0;
+    right: 0;
+    text-align: center;
+    max-width:100%;
+    max-height:50vh;
+  }
+</style>
+
+<body>
+  <a id="closeButton" href="/New_Horizons" class="btn btn-sm btn-outline-secondary p-0">
+    <i class="material-icons">close</i>
+  </a>
+
+  <button class="btn btn-outline-secondary p-0" data-bs-toggle="modal" data-bs-target="#type_modal">
+    <i class="material-icons">info</i>
+  </button>
+
+  <div id="content" class="container g-0" style="min-height:100vh;">
+  
+    <div class="row g-0">
+      <div class="col-1"></div>
+      <div class="col-10 text-center">
+        <div id="display" class="text-center UD"></div>
+      </div>
+      <div class="col-1">
+        <div id="timer" class="display-3 text-primary UD"></div>
+      </div>
+    </div>
+
+    <div class="row g-0">
+      <!-- answer -->
+      <div class="col">
+        <div class="d-flex justify-content-center my-3">
+          <div id="answer" class="d-flex flex-wrap UD"><!-- populated dynamically by resetAnswer() --></div>
+          <button id="start" aria-label="next" class="btn btn-lg btn-success ms-3" style="display:none;">
+            START
+          </button>
+        </div>
+      </div>
+
+    </div>
+    <div class="row g-0">
+      <!-- image -->
+      <div class="col text-center">
+        <div id="image" class="p-4"></div>
+      </div>
+
+    </div>
+  </div>
 
 <%- include ("../modals/modal_type.ejs") %>
 
+<script>
 $(function(){
-  $('#save').click(function(){
-    var title = $("#postRichText input[name=title]").val() || Date.now();
-    var group = $("#postRichText select[name=group] option:selected").text() || "";
-    var html = `
-<!DOCTYPE html>
-<html lang="en-US">
-<head>
-  <title>${title}</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="keywords" content="${group}">
-</head>
-<body>
-${formatHTML(editor.root.innerHTML)}
-</body>
-</html>`;
-    var blob = new Blob([html], {type: "text/html;charset=utf-8"});
-    saveAs(blob, `${title}.html`);
-  });
+  // PREPARE THE DECK ////////////////////////////////////////////////////////////
+  var url = window.location.href;
+  var returnto = url.substring(0, url.lastIndexOf('/'));
+  $("#closeButton").attr('href', returnto);
 
-  $("#copy").on('click', ()=>{
-    navigator.clipboard.writeText( formatHTML(editor.root.innerHTML) );
-  });
+  const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
+  const setName = searchParams.get('setName');
+  const deckType = searchParams.get('deckType');
+  let timeLimit = 60; // seconds
+  var finished = false;
+  var starttime = 0;
+  var score = 0;
+  var misses = 0;
+  var totalLetters = 0;
+  var deck = [];
 
-// QUILL CONFIGURATION /////////////////////////////////////////////////////////
-  const Image = Quill.import('formats/image');
-  Image.sanitize = function (url) { return url }
+  const letters = ["q","w","e","r","t","y","u","i","o","p",
+                  "a","s","d","f","g","h","j","k","l",
+                  "z","x","c","v","b","n","m","-","'",
+                  " ",
+                  "Q","W","E","R","T","Y","U","I","O","P",
+                  "A","S","D","F","G","H","J","K","L",
+                  "Z","X","C","V","B","N","M","_"];
 
-  // boiler plate for using quill tooltip instead of prompt for image url
-  function imageHandler() {
-    const tooltip = this.quill.theme.tooltip;
-    const originalSave = tooltip.save;
-    const originalHide = tooltip.hide;
-    tooltip.save = function () {
-      const range = this.quill.getSelection(true);
-      const value = this.textbox.value;
-      if (value) {
-        this.quill.insertEmbed(range.index, 'image', value, Quill.sources.USER);
-      }
-    };
-    tooltip.hide = function () {
-      tooltip.save = originalSave;
-      tooltip.hide = originalHide;
-      tooltip.hide();
-    };
-    tooltip.edit('image');
-    tooltip.textbox.placeholder = 'Image URL';
+  start = () =>{
+    finished = false;
+    starttime = new Date();
+    score = 0;
+    misses = 0;
+    totalLetters = 0;
+    deck = getDeck({setName, deckType});
+    FYshuffle(deck);
+    resetAnswer();
+    requestAnimationFrame(updateAnimation);
+    $("#timer").show();
   }
 
-  // next 16 lines scrap quill classes in favor of inline styles to indent
-  const Parchment = Quill.import('parchment')
-  class IndentAttributor extends Parchment.Attributor.Style {
-    add (node, value) {
-      if (value === 0) {
-        this.remove(node)
-        return true
-      } else {
-        return super.add(node, `${value}em`)
-      }
+
+  showResults = ()=>{
+    let elapsedTime = (new Date() - starttime) / 1000;
+    let wpm = Math.round(60 * score / elapsedTime);
+
+    $("#display").html(`
+      <div class="display-1">Words Typed : ${score}</div><hr/>
+      <div class="display-3">Mistakes : ${misses}</div>
+      <div class="display-5">Accuracy : ${Math.round(100 * totalLetters / (totalLetters + misses))}%</div>
+      <div class="display-5">Speed : ${wpm} wpm</div>`);
+    $("#timer").hide();
+    $("#answer").empty();
+    $("#image").empty();
+    $("#start").show().focus();
+  }
+
+
+  updateAnimation = ()=> {
+    if (!finished && new Date() - starttime < timeLimit * 1000) {
+      $("#timer").text((timeLimit - Math.floor((new Date() - starttime) / 1000)).toString());
+      requestAnimationFrame(updateAnimation); // Keep the animation going
+    } 
+    else {
+      finished = true;
+      showResults();
     }
   }
-  let IndentStyle = new IndentAttributor('indent', 'text-indent', {
-    scope: Parchment.Scope.BLOCK,
-    whitelist: ['1em', '2em', '3em', '4em', '5em', '6em', '7em', '8em', '9em']
-  })
-  Quill.register(IndentStyle, true)
 
-  // the next 12 lines scrap other quill classes in favor of inline styles
-  var AlignStyle = Quill.import('attributors/style/align');
-  Quill.register(AlignStyle, true);
-  var BackgroundStyle = Quill.import('attributors/style/background');
-  Quill.register(BackgroundStyle, true);
-  var ColorStyle = Quill.import('attributors/style/color');
-  Quill.register(ColorStyle, true);
-  var FontStyle = Quill.import('attributors/style/font');
-  Quill.register(FontStyle, true);
-  var SizeStyle = Quill.import('attributors/style/size');
-  Quill.register(SizeStyle, true);
 
-  var editor = new Quill('#editor', {
-    modules: {
-      imageResize: {},
-      toolbar: {
-        container: [
-          {'font': [] }, 
-      // {'size': ['small', false, 'large', 'huge'] }, 
-          {'header': [1, 2, 3, 4, 5, 6, false] }, 
-          'bold', 
-          'italic', 
-          'underline', 
-          {'color': [] }, 
-          {'background': [] }, 
-          'strike', 
-          'code', 
-          {'script': 'sub'}, 
-          {'script': 'super' }, 
-          {'align': [] }, 
-          {'indent': '+1' }, 
-          {'indent': '-1'}, 
-          'blockquote', 
-          'code-block', 
-          {'list': 'ordered'}, 
-          {'list': 'bullet' }, 
-          'link', 
-          'image', 
-          'video',
-          'clean'],
-        handlers: {
-          image: imageHandler
+  resetAnswer = ()=>{
+    if (finished){
+      finished = false;
+      starttime = new Date();
+      requestAnimationFrame(updateAnimation);
+    }
+
+    place = 0;
+    guess = '';
+    $("#display").empty();
+    $("#answer").html(`<div class="word d-flex"></div>`);
+
+    word = deck.pop();
+    if (word){
+      if (deckType != 'text') $("#image").html(word.image);
+      $("#display").html(`<div class="display-1">${word.name}</div>`);
+
+      for (let i = 0; i < word.name.length; i++){
+        let l = word.name[i];
+        let wordwrap = [' ', '-'].includes( l ) ? true : false;
+
+        $("#answer .word:last-child").append(`<div id="place${i}"
+                                  class="place btn btn-lg alert-primary"
+                                  style="font-size:2em;width:60px;">_</div>`);
+        if (wordwrap) {
+          $("#answer").append(`<div class="word d-flex"></div>`);
         }
       }
-    },
-    theme: 'snow'
+
+      $("#answer").show();
+      $("#start").hide();
+    } 
+    else {
+      finished = true;
+      showResults();
+    }
+  }
+
+
+  $("#start").on('click', ()=>{
+    start();
   });
 
-  $(".ql-toolbar").addClass("sticky-top bg-light");
+
+  start();
+
+// keyboard input //////////////////////////////////////////////////////////////
+  let fired = false;
+
+  backspace = ()=>{
+    if(place > 0){
+      place--;
+      guess = guess.slice(0, -1);
+      $("#place"+place).text('_');
+    }
+  }
+
+  $(window).on('keydown', function(e){
+    if (e.key === fired && e.key !== ' ') return;
+    if (e.key === ' ') e.preventDefault();
+
+    if(e.key.length == 1 && e.key !== fired && letters.includes(e.key)){
+      if (finished) return;
+      fired = e.key;
+      if (place < word.name.length){
+        if (e.key == word.name[place]){
+          $("#place"+place).text(e.key).removeClass('alert-danger').addClass('alert-primary');
+        }
+        else {
+          $("#place"+place).text(e.key).addClass('alert-danger');
+          misses += 1;
+        }
+        place++;
+        guess += e.key;
+
+        if (guess == word.name){
+          totalLetters += word.name.length;
+          score += 1;
+          // spaces and hyphens mean more words should be counted
+          let spaces = word.name.match(/[- ]/g);
+          if (spaces) score += spaces.length;
+
+          resetAnswer();
+        }
+      }
+    }
+    else if(e.key == 'Backspace'){
+      backspace();
+    }
+    else if(e.key == 'Enter'){
+      e.preventDefault();
+      if (finished) start();
+    }
+  });
+
+
+  $(window).on('keyup', function(e){
+    fired = false;
+  });
+
 
 });
 </script>
 
-
-
-<%- include('../foot'); -%>
+<%- include('../foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->

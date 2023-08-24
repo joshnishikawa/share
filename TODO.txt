@@ -4,7 +4,7 @@ MATCH allow related things (not just exact matches)
 
 
 ////////// IDEAS FOR STUDENT ACTIVITIES ////////////////////////////////////////
-Type what you see.
+Put UD everywhere it's needed
 
 find the given word among a group of like words
 word find

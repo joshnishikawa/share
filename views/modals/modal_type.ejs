@@ -3,14 +3,32 @@
     <div class="modal-content">
 
       <div class="modal-header">
-        <h3 class="modal-title">Type</h3>
+        <div class="modal-title d-flex UD">
+          <div class="wordle rounded-3 alert-primary text-center">t</div>
+          <div class="wordle rounded-3 alert-primary text-center">y</div>
+          <div class="wordle rounded-3 alert-primary text-center">p</div>
+          <div class="wordle rounded-3 alert-primary text-center">_</div>
+        </div>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <p>This is a simple rich text editor. There are many rich-text editors
-          out there. This one just allows you to SAVE the text as an html file 
-          or COPY the html to the clipboard.
-        </p>
+        <p><%- __('activity.type.1') %></p>
+          <hr>
+        <p><%- __('activity.type.2') %></p>
+          <div class="d-flex UD">
+            <div class="wordle rounded-3 alert-primary text-center">t</div>
+            <div class="wordle rounded-3 alert-primary text-center">y</div>
+            <div class="wordle rounded-3 alert-danger text-center">q</div>
+            <div class="wordle rounded-3 alert-primary text-center">_</div>
+          </div>
+          <hr/>
+        <p><%- __('activity.type.3') %></p>
+        <ul>
+          <li><%- __('activity.type.typed') %> </li>
+          <li><%- __('activity.type.mistakes') %></li>
+          <li><%- __('activity.type.accuracy') %></li>
+          <li><%- __('activity.type.speed') %></li>
+        </ul>
       </div>
     </div>
   </div>

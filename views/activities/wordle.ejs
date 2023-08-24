@@ -26,7 +26,7 @@
     <i class="material-icons">close</i>
   </a>
 
-  <button class="btn btn-outline-info p-0" data-bs-toggle="modal" data-bs-target="#wordle_modal">
+  <button class="btn btn-outline-secondary p-0" data-bs-toggle="modal" data-bs-target="#wordle_modal">
     <i class="material-icons">info</i>
   </button>
 
@@ -35,7 +35,7 @@
     <div class="row g-0">
 
       <!-- answer -->
-      <div class="col">
+      <div class="col UD">
         <div id="guess" class="d-flex justify-content-center my-3"></div>
         <div class="d-flex justify-content-center my-3">
           <div id="answer" class="d-flex flex-wrap"><!-- populated dynamically by resetAnswer() --></div>
@@ -67,7 +67,7 @@
 
 <script>
 $(function(){
-  // PREPARE THE DECK ////////////////////////////////////////////////////////////
+// PREPARE THE DECK ////////////////////////////////////////////////////////////
   var url = window.location.href;
   var returnto = url.substring(0, url.lastIndexOf('/'));
   $("#closeButton").attr('href', returnto);
@@ -94,9 +94,12 @@ $(function(){
   // input handlers
   inputLetter = (letter)=>{
     if(place < word.name.length){
-      $("#place"+place ).html(letter == ' ' ? '&nbsp;' : letter);
+      let l = [' ', '_'].includes(letter) ? ' ' :      letter; // for data-value
+      let d = [' ', '_'].includes(letter) ? '&nbsp;' : letter; // for display
+
+      $("#place"+place ).html(d);
       place++;
-      guess += letter;
+      guess += l;
     }
     $("#enter").prop('disabled', place < word.name.length);
   }

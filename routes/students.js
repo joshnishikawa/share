@@ -31,4 +31,15 @@ router.get('/wordle', (req, res)=>{
 });
 
 
+router.get('/type', (req, res)=>{
+  try{
+    res.render('activities/type');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
+
 module.exports = router;

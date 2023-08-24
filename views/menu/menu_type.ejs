@@ -1,17 +1,20 @@
-<div class="rounded-3 border p-3 shadow d-flex">
-  <strong class="text-primary h3">TYPE</strong>
-  
+<div class="rounded-3 border p-3 shadow d-flex UD">
+  <div class="wordle rounded-3 alert-primary text-center">t</div>
+  <div class="wordle rounded-3 alert-primary text-center">y</div>
+  <div class="wordle rounded-3 alert-primary text-center">p</div>
+  <div class="wordle rounded-3 alert-primary text-center">_</div>
+
   <div class="d-flex justify-content-end w-100">
 
-    <button class="btn btn-outline-info me-1" 
+    <button class="btn btn-outline-secondary me-1" 
             data-bs-toggle="modal" data-bs-target="#type_modal">
       <i class="material-icons" style="line-height:1rem;vertical-align:middle;">info</i>
     </button>
 
-    <form action="type" method="GET">
-      <button type="submit" class="btn btn-primary" style="height:100%">
-        Start
-      </button>
+    <form id="typeForm" action="type" method="GET">
+      <input type="hidden" value="" name="setName">
+      <input type="hidden" value="" name="deckType">
+      <button id="typeButton" type="submit" class="btn btn-primary" style="height:100%;">Start</button>
     </form>
   </div>
 </div>
@@ -20,5 +23,17 @@
 
 <script>
 $(function(){
+  $("#typeButton").on('click', (e)=>{
+    e.preventDefault();
+    if (!window.setName || window.setName == '{}') {
+      alert("Please select a deck.");
+    }
+    else {
+      $("#typeForm input[name='setName']").val(window.setName);
+      $("#typeForm input[name='deckType']").val(window.deckType);
+      $("#typeForm").submit();
+    }
+  });
 });
+
 </script>
