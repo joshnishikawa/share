@@ -64,10 +64,6 @@
 			"title": "Sequence",
 			"description": "Type the missing letter. How many can you get in 1 minute?"
 		},
-		"write": {
-      "title": "Write",
-			"description": "Click one of the lower case letters on the left and an animation will appear on the right to demonstrate stroke order. You can also hit a key on the keyboard to display a letter or hit Backspace to clear the animation."
-		},
     "spell": {
       "1": "You know the word. Do you know how to spell it?",
       "2": "Make your best guess and press <kbd>Enter</kbd>. The letters will change colors to give you hints.",
