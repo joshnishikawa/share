@@ -170,4 +170,16 @@ router.get('/reveal', (req, res)=>{
   }
 });
 
+
+router.get('/test', (req, res)=>{
+  try{
+    res.render('teachers/test');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
+
 module.exports = router;

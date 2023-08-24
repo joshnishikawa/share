@@ -50,14 +50,16 @@ body {
 .write{
   background-image: url(../image/abc/lines.png);
   background-size: contain;
-  font-family: 'UD Digi Kyokasho NP-B', sans-serif;
+  font-family: 'Yusei Magic', sans-serif;
 }
 
 .write img{
   mix-blend-mode: multiply;
 }
 
-.UD{font-family: 'UD Digi Kyokasho NP-B', sans-serif;}
+.UD{
+  font-family: 'Yusei Magic', sans-serif;
+}
 
 [contenteditable] {
   outline: 0px solid transparent;
