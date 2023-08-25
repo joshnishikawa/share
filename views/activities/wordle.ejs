@@ -1,16 +1,5 @@
 <%- include('../head'); -%>
 <style>
-  #alldone{
-    font-family: "UD Digi Kyokasho NP-B", sans-serif;
-    font-size: 10rem;
-    font-weight:bold;
-    text-shadow: 5px 5px 10px #99c;
-    -webkit-text-stroke: 5px DarkSlateBlue;
-    color:SlateBlue;
-    height:100vh;
-    position:relative;
-  }
-
   #image img{
     margin: auto;
     left: 0;
@@ -39,7 +28,9 @@
       <div class="col UD">
         <div id="guess" class="d-flex flex-wrap justify-content-center my-3"></div>
         <div class="d-flex justify-content-center my-3">
-          <div id="answer" class="d-flex flex-wrap justify-content-center"><!-- populated dynamically by resetAnswer() --></div>
+          <div id="answer" class="d-flex flex-wrap justify-content-center">
+            <!-- populated dynamically by resetAnswer() -->
+          </div>
           <button id="start" aria-label="next" class="btn btn-lg btn-success" style="display:none;">
             <i class="material-icons">arrow_forward</i>
           </button>

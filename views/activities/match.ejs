@@ -132,7 +132,7 @@ $(function(){
 
     case 'animals':
       for (let i = 0; i < deck.length; i++){
-        backContent.push(`<img class="img-flash" 
+        backContent.push(`<img style="max-width:70%;max-height:70%;" 
                                src="/image/svg/${vocab_decks.animals[i]}.svg" 
                                alt="${vocab_decks.animals[i]}">`);
         backClass.push('alert-primary');
@@ -143,7 +143,7 @@ $(function(){
 
     case 'objects':
       for (let i = 0; i < deck.length; i++){
-        backContent.push(`<img class="img-flash" 
+        backContent.push(`<img style="max-width:70%;max-height:70%;" 
                                src="/image/svg/${vocab_decks.objects[i]}.svg" 
                                alt="${vocab_decks.animals[i]}">`);
         backClass.push('alert-primary');

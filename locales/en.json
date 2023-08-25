@@ -1,5 +1,5 @@
 {
-  "pleaseSelect": "Please select a set of words.",
+	"pleaseSelect": "Please select a set of words.",
 	"feelings": "feelings",
 	"numbers": "numbers",
 	"weather": "weather",
@@ -63,26 +63,27 @@
 		},
 		"sequence": {
 			"title": "Sequence",
-			"description": "Type the missing letter. How many can you get in 1 minute?"
+			"description": "Type the missing letter. How many can you get?"
 		},
-    "spell": {
-      "1": "You know the word. Do you know how to spell it?",
-      "2": "Make your best guess and press <kbd>Enter</kbd>. The letters will change colors to give you hints.",
-      "3": "Think carefully and try again.",
-      "4": "You got it! Now hit the green arrow or <kbd>Enter</kbd> to continue.",
-      "blue": "Great! This is the correct letter for this position.",
-      "yellow": "This letter is needed, but not in this position.",
-      "gray": "This letter is <strong>not</strong> needed in the word."
-    },
-    "type": {
-      "1": "Read the word displayed and type it as accurately as you can. How many words can you type in 60 seconds?",
-      "2": "If you make a mistake, the letter will turn red. You'll have to hit backspace <i class=\"material-icons\" style=\"vertical-align:top\">backspace</i> to correct it.",
-      "3": "Your stats will be displayed when time is up or when you finish typing all the words.",
-      "typed": "<strong>Words Typed</strong> is just that: the number of words you typed.",
-      "mistakes": "<strong>Mistakes</strong> is the number of times you saw a letter turn red.",
-      "accuracy": "Your <strong>Accuracy</strong> is the percentage of letters you typed correctly.",
-      "speed": "Your <strong>Speed</strong> is given in WPM (words per minute)."
-    }
+		"spell": {
+			"1": "You know the word. Do you know how to spell it?",
+			"2": "Make your best guess and press <kbd>Enter</kbd>. The letters will change colors to give you hints.",
+			"3": "Think carefully and try again.",
+			"4": "You got it! Now hit the green arrow or <kbd>Enter</kbd> to continue.",
+			"blue": "Great! This is the correct letter for this position.",
+			"yellow": "This letter is needed, but not in this position.",
+			"gray": "This letter is <strong>not</strong> needed in the word."
+		},
+		"type": {
+			"1": "Read the word displayed and type it as accurately as you can. How many words can you type?",
+			"2": "If you make a mistake, the letter will turn red. You'll have to hit backspace <i class=\"material-icons\" style=\"vertical-align:top\">backspace</i> to correct it.",
+			"3": "Your stats will be displayed when time is up or when you finish typing all the words.",
+			"typed": "<strong>Words Typed</strong> is just that: the number of words you typed.",
+			"mistakes": "<strong>Mistakes</strong> is the number of times you saw a letter turn red.",
+			"accuracy": "Your <strong>Accuracy</strong> is the percentage of letters you typed correctly.",
+			"speed": "Your <strong>Speed</strong> is given in WPM (words per minute).",
+			"title": "Type"
+		}
 	},
 	"navbar": {
 		"students": {

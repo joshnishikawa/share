@@ -18,24 +18,48 @@
     </a>
   </div>
 
-  <div class="container" style="min-height:100vh;user-select: none;">
-    <div class="row">
-      <div class="col-8 text-center">
-        <div id="result" class="text-center">
-          <div class="display-1 UD">
-            <%- __('activity.sequence.title') %>
-          </div>
-          <%- __('activity.sequence.description') %>
+
+  <div id="info" class="container">
+    <div class="row pb-5">
+
+      <div class="col text-center">
+        <div class="display-1 UD">
+          <%- __('activity.sequence.title') %>
         </div>
+        <%- __('activity.sequence.description') %>
       </div>
-      <div class="col-4">
-        <div id="timer" class="display-1 UD"></div>
-        <div id="start" class="btn btn-success btn-lg" style="display:none;">Start</div>
+
+    </div>
+    <div class="row text-center">
+      <div id="result" class="col" style="display:none;"></div>
+      <div id="controls" class="col d-flex justify-content-center">
+        <div class="d-flex align-items-center">
+          <select id="timeLimit" class="form-select form-select-lg" aria-label="time limit">
+            <option value="10">10 seconds</option>
+            <option value="30">30 seconds</option>
+            <option value="60" selected>1 minute</option>
+            <option value="90">90 seconds</option>
+            <option value="120">2 minutes</option>
+            <option value="180">3 minutes</option>
+            <option value="240">4 minutes</option>
+            <option value="300">5 minutes</option>
+          </select>
+          <button id="start" aria-label="next" class="btn btn-lg btn-success ms-3">
+            START
+          </button>
+        </div>
+
       </div>
     </div>
-    <div class="row">
-      <div class="col text-center">
+  </div>
+
+  <div id="content" class="container" style="display:none;">
+    <div class="row g-0">
+      <div id="remaining"  class="col-1 text-primary UD"></div>
+      <div class="col-10">
         <div id="wheel" class="d-flex UD shadow m-5" style="overflow: hidden;"></div>
+      </div>
+      <div id="timer" class="col-1 text-primary UD"></div>
     </div>
   </div>
 
@@ -51,8 +75,15 @@ $(function(){
               'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
               'u', 'v', 'w', 'x', 'y', 'z'];
   let l = '';
-  
-  $("#start").show();
+
+
+  underscore = ()=>{
+    let wheelwidth = $("#wheel").width();
+    let offset = $("#wheel").scrollLeft();
+    let letterOffset = $(`#${l}`).offset().left;
+    $(`#${l}`).text('_');
+    $("#wheel").animate({ scrollLeft: offset + letterOffset - wheelwidth / 2 }, 100);
+  }
 
 
   getNextLetter = async (k)=>{
@@ -64,11 +95,7 @@ $(function(){
       if (k == l){
         await $(`#${l}`).text(l).removeClass('text-danger'); // show the letter again
         l = deck.pop();
-        let wheelwidth = $("#wheel").width();
-        let offset = $("#wheel").scrollLeft();
-        let letterOffset = $(`#${l}`).offset().left;
-        $(`#${l}`).text('_');
-        $("#wheel").animate({ scrollLeft: offset + letterOffset - wheelwidth / 2 }, 100);
+        underscore();
       }
       else {
         $(`#${l}`).text(l).addClass('text-danger');
@@ -84,48 +111,52 @@ $(function(){
 
   function updateAnimation() {
     if (!finished && new Date() - starttime < timeLimit * 1000) {
-      $("#timer").text(':'+(timeLimit - Math.floor((new Date() - starttime) / 1000)).toString());
+      $("#timer").html(`<span class="display-3">${(timeLimit - Math.floor((new Date() - starttime) / 1000)).toString()}</span><br/>seconds left`);
       requestAnimationFrame(updateAnimation); // Keep the animation going
     } 
     else {
-      $("#start").show();
+      $("#info").show();
+      $("#content").hide();
       if (finished) {
-        $("#wheel").removeClass('d-flex').addClass('d-none');
-        $("#result").html(`
-          <div class="mx-auto mt-3 display-1 alert-success rounded-3">
-            You got them all!
-          </div>`);
+        $("#result").html(`<div class="display-3 alert-success rounded-3">You got them all!</div>`).show();
       } else {
-        $("#timer").text(':00');
-        $("#result").html(`
-          <div class="mx-auto mt-3 display-1 alert-primary rounded-3">
-            You got ${26 - deck.length} letters!
-          </div>`);
+        let num = 25 - deck.length; // 25 assumes there is one letter still open
+        let str = 'You got ' + num.toString() + ' letter';
+        if (num > 1) str += 's';
+        str += '!';
+
+        $("#result").html(`<div class="display-3 alert-primary rounded-3">${str}</div>`).show();
       }
     }
   }
 
 
-  $("#start").on('click', function(){
-    $("#start").hide();
-    $("#result").html('');
-    $("#wheel").empty().removeClass('d-none').addClass('d-flex');
+  start = () =>{
+    $("#info").hide();
+    $("#content").show();
+
+    $("#wheel").empty(); // has to be reset each time or '_' will remain
     for (let i of letters){
       $("#wheel").append(`<div id="${i}" class="letter m-3" style="font-size:10rem;">${i}</div>`);
     }
 
-    deck = letters.slice(0);
-    FYshuffle(deck);
-    console.log(deck);
-    l = deck.pop();
-
+    timeLimit = parseInt($("#timeLimit").val());
     starttime = new Date();
     finished = false;
-
-    getNextLetter(l);
+    
+    deck = letters.slice(0);
+    FYshuffle(deck);
+    l = deck.pop();
+    underscore();
     requestAnimationFrame(updateAnimation);
+  }
+
+
+  $("#start").on('click', function(){
+    start();
   });
   
+  $("#info").show();
 
 });
 

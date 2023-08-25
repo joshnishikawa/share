@@ -96,7 +96,7 @@ for (let i of deck){
   for (let i of deck){
     $("#grid").append(
      `<div id="${i.name.replace(/[ ()]/g, '_')}" class="col-${colspan} vocab p-0" style="height:${rowheight}vh;">
-        <div class="flip m-3" style="height:80%;">
+        <div class="flip border-primary border-5 rounded-3 m-3" style="height:80%;">
           <div class="flip-card shadow">
             <div class="flip-front bg-white rounded border display-1">
               ${i.image}
@@ -138,24 +138,24 @@ for (let i of deck){
 
   $("#searchInput").on('keyup', function(e){
     if (e.key == "Enter"){
-      $(".flip.highlight")
+      $(".flip.border")
         .addClass('flipped')
         .removeClass('flip')
         .off('mousedown')
         .promise().done(()=>{
-        $(".highlight").removeClass('highlight');
+        $(".border-5").removeClass('border');
       });
       $("#searchInput").val("");
     }
     else{
-      $(".flip").removeClass('highlight');
+      $(".flip").removeClass('border');
       $(".flip-back").html('&nbsp;');
 
       let input = $(this).val();
       if (input == ""){return;}
       let matches = deck.filter((v)=>{return v.name.startsWith(input);});
       for (let i of matches){
-        $(`#${i.name.replace(/[ ()]/g, '_')} > .flip`).addClass('highlight');
+        $(`#${i.name.replace(/[ ()]/g, '_')} > .flip`).addClass('border');
         $(`#${i.name.replace(/[ ()]/g, '_')} > .flip > .flip-card > .flip-back`).html(input);
       }
     }
@@ -169,8 +169,8 @@ for (let i of deck){
       if (slash) return;
 
       slash = true;
-      if ($(".highlight").length > 0){
-        $(".flip.highlight").addClass('flipped');
+      if ($(".flip.border").length > 0){
+        $(".flip.border").addClass('flipped');
       }
       else{
         $(".flip:not(.flipped)").addClass('flipped')
