@@ -62,7 +62,7 @@ $(function(){
 
 // PREPARE THE DECK ////////////////////////////////////////////////////////////
   var url = window.location.href;
-  var returnto = url.substring(0, url.lastIndexOf('/'));
+  var returnto = url.substring(0, url.lastIndexOf('/')) + '/New_Horizons';
   $("#closeButton").attr('href', returnto);
 
   const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));

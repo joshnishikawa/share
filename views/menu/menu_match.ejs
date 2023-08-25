@@ -8,7 +8,7 @@
       <i class="material-icons" style="line-height:1rem;vertical-align:middle;">info</i>
     </button>
 
-    <form id="matchForm" action="match" method="GET">
+    <form id="match" action="match" method="GET">
       <div class="d-flex" style="height:100%;">
         <select class="form-control" name="backs">
           <option value="" disabled selected>Card Backs</option>
@@ -21,7 +21,7 @@
         </select>
         <input type="hidden" value="" name="setName">
         <input type="hidden" value="" name="deckType">
-        <button id="matchButton" type="submit" class="btn btn-primary">Start</button>
+        <button type="submit" class="btn btn-primary">Start</button>
       </div>
     </form>
   
@@ -32,15 +32,14 @@
 
 <script>
 $(function(){
-  $("#matchButton").on('click', (e)=>{
-    e.preventDefault();
+  $("#match").on('submit', (e)=>{
     if (!window.setName || window.setName == '{}') {
+      e.preventDefault();
       alert("<%- __('pleaseSelect') %>");
     }
     else {
-      $("#matchForm input[name='setName']").val(window.setName);
-      $("#matchForm input[name='deckType']").val(window.deckType);
-      $("#matchForm").submit();
+      $("#match input[name='setName']").val(window.setName);
+      $("#match input[name='deckType']").val(window.deckType);
     }
   });
 });

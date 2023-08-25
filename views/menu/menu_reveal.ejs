@@ -15,12 +15,11 @@
           <option value="spotlight">Spotlight</option>
           <option value="blur">Fog</option>
           <option value="pixelate">Pixels</option>
-          <!-- <option value="blinder">Blinder</option> -->
         </select>
 
         <input type="hidden" value="" name="setName">
         <input type="hidden" value="" name="deckType">
-        <button id="revealButton" type="submit" class="btn btn-primary">Start</button>
+        <button type="submit" class="btn btn-primary">Start</button>
       </div>
     </form>
   </div>
@@ -30,18 +29,14 @@
 
 <script>
 $(function(){
-  $("#revealButton").on('click', (e)=>{
-    e.preventDefault();
+  $("#reveal").on('submit', (e)=>{
     if (!window.setName || window.setName == '{}') {
+      e.preventDefault();
       alert("<%- __('pleaseSelect') %>");
-    }
-    else if (!$("#reveal select[name='style']").val()) {
-      alert("Please select a style.");
     }
     else {
       $("#reveal input[name='setName']").val(window.setName);
       $("#reveal input[name='deckType']").val(window.deckType);
-      $("#reveal").submit();
     }
   });
 });
