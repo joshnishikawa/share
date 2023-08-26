@@ -5,7 +5,7 @@
   <div class="row pb-3">
     <div class="col">
       <div id="tags" class="d-flex flex-wrap">
-        <div class="d-flex border rounded-2 p-0 me-3">
+        <div class="d-flex align-items-start border rounded-2 p-0 m-3">
           <input class="form-check-input me-2" type="radio" name="tags" id="numbers" value="numbers" aria-label="numbers">
           <label class="form-check-label me-3" style="margin-left:-5px;" for="numbers">No.</label>          
           <label class="form-check-label" style="margin-left:-5px;" for="firstNum">from</label>
@@ -57,7 +57,7 @@ $(function(){
 
   for (let t in vocab_decks) {
     if ( ["animals", "objects"].includes(t) ) continue;
-    $("#tags").append(`<div class="form-check">
+    $("#tags").append(`<div class="form-check m-3">
       <input class="form-check-input" type="radio" name="tags" id="tag_${t}" value="${t}" aria-label="tags">
       <label class="form-check-label me-3" style="margin-left:-5px;" for="tag_${t}">${t} (${vocab_decks[t].length})</label>
     </div>`);
