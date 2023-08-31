@@ -42,4 +42,15 @@ router.get('/type', (req, res)=>{
 });
 
 
+router.get('/sample', (req, res)=>{
+  try{
+    res.render('sample');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
+
 module.exports = router;
