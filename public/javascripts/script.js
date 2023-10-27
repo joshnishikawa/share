@@ -58,9 +58,10 @@ const vocab_decks = {
             //square     star      diamond   heart     rectangle triangle  circle    arrow     cross
 
   "colors":['red','orange','yellow','green','blue','purple','black','pink',
-           'gray','brown','gold','silver','violet',
+           'gray','brown','violet', 
            'lightBlue','lightGreen','lightBrown',
-           'darkBlue','darkGreen','darkBrown','white']
+           'darkBlue','darkGreen','darkBrown',
+           'white','gold','silver']
 }
 
 getCookieObject = ()=>{

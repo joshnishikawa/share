@@ -3,7 +3,6 @@
   .flip-back{
     font-weight: bold;
     -webkit-text-stroke: 1px black;
-    color: slateblue
   }
   .flip-front img{
     position:absolute;
@@ -191,27 +190,58 @@ $(function(){
   }
 
 
-  var pause = false;
-
   $(".flip").on('click', function(){
-    if (pause) return;
+    $(this).toggleClass('flipped').promise().done(function(){
+      if ($('.flip.flipped').length == 2){
+        if ($('.flip.flipped').first().data('value') == $('.flip.flipped').last().data('value')){
+          $('.flip.flipped').removeClass('flip picked').off('click');
+        }
+        else {
+          $('.picked').removeClass('picked');
+          setTimeout(function(){ // wait or this will trigger on the same click
+            $(document).on('click',()=>{
+              $('.flip.flipped').removeClass('flipped');
+              $(document).off('click');
+            });
+          }, 100);
+        }
+      }
+    });
+  });
 
-    $(this).toggleClass('flipped');
+  var slash = false;
+  $(document).on('keydown', function(e){
+    if (e.key == "/"){
+      e.preventDefault();
+      if (slash) return;
 
-    if ($('.flip.flipped').length == 2){
-      if ($('.flip.flipped').first().data('value') == $('.flip.flipped').last().data('value')){
-        $('.flip.flipped').removeClass('flip').off('click');
+      slash = true;
+      let len = $(".flip.flipped").length;
+      if (len == 1){
+        $(".flip.flipped").addClass('picked');
+        let val = $(".flip.flipped").data('value');
+        $(`.flip[data-value="${val}"]:not(.picked)`).addClass('flipped');
+      }
+      else if (len == 0){
+        $(".flip:not(.flipped)").addClass('flipped')
+      }
+      else{
+        $(document).off('click'); // saves you having to click next card twice
+      }
+    }
+  });
+
+  $(document).on('keyup', function(e){
+    if (e.key == "/"){
+      let len = $(".picked").length;
+      console.log(len + " picked");
+      if (len == 1){
+        $(".flip.flipped:not(.picked)").removeClass('flipped');
       }
       else {
-        pause = true;
-        setTimeout(()=>{ // this doesn't work unless there's a delay
-          $(document).on('click',()=>{
-            $('.flip.flipped').removeClass('flipped');
-            pause = false;
-            $(document).off('click');
-          });
-        }, 100);
+        $(".flip.flipped").removeClass('flipped');
       }
+      slash = false;
     }
   });
 
