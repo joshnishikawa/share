@@ -1,6 +1,5 @@
 ////////// BUGS ////////////////////////////////////////////////////////////////
 RECALL 'rice ball' persists after 'rice' is entered
-MATCH allow related things (not just exact matches)
 
 
 ////////// IDEAS FOR STUDENT ACTIVITIES ////////////////////////////////////////
@@ -16,7 +15,9 @@ See English and Romaji, type the English version.
 Sentences: Listen to the sentence. Click each word to listen. Drag the words into order.
 Speaking Slots: Pull the lever to make a sentence with random parts. Say the sentence to continue.
 
+
 ////////// IDEAS FOR TEACHER ACTIVITIES ////////////////////////////////////////
+MATCH allow related things (not just exact matches)
 Trash or Treasure (a la Bamboozle)
 
 Time Bomb: Pause for 3 seconds = die. Don't finish in 1 minute = die. Three strikes = die.

@@ -47,6 +47,13 @@
 
 <button id="review" class="btn btn-sm btn-outline-success" style="display:none;"></button>
 
+<form id="flashForm" action="flash" method="GET" class="d-none">
+  <input type="hidden" value="" name="setName">
+  <input type="hidden" value="" name="deckType">
+  <input type="hidden" value="" name="shuffled">
+  <input type="hidden" value="" name="showtext">
+</form>
+
 <input type="checkbox" id="shuffle" class="ms-2">
 <label for="shuffle">Shuffle</label>
 
@@ -56,7 +63,7 @@
 
 <div id="content" style="height:100vh;width:100%;">
   <div id="flash" class="text-center p-5" style="height:70%;width:100%;"></div>
-  <div id="text" class="text-center display-1" style="height:20%;width:100%;"></div>
+  <div id="text" class="text-center display-1 UD" style="height:20%;width:100%;"></div>
 </div> 
 
 <%- include ("../modals/modal_flash.ejs") %>
@@ -67,14 +74,35 @@ $(function(){
   const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
   const setName = searchParams.get('setName');
   const deckType = searchParams.get('deckType');
-  var isNum = setName.startsWith('_') || setName == "tens_teens"; // for sorting
   var deck = getDeck({setName, deckType});
-  
   var originalDeck = deck;
   var deckLength = originalDeck.length;
   var review = [];
   var card = 0;
   var reviewing = false;
+
+  const shuffled = searchParams.get('shuffled');
+  var isNum = setName.startsWith('_') || setName == "tens_teens"; // for sorting
+  if (shuffled == "true") {
+    $("#shuffle").prop('checked', true);
+    deck = FYshuffle(deck);
+  }
+  else {
+    $("#shuffle").prop('checked', false);
+    if(isNum) deck.sort(function(a, b){
+      return a.name - b.name}); // sort numerically
+    else {
+      deck.sort(function(a, b){ // sort alphabetically
+        var nameA=a.name.toLowerCase(), nameB=b.name.toLowerCase();
+        if (nameA < nameB) return -1;
+        if (nameA > nameB) return 1;
+        return 0;
+      });
+    }
+  }
+
+  const showtext = searchParams.get('showtext');
+  $("#showtext").prop('checked', showtext == "true");
 
   function start(){
     if (reviewing){
@@ -102,37 +130,20 @@ $(function(){
 
 
   $("#showtext").on('click', function(){
-    if ( $(this).prop('checked') ) {
-      $("#text").html( deck[card].name );
-    }
-    else {
-      $("#text").html('');
-    }
-    $(this).blur();
+    $("#flashForm input[name='setName']").val(setName);
+    $("#flashForm input[name='deckType']").val(deckType);
+    $("#flashForm input[name='shuffled']").val( $("#shuffle").prop('checked') ? "true" : "false");
+    $("#flashForm input[name='showtext']").val( $(this).prop('checked') ? "true" : "false");
+    $("#flashForm").submit();
   });
 
 
   $("#shuffle").on('click', function(){
-    if ( $(this).prop('checked') ) {
-      deck = FYshuffle(deck);
-      card = 0;
-    }
-    else {
-      if(isNum) deck.sort(function(a, b){
-        return a.name - b.name}); // sort numerically
-      else {
-        deck.sort(function(a, b){ // sort alphabetically
-          var nameA=a.name.toLowerCase(), nameB=b.name.toLowerCase();
-          if (nameA < nameB) return -1;
-          if (nameA > nameB) return 1;
-          return 0;
-        });
-      }
-      card = 0;
-    }
-    $("#flash").html( deck[card].image );
-    if ( $("#showtext").prop('checked') ) $("#text").html( deck[card].name );
-    $(this).blur();
+    $("#flashForm input[name='setName']").val(setName);
+    $("#flashForm input[name='deckType']").val(deckType);
+    $("#flashForm input[name='shuffled']").val( $(this).prop('checked') ? "true" : "false");
+    $("#flashForm input[name='showtext']").val( $("#showtext").prop('checked') ? "true" : "false");
+    $("#flashForm").submit();
   });
 
 

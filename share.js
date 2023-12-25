@@ -2,13 +2,35 @@
 require('dotenv').config();
 const express = require('express');
 const app = express();
+const server = require('http').createServer(app);
+const io = require('socket.io')(server);
+io.sockets.on('connection', socket =>{
+  console.log('io connection');
+
+  socket.on('join', function(){
+    socket.join('room1');
+    console.log('socket joined room1');
+  });
+
+  socket.on('add', function(data){
+    console.log('socket added to count');
+    io.sockets.in('room1').emit('add', data);
+  });
+});
+
+io.on('disconnect', function(){
+  console.log('io disconnect');
+});
+io.on('error', function(){
+  console.log('io error');
+});
+
 const createError = require('http-errors');
 const logger = require('morgan');
 const path = require('path');
 const teachersRouter = require('./routes/teachers');
 const studentsRouter = require('./routes/students');
 
-const port = process.env.PORT || 5000;
 
 const { I18n } = require('i18n');
 const i18n = new I18n({
@@ -20,7 +42,8 @@ const i18n = new I18n({
 });
 
 
-app.listen(port, (err)=>{
+const port = process.env.PORT || 5000;
+server.listen(port, (err)=>{
   if(err) {
     console.error(err);
     return;

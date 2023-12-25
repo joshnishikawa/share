@@ -7,7 +7,7 @@ const New_Horizons = require('./New_Horizons.js');
 
 router.use('/abc', abc);
 router.use('/New_Horizons', New_Horizons);
-
+router.use('/sockets', require('./sockets.js'));
 
 router.get('/', (req, res)=>{
   try{

@@ -1,23 +1,45 @@
 <%- include('../head'); -%>
 
 <body>
-  <a href="/teachers" class="btn btn-sm btn-outline-secondary py-0">
-    <i class="material-icons">close</i>
-  </a>
+  <div class="d-flex">
+    <a href="/teachers" class="btn btn-sm btn-outline-secondary py-0 me-1">
+      <i class="material-icons">close</i>
+    </a>
 
-  <button class="btn btn-sm btn-outline-secondary p-0" data-bs-toggle="modal" data-bs-target="#QnA_modal">
-    <i class="material-icons">info</i>
-  </button>
+    <button class="btn btn-sm btn-outline-secondary p-0 me-1" data-bs-toggle="modal" data-bs-target="#QnA_modal">
+      <i class="material-icons">info</i>
+    </button>
 
+    <form id="QnA_form" action="QnA" method="GET" class="p-0">
+      <select id="QnA_select" class="form-control form-control-sm" name="QnA" required>
+  <% for (let d of QnA ) { %>
+        <option value="<%- d %>"><%- d %></option>
+  <% } %>
+      </select>
+    </form>
+  </div>
 
   <div class="container-fluid" style="min-height:100vh;">
     <div class="row">
-      <div class="col text-center">
-        <img src="<%- QnA %>" alt="QnA" style="height:90vh;" />
+      <div id="img_container" class="col text-center">
+        <img src="<%- selected %>" alt="QnA" style="height:90vh;" />
       </div>
     </div>
 
   </div>
 
+<script>
+$(function(){
+  var url = window.location.href;
+  const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
+  const setName = searchParams.get('QnA');
+  $('#QnA_select').val(setName);
+
+  $('#QnA_select').on('change', function(){
+    $('#QnA_form').submit();
+  });
+});
+
+</script>
 <%- include ("../modals/modal_QnA.ejs") %>
 <%- include('../foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->

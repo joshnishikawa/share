@@ -1,0 +1,36 @@
+<%- include('../head') %>
+
+<div class="container">
+  <div class="row">
+    <div class="col-12 text-center">
+      <h1>Pairs</h1>
+      <button id="add" class="btn btn-primary" id="add">ADD</button>
+      <div class="display-1" id="count"></div>
+    </div>
+  </div>
+
+
+<script src="https://cdn.socket.io/4.0.1/socket.io.js"></script>
+<script>
+  var socket = io();
+  var count = 0;
+
+  socket.on('connect', ()=>{
+    console.log('connected');
+    socket.emit('join', {room: 'room1'}, (data)=>{
+      console.log(data);
+    });
+  });
+  
+  socket.on('add', (data)=>{
+    count = data.count;
+    $('#count').html(count);
+  });
+
+  $('#add').click(()=>{
+    count++;
+    socket.emit('add', {count});
+  });
+</script>
+
+<%- include('../foot') %>

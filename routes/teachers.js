@@ -99,8 +99,12 @@ router.get('/flash', (req, res)=>{
 
 router.get('/QnA', (req, res)=>{
   try{
-    let QnA = `/image/QnA/${req.query.QnA}`;
-    res.render('activities/QnA', {QnA});
+    let selected = `/image/QnA/${req.query.QnA}`;
+
+    fs.readdir( path.join(__dirname, '../public/image/QnA'), (err, QnA)=>{
+      if (err) throw err;
+      res.render('activities/QnA', {QnA, selected});
+    });
   }
   catch(err){ console.error(err); }
 });

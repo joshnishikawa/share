@@ -1,0 +1,100 @@
+<style>
+  .active {
+    color: #0d6efd;
+  }
+</style>
+
+<div id="hrt_alt" class="accordion">
+  <h2 id="item_hrt" class="accordion-header border shadow">
+    <button class="accordion-button collapsed" type="button" 
+            data-bs-toggle="collapse" data-bs-target="#content_hrt" 
+            aria-expanded="true" aria-controls="item_hrt">
+      It depends on the homeroom teacher (3rd and 4th grades).
+    </button>
+  </h2>
+  <div id="content_hrt"
+      class="accordion-collapse collapse bg-white border shadow ps-5" 
+      style="cursor:pointer;"
+      title="item_hrt"
+      aria-labelledby="head_hrt" data-bs-parent="#hrt_alt">
+      <ul>
+        <li>
+          Some homeroom teachers are more proficient in English than others.
+        </li>
+        <li>
+          Some homeroom teachers have enough confidence in their English proficiency to feel comfortable leading an English lesson. Others don't.
+        </li>
+        <li>
+          Some homeroom teachers (proficient in English or not) would rather leave English instruction to a native speaker or at least someone who specializes in it.
+        </li>
+      </ul>
+      
+  </div>
+
+
+  <h2 id="item_alt" class="accordion-header border shadow">
+    <button class="accordion-button collapsed" type="button" 
+            data-bs-toggle="collapse" data-bs-target="#content_alt" 
+            aria-expanded="true" aria-controls="item_alt">
+      It depends on the ALT.
+    </button>
+  </h2>
+  <div id="content_alt"
+      class="accordion-collapse collapse bg-white border shadow ps-5" 
+      style="cursor:pointer;"
+      title="item_alt"
+      aria-labelledby="head_alt" data-bs-parent="#hrt_alt">
+
+      <ul>
+        <li>
+          Some ALTs are more experienced than others in teaching English as a second language to large groups of small children in invariably mixed-level classes.
+        </li>
+        <li>
+          Some ALTs take their role as educators more seriously than the term 'assistant language teacher' recognizes. Some ALTs are content to fill what could be considered a temporary position for unskilled labor and not take it too seriously.
+        </li>
+        <li>
+          Many ALTs are just serious enough and just experienced enough to have developed a robust cynicism for, not only their role in the education system but for life in Japan.
+        </li>
+      </ul>
+
+  </div>
+
+
+  <h2 id="item_relation" class="accordion-header border shadow">
+    <button class="accordion-button collapsed" type="button" 
+            data-bs-toggle="collapse" data-bs-target="#content_relation" 
+            aria-expanded="true" aria-controls="item_relation">
+      It depends on the working relationship between all teaching staff.
+    </button>
+  </h2>
+  <div id="content_relation"
+      class="accordion-collapse collapse bg-white border shadow ps-5" 
+      style="cursor:pointer;"
+      title="item_relation"
+      aria-labelledby="head_relation" data-bs-parent="#hrt_alt">
+      <ul>
+        <li>
+          a
+        </li>
+        <li>
+          b
+        </li>
+        <li>
+          c
+        </li>
+      </ul>
+  </div>
+
+
+</div>
+
+
+<script>
+  $(function() {
+    $('ul li').on('click', function() {
+      $('ul li').not(this).removeClass('active');
+      $(this).toggleClass('active');
+    });
+  });
+  
+</script>

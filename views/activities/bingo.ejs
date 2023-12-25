@@ -43,6 +43,9 @@
   <button id="start" class="btn btn-sm btn-outline-success py-0">
     <i class="material-icons">play_arrow</i>
   </button>
+  <button id="check" class="btn btn-sm btn-outline-success py-0" style="display:none;">
+    <i class="material-icons">check_circle</i>
+  </button>
 
 
   <div class="container-fluid" style="min-height:100vh;">
@@ -51,8 +54,8 @@
     </div>
 
     <div id="slides" class="row" style="display:none;">
-      <div class="col-1 text-center">
-        <button id="prev" class="btn btn-light" style="min-height:100%" aria-label="previous slide">
+      <div class="col-1 text-center py-5">
+        <button id="prev" class="btn btn-light shadow h-100" aria-label="previous slide">
           <i class="material-icons md-large">navigate_before</i>
         </button>
       </div>
@@ -61,8 +64,8 @@
         <div id="currentSlide" class="text-center p-5"></div>
       </div>
 
-      <div class="col-1 text-center">
-        <button id="next" class="btn btn-light" style="min-height:100%" aria-label="next slide">
+      <div class="col-1 text-center py-5">
+        <button id="next" class="btn btn-light shadow h-100" aria-label="next slide">
           <i class="material-icons md-large">navigate_next</i>
         </button>
       </div>
@@ -104,6 +107,26 @@ $(function(){
   $("#start").on('click', ()=>{
     $("#display").empty();
     $("#slides").show();
+    $("#start").hide();
+    $("#check").show();
+    $("#currentSlide").html(deck[index].image);
+  });
+
+  $("#check").on('click', ()=>{
+    $("#check").hide();
+    $("#start").show();
+    $("#slides").hide();
+    for (let i=0; i<=index; i++){
+    $('#display').append(
+       `<div class="rounded-3 px-3 bg-white border display-1">
+          <div style="font-size:3rem;">
+            ${deck[i].name.split('(')[0].replace('_', " ")}
+            <div style="${deckType == "text" ? '' : "height:8rem;width:8rem;"} position:relative;">
+              ${deckType == "text" ? '' : deck[i].image}
+            </div>
+          </div>
+        </div>`);
+    }
   });
 
   $("#prev").on('click', ()=>{
