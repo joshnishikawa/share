@@ -10,18 +10,26 @@
   <div style="min-height:100vh;user-select: none;">
     <div id="buttons" class="container d-block text-center">
       <div class="row">
-        <div class="col display-1 UD">
-          <%- __('activity.pairs.title') %>
+        <div class="col d-flex flex-wrap justify-content-center">
+          <div class="display-1 UD"><%- __('activity.pairs.title') %></div>
+          <div id="time" class="px-5 text-center display-5 UD mb-3 mt-auto">
+          </div>
         </div>
-      </div>
+        </div>
       <div class="row">
         <div class="col">
           <%- __('activity.pairs.description') %>
         </div>
       </div>
       <div class="row UD">
-        <button data-value="abc" class="col menu p-3 m-5 border rounded-3 alert-primary display-1">abc</button>
-        <button data-value="ABC" class="col menu p-3 m-5 border rounded-3 alert-primary display-1">ABC</button>
+        <button data-value="abc" class="col menu p-3 m-5 border rounded-3 alert-primary">
+          <span class="display-1">abc</span><br/>
+          <span class="small time"></span>
+        </button>
+        <button data-value="ABC" class="col menu p-3 m-5 border rounded-3 alert-primary">
+          <span class="display-1">ABC</span><br/>
+          <span class="small time"></span>
+        </button>
       </div>
     </div>
     <div id="gridContainer">
@@ -33,6 +41,14 @@
 
 <script>
 $(function(){
+  // get times from local storage
+  let times = JSON.parse(localStorage.getItem('pairs'));
+  times = times ? times : {};
+  // add times to buttons
+  for (let i in times){
+    $(`button[data-value="${i}"] .time`).text(times[i]);
+  }
+
   $(".menu").on('click', function(){
     var setName = $(this).data('value');
     $("#buttons").removeClass('d-block').addClass('d-none');
@@ -90,12 +106,25 @@ $(function(){
         if ($('.flip.border-5').first().data('value') == $('.flip.border-5').last().data('value')){
           $('.flip.border-5').removeClass('flip flipped border').off('click');
           if ($('.flip.flipped').length == 0){
+
             var time = (Date.now() - timer) / 1000;
+            time = time.toFixed(2);
+            // if there is a previous time, and this time is less, use this time
+            if (times[setName] && time < times[setName]) {
+              times[setName] = time;
+              localStorage.setItem('pairs', JSON.stringify(times));
+              $(`button[data-value="${setName}"] .time`).text(time);
+            }
+            // if there is no previous time, use this time
+            else if (!times[setName]) {
+              times[setName] = time;
+              localStorage.setItem('pairs', JSON.stringify(times));
+              $(`button[data-value="${setName}"] .time`).text(time);
+            }
+
             $("#buttons").removeClass('d-none').addClass('d-block');
-            $("#grid").html(`
-              <div class="mx-auto mt-3 text-center display-1 alert-success rounded-3">
-                ${time} seconds!
-              </div>`);
+            $("#grid").empty();
+            $("#time").html(`<span class="mx-5 alert-success rounded-3">${time}&nbsp;seconds!</span>`);
           }
         }
         else {

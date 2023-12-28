@@ -9,8 +9,10 @@
 
   <div id="menu" class="container-fluid d-block text-center" style="user-select: none;">
     <div class="row">
-      <div class="col display-1 UD">
-        <%- __('activity.haystack.title') %>
+      <div class="col d-flex flex-wrap justify-content-center">
+        <div class="display-1 UD"><%- __('activity.haystack.title') %></div>
+        <div id="time" class="px-5 text-center display-5 UD mb-3 mt-auto">
+        </div>
       </div>
     </div>
     <div class="row">
@@ -32,6 +34,10 @@
 
 <script>
 $(function(){
+  // get times from local storage
+  let times = JSON.parse(localStorage.getItem('haystack'));
+  times = times ? times : {};
+
   var cap = ["A", "B", "C", "D", "E", "F", "G", "H", "I",
                  "J", "K", "L", "M", "N", "O", "P", "Q", "R",
                  "S", "T", "U", "V", "W", "X", "Y", "Z"];
@@ -42,17 +48,18 @@ $(function(){
 
   for (let i of cap){
     $("#cap").append(
-      `<button data-value="${i}" class="btn btn-outline-primary letter m-1" style="width:60px;font-size:2.8rem;">
-          ${i}
+      `<button data-value="${i}" class="btn btn-outline-primary letter m-1" style="width:60px;">
+          <span style="font-size:2.8rem;">${i}</span><br/>
+          <span class="small time">${times[i] ? times[i] : ''}</span>
        </button>`);
   }
   for (let i of lc){
     $("#lc").append(
-      `<div data-value="${i}" class="btn btn-outline-success letter m-1" style="width:60px;font-size:2.8rem;">
-          ${i}
-       </div>`);
+      `<button data-value="${i}" class="btn btn-outline-success letter m-1" style="width:60px;">
+         <span style="font-size:2.8rem;">${i}</span><br/>
+         <span class="small time">${times[i] ? times[i] : ''}</span>
+       </button>`);
   }
-
 
 
   var sets = {
@@ -149,11 +156,23 @@ $(function(){
         if ($('.select.alert-primary').length == 6) {
 
           let time = (Date.now() - timer) / 1000;
+          time = time.toFixed(2);
+          // if there is a previous time, and this time is less, use this time
+          if (times[letter] && time < times[letter]) {
+            times[letter] = time;
+            localStorage.setItem('haystack', JSON.stringify(times));
+            $(`button[data-value="${letter}"] .time`).html(`${time}`);
+          }
+          // if there is no previous time, use this time
+          else if (!times[letter]) {
+            times[letter] = time;
+            localStorage.setItem('haystack', JSON.stringify(times));
+            $(`button[data-value="${letter}"] .time`).html(`${time}`);
+          }
+          
           $("#menu").removeClass('d-none').addClass('d-block');
-          $("#grid").html(`
-            <div class="mx-auto mt-3 text-center display-1 alert-success rounded-3">
-              ${time} seconds!
-            </div>`);
+          $("#grid").empty();
+          $("#time").html(`<span class="mx-5 alert-success rounded-3">${time} seconds!</span>`);
         }
       }
       else {

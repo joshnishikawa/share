@@ -1,6 +1,6 @@
 <%- include('../head.ejs') -%>
 <%- include('navbar.ejs') -%>
-<%- include('../menu/select_NH.ejs') -%>
+<%- include('../menu/select_LT.ejs') -%>
 
 <div class="container-fluid">
   <div class="row pb-3">
@@ -29,38 +29,31 @@
     </div>
   
     <div class="col">
-      <%- include('../menu/menu_type.ejs') -%>
     </div>
-  
-  </div>
-  <div class="row pb-3">
-    <div class="col"></div>
-    <div class="col">
-      <%- include('../menu/menu_wordle.ejs') -%>
-    </div>
-    <div class="col"></div>
   </div>
 
   <hr>
 
   <div class="row pb-3">
     <div class="col">
-      <%- include('../menu/menu_schedule.ejs') -%>
+      <%- include('../menu/menu_supplies.ejs') -%>
     </div>
+
     <div class="col">
-      <%- include('../menu/menu_restaurant.ejs') -%>
+      <%- include('../menu/menu_pizza.ejs') -%>
     </div>
-    <div class="col"></div>
+
+    <div class="col">
+      <%- include('../menu/menu_parfait.ejs') -%>
+    </div>
+  
   </div>
-
-</div>
-
 
 
 <script>
   $(function(){
-    $(`#NH-tab`).addClass("active");
-    window.deckType = "NH";
+    $(`#LT-tab`).addClass("active");
+    window.deckType = "LT";
   });
 </script>
 

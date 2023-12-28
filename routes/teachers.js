@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const tagsRouter = require('./tags');
 const NH_vocab = require('../public/NH_vocab.js');
+const LT_vocab = require('../public/LT_vocab.js');
 
 // router.use('/tags', tagsRouter); // uncomment to update tags
 
@@ -22,6 +23,26 @@ router.get('/', (req, res)=>{
 router.get('/images', (req, res)=>{
   try{
     res.render('teachers/images');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
+
+router.get('/Lets_Try', (req, res)=>{
+  try{
+    var colors = {
+      "#c5b3e6" : ["fruit", "life", "time"],
+      "#a3cfbb" : ["vegetable", "body", "supplies"],
+      "#ffe69c" : ["food", "play", "town"],
+      "#f1aeb5" : ["colors", "weather", "school"],
+      "#9ec5fe" : ["shapes", "clothes", "daily"],
+      "#fecba1" : ["adjectives", "weekdays"],
+      }
+
+    res.render('teachers/LT', {LT_vocab, colors});
   }
   catch(err){
     res.send(err);
@@ -78,6 +99,17 @@ router.get('/tools', (req, res)=>{
 router.get('/richtext', (req, res)=>{ 
   try{
     res.render('activities/richtext');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
+
+router.get('/shapes', (req, res)=>{
+  try{
+    res.render('activities/shapes');
   }
   catch(err){
     res.send(err);

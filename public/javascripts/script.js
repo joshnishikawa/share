@@ -107,10 +107,17 @@ getDeck = (data)=>{
       }
       break;
 
-    case 'NH':
+    case 'LT' :
       list = JSON.parse(setName); // {"vocab word": "file name", "other word": "other file name"}
       for (let i in list){
-        deck.push({name: i, image: `<img src="/image/gif/${list[i]}" alt="${i}">`});
+        deck.push({name: i, image: `<img src="/image/LT/${list[i]}" alt="${i}">`});
+      }
+      break;
+
+    case 'NH' :
+      list = JSON.parse(setName); // {"vocab word": "file name", "other word": "other file name"}
+      for (let i in list){
+        deck.push({name: i, image: `<img src="/image/NH/${list[i]}" alt="${i}">`});
       }
       break;
 

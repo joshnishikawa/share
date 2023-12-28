@@ -87,10 +87,14 @@ $(function(){
 
 // PREPARE THE DISPLAY /////////////////////////////////////////////////////////
   for (let i of deck){
+    console.log(i.name);
+    let str = i.name.split('(')[0].replace('_', " ");
+    console.log(str);
+
     $('#display').append(
        `<div class="rounded-3 px-3 bg-white border display-1">
           <div style="font-size:3rem;">
-            ${i.name.split('(')[0].replace('_', " ")}
+            ${str}
             <div style="${deckType == "text" ? '' : "height:8rem;width:8rem;"} position:relative;">
               ${deckType == "text" ? '' : i.image}
             </div>

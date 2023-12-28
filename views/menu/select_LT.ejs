@@ -1,0 +1,82 @@
+<div class="container-fluid pb-3">
+  <div class="row">
+
+    <div class="col-6"><%- __('themes') %></div>
+
+    <div class="col-6 d-flex justify-content-between">
+      <div><%- __('list') %><span id="numOfItems"> (0)</span></div>
+      <div class="small text-danger"><%- __('editThisLast') %></div>
+    </div>
+
+  </div>
+  <div class="row">
+
+    <div class="col-6">
+      <div id="themes" class="d-flex flex-wrap">
+<% for (let t in LT_vocab) { let color = ''; for (let c in colors) { if (colors[c].includes(t)) { color = c; break;}} %>
+        <div class="rounded-3 p-1 d-flex" style="margin:1px;background-color:<%- color %>">
+
+          <div class="form-check">
+            <input aria-label="themes" class="form-check-input" type="checkbox" id="<%- t %>" name="themes" value="<%- t %>">
+            <label class="form-check-label me-3" style="margin-left:-5px;" for="<%- t %>"><%- __(t) %> (<%- Object.keys(LT_vocab[t]).length %>)</label>
+          </div>
+
+        </div>
+<% } %>
+      </div>
+    </div>
+
+    <div class="col-6" style="position:relative;">
+      <div id="list" class="d-flex flex-wrap" style="position:absolute;max-height:100%;overflow-y:scroll;"></div>
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+$(function(){
+  let LT_vocab = <%- JSON.stringify(LT_vocab) %>;
+  window.deckType = "LT";
+
+  function updateWordList(){
+    $("#list").empty();
+
+    let checkedThemes = $("#themes input:checked").toArray().map(e => e.value);
+    checkedThemes = checkedThemes.filter(e => e);  // remove empty strings
+
+    let words = {};
+
+    for (let t of checkedThemes) {
+
+      for (let w in LT_vocab[t]) {
+        words[w] = LT_vocab[t][w].image; // BUG: this will overwrite words with the same name
+        $("#list").append(`
+          <div class="alert-primary rounded-3 mb-1 me-1 ps-1 d-flex justify-content-between">
+            <div>${w}</div>
+            <div id="${w}" class="list btn btn-close" style="font-size:10px;"></div>
+          </div>
+        `);
+      }
+    }
+
+    $(".list").on('click', function(){
+      let word = $(this).attr('id');
+      delete words[word];
+      $(this).parent().remove();
+      $("#numOfItems").html(`&nbsp;(${Object.keys(words).length})`);
+      window.setName = JSON.stringify(words);
+    });
+
+    $("#numOfItems").html(`&nbsp;(${Object.keys(words).length})`);
+    window.setName = JSON.stringify(words);
+  }
+
+
+  $("#themes input").on('change', ()=>{
+    updateWordList();
+  });
+
+});
+</script>

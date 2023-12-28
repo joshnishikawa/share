@@ -50,7 +50,7 @@
 <form id="flashForm" action="flash" method="GET" class="d-none">
   <input type="hidden" value="" name="setName">
   <input type="hidden" value="" name="deckType">
-  <input type="hidden" value="" name="shuffled">
+  <input type="hidden" value="" name="order">
   <input type="hidden" value="" name="showtext">
 </form>
 
@@ -81,13 +81,14 @@ $(function(){
   var card = 0;
   var reviewing = false;
 
-  const shuffled = searchParams.get('shuffled');
+  const order = searchParams.get('order');
+  console.log(order);
   var isNum = setName.startsWith('_') || setName == "tens_teens"; // for sorting
-  if (shuffled == "true") {
+  if (order == "shuffled") {
     $("#shuffle").prop('checked', true);
     deck = FYshuffle(deck);
   }
-  else {
+  else if (order == "alphabetical"){
     $("#shuffle").prop('checked', false);
     if(isNum) deck.sort(function(a, b){
       return a.name - b.name}); // sort numerically
@@ -99,6 +100,9 @@ $(function(){
         return 0;
       });
     }
+  }
+  else {
+    $("#shuffle").prop('checked', false);
   }
 
   const showtext = searchParams.get('showtext');
@@ -132,7 +136,7 @@ $(function(){
   $("#showtext").on('click', function(){
     $("#flashForm input[name='setName']").val(setName);
     $("#flashForm input[name='deckType']").val(deckType);
-    $("#flashForm input[name='shuffled']").val( $("#shuffle").prop('checked') ? "true" : "false");
+    $("#flashForm input[name='order']").val( $("#shuffle").prop('checked') ? "shuffled" : "alphabetical");
     $("#flashForm input[name='showtext']").val( $(this).prop('checked') ? "true" : "false");
     $("#flashForm").submit();
   });
@@ -141,7 +145,7 @@ $(function(){
   $("#shuffle").on('click', function(){
     $("#flashForm input[name='setName']").val(setName);
     $("#flashForm input[name='deckType']").val(deckType);
-    $("#flashForm input[name='shuffled']").val( $(this).prop('checked') ? "true" : "false");
+    $("#flashForm input[name='order']").val( $(this).prop('checked') ? "shuffled" : "alphabetical");
     $("#flashForm input[name='showtext']").val( $("#showtext").prop('checked') ? "true" : "false");
     $("#flashForm").submit();
   });

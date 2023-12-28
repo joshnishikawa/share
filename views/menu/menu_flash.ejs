@@ -11,7 +11,7 @@
     <form id="flashForm" action="flash" method="GET">
       <input type="hidden" value="" name="setName">
       <input type="hidden" value="" name="deckType">
-      <input type="hidden" value="" name="shuffled">
+      <input type="hidden" value="" name="order">
       <input type="hidden" value="" name="showtext">
       <button id="flashButton" type="submit" class="btn btn-primary" style="height:100%;">Start</button>
     </form>
@@ -30,7 +30,7 @@ $(function(){
     else {
       $("#flashForm input[name='setName']").val(window.setName);
       $("#flashForm input[name='deckType']").val(window.deckType);
-      $("#flashForm input[name='shuffled']").val("false");
+      $("#flashForm input[name='order']").val("ordered");
       $("#flashForm input[name='showtext']").val("false");
       $("#flashForm input[name='review']").val("{}");
       $("#flashForm").submit();
