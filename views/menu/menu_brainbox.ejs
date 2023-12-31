@@ -3,14 +3,14 @@
   <div class="d-flex justify-content-end w-100">
 
     <button class="btn btn-outline-secondary me-1" 
-            data-bs-toggle="modal" data-bs-target="#QnA_modal">
+            data-bs-toggle="modal" data-bs-target="#brainbox_modal">
       <i class="material-icons" style="line-height:1rem;vertical-align:middle;">info</i>
     </button>
 
-    <form action="QnA" method="GET">
+    <form action="brainbox" method="GET">
       <div class="d-flex" style="height:100%;">
-        <select class="form-control" name="QnA" required>
-<% for (let d of QnA ) { %>
+        <select class="form-control" name="brainbox" required>
+<% for (let d of brainbox ) { %>
           <option value="<%- d %>"><%- d %></option>
 <% } %>
         </select>
@@ -21,7 +21,7 @@
 
 </div>
 
-<%- include ("../modals/modal_QnA.ejs") %>
+<%- include ("../modals/modal_brainbox.ejs") %>
 
 <script>
 $(function(){

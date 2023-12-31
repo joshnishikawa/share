@@ -6,13 +6,13 @@
       <i class="material-icons">close</i>
     </a>
 
-    <button class="btn btn-sm btn-outline-secondary p-0 me-1" data-bs-toggle="modal" data-bs-target="#QnA_modal">
+    <button class="btn btn-sm btn-outline-secondary p-0 me-1" data-bs-toggle="modal" data-bs-target="#brainbox_modal">
       <i class="material-icons">info</i>
     </button>
 
-    <form id="QnA_form" action="QnA" method="GET" class="p-0">
-      <select id="QnA_select" class="form-control form-control-sm" name="QnA" required>
-  <% for (let d of QnA ) { %>
+    <form id="brainbox_form" action="brainbox" method="GET" class="p-0">
+      <select id="brainbox_select" class="form-control form-control-sm" name="brainbox" required>
+  <% for (let d of brainbox ) { %>
         <option value="<%- d %>"><%- d %></option>
   <% } %>
       </select>
@@ -22,7 +22,7 @@
   <div class="container-fluid" style="min-height:100vh;">
     <div class="row">
       <div id="img_container" class="col text-center">
-        <img src="<%- selected %>" alt="QnA" style="height:90vh;" />
+        <img src="<%- selected %>" alt="brainbox" style="height:90vh;" />
       </div>
     </div>
 
@@ -32,14 +32,14 @@
 $(function(){
   var url = window.location.href;
   const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
-  const setName = searchParams.get('QnA');
-  $('#QnA_select').val(setName);
+  const setName = searchParams.get('brainbox');
+  $('#brainbox_select').val(setName);
 
-  $('#QnA_select').on('change', function(){
-    $('#QnA_form').submit();
+  $('#brainbox_select').on('change', function(){
+    $('#brainbox_form').submit();
   });
 });
 
 </script>
-<%- include ("../modals/modal_QnA.ejs") %>
+<%- include ("../modals/modal_brainbox.ejs") %>
 <%- include('../foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->

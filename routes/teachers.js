@@ -84,9 +84,9 @@ router.get('/text', (req, res)=>{
 
 router.get('/tools', (req, res)=>{
   try{
-    fs.readdir( path.join(__dirname, '../public/image/QnA'), (err, QnA)=>{
+    fs.readdir( path.join(__dirname, '../public/image/brainbox'), (err, brainbox)=>{
       if (err) throw err;
-      res.render('teachers/tools', {QnA});
+      res.render('teachers/tools', {brainbox});
     });
   }
   catch(err){
@@ -129,13 +129,13 @@ router.get('/flash', (req, res)=>{
 });
 
 
-router.get('/QnA', (req, res)=>{
+router.get('/brainbox', (req, res)=>{
   try{
-    let selected = `/image/QnA/${req.query.QnA}`;
+    let selected = `/image/brainbox/${req.query.brainbox}`;
 
-    fs.readdir( path.join(__dirname, '../public/image/QnA'), (err, QnA)=>{
+    fs.readdir( path.join(__dirname, '../public/image/brainbox'), (err, brainbox)=>{
       if (err) throw err;
-      res.render('activities/QnA', {QnA, selected});
+      res.render('activities/brainbox', {brainbox, selected});
     });
   }
   catch(err){ console.error(err); }

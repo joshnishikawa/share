@@ -1,36 +1,116 @@
 <%- include('../head') %>
+<style>
+  .thumb {
+    width: 100px;
+  }
+</style>
+
 <div class="container">
+  <div class="row text-center display-5 UD">
+    <div id="room" class="col-1"></div>
+    <div id="users" class="col-1"></div>
+    <div class="col-9">Find the Word</div>
+    <div id="time" class="col-1"></div>
+  </div>
+
   <div class="row">
-    <div class="col-12 text-center">
-      <h1>Pairs</h1>
-      <button id="add" class="btn btn-primary" id="add">ADD</button>
-      <div class="display-1" id="count"></div>
-    </div>
+    <div id="images" class="col-6 d-flex flex-wrap"></div>
+    <div id="words" class="col-6 d-flex flex-wrap"></div>
   </div>
 </div>
 
 
 <script src="https://cdn.socket.io/4.0.1/socket.io.js"></script>
 <script>
+$(function(){
+  let set = [
+    {word: "apple", image: "fruit_apple.jpg"},
+    {word: "banana", image: "fruit_banana.jpg"},
+    {word: "cherry", image: "fruit_cherry.jpg"},
+    {word: "orange", image: "fruit_orange.jpg"},
+    {word: "peach", image: "fruit_peach.jpg"},
+    {word: "strawberry", image: "fruit_strawberry.jpg"}
+  ];
+
+  let type = 'LT'; // for testing
+  let users = [];
+  let p1 = false;
+  let timer = null;
+  let selectedimg = null;
+
+  FYshuffle(set);
+
+  // add images to #images and words to words
+  for (let i=0; i<set.length; i++) {
+    let img = `<img src="/image/${type}/${set[i].image}" alt="${set[i].word}" class="img-fluid thumb">`;
+    $("#images").append(img);
+    // add click event to each image
+    $(`#images img[alt="${set[i].word}"]`).on('click', ()=>{
+      // send the word to the server
+      socket.emit('selectimg', {word: set[i].word, room});
+      // remove the word from #words
+      $(`#words div:contains("${set[i].word}")`).remove();
+    });
+    
+    let word = `<div class="col-4">${set[i].word}</div>`;
+    $("#words").append(word);
+  }
+
+
+
+  
+  /* A set of words is displayed in random order on the left. 
+     On the right, corresponding images are displayed in a different order for a selected user.
+     All other users see only the image selected by the first user and select 
+        the corresponding word within a time limit.
+
+     The selecting user is selected semi-randomly. 
+        (Each user gets a turn in random order.
+         Then the users are shuffled for the next round.)
+  */
+
   var socket = io();
-  var count = 0;
+  var room = 'room1'; // for testing
 
   socket.on('connect', ()=>{
     console.log('connected');
-    socket.emit('join', {room: 'room1'}, (data)=>{
+    socket.emit('join', {room}, (data)=>{
       console.log(data);
     });
   });
   
-  socket.on('add', (data)=>{
-    count = data.count;
-    $('#count').html(count);
+  socket.on('selectedimg', (data)=>{
+    selectedimg = data;
+    $("#images img").addClass('thumb').hide();
+    $(`#images img[alt="${data}"]`).removeClass('thumb').show();
+    // add click event to each word
+    $("#words div").on('click', function(){
+      // send the word to the server
+      if (selectedimg == $(this).text()) {
+        socket.emit('selectword', {word: $(this).text(), room});
+        $(this).remove();
+        $("#words div").removeClass('text-danger');
+        // remove the image from #images
+        $(`#images img[alt="${selectedimg}"]`).remove();
+        selectedimg = null;
+        // show other images
+        $("#images img").show();
+      }
+      else {
+        $(this).addClass('text-danger');
+      }
+    });
+
   });
 
-  $('#add').click(()=>{
-    count++;
-    socket.emit('add', {count});
-  });
+
+  // for testing
+  $("#room").html(`${room}`);
+
+  let time = 12;
+  $("#time").html(`${time}`);
+
+});
 </script>
 
 <%- include('../foot') %>
