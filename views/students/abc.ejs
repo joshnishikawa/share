@@ -105,7 +105,8 @@
         <div class="write shadow w-25 mx-auto"><img src="/image/abc/f.gif" class="img-fluid" alt="f"></div>
       </a>
     </div>
-
+    <div class="col mb-1"></div>
+    <div class="col mb-1"></div>
     <!-- <div class="col">
       <div class="text-center bg-light border border-3 border-success rounded-3 shadow w-100 h-100">
         <h5>Letters and Sounds</h5>
@@ -147,12 +148,12 @@ $(function(){
   let {abcranks} = getCookieObject();
   if (abcranks) ranks = abcranks.split(",").map(Number);
 
-  // get sum of ranks
-  let percent = Math.round( progressToPercent(ranks, ranks.length * 5) );
-  if (percent >= 100){
-    $("#startSRS").prop('disabled', true);
-    $("#resetSRS").show();
-  }
+  // // get sum of ranks
+  // let percent = Math.round( progressToPercent(ranks, ranks.length * 5) );
+  // if (percent >= 100){
+  //   $("#startSRS").prop('disabled', true);
+  //   $("#resetSRS").show();
+  // }
 
 
   $("#startSRS").on('click', ()=>{
