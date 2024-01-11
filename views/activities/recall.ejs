@@ -35,6 +35,9 @@
     <button id="start" class="btn btn-sm btn-outline-success py-0">
       <i class="material-icons">play_arrow</i>
     </button>
+    <button id="replay" class="btn btn-sm btn-outline-success py-0 me-1" style="display:none;">
+      <i class="material-icons">replay</i>
+    </button>
 
     <div class="d-inline-block">
       <input id="searchInput" class="form-control form-control-sm" type="text" placeholder="Search" aria-label="Search" style="display:none;">
@@ -63,12 +66,13 @@ $(function(){
   deck = FYshuffle(deck); // Shuffle first so that cards left out are random.
   let {length, colspan, rowheight} = getGrid({length: deck.length, even: false});
   deck = deck.slice(0, length); // Slice the deck to the correct length.
+  let fontsize = Math.floor( deck.length / 6 );
 
   $("#numCards").val(deck.length);
   $("#numCards").attr('max', deck.length);
 
 // PREPARE THE DISPLAY /////////////////////////////////////////////////////////
-for (let i of deck){
+  for (let i of deck){
     $('#display').append(
        `<div class="rounded-3 px-3 bg-white border display-1">
           <div style="font-size:3rem;">
@@ -81,31 +85,32 @@ for (let i of deck){
   }
   $("#display").show();
 
-  deck = FYshuffle(deck);
 
-  let fontsize = Math.floor( deck.length / 6 );
 
-  for (let i of deck){
-    $("#grid").append(
-     `<div id="${i.name.replace(/[ ()]/g, '_')}" class="col-${colspan} vocab p-0" style="height:${rowheight}vh;">
-        <div class="flip border-primary border-5 rounded-3 m-3" style="height:80%;">
-          <div class="flip-card shadow">
-            <div class="flip-front bg-white rounded border display-1">
-              ${i.image}
-            </div>
-            <div class="flip-back rounded border border-primary text-center alert-primary display-${fontsize}">
-              &nbsp;
+// PREPARE THE GRID ////////////////////////////////////////////////////////////
+  play = () => {
+    $("#grid").empty();
+    deck = FYshuffle(deck);
+
+    for (let i of deck){
+      $("#grid").append(
+      `<div id="${i.name.replace(/[ ()]/g, '_')}" class="col-${colspan} vocab p-0" style="height:${rowheight}vh;">
+          <div class="flip border-primary border-5 rounded-3 m-3" style="height:80%;">
+            <div class="flip-card shadow">
+              <div class="flip-front bg-white rounded border display-1">
+                ${i.image}
+              </div>
+              <div class="flip-back rounded border border-primary text-center alert-primary display-${fontsize}">
+                &nbsp;
+              </div>
             </div>
           </div>
-        </div>
-      </div>`);
-  }
+        </div>`);
+    }
 
-
-  $("#start").on('click', ()=>{
     $("#display").empty();
-    $("#numselect").hide();
     $("#start").hide();
+    $("#replay").show();
     $("#searchInput").show().focus();
 
     let numCards = deck.length - $("#numCards").val(); // Hide (not show) this many cards.
@@ -120,13 +125,17 @@ for (let i of deck){
       $(i).addClass('flipped').removeClass('flip').off('mousedown');
     }
 
+    $(".flip").on('dblclick', function(){
+      $(this).addClass('flipped').removeClass('flip').off('mousedown');
+    });
+
     $("#gridContainer").show();
-  });
+  }
 
 
-  $(".flip").on('dblclick', function(){
-    $(this).addClass('flipped').removeClass('flip').off('mousedown');
-  });
+  $("#start").on('click', play);
+  $("#replay").on('click', play);
+
 
   $("#searchInput").on('keyup', function(e){
     if (e.key == "Enter"){
