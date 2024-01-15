@@ -94,7 +94,7 @@ $(function(){
 
     for (let i of deck){
       $("#grid").append(
-      `<div id="${i.name.replace(/[ ()]/g, '_')}" class="col-${colspan} vocab p-0" style="height:${rowheight}vh;">
+      `<div id="${i.name.replace(/[ ()']/g, '_')}" class="col-${colspan} vocab p-0" style="height:${rowheight}vh;">
           <div class="flip border-primary border-5 rounded-3 m-3" style="height:80%;">
             <div class="flip-card shadow">
               <div class="flip-front bg-white rounded border display-1">
@@ -156,8 +156,9 @@ $(function(){
       if (input == ""){return;}
       let matches = deck.filter((v)=>{return v.name.startsWith(input);});
       for (let i of matches){
-        $(`#${i.name.replace(/[ ()]/g, '_')} > .flip`).addClass('border');
-        $(`#${i.name.replace(/[ ()]/g, '_')} > .flip > .flip-card > .flip-back`).html(input);
+        let id = i.name.replace(/[ ()']/g, '_');
+        $(`#${id} > .flip`).addClass('border');
+        $(`#${id} > .flip > .flip-card > .flip-back`).html(input);
       }
     }
   });

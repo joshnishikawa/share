@@ -1,9 +1,3 @@
-<style>
-  .active {
-    color: #0d6efd;
-  }
-</style>
-
 <div id="hrt_alt" class="accordion">
   <h2 id="item_hrt" class="accordion-header border shadow">
     <button class="accordion-button collapsed" type="button" 
@@ -92,8 +86,8 @@
 <script>
   $(function() {
     $('ul li').on('click', function() {
-      $('ul li').not(this).removeClass('active');
-      $(this).toggleClass('active');
+      $('ul li').not(this).removeClass('text-primary');
+      $(this).toggleClass('text-primary');
     });
   });
   

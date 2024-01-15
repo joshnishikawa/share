@@ -1,6 +1,21 @@
 <%- include('../head') %>
 
 <div id="list1" class="accordion">
+  <h2 id="item0_1" class="accordion-header border shadow">
+    <button class="accordion-button collapsed" type="button" 
+            data-bs-toggle="collapse" data-bs-target="#content0_1" 
+            aria-expanded="true" aria-controls="item0_1">
+      It depends on the city.
+    </button>
+  </h2>
+  <div id="content1_1"
+      class="accordion-collapse collapse bg-white border shadow ps-5" 
+      style="cursor:pointer;"
+      aria-labelledby="head1_1" data-bs-parent="#list1">
+      <%- include('yearinreview/city.ejs') %>
+  </div>
+
+
   <h2 id="item1_1" class="accordion-header border shadow">
     <button class="accordion-button collapsed" type="button" 
             data-bs-toggle="collapse" data-bs-target="#content1_1" 
