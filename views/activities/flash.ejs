@@ -29,6 +29,11 @@
     z-index:-1;
   }
 
+  /* add box shadow to #flash img if not .svg */
+  #flash img:not([src*=".svg"]){
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  }
+
   .review{
     color:LimeGreen !important;
     text-shadow: 5px 5px 10px #9c9 !important;
@@ -62,7 +67,7 @@
 
 
 <div id="content" style="height:100vh;width:100%;">
-  <div id="flash" class="text-center p-5" style="height:70%;width:100%;"></div>
+  <div id="flash" class="text-center p-4" style="height:75%;width:100%;"></div>
   <div id="text" class="text-center display-1 UD" style="height:20%;width:100%;"></div>
 </div> 
 
@@ -82,7 +87,7 @@ $(function(){
   var reviewing = false;
 
   const order = searchParams.get('order');
-  console.log(order);
+
   var isNum = setName.startsWith('_') || setName == "tens_teens"; // for sorting
   if (order == "shuffled") {
     $("#shuffle").prop('checked', true);
@@ -105,8 +110,6 @@ $(function(){
     $("#shuffle").prop('checked', false);
   }
 
-  const showtext = searchParams.get('showtext');
-  $("#showtext").prop('checked', showtext == "true");
 
   function start(){
     if (reviewing){
@@ -134,11 +137,7 @@ $(function(){
 
 
   $("#showtext").on('click', function(){
-    $("#flashForm input[name='setName']").val(setName);
-    $("#flashForm input[name='deckType']").val(deckType);
-    $("#flashForm input[name='order']").val( $("#shuffle").prop('checked') ? "shuffled" : "alphabetical");
-    $("#flashForm input[name='showtext']").val( $(this).prop('checked') ? "true" : "false");
-    $("#flashForm").submit();
+    $("#text").html( deck[card].name );
   });
 
 

@@ -53,4 +53,15 @@ router.get('/sample', (req, res)=>{
 });
 
 
+router.get('/speech', (req, res)=>{
+  try{
+    res.render('activities/speech');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
+
 module.exports = router;

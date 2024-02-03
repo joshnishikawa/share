@@ -7,8 +7,6 @@ const NH_vocab = require('../public/NH_vocab.js');
 const LT_vocab = require('../public/LT_vocab.js');
 
 // router.use('/tags', tagsRouter); // uncomment to update tags
-
-
 router.get('/', (req, res)=>{
   try{
     res.redirect('/teachers/images');
@@ -199,6 +197,17 @@ router.get('/recall', (req, res)=>{
 router.get('/reveal', (req, res)=>{
   try{
     res.render('activities/reveal');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
+
+router.get('/grid', (req, res)=>{
+  try{
+    res.render('activities/grid');
   }
   catch(err){
     res.send(err);

@@ -1,0 +1,92 @@
+<%- include('../head'); -%>
+<div style="background-color:black;color:white;">
+  <div class="text-center pt-3">
+    <button id="listen" class="btn btn-lg btn-success">Listen</button>
+  </div>
+
+  <div>
+    <p>Tap/click then say a color to change the background color of the app.</p>
+  </div>
+
+  <div>
+    <p class="hints p-3"></p>
+  </div>
+
+  <div>
+    <p class="output p-3"></p>
+  </div>
+</div>
+
+
+<script>
+$(function(){
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+  const SpeechGrammarList =
+    window.SpeechGrammarList || window.webkitSpeechGrammarList;
+  const SpeechRecognitionEvent =
+    window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
+
+  const colors = [
+    "red", "orange", "yellow", "green", "blue", "purple", 
+    "black", "white", "pink", "brown", "gray"];
+
+  const grammar = `#JSGF V1.0; grammar colors; public <color> = ${colors.join(
+    " | ",
+  )};`;
+
+  const recognition = new SpeechRecognition();
+  const speechRecognitionList = new SpeechGrammarList();
+  speechRecognitionList.addFromString(grammar, 1);
+  recognition.grammars = speechRecognitionList;
+  recognition.continuous = false;
+  recognition.lang = "en-US";
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  const diagnostic = document.querySelector(".output");
+  const bg = document.querySelector("html");
+
+  // DISPLAY HINTS
+  const hints = document.querySelector(".hints");
+  let colorHTML = "";
+  colors.forEach((color, i) => {
+    if (["black", "gray", "purple", "brown", "green", "blue"].includes(color)) {
+      colorHTML += `<span style="background-color:${color};"> ${color} </span>`;
+    } else {
+      colorHTML += `<span style="color:black;background-color:${color};"> ${color} </span>`;
+    }
+  });
+  hints.innerHTML = 
+  `Tap or click then say a color to change the background color of the app. <br>
+  Try ${colorHTML}.`;
+
+
+  // LISTEN
+  $("#listen").on('click', () => {
+    recognition.start();
+    console.log("Ready to receive a color command.");
+  });
+
+  recognition.onresult = (event) => {
+    const color = event.results[0][0].transcript;
+    diagnostic.textContent = `Result received: ${color}.`;
+    bg.style.backgroundColor = color;
+    console.log(`Confidence: ${event.results[0][0].confidence}`);
+  };
+
+  // recognition.onspeechend = () => {
+  //   recognition.stop();
+  // };
+
+  recognition.onnomatch = (event) => {
+    diagnostic.textContent = "I didn't recognise that color.";
+  };
+
+  recognition.onerror = (event) => {
+    diagnostic.textContent = `Error occurred in recognition: ${event.error}`;
+  };
+});
+</script>
+
+<%- include('../foot') %>

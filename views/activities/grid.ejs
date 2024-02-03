@@ -1,0 +1,116 @@
+<%- include('../head'); -%>
+<style>
+  @media print {
+    @page {
+      .txt {
+        font-size: 80%; /* Adjust the percentage based on your preference */
+      }
+    }
+  }
+
+  body{
+    background-image: none !important;
+  }
+</style>
+
+
+<body>
+  <div id="grid" class="d-flex flex-wrap justify-content-center"></div>
+
+
+<script>
+$(function(){
+  var url = window.location.href;
+  const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
+  const setName = searchParams.get('setName');
+  const deckType = searchParams.get('deckType');
+  const spaces = searchParams.get('spaces');
+  const showText = searchParams.get('showText');
+  var deck = getDeck({setName, deckType});
+
+  deck = FYshuffle(deck); // Shuffle 1st so that cards duped/omitted are random.
+  while (spaces > deck.length) deck = deck.concat(deck);  // dupe items to fill
+  if (deck.length > spaces) deck = deck.slice(0, spaces); // omit rando items
+  deck = FYshuffle(deck); // shuffle again to mix up the dupes.
+
+
+  let cols = 12;
+
+  if (deck.length >= 144){
+    while (deck.length % 12 != 0) deck.pop();
+    cols = 12;
+  }
+  else if (deck.length >= 121){
+    while (deck.length % 11 != 0) deck.pop();
+    cols = 11;
+  }
+  else if (deck.length >= 100){
+    while (deck.length % 10 != 0) deck.pop();
+    cols = 10;
+  }
+  else if (deck.length >= 81){
+    while (deck.length % 9 != 0) deck.pop();
+    cols = 9;
+  }
+  else if (deck.length >= 64){
+    while (deck.length % 8 != 0) deck.pop();
+    cols = 8;
+  }
+  else if (deck.length >= 49){
+    while (deck.length % 7 != 0) deck.pop();
+    cols = 7;
+  }
+  else if (deck.length >= 36){
+    while (deck.length % 6 != 0) deck.pop();
+    cols = 6;
+  }
+  else if (deck.length >= 25){
+    while (deck.length % 5 != 0) deck.pop();
+    cols = 5;
+  }
+  else if (deck.length >= 16){
+    while (deck.length % 4 != 0) deck.pop();
+    cols = 4;
+  }
+  else if (deck.length >= 9){
+    while (deck.length % 3 != 0) deck.pop();
+    cols = 3;
+  }
+  else if (deck.length >= 4){
+    while (deck.length % 2 != 0) deck.pop();
+    cols = 2;
+  }
+  else if (deck.length >= 1){
+    cols = 1;
+  }
+
+  let colspan = (100 / cols - 1).toString(); // -1 to account for scrollbar
+
+  let html = '<div class="d-flex flex-wrap justify-content-center">';
+  for (let i = 0; i < deck.length; i++){
+    html +=
+     `<div class="space border text-center" style="position:relative;
+                                                   width:${colspan}vw;
+                                                   height:${colspan}vw;">
+        ${deck[i].image}
+        <div class="txt text-center UD w-100" style="position:absolute;
+                                                     display:none;">${deck[i].name}</div>
+      </div>`;
+
+    if (i % cols == cols - 1) html += '</div><div class="d-flex flex-wrap justify-content-center">';
+  }
+  html += '</div>';
+
+  $('#grid').html(html);
+
+  // add img-fluid to all images
+  $('img').addClass('img-fluid w-75');
+
+  // set height of all each .space to be the same as its width
+  if (showText == 'true') $('.txt').show();
+
+});
+
+</script>
+  
+<%- include('../foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->

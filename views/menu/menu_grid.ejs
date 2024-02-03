@@ -1,0 +1,45 @@
+<div class="rounded-3 border p-3 shadow d-flex">
+  <strong class="text-primary h3">
+    <abbr title="BINGO, Tic Tac Toe, Connect 4 etc.">GRID</abbr>
+  </strong>
+
+  <div class="d-flex justify-content-end w-100">
+
+    <form id="gridForm" action="grid" method="GET">
+      <div class="d-flex" style="height:100%;">
+        <input type="hidden" value="" name="setName">
+        <input type="hidden" value="" name="deckType">
+
+  <div>
+        <label class="form-label small text-center" for="showText" style="transform:rotate(-90deg);line-height: 1rem;">show<br/>text</label>
+        <input type="checkbox" value="true" name="showText" class="form-checkbox me-3">
+  </div>
+
+  <!-- rotate label 90 degrees counter clockwise and align text top-->
+
+        <label class="form-label small" for="spaces" style="transform:rotate(-90deg);margin-right:-20px;">spaces</label>
+        <input type="number" min="4" value="25" name="spaces" class="form-control" style="width:4.5rem;">
+        <button id="gridButton" type="submit" class="btn btn-primary" style="height:100%;">Start</button>
+      </div>
+    </form>
+
+  </div>
+</div>
+
+
+<script>
+$(function(){
+  $("#gridButton").on('click', (e)=>{
+    e.preventDefault();
+    if (!window.setName || window.setName == '{}') {
+      alert("<%- __('pleaseSelect') %>");
+    }
+    else {
+      $("#gridForm input[name='setName']").val(window.setName);
+      $("#gridForm input[name='deckType']").val(window.deckType);
+      $("#gridForm").submit();
+    }
+  });
+});
+
+</script>

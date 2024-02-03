@@ -806,6 +806,16 @@ const LT_vocab = {
 
 "school" : {
   // library, teachers' office, school principal's office, school office, classroom, school nurse's office, computer room, arts and crafts room, lunch room, science room, cooking room, music room, gym, playground
+  "entrance" : {
+    "meaning": "入り口",
+    "image": "school_entrance.jpg",
+    "audio": "https://members.englishjones.com/audio/words/entrance.mp3"
+  },
+  "restroom" : {
+    "meaning": "トイレ",
+    "image": "school_restroom.jpg",
+    "audio": "https://members.englishjones.com/audio/words/restroom.mp3"
+  },
   "library": {
     "meaning": "としょかん",
     "image": "school_library.jpg",
