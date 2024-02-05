@@ -137,7 +137,8 @@ $(function(){
 
 
   $("#showtext").on('click', function(){
-    $("#text").html( deck[card].name );
+    if ( $("#showtext").prop('checked') ) $("#text").html( deck[card].name );
+    else $("#text").html("");
   });
 
 

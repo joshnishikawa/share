@@ -1,10 +1,23 @@
 <%- include('../head'); -%>
 <style>
+  .helper {
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+  }
+
   @media print {
-    @page {
-      .txt {
-        font-size: 80%; /* Adjust the percentage based on your preference */
-      }
+    #menucontainer, #print {
+      display: none;
+    }
+
+    .txt {
+      font-size: 80%; /* Adjust the percentage based on your preference */
+    }
+
+    #grid {
+      position: absolute;
+      bottom: 0;
     }
   }
 
@@ -15,6 +28,31 @@
 
 
 <body>
+  <div id="menucontainer">
+    <div id="menu" class="d-flex">
+      <a href="/teachers" class="btn btn-sm btn-outline-secondary py-0 me-1">
+        <i class="material-icons">close</i>
+      </a>
+
+      <button class="btn btn-sm btn-outline-secondary p-0 me-1" data-bs-toggle="modal" data-bs-target="#grid_modal">
+        <i class="material-icons">info</i>
+      </button>
+
+      <div id="numselect" class="form-group me-1">
+        <div class="d-flex rounded-3 border border-secondary">
+          <label for="numCards" class="form-label px-1 mt-1 mb-0">Squares</label>
+          <input id="numCards" type="number" class="form-control form-control-sm border-0" 
+                min="4" style="width:4.5rem;" aria-label="number of squares">
+        </div>
+      </div>
+
+      <button id="print" class="btn btn-sm btn-outline-success py-0">
+        <i class="material-icons">print</i>
+      </button>
+
+    </div>
+  </div>
+
   <div id="grid" class="d-flex flex-wrap justify-content-center"></div>
 
 
@@ -24,91 +62,79 @@ $(function(){
   const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
   const setName = searchParams.get('setName');
   const deckType = searchParams.get('deckType');
-  const spaces = searchParams.get('spaces');
+  var spaces = searchParams.get('spaces');
+  $("#numCards").val(spaces);
   const showText = searchParams.get('showText');
   var deck = getDeck({setName, deckType});
 
-  deck = FYshuffle(deck); // Shuffle 1st so that cards duped/omitted are random.
-  while (spaces > deck.length) deck = deck.concat(deck);  // dupe items to fill
-  if (deck.length > spaces) deck = deck.slice(0, spaces); // omit rando items
-  deck = FYshuffle(deck); // shuffle again to mix up the dupes.
-
-
-  let cols = 12;
-
-  if (deck.length >= 144){
-    while (deck.length % 12 != 0) deck.pop();
-    cols = 12;
-  }
-  else if (deck.length >= 121){
-    while (deck.length % 11 != 0) deck.pop();
-    cols = 11;
-  }
-  else if (deck.length >= 100){
-    while (deck.length % 10 != 0) deck.pop();
-    cols = 10;
-  }
-  else if (deck.length >= 81){
-    while (deck.length % 9 != 0) deck.pop();
-    cols = 9;
-  }
-  else if (deck.length >= 64){
-    while (deck.length % 8 != 0) deck.pop();
-    cols = 8;
-  }
-  else if (deck.length >= 49){
-    while (deck.length % 7 != 0) deck.pop();
-    cols = 7;
-  }
-  else if (deck.length >= 36){
-    while (deck.length % 6 != 0) deck.pop();
-    cols = 6;
-  }
-  else if (deck.length >= 25){
-    while (deck.length % 5 != 0) deck.pop();
-    cols = 5;
-  }
-  else if (deck.length >= 16){
-    while (deck.length % 4 != 0) deck.pop();
-    cols = 4;
-  }
-  else if (deck.length >= 9){
-    while (deck.length % 3 != 0) deck.pop();
-    cols = 3;
-  }
-  else if (deck.length >= 4){
-    while (deck.length % 2 != 0) deck.pop();
-    cols = 2;
-  }
-  else if (deck.length >= 1){
-    cols = 1;
+  getCols = (deckLength)=>{
+    if (deckLength >= 144) return 12;
+    if (deckLength >= 121) return 11;
+    if (deckLength >= 100) return 10;
+    if (deckLength >= 81) return 9;
+    if (deckLength >= 64) return 8;
+    if (deckLength >= 49) return 7;
+    if (deckLength >= 36) return 6;
+    if (deckLength >= 25) return 5;
+    if (deckLength >= 16) return 4;
+    if (deckLength >= 9) return 3;
+    if (deckLength >= 4) return 2;
+    if (deckLength >= 1) return 1;
+    return 0;
   }
 
-  let colspan = (100 / cols - 1).toString(); // -1 to account for scrollbar
+  setGrid = ()=>{
+    spaces = parseInt($("#numCards").val());
+    deck = FYshuffle(deck); // Shuffle first so cards duped/omitted are random.
+    let workingdeck = FYshuffle(deck); 
+    while (workingdeck.length < spaces) workingdeck = workingdeck.concat(deck);
+    if (workingdeck.length > spaces) workingdeck = workingdeck.slice(0, spaces);
+    workingdeck = FYshuffle(workingdeck); // shuffle so order doesn't repeat
 
-  let html = '<div class="d-flex flex-wrap justify-content-center">';
-  for (let i = 0; i < deck.length; i++){
-    html +=
-     `<div class="space border text-center" style="position:relative;
-                                                   width:${colspan}vw;
-                                                   height:${colspan}vw;">
-        ${deck[i].image}
-        <div class="txt text-center UD w-100" style="position:absolute;
-                                                     display:none;">${deck[i].name}</div>
-      </div>`;
+    let cols = getCols(workingdeck.length);
+    while (workingdeck.length % cols != 0) workingdeck.pop(); // reduce to a multiple of cols
+    let colspan = (100 / cols - 1).toString(); // -1 to account for scrollbar
 
-    if (i % cols == cols - 1) html += '</div><div class="d-flex flex-wrap justify-content-center">';
+    let html = '<div class="border-top border-end d-flex flex-wrap justify-content-center">';
+    for (let i = 0; i < workingdeck.length; i++){
+      html +=
+      `<div class="space border-start border-bottom text-center pt-3" 
+            style="position:relative;width:${colspan}vw;height:${colspan}vw;">
+          ${workingdeck[i].image}
+
+          <div class="txt text-center UD w-100 position-absolute bottom-0 mb-1" 
+              style="text-stroke: 3px white;-webkit-text-stroke: 3px #fff;display:none;">
+            ${workingdeck[i].name}
+          </div>
+          <div class="txt text-center UD w-100 position-absolute bottom-0 mb-1" style="display:none;">
+            ${workingdeck[i].name}
+          </div>
+
+        </div>`;
+
+      if (i % cols == cols - 1) html += '</div><div class="border-end d-flex flex-wrap justify-content-center">';
+    }
+    html += '</div>';
+
+    $('#grid').html(html);
+
+    // add img-fluid to all images
+    $('img').addClass('img-fluid w-75 position-absolute top-50 translate-middle').css('max-height', '75%');
+
+    // set height of all each .space to be the same as its width
+    if (showText == 'true') $('.txt').show();
   }
-  html += '</div>';
 
-  $('#grid').html(html);
 
-  // add img-fluid to all images
-  $('img').addClass('img-fluid w-75');
+  $("#print").on('click', ()=>{
+    window.print();
+  });
 
-  // set height of all each .space to be the same as its width
-  if (showText == 'true') $('.txt').show();
+  $("#numCards").on('change', ()=>{
+    setGrid();
+  });
 
+  setGrid();
 });
 
 </script>
