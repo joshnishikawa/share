@@ -1,5 +1,9 @@
 <%- include('../head'); -%>
 <style>
+  .container {
+    container-type: size;
+  }
+
   .flip-back{
     font-weight: bold;
     -webkit-text-stroke: 1px black;
@@ -25,7 +29,10 @@
     <i class="material-icons">info</i>
   </button>
 
+  <input type="checkbox" id="matchtext" class="ms-2">
+  <label for="matchtext">Match Image with Text</label>
 
+  
   <div style="min-height:100vh;user-select: none;">
     <div id="gridContainer">
       <div id="grid" class="d-flex flex-wrap"></div>
@@ -67,8 +74,11 @@ $(function(){
   let {length, colspan, rowheight} = getGrid({length: deck.length * 2, even: true});
   deck = deck.slice(0, length / 2);
 
-  // Then double the deck to make pairs.
-  deck = deck.concat( deck );
+  let numofitems = deck.length;
+  for (let i = 0; i < numofitems; i++){
+    deck[i]["type"] = ""; // half of cards wont have the class that toggles text
+    deck.push({"name": deck[i].name, "image": deck[i].image, "type": "text"});
+  }
 
 
   // THEN SET UP THE CARD BACKS //////////////////////////////////////////////////
@@ -174,11 +184,12 @@ $(function(){
   for (let i = 0; i < deck.length; i++){
     $("#grid").append(
      `<div class="col-${colspan} vocab p-0" style="height:${rowheight}vh;">
-        <div data-value="${deck[i].name}" class="flip m-3" style="height:80%;">
+        <div data-value="${deck[i].name}" class="container flip m-3" style="height:80%;">
           <div class="flip-card shadow">
 
-            <div class="flip-front bg-white rounded border display-1">
+            <div class="${deck[i].type} flip-front bg-white rounded border UD">
               ${deck[i].image}
+              <div style="display:none;font-size:30cqh;">${deck[i].name}</div>
             </div>
             <div class="flip-back rounded border border-primary text-center ${backClass[i]}"
                  style="font-size:${Math.floor(rowheight * 0.8)}vh;">
@@ -208,6 +219,21 @@ $(function(){
       }
     });
   });
+
+
+  $("#matchtext").on('change', function(){
+    if ($(this).is(':checked')){
+      // hide all images inside divs with .text class
+      $(".text img").hide();
+      $(".text div").show();
+    }
+    else {
+      // show all images inside divs with .text class
+      $(".text img").show();
+      $(".text div").hide();
+    }
+  });
+
 
   var slash = false;
   $(document).on('keydown', function(e){
