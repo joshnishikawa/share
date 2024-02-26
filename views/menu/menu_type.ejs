@@ -1,22 +1,20 @@
-<div class="rounded-3 border p-3 shadow d-flex UD">
+<div class="rounded-3 border p-1 shadow d-flex UD">
+  <i class="material-icons text-secondary" 
+    style="line-height:1.4rem;font-size:1.4rem;cursor:pointer;" 
+    data-bs-toggle="modal" data-bs-target="#type_modal">
+    info
+  </i>
+
   <div class="wordle rounded-3 alert-primary text-center">t</div>
   <div class="wordle rounded-3 alert-primary text-center">y</div>
   <div class="wordle rounded-3 alert-primary text-center">p</div>
   <div class="wordle rounded-3 alert-primary text-center">_</div>
 
-  <div class="d-flex justify-content-end w-100">
-
-    <button class="btn btn-outline-secondary me-1" 
-            data-bs-toggle="modal" data-bs-target="#type_modal">
-      <i class="material-icons" style="line-height:1rem;vertical-align:middle;">info</i>
-    </button>
-
-    <form id="typeForm" action="type" method="GET">
-      <input type="hidden" value="" name="setName">
-      <input type="hidden" value="" name="deckType">
-      <button id="typeButton" type="submit" class="btn btn-primary" style="height:100%;">Start</button>
-    </form>
-  </div>
+  <form id="typeForm" action="/type" method="GET" class="d-flex justify-content-end w-100">
+    <input type="hidden" value="" name="deck">
+    <input type="hidden" value="" name="deckType">
+    <button id="typeButton" type="submit" class="btn btn-primary" style="height:100%;">Start</button>
+  </form>
 </div>
 
 <%- include ("../modals/modal_type.ejs") %>
@@ -25,11 +23,11 @@
 $(function(){
   $("#typeButton").on('click', (e)=>{
     e.preventDefault();
-    if (!window.setName || window.setName == '{}') {
+    if (!window.deck || window.deck.length == 0) {
       alert("<%- __('pleaseSelect') %>");
     }
     else {
-      $("#typeForm input[name='setName']").val(window.setName);
+      $("#typeForm input[name='deck']").val(JSON.stringify(window.deck));
       $("#typeForm input[name='deckType']").val(window.deckType);
       $("#typeForm").submit();
     }

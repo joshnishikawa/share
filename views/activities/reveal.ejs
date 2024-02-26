@@ -49,15 +49,23 @@
     background-image: none;
   }
 </style>
+<div class="d-flex">
+  <a id="home" href="/" class="btn btn-sm btn-outline-secondary py-0 me-1">
+    <i class="material-icons">home</i>
+  </a>
 
-<a href="/teachers" class="btn btn-sm btn-outline-secondary py-0">
-  <i class="material-icons">close</i>
-</a>
+  <button class="btn btn-sm btn-outline-secondary p-0 me-3" data-bs-toggle="modal" data-bs-target="#reveal_modal">
+    <i class="material-icons">info</i>
+  </button>
 
-<button class="btn btn-sm btn-outline-secondary p-0" data-bs-toggle="modal" data-bs-target="#reveal_modal">
-  <i class="material-icons">info</i>
-</button>
+  <select id="style" class="form-control form-control-sm style="width:fit-content;" name="style">
+    <option value="" disabled selected>Style</option>
+    <option value="spotlight">Spotlight</option>
+    <option value="blur">Fog</option>
+    <option value="pixelate">Pixels</option>
+  </select>
 
+</div>
 
 <div id="blurme" class="text-center"></div>
 <div id="loadme" class="text-center" style="height:100vh;display:none;"></div>
@@ -67,14 +75,16 @@
 <script>
 $(function(){
 // PREPARE THE DECK ////////////////////////////////////////////////////////////
-  var url = window.location.href;
-  const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
-  const setName = searchParams.get('setName');
-  const deckType = searchParams.get('deckType');
-  const style = searchParams.get('style');
+  const deckType = '<%- deckType %>';
+  $("#home").attr('href', `/teachers/${deckType}`);
+
+  const params = JSON.parse(<%- JSON.stringify(params) %>);
+  var deck = JSON.parse(params.deck);
+  var style = params.style;
+  $("#style").val(style);
+  $("#style").on('change', (e)=>{style = e.target.value;e.target.blur();setStyle();});
+
   var index = 0;
-  var deck = getDeck({setName, deckType});
-  
   deck = FYshuffle(deck);
 
 // FUNCTIONS ///////////////////////////////////////////////////////////////////
@@ -124,7 +134,7 @@ $(function(){
 
 
   renderSpotlight = ()=>{
-    $("#blurme").html(deck[index].image + `<div id="mask"></div>`);
+    $("#blurme").html(`<img src="${deck[index].image}" alt="${deck[index].name}"><div id="mask"></div>`);
       document.documentElement.style.setProperty('--cursorX', x + 'px')
       document.documentElement.style.setProperty('--cursorY', y + 'px')
       document.documentElement.style.setProperty('--light', light + 'px')
@@ -158,105 +168,109 @@ $(function(){
   }
 
 // PICK A STYLE ////////////////////////////////////////////////////////////////
-  switch (style){
-    case 'blur':
-      var blr = 100;
+  function setStyle(){
+    switch (style){
+      case 'blur':
+        var blr = 100;
 
-      $(document).off('keydown').on('keydown', (e)=>{
-        if (e.keyCode == 13){
-          e.preventDefault();
-          index++;
-          if (index < Object.keys(deck).length){
-            blr = 100;
-            $("#blurme").html(deck[index].image);
+        $(document).off('keydown').on('keydown', (e)=>{
+          if (e.keyCode == 13){
+            e.preventDefault();
+            index++;
+            if (index < deck.length){
+              blr = 100;
+              $("#blurme").html(`<img src="${deck[index].image}" alt="${deck[index].name}">`);
+            }
+            else {
+              $("#blurme").html("All done!");
+            }
           }
-          else {
-            $("#blurme").html("All done!");
+          else if (e.keyCode == 37){
+            e.preventDefault();
+            blr = blr == 100 ? 100 : blr +1;
           }
-        }
-        else if (e.keyCode == 37){
-          e.preventDefault();
-          blr = blr == 100 ? 100 : blr +1;
-        }
-        else if (e.keyCode == 39){
-          e.preventDefault();
-          blr = blr == 0 ? 0 : blr -1;
-        }
+          else if (e.keyCode == 39){
+            e.preventDefault();
+            blr = blr == 0 ? 0 : blr -1;
+          }
+          setBlur(blr);
+        });
+
+        $("#blurme").html(`<img src="${deck[index].image}" alt="${deck[index].name}">`);
         setBlur(blr);
-      });
+        break;
 
-      $("#blurme").html(deck[index].image);
-      setBlur(blr);
-      break;
+      case 'pixelate':
+        $("#loadme").html(deck[0].image);
 
-    case 'pixelate':
-      $("#loadme").html(deck[0].image);
+        $(document).off('keydown').on('keydown', (e)=>{
+          if (e.keyCode == 13){
+            e.preventDefault();
+            index++;
+            if (index < deck.length){
+              factor = 4;
+              $("#loadme").html(`<img src="${deck[index].image}" alt="${deck[index].name}">`); // load the image
+            }
+            else {
+              $("#blurme").html("All done!");
+            }
+          }
+          else if (e.keyCode == 37){
+            e.preventDefault();
+            factor = factor <= 4 ? 4 : factor/2;
+            $("#loadme").html(`<img src="${deck[index].image}" alt="${deck[index].name}">`); // load the image
+          }
+          else if (e.keyCode == 39){
+            if (e.repeat) return;
+            e.preventDefault();
+            factor = factor*2;
+            $("#loadme").html(`<img src="${deck[index].image}" alt="${deck[index].name}">`); // load the image
+          }
+          renderPixelated(factor);
+        });
 
-      $(document).off('keydown').on('keydown', (e)=>{
-        if (e.keyCode == 13){
-          e.preventDefault();
+        $("#loadme").html(`<img src="${deck[index].image}" alt="${deck[index].name}">`); // load the image
+        renderPixelated(factor);
+        break;
+
+      case 'spotlight':
+        getNext = () => {
           index++;
-          if (index < Object.keys(deck).length){
-            factor = 4;
-            $("#loadme").html(deck[index].image); // load the image
+          if (index < deck.length){
+            light = 5;
+            dark = 9;
+            renderSpotlight();
           }
           else {
+            $("#mask").hide();
             $("#blurme").html("All done!");
           }
         }
-        else if (e.keyCode == 37){
-          e.preventDefault();
-          factor = factor <= 4 ? 4 : factor/2;
-          $("#loadme").html(deck[index].image); // load the image
-        }
-        else if (e.keyCode == 39){
-          if (e.repeat) return;
-          e.preventDefault();
-          factor = factor*2;
-          $("#loadme").html(deck[index].image); // load the image
-        }
-        renderPixelated(factor);
-      });
 
-      $("#loadme").html(deck[index].image); // load the image
-      renderPixelated(factor);
-      break;
+        $(document).off('kedown').on('keydown', (e)=>{
+          if (e.keyCode == 13){
+            e.preventDefault();
+            getNext();
+          }
+        });
 
-    case 'spotlight':
-      getNext = () => {
-        index++;
-        if (index < Object.keys(deck).length){
-          light = 5;
-          dark = 9;
-          renderSpotlight();
-        }
-        else {
-          $("#mask").hide();
-          $("#blurme").html("All done!");
-        }
-      }
-
-      $(document).off('kedown').on('keydown', (e)=>{
-        if (e.keyCode == 13){
-          e.preventDefault();
+        $(document).off('dblclick').on('dblclick', (e)=>{
           getNext();
-        }
-      });
+        });
 
-      $(document).off('dblclick').on('dblclick', (e)=>{
-        getNext();
-      });
+        $(document).on('mousemove', growSpotlight);
+        renderSpotlight();
+        break;
 
-      $(document).on('mousemove', growSpotlight);
-      renderSpotlight();
-      break;
-
-    case 'blinder':
-      console.log('blinder');
-      break;
-    default:
-      console.log('whu?');
+      case 'blinder':
+        console.log('blinder');
+        break;
+      default:
+        console.log('whu?');
+    }
   }
+
+  setStyle();
 });
 </script>
 

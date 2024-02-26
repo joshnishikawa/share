@@ -28,25 +28,31 @@
 
 
 <body>
-  <div id="menucontainer">
+  <div id="menucontainer"><!-- to adios the entire menu when printing -->
     <div id="menu" class="d-flex">
-      <a href="/teachers" class="btn btn-sm btn-outline-secondary py-0 me-1">
-        <i class="material-icons">close</i>
+      <a id="home" href="/" class="btn btn-sm btn-outline-secondary py-0 me-1">
+        <i class="material-icons">home</i>
       </a>
 
-      <button class="btn btn-sm btn-outline-secondary p-0 me-1" data-bs-toggle="modal" data-bs-target="#grid_modal">
+      <button class="btn btn-sm btn-outline-secondary p-0 me-3" data-bs-toggle="modal" data-bs-target="#grid_modal">
         <i class="material-icons">info</i>
       </button>
 
-      <div id="numselect" class="form-group me-1">
+      <div id="numselect" class="form-group mx-3">
         <div class="d-flex rounded-3 border border-secondary">
-          <label for="numCards" class="form-label px-1 mt-1 mb-0">Squares</label>
+          <label for="numCards" class="form-label px-1 mt-1 mb-0">Spaces</label>
           <input id="numCards" type="number" class="form-control form-control-sm border-0" 
                 min="4" style="width:4.5rem;" aria-label="number of squares">
         </div>
       </div>
 
-      <button id="print" class="btn btn-sm btn-outline-success py-0">
+      <div class="form-check mx-3">
+        <input type="checkbox" id="showtext" class="form-check-input">
+        <label for="showtext" class="form-check-label">Text</label>
+      </div>
+
+
+      <button id="print" class="btn btn-sm btn-outline-success py-0 mx-3">
         <i class="material-icons">print</i>
       </button>
 
@@ -58,14 +64,16 @@
 
 <script>
 $(function(){
-  var url = window.location.href;
-  const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
-  const setName = searchParams.get('setName');
-  const deckType = searchParams.get('deckType');
-  var spaces = searchParams.get('spaces');
+  const deckType = '<%- deckType %>';
+  $("#home").attr('href', `/teachers/${deckType}`);
+
+  const params = JSON.parse(<%- JSON.stringify(params) %>);
+  var deck = JSON.parse(params.deck);
+  var spaces = params.spaces;
   $("#numCards").val(spaces);
-  const showText = searchParams.get('showText');
-  var deck = getDeck({setName, deckType});
+  var text = (params.text == "true"); // convert string to boolean
+  $("#showtext").prop('checked', text);
+
 
   getCols = (deckLength)=>{
     if (deckLength >= 144) return 12;
@@ -100,7 +108,9 @@ $(function(){
       html +=
       `<div class="space border-start border-bottom text-center pt-3" 
             style="position:relative;width:${colspan}vw;height:${colspan}vw;">
-          ${workingdeck[i].image}
+          <img src="${workingdeck[i].image}" alt="${workingdeck[i].name}" 
+               class="img-fluid position-absolute top-50 translate-middle" 
+               style="max-height:75%;max-width:75%;">
 
           <div class="txt text-center UD w-100 position-absolute bottom-0 mb-1" 
               style="text-stroke: 3px white;-webkit-text-stroke: 3px #fff;display:none;">
@@ -118,12 +128,16 @@ $(function(){
 
     $('#grid').html(html);
 
-    // add img-fluid to all images
-    $('img').addClass('img-fluid w-75 position-absolute top-50 translate-middle').css('max-height', '75%');
-
     // set height of all each .space to be the same as its width
-    if (showText == 'true') $('.txt').show();
+    if (text) $('.txt').show();
   }
+
+  $("#showtext").on('change', ()=>{
+    text = $("#showtext").prop('checked');
+    if (text) $('.txt').show();
+    else $('.txt').hide();
+  });
+
 
 
   $("#print").on('click', ()=>{

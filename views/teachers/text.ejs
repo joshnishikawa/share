@@ -33,33 +33,33 @@
   
   </div>
   <div class="row pt-3">
-  
+
     <div class="col">
       <%- include('../menu/menu_bingo.ejs') -%>
     </div>
   
-    <div class="col"></div>
+    <div class="col">
+    </div>
 
     <div class="col">
       <%- include('../menu/menu_type.ejs') -%>
     </div>
 
   </div>
-  
 </div>
-
 
 <script>
 $(function(){
-
   $(`#text-tab`).addClass("active");
-  window.deckType = "text";
+  let text_decks = <%- JSON.stringify(text_decks) %>;
+  window.deck = [];
+  window.deckType = 'text';
 
-  for (let t in vocab_decks) {
+  for (let t in text_decks) {
     if ( ["animals", "objects"].includes(t) ) continue;
     $("#tags").append(`<div class="form-check m-3">
       <input class="form-check-input" type="radio" name="tags" id="tag_${t}" value="${t}" aria-label="tags">
-      <label class="form-check-label me-3" style="margin-left:-5px;" for="tag_${t}">${t} (${vocab_decks[t].length})</label>
+      <label class="form-check-label me-3" style="margin-left:-5px;" for="tag_${t}">${t} (${text_decks[t].length})</label>
     </div>`);
   }
 
@@ -80,11 +80,19 @@ $(function(){
   });
 
   $("#tags").on("change", (e)=>{
+    window.deck = [];
     if ( $("#numbers").prop("checked") ) {
-      window.setName = `_${$("#firstNum").val()}_${$("#lastNum").val()}`;
+      let from = parseInt($("#firstNum").val());
+      let to = parseInt($("#lastNum").val());
+      for (let i=from; i<=to; i++) {
+        window.deck.push({name: i});
+      }
     }
     else {
-      window.setName = e.target.value;
+      let deck = text_decks[e.target.value];
+      for (let i=0; i<deck.length; i++) {
+        window.deck.push({name: deck[i]});
+      }
     }
   });
 

@@ -21,18 +21,21 @@
 </style>
 
 <body>
-  <a href="/teachers" class="btn btn-sm btn-outline-secondary py-0">
-    <i class="material-icons">close</i>
+<div class="d-flex">
+  <a id="home" href="/" class="btn btn-sm btn-outline-secondary py-0 me-1">
+    <i class="material-icons">home</i>
   </a>
 
-  <button class="btn btn-sm btn-outline-secondary p-0" data-bs-toggle="modal" data-bs-target="#match_modal">
+  <button class="btn btn-sm btn-outline-secondary p-0 me-3" data-bs-toggle="modal" data-bs-target="#match_modal">
     <i class="material-icons">info</i>
   </button>
 
-  <input type="checkbox" id="matchtext" class="ms-2">
-  <label for="matchtext">Match Image with Text</label>
+  <div class="form-check mx-3">
+    <input type="checkbox" id="showtext" class="form-check-input">
+    <label for="showtext" class="form-check-label">Match Image with Text</label>
+  </div>
+</div> 
 
-  
   <div style="min-height:100vh;user-select: none;">
     <div id="gridContainer">
       <div id="grid" class="d-flex flex-wrap"></div>
@@ -41,15 +44,22 @@
 
 <%- include ("../modals/modal_match.ejs") %>
 
+
 <script>
-$(function(){
-  const NH_vocab = <%- JSON.stringify(NH_vocab) %>;
-  
-  var url = window.location.href;
-  const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
-  const setName = searchParams.get('setName');
-  const deckType = searchParams.get('deckType');
-  const backs = searchParams.get('backs');
+  const deckType = '<%- deckType %>';
+  $("#home").attr('href', `/teachers/${deckType}`);
+
+  $(async function(){
+  var text_decks;
+  await fetch('/javascripts/text_decks.json')
+        .then(response => response.json())
+        .then(data => {
+          text_decks = data;
+        });
+
+  const params = JSON.parse(<%- JSON.stringify(params) %>);
+  var deck = JSON.parse(params.deck);
+  var backs = params.backs;
 
   let max_num_of_cards = {
     'colors': 20,
@@ -59,13 +69,12 @@ $(function(){
     'objects': 20,
   }
 
-  var deck = getDeck({setName, deckType, backs});
   var backContent = [];
   var backClass = [];
 
   // SET UP THE DECK ///////////////////////////////////////////////////////////
   // Shuffle first so that cards left out are random (unless doing letters).
-  if ( setName != "lower_case_mix" ) FYshuffle(deck);
+  if ( deck != "lower_case_mix" ) FYshuffle(deck);
   
   // FIRST whittle down the deck to half the number of card backs available.
   while (deck.length * 2 > max_num_of_cards[backs]) deck.pop();
@@ -84,7 +93,7 @@ $(function(){
   // THEN SET UP THE CARD BACKS //////////////////////////////////////////////////
   switch(backs){
     case 'colors':
-      backClass = vocab_decks.colors.slice(0, deck.length);
+      backClass = text_decks.colors.slice(0, deck.length);
       FYshuffle(backClass);
       break;
 
@@ -100,8 +109,8 @@ $(function(){
       let nums = [];
       for (let i = 0; i < deck.length / 2; i++){
         nums.push(i.toString());
-        backClass.push(vocab_decks.colors[i] + 'Text alert-primary'); //use .redText class instead of .red
-        backClass.push(vocab_decks.colors[i] + 'Text alert-primary');
+        backClass.push(text_decks.colors[i] + 'Text alert-primary'); //use .redText class instead of .red
+        backClass.push(text_decks.colors[i] + 'Text alert-primary');
       }
 
       let nums2 = nums.slice(); // Do this way because FYshuffle shuffles in place.
@@ -119,9 +128,9 @@ $(function(){
     case 'colorsShapes':
       let shapes = [];
       for (let i = 0; i < deck.length / 2; i++){
-        shapes.push(vocab_decks.shapes[i]);
-        backClass.push(vocab_decks.colors[i] + 'Text alert-primary'); //use .redText class instead of .red
-        backClass.push(vocab_decks.colors[i] + 'Text alert-primary');
+        shapes.push(text_decks.shapes[i]);
+        backClass.push(text_decks.colors[i] + 'Text alert-primary'); //use .redText class instead of .red
+        backClass.push(text_decks.colors[i] + 'Text alert-primary');
       }
 
       let shapes2 = shapes.slice(0); // Do this way because FYshuffle shuffles in place.
@@ -142,23 +151,23 @@ $(function(){
     case 'animals':
       for (let i = 0; i < deck.length; i++){
         backContent.push(`<img style="max-width:70%;max-height:70%;" 
-                               src="/image/svg/${vocab_decks.animals[i]}.svg" 
-                               alt="${vocab_decks.animals[i]}">`);
+                               src="/image/svg/${text_decks.animals[i]}.svg" 
+                               alt="${text_decks.animals[i]}">`);
         backClass.push('alert-primary');
       }
 
-      if (setName != 'lower_case_mix') FYshuffle(backContent);
+      if (deck != 'lower_case_mix') FYshuffle(backContent);
       break;
 
     case 'objects':
       for (let i = 0; i < deck.length; i++){
         backContent.push(`<img style="max-width:70%;max-height:70%;" 
-                               src="/image/svg/${vocab_decks.objects[i]}.svg" 
-                               alt="${vocab_decks.animals[i]}">`);
+                               src="/image/svg/${text_decks.objects[i]}.svg" 
+                               alt="${text_decks.animals[i]}">`);
         backClass.push('alert-primary');
       }
 
-      if (setName != "lower_case_mix") FYshuffle(backContent);
+      if (deck != "lower_case_mix") FYshuffle(backContent);
       break;
 
     default:
@@ -171,7 +180,7 @@ $(function(){
 
 
   // letters need to be shuffled in parallel with the objects they represent
-  if ( setName == "lower_case_mix" ) {
+  if ( deck == "lower_case_mix" ) {
     parallelShuffle(deck, backContent);
     FYshuffle(backClass);
   }
@@ -188,7 +197,8 @@ $(function(){
           <div class="flip-card shadow">
 
             <div class="${deck[i].type} flip-front bg-white rounded border UD">
-              ${deck[i].image}
+              <img src="${deck[i].image}" alt="${deck[i].name}" class="rounded" 
+                   style="max-width:90%;max-height:90%;">
               <div style="display:none;font-size:30cqh;">${deck[i].name}</div>
             </div>
             <div class="flip-back rounded border border-primary text-center ${backClass[i]}"
@@ -221,7 +231,7 @@ $(function(){
   });
 
 
-  $("#matchtext").on('change', function(){
+  $("#showtext").on('change', function(){
     if ($(this).is(':checked')){
       // hide all images inside divs with .text class
       $(".text img").hide();

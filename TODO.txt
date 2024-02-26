@@ -17,7 +17,6 @@ Speaking Slots: Pull the lever to make a sentence with random parts. Say the sen
 
 
 ////////// IDEAS FOR TEACHER ACTIVITIES ////////////////////////////////////////
-MATCH allow related things (not just exact matches)
 Trash or Treasure (a la Bamboozle)
 
 Time Bomb: Pause for 3 seconds = die. Don't finish in 1 minute = die. Three strikes = die.

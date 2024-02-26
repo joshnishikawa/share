@@ -11,8 +11,8 @@
 </style>
 
 <body>
-  <a id="closeButton" href="/" class="btn btn-sm btn-outline-secondary py-0">
-    <i class="material-icons">close</i>
+  <a href="/" class="btn btn-sm btn-outline-secondary py-0">
+    <i class="material-icons">home</i>
   </a>
 
   <button class="btn btn-sm btn-outline-secondary p-0" data-bs-toggle="modal" data-bs-target="#wordle_modal">
@@ -61,17 +61,10 @@
 $(function(){
 
 // PREPARE THE DECK ////////////////////////////////////////////////////////////
-  var url = window.location.href;
-  var returnto = url.substring(0, url.lastIndexOf('/')) + '/New_Horizons';
-  $("#closeButton").attr('href', returnto);
-
-  const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
-  const setName = searchParams.get('setName');
-  const deckType = searchParams.get('deckType');
-  var deck = getDeck({setName, deckType});
-  
+const deckType = '<%- deckType %>';
+  const params = JSON.parse(<%- JSON.stringify(params) %>);
+  var deck = JSON.parse(params.deck);
   deck = FYshuffle(deck);
-
   var place = 0;
   var guess = '';
   var correct = true; // just to get things started
@@ -184,7 +177,7 @@ $(function(){
 
     word = deck.pop();
     if (word){
-      $("#image").html(word.image);
+      $("#image").html(`<img src="${word.image}" alt="${word.name}" class="img-fluid" />`);
 
       for (let l = 0; l < word.name.length; l++){
         let wordwrap = [' ', '-'].includes( word.name[l] ) ? true : false;

@@ -38,39 +38,38 @@
 <script>
 $(function(){
   let LT_vocab = <%- JSON.stringify(LT_vocab) %>;
-  window.deckType = "LT";
+  window.deckType = 'LT';
+  window.deck = [];
 
   function updateWordList(){
+    window.deck = [];
     $("#list").empty();
 
     let checkedThemes = $("#themes input:checked").toArray().map(e => e.value);
     checkedThemes = checkedThemes.filter(e => e);  // remove empty strings
 
-    let words = {};
+    for (let theme of checkedThemes) {
 
-    for (let t of checkedThemes) {
-
-      for (let w in LT_vocab[t]) {
-        words[w] = LT_vocab[t][w].image; // BUG: this will overwrite words with the same name
+      for (let word in LT_vocab[theme]) {
+        let addme = LT_vocab[theme][word];
+        addme["name"] = word;
+        window.deck.push(addme);
         $("#list").append(`
           <div class="alert-primary rounded-3 mb-1 me-1 ps-1 d-flex justify-content-between">
-            <div>${w}</div>
-            <div id="${w}" class="list btn btn-close" style="font-size:10px;"></div>
-          </div>
-        `);
+            <div>${word}</div>
+            <div id="${word}" class="list btn btn-close" style="font-size:10px;"></div>
+          </div>`);
       }
     }
 
     $(".list").on('click', function(){
       let word = $(this).attr('id');
-      delete words[word];
+      window.deck = window.deck.filter(e => e.name !== word);
       $(this).parent().remove();
-      $("#numOfItems").html(`&nbsp;(${Object.keys(words).length})`);
-      window.setName = JSON.stringify(words);
+      $("#numOfItems").html(`&nbsp;(${window.deck.length})`);
     });
 
-    $("#numOfItems").html(`&nbsp;(${Object.keys(words).length})`);
-    window.setName = JSON.stringify(words);
+    $("#numOfItems").html(`&nbsp;(${window.deck.length})`);
   }
 
 

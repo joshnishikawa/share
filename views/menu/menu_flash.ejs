@@ -1,21 +1,32 @@
-<div class="rounded-3 border p-3 shadow d-flex">
+<div class="rounded-3 border p-1 shadow d-flex">
+  <i class="material-icons text-secondary" 
+    style="line-height:1.4rem;font-size:1.4rem;cursor:pointer;" 
+    data-bs-toggle="modal" data-bs-target="#flash_modal">
+    info
+  </i>
   <strong class="text-primary h3">FLASH</strong>
 
-  <div class="d-flex justify-content-end w-100">
+  <form id="flashForm" action="/flash" method="GET" class="d-flex justify-content-end w-100">
 
-    <button class="btn btn-outline-secondary me-1" 
-            data-bs-toggle="modal" data-bs-target="#flash_modal">
-      <i class="material-icons" style="line-height:1rem;vertical-align:middle;">info</i>
-    </button>
+    <div class="form-check me-3">
+      <input class="form-check-input" type="checkbox" value="shuffle" name="order" id="order">
+      <label class="form-check-label small" for="order">
+        Shuffle
+      </label>
+    </div>
 
-    <form id="flashForm" action="flash" method="GET">
-      <input type="hidden" value="" name="setName">
-      <input type="hidden" value="" name="deckType">
-      <input type="hidden" value="" name="order">
-      <input type="hidden" value="" name="showtext">
-      <button id="flashButton" type="submit" class="btn btn-primary" style="height:100%;">Start</button>
-    </form>
-  </div>
+    <div class="form-check me-3">
+      <input class="form-check-input" type="checkbox" value="true" name="text" id="text">
+      <label class="form-check-label small" for="text">
+        Text
+      </label>
+    </div>
+
+    <input type="hidden" value="" name="deckType">
+    <input type="hidden" value="" name="deck">
+    <button id="flashButton" type="submit" class="btn btn-primary" style="height:100%;">Start</button>
+  </form>
+
 </div>
 
 <%- include ("../modals/modal_flash.ejs") %>
@@ -24,15 +35,12 @@
 $(function(){
   $("#flashButton").on('click', (e)=>{
     e.preventDefault();
-    if (!window.setName || window.setName == '{}') {
+    if (!window.deck || window.deck.length == 0) {
       alert("<%- __('pleaseSelect') %>");
     }
     else {
-      $("#flashForm input[name='setName']").val(window.setName);
+      $("#flashForm input[name='deck']").val(JSON.stringify(window.deck));
       $("#flashForm input[name='deckType']").val(window.deckType);
-      $("#flashForm input[name='order']").val("ordered");
-      $("#flashForm input[name='showtext']").val("false");
-      $("#flashForm input[name='review']").val("{}");
       $("#flashForm").submit();
     }
   });

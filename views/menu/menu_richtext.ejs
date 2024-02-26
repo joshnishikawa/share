@@ -1,19 +1,16 @@
-<div class="rounded-3 border p-3 shadow d-flex">
+<div class="rounded-3 border p-1 shadow d-flex">
+  <i class="material-icons text-secondary" 
+    style="line-height:1.4rem;font-size:1.4rem;cursor:pointer;" 
+    data-bs-toggle="modal" data-bs-target="#richtext_modal">
+    info
+  </i>
   <strong class="text-primary h3">RICH&nbsp;TEXT</strong>
   
-  <div class="d-flex justify-content-end w-100">
-
-    <button class="btn btn-outline-secondary me-1" 
-            data-bs-toggle="modal" data-bs-target="#richtext_modal">
-      <i class="material-icons" style="line-height:1rem;vertical-align:middle;">info</i>
+  <form action="/richtext" method="GET" class="d-flex justify-content-end w-100">
+    <button type="submit" class="btn btn-primary" style="height:100%">
+      Start
     </button>
-
-    <form action="richtext" method="GET">
-      <button type="submit" class="btn btn-primary" style="height:100%">
-        Start
-      </button>
-    </form>
-  </div>
+  </form>
 </div>
 
 <%- include ("../modals/modal_richtext.ejs") %>

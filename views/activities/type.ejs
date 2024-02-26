@@ -11,8 +11,8 @@
 </style>
 
 <body>
-  <a id="closeButton" href="/New_Horizons" class="btn btn-sm btn-outline-secondary py-0">
-    <i class="material-icons">close</i>
+  <a href="/" class="btn btn-sm btn-outline-secondary py-0">
+    <i class="material-icons">home</i>
   </a>
 
   <button class="btn btn-sm btn-outline-secondary p-0" data-bs-toggle="modal" data-bs-target="#type_modal">
@@ -75,21 +75,17 @@
 
 <script>
 $(function(){
-  // PREPARE THE DECK ////////////////////////////////////////////////////////////
-  var url = window.location.href;
-  var returnto = url.substring(0, url.lastIndexOf('/')) + '/New_Horizons';
-  $("#closeButton").attr('href', returnto);
+  const deckType = '<%- deckType %>';
+  const params = JSON.parse(<%- JSON.stringify(params) %>);
+  var deck = JSON.parse(params.deck);
 
-  const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
-  const setName = searchParams.get('setName');
-  const deckType = searchParams.get('deckType');
+  // PREPARE THE DECK //////////////////////////////////////////////////////////
   let timeLimit = 0; // seconds
   var finished = false;
   var starttime = 0;
   var score = 0;
   var misses = 0;
   var totalLetters = 0;
-  var deck = [];
 
   const letters = ["q","w","e","r","t","y","u","i","o","p",
                   "a","s","d","f","g","h","j","k","l",
@@ -107,7 +103,6 @@ $(function(){
     misses = 0;
     totalLetters = 0;
 
-    deck = getDeck({setName, deckType});
     FYshuffle(deck);
     resetAnswer();
     requestAnimationFrame(updateAnimation);
@@ -118,7 +113,6 @@ $(function(){
 
   showResults = ()=>{
     let elapsedTime = Math.round( (new Date() - starttime) / 1000 );
-    console.log(elapsedTime);
     let wpm = Math.round(60 * score / elapsedTime);
 
     $("#result").html(`
@@ -158,7 +152,9 @@ $(function(){
     if (word){
       $("#remaining").html(`<span class="display-3">${deck.length}</span><br/>words left`);
 
-      if (deckType != 'text') $("#image").html(word.image);
+      if (deckType != 'text') $("#image").html(`<img src="${word.image}" alt="${word.name}" class="img-fluid" />`);
+      else $("#image").html('');
+
       $("#display").html(`<div class="display-1">${word.name}</div>`);
 
       for (let i = 0; i < word.name.length; i++){

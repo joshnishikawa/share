@@ -2,8 +2,8 @@
 
 <body>
   <div class="d-flex">
-    <a href="/teachers" class="btn btn-sm btn-outline-secondary py-0 me-1">
-      <i class="material-icons">close</i>
+    <a href="tools" class="btn btn-sm btn-outline-secondary py-0 me-1">
+      <i class="material-icons">home</i>
     </a>
 
     <button class="btn btn-sm btn-outline-secondary p-0 me-1" data-bs-toggle="modal" data-bs-target="#brainbox_modal">
@@ -32,8 +32,8 @@
 $(function(){
   var url = window.location.href;
   const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
-  const setName = searchParams.get('brainbox');
-  $('#brainbox_select').val(setName);
+  const deck = searchParams.get('brainbox');
+  $('#brainbox_select').val(deck);
 
   $('#brainbox_select').on('change', function(){
     $('#brainbox_form').submit();

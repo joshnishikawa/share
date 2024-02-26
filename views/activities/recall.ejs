@@ -1,7 +1,9 @@
 <%- include('../head'); -%>
 
 <style>
-  #grid img, #display img{
+  #display div{ width: 16%;}
+
+  #grid img{
     position:absolute;
     margin: auto;
     left: 0;
@@ -15,15 +17,15 @@
 
 <body>
   <div class="d-flex">
-    <a href="/teachers" class="btn btn-sm btn-outline-secondary py-0 me-1">
-      <i class="material-icons">close</i>
+    <a id="home" href="/" class="btn btn-sm btn-outline-secondary py-0 me-1">
+      <i class="material-icons">home</i>
     </a>
 
-    <button class="btn btn-sm btn-outline-secondary p-0 me-1" data-bs-toggle="modal" data-bs-target="#recall_modal">
+    <button class="btn btn-sm btn-outline-secondary p-0 me-3" data-bs-toggle="modal" data-bs-target="#recall_modal">
       <i class="material-icons">info</i>
     </button>
 
-    <div id="numselect" class="form-group me-1">
+    <div id="numselect" class="form-group mx-3">
 
       <div class="d-flex rounded-3 border border-secondary">
         <label for="numCards" class="form-label px-1 mt-1 mb-0">Hide</label>
@@ -32,21 +34,21 @@
       </div>
     </div>
     
-    <button id="start" class="btn btn-sm btn-outline-success py-0">
+    <button id="start" class="btn btn-sm btn-outline-success py-0 mx-3">
       <i class="material-icons">play_arrow</i>
     </button>
-    <button id="replay" class="btn btn-sm btn-outline-success py-0 me-1" style="display:none;">
+    <button id="replay" class="btn btn-sm btn-outline-success py-0 mx-3" style="display:none;">
       <i class="material-icons">replay</i>
     </button>
 
-    <div class="d-inline-block">
+    <div class="d-inline-block mx-3">
       <input id="searchInput" class="form-control form-control-sm" type="text" placeholder="Search" aria-label="Search" style="display:none;">
     </div>
   </div>
 
 
   <div style="min-height:100vh;">
-    <div id="display" class="col d-flex flex-wrap justify-content-center" style="display:none;"></div>
+    <div id="display" class="col d-flex flex-wrap justify-content-center text-center"></div>
     <div id="gridContainer" style="display:none;">
       <div id="grid" class="d-flex flex-wrap"></div>
     </div>
@@ -57,12 +59,11 @@
 
 <script>
 $(function(){
-  var url = window.location.href;
-  const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
-  const setName = searchParams.get('setName');
-  const deckType = searchParams.get('deckType');
-  var deck = getDeck({setName, deckType});
-  
+  const deckType = '<%- deckType %>';
+  $("#home").attr('href', `/teachers/${deckType}`);
+
+  const params = JSON.parse(<%- JSON.stringify(params) %>);
+  var deck = JSON.parse(params.deck);
   deck = FYshuffle(deck); // Shuffle first so that cards left out are random.
   let {length, colspan, rowheight} = getGrid({length: deck.length, even: false});
   deck = deck.slice(0, length); // Slice the deck to the correct length.
@@ -72,33 +73,31 @@ $(function(){
   $("#numCards").attr('max', deck.length);
 
 // PREPARE THE DISPLAY /////////////////////////////////////////////////////////
-  for (let i of deck){
-    $('#display').append(
-       `<div class="rounded-3 px-3 bg-white border display-1">
-          <div style="font-size:3rem;">
-            ${i.name.split('(')[0].replace('_', " ")}
-            <div style="${deckType == "text" ? '' : "height:8rem;width:8rem;"} position:relative;">
-              ${ deckType == 'text' ? '' : i.image}
-            </div>
-          </div>
-        </div>`);
+  function getContent(i){
+    let str = i.name.split('(')[0].replace(/_/g, " ");
+    if (deckType == "text") return `<div class="rounded-3 bg-white border display-1 p-1">${str}</div>`;
+    else {
+      let img = i.image ? `<image alt="${str}" src="${i.image}" class="img-fluid">` : '';
+      return `<div class="rounded-3 bg-white border display-6 p-1">${img}<br/>${str}</div>`;
+    }
   }
-  $("#display").show();
-
+  for (let i of deck){
+    $('#display').append(getContent(i));
+  }
 
 
 // PREPARE THE GRID ////////////////////////////////////////////////////////////
   play = () => {
     $("#grid").empty();
     deck = FYshuffle(deck);
-
     for (let i of deck){
       $("#grid").append(
       `<div id="${i.name.replace(/[ ()']/g, '_')}" class="col-${colspan} vocab p-0" style="height:${rowheight}vh;">
           <div class="flip border-primary border-5 rounded-3 m-3" style="height:80%;">
             <div class="flip-card shadow">
               <div class="flip-front bg-white rounded border display-1">
-                ${i.image}
+                <img src="${i.image}" alt="${i.name}" class="rounded" 
+                   style="max-width:90%;max-height:90%;">
               </div>
               <div class="flip-back rounded border border-primary text-center alert-primary display-${fontsize}">
                 &nbsp;

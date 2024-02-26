@@ -91,7 +91,8 @@
         <div class="col">
           <%- include('../menu/menu_wordle.ejs') -%>
         </div>
-        <div class="col"></div>
+        <div class="col">
+        </div>
 
       </div>
     </div>
@@ -99,17 +100,18 @@
 </div>
 
 
-
 <script>
 $(function(){
   $(`#images-tab`).addClass("active");
-  window.deckType = "images";
+  window.deck = [];
+  window.deckType = 'images';
+
   var tags = {};
   var allWords = []; // in case only selecting 'Starts with' and/or 'No. of letters'
   var words = [];
 
-
   function updateWordList(){
+    window.deck = [];
     let checkedPhonics = $("#phonics input:checked").toArray().map(e => e.value).join(',').split(',');
     let checkedThemes = $("#themes input:checked").toArray().map(e => e.value).join(',').split(',');
     let sw = $("#startsWith").val().split(',').map(e => e.trim()).filter(e => e);
@@ -154,10 +156,11 @@ $(function(){
 
     words = words.filter(e => e);// remove empty strings
     words = [...new Set(words)]; // remove duplicates
-
-    $("#list").val(words.join(', '));
-    window.setName = JSON.stringify(words);
+    for (let i in words) {
+      window.deck.push({name: words[i], image: `/image/svg/${words[i]}.svg`});
+    }
     $("#numOfItems").html(`&nbsp;(${words.length})`);
+    $("#list").val(words.join(', ').replace(/_/g, ' '));
   }
 
 
@@ -224,12 +227,13 @@ $(function(){
 
   
   $("#list").on('input', ()=>{
+    window.deck = [];
     words = $("#list").val().split(',');
     $("#numOfItems").html(`&nbsp;&nbsp;&nbsp;(${words.length})`);
     for (let i in words) {
       words[i] = words[i].trim().replace(/\s/g, '_');
+      window.deck.push({name: words[i], image: `/image/svg/${words[i]}.svg`});
     }
-    window.setName = JSON.stringify(words);
   });
 
 });

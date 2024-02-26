@@ -59,7 +59,7 @@ io.on('error', function(){
 const createError = require('http-errors');
 const logger = require('morgan');
 const path = require('path');
-const teachersRouter = require('./routes/teachers');
+const TRouter = require('./routes/teachers');
 const studentsRouter = require('./routes/students');
 
 
@@ -90,8 +90,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.use( logger('dev') );
 app.use(  express.static( path.join(__dirname, 'public') )  );
 app.use( i18n.init );
+app.use('/teachers', TRouter);
 app.use('/', studentsRouter);
-app.use('/teachers', teachersRouter);
 
 app.use( (req, res, next)=> { next(createError(404)); });
 app.use( (err, req, res, next)=> {

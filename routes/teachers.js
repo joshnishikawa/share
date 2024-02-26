@@ -2,9 +2,15 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
-const tagsRouter = require('./tags');
+const tagsRouter = require('./tags.js');
 const NH_vocab = require('../public/NH_vocab.js');
 const LT_vocab = require('../public/LT_vocab.js');
+
+const creds = require('../../creds.js');
+const mysql = require('mysql2/promise');
+const db = mysql.createPool(creds);
+
+const text_decks = require('../public/javascripts/text_decks.json'); // FIXME: Deprecate this in 2025
 
 // router.use('/tags', tagsRouter); // uncomment to update tags
 router.get('/', (req, res)=>{
@@ -29,7 +35,7 @@ router.get('/images', (req, res)=>{
 });
 
 
-router.get('/Lets_Try', (req, res)=>{
+router.get('/LT', (req, res)=>{
   try{
     var colors = {
       "#c5b3e6" : ["fruit", "life", "time"],
@@ -49,7 +55,7 @@ router.get('/Lets_Try', (req, res)=>{
 });
 
 
-router.get('/New_Horizons', (req, res)=>{
+router.get('/NH', (req, res)=>{
   try{
     var colors = {
       "#c5b3e6" : ["page_4_5", "page_14_15"],
@@ -71,7 +77,7 @@ router.get('/New_Horizons', (req, res)=>{
 
 router.get('/text', (req, res)=>{
   try{
-    res.render('teachers/text');
+    res.render('teachers/text', {text_decks});
   }
   catch(err){
     res.send(err);
@@ -94,9 +100,9 @@ router.get('/tools', (req, res)=>{
 });
 
 
-router.get('/richtext', (req, res)=>{ 
+router.get('/yearinreview', (req, res)=>{
   try{
-    res.render('activities/richtext');
+    res.render('teachers/yearinreview');
   }
   catch(err){
     res.send(err);
@@ -105,126 +111,71 @@ router.get('/richtext', (req, res)=>{
 });
 
 
-router.get('/shapes', (req, res)=>{
+// replace deprecated links and reroute
+router.get('/:activity', async(req, res)=>{
   try{
-    res.render('activities/shapes');
+    if (!["bingo", "brainbox", "flash", "grid", "match", "recall", "reveal", "richtext", "type", "wordle"].includes(req.params.activity)) res.render('404');
+
+    let activity = req.params.activity;
+    let params = req.query;
+    let deckType = params.deckType;
+    delete params.deckType;
+
+    if (params.setName){ // Create row for deprecated link. Return new link.
+      var setName = params.setName;
+      delete params.setName;
+      var parseme;
+      var deck = [];
+
+      if (setName.startsWith('{')){ // it's either from NH or LT
+        parseme = JSON.parse(setName);
+        for (var key in parseme){
+          deck.push({name: key, image: `/image/${deckType}/${parseme[key]}`});
+        }
+        params["deck"] = JSON.stringify(deck);
+      }
+
+      else if (setName.startsWith('[')){ // it's an array of images
+        parseme = JSON.parse(setName);
+        for (let key of parseme){
+          deck.push({name: key, image: `/image/svg/${key}.svg`});
+        }
+        params["deck"] = JSON.stringify(deck);
+      }
+
+      else { // it's actually the name of a set from the text menu
+        params["deck"] = text_decks[setName]; //FIXME: Deprecate this in 2025
+      }
+
+      let link = await addLinktoDB({deckType, activity, params});
+      res.redirect(`/${activity}/${link}?deprecated=true`);
+    }
+    else {
+      res.render('404');
+    }
   }
-  catch(err){
+  catch (err){
     res.send(err);
     console.error(err);
   }
 });
 
 
-router.get('/flash', (req, res)=>{
-  try{
-    res.render('activities/flash');
+async function addLinktoDB({deckType, activity, params}){
+  var [rows, schema] = await db.query(`SELECT id FROM links
+                                       WHERE deckType=?
+                                       AND activity=?
+                                       AND params=?`, 
+                                      [deckType, activity, JSON.stringify(params)]);
+
+  if (rows.length != 0) return rows[0].id
+  else {
+    let newrow = await db.query(`INSERT INTO links (deckType, activity, params) 
+                                 VALUES (?, ?, ?)`, 
+                                [deckType, activity, JSON.stringify(params)]);
+    return newrow[0].insertId;
   }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
-
-
-router.get('/brainbox', (req, res)=>{
-  try{
-    let selected = `/image/brainbox/${req.query.brainbox}`;
-
-    fs.readdir( path.join(__dirname, '../public/image/brainbox'), (err, brainbox)=>{
-      if (err) throw err;
-      res.render('activities/brainbox', {brainbox, selected});
-    });
-  }
-  catch(err){ console.error(err); }
-});
-
-
-router.get('/match', (req, res)=>{
-  try{
-    res.render('activities/match', {NH_vocab: NH_vocab});
-  }
-  catch(err){ 
-    res.send(err);
-    console.error(err);
-  }
-});
-
-
-router.get('/wordle', (req, res)=>{
-  try{
-    res.render('activities/wordle');
-  }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
-
-
-router.get('/type', (req, res)=>{
-  try{
-    res.render('activities/type');
-  }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
-
-
-router.get('/bingo', (req, res)=>{
-  try{
-    res.render('activities/bingo');
-  }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
-
-
-router.get('/recall', (req, res)=>{
-  try{
-    res.render('activities/recall'); }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
-
-
-router.get('/reveal', (req, res)=>{
-  try{
-    res.render('activities/reveal');
-  }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
-
-
-router.get('/grid', (req, res)=>{
-  try{
-    res.render('activities/grid');
-  }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
-
-
-router.get('/test', (req, res)=>{
-  try{
-    res.render('teachers/test');
-  }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
+}
 
 
 module.exports = router;

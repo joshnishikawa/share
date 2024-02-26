@@ -53,25 +53,27 @@
 <script>
 $(function(){
   let NH_vocab = <%- JSON.stringify(NH_vocab) %>;
-  window.deckType = "NH";
+  window.deckType = 'NH';
+  window.deck = [];
 
   function updateWordList(){
+    window.deck = [];
     $("#list").empty();
 
     let checkedThemes = $("#themes input:checked").toArray().map(e => e.value);
     checkedThemes = checkedThemes.filter(e => e);  // remove empty strings
 
-    let words = {};
+    for (let theme of checkedThemes) {
+      let p = $(`input:checked[value="${theme}"]`).parent().parent().attr('id');
 
-    for (let t of checkedThemes) {
-      let p = $(`input:checked[value="${t}"]`).parent().parent().attr('id');
-
-      for (let w in NH_vocab[p][t]) {
-        words[w] = NH_vocab[p][t][w].image;
+      for (let word in NH_vocab[p][theme]) {
+        let addme = NH_vocab[p][theme][word];
+        addme["name"] = word;
+        window.deck.push(addme);
         $("#list").append(`
           <div class="alert-primary rounded-3 mb-1 me-1 ps-1 d-flex justify-content-between">
-            <div>${w}</div>
-            <div id="${w}" class="list btn btn-close" style="font-size:10px;"></div>
+            <div>${word}</div>
+            <div id="${word}" class="list btn btn-close" style="font-size:10px;"></div>
           </div>
         `);
       }
@@ -79,14 +81,12 @@ $(function(){
 
     $(".list").on('click', function(){
       let word = $(this).attr('id');
-      delete words[word];
+      window.deck = window.deck.filter(e => e.name !== word);
       $(this).parent().remove();
-      $("#numOfItems").html(`&nbsp;(${Object.keys(words).length})`);
-      window.setName = JSON.stringify(words);
+      $("#numOfItems").html(`&nbsp;(${window.deck.length})`);
     });
 
-    $("#numOfItems").html(`&nbsp;(${Object.keys(words).length})`);
-    window.setName = JSON.stringify(words);
+    $("#numOfItems").html(`&nbsp;(${window.deck.length})`);
   }
 
 

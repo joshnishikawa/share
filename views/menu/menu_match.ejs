@@ -1,31 +1,29 @@
-<div class="rounded-3 border p-3 shadow d-flex">
+<div class="rounded-3 border p-1 shadow d-flex">
+  <i class="material-icons text-secondary" 
+    style="line-height:1.4rem;font-size:1.4rem;cursor:pointer;" 
+    data-bs-toggle="modal" data-bs-target="#match_modal">
+    info
+  </i>
   <strong class="text-primary h3">MATCH</strong>
 
-  <div class="d-flex justify-content-end w-100">
+  <form id="match" action="/match" method="GET" class="d-flex justify-content-end w-100">
+    <div class="d-flex" style="height:100%;">
+      <select class="form-control" name="backs">
+        <option value="" disabled selected>Card Backs</option>
+        <option value="colors">Colors</option>
+        <option value="numbers">Numbers</option>
+        <option value="colorsNumbers">Color & Num.</option>
+        <option value="colorsShapes">Color & Shape</option>
+        <option value="animals">Animals</option>
+        <option value="objects">Objects</option>
+      </select>
+      <input type="hidden" value="" name="deck">
+      <input type="hidden" value="" name="deckType">
 
-    <button class="btn btn-outline-secondary me-1" 
-            data-bs-toggle="modal" data-bs-target="#match_modal">
-      <i class="material-icons" style="line-height:1rem;vertical-align:middle;">info</i>
-    </button>
-
-    <form id="match" action="match" method="GET">
-      <div class="d-flex" style="height:100%;">
-        <select class="form-control" name="backs">
-          <option value="" disabled selected>Card Backs</option>
-          <option value="colors">Colors</option>
-          <option value="numbers">Numbers</option>
-          <option value="colorsNumbers">Color & Num.</option>
-          <option value="colorsShapes">Color & Shape</option>
-          <option value="animals">Animals</option>
-          <option value="objects">Objects</option>
-        </select>
-        <input type="hidden" value="" name="setName">
-        <input type="hidden" value="" name="deckType">
-        <button type="submit" class="btn btn-primary">Start</button>
-      </div>
-    </form>
+      <button type="submit" class="btn btn-primary">Start</button>
+    </div>
+  </form>
   
-  </div>
 </div>
 
 <%- include ("../modals/modal_match.ejs") %>
@@ -33,12 +31,12 @@
 <script>
 $(function(){
   $("#match").on('submit', (e)=>{
-    if (!window.setName || window.setName == '{}') {
+    if (!window.deck || window.deck.length == 0) {
       e.preventDefault();
       alert("<%- __('pleaseSelect') %>");
     }
     else {
-      $("#match input[name='setName']").val(window.setName);
+      $("#match input[name='deck']").val(JSON.stringify(window.deck));
       $("#match input[name='deckType']").val(window.deckType);
     }
   });

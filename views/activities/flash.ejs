@@ -42,29 +42,28 @@
 </style>
 
 <body>
-<a href="/teachers" class="btn btn-sm btn-outline-secondary py-0">
-  <i class="material-icons">close</i>
-</a>
+<div class="d-flex">
 
-<button class="btn btn-sm btn-outline-secondary p-0" data-bs-toggle="modal" data-bs-target="#flash_modal">
-  <i class="material-icons">info</i>
-</button>
+  <a id="home" href="/teachers" class="btn btn-sm btn-outline-secondary py-0 me-1">
+    <i class="material-icons">home</i>
+  </a>
 
-<button id="review" class="btn btn-sm btn-outline-success" style="display:none;"></button>
+  <button class="btn btn-sm btn-outline-secondary p-0 me-3" data-bs-toggle="modal" data-bs-target="#flash_modal">
+    <i class="material-icons">info</i>
+  </button>
 
-<form id="flashForm" action="flash" method="GET" class="d-none">
-  <input type="hidden" value="" name="setName">
-  <input type="hidden" value="" name="deckType">
-  <input type="hidden" value="" name="order">
-  <input type="hidden" value="" name="showtext">
-</form>
+  <button id="review" class="btn btn-sm btn-outline-success mx-3" style="display:none;"></button>
 
-<input type="checkbox" id="shuffle" class="ms-2">
-<label for="shuffle">Shuffle</label>
+  <div class="form-check mx-3">
+    <input type="checkbox" id="shuffle" class="form-check-input">
+    <label for="shuffle" class="form-check-label">Shuffle</label>
+  </div>
 
-<input type="checkbox" id="showtext" class="ms-2">
-<label for="showtext">Text</label>
-
+  <div class="form-check mx-3">
+    <input type="checkbox" id="showtext" class="form-check-input">
+    <label for="showtext" class="form-check-label">Text</label>
+  </div>
+</div>
 
 <div id="content" style="height:100vh;width:100%;">
   <div id="flash" class="text-center p-4" style="height:75%;width:100%;"></div>
@@ -75,39 +74,55 @@
 
 <script>
 $(function(){
-  var url = window.location.href;
-  const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
-  const setName = searchParams.get('setName');
-  const deckType = searchParams.get('deckType');
-  var deck = getDeck({setName, deckType});
-  var originalDeck = deck;
-  var deckLength = originalDeck.length;
+  const deckType = '<%- deckType %>';
+  $("#home").attr('href', `/teachers/${deckType}`);
+
+  const params = JSON.parse(<%- JSON.stringify(params) %>);
+  var order = params.order;
+  const originalDeck = JSON.parse(params.deck);
+  var isNum = originalDeck[0].name.match(/^\d+$/);
+  var text = (params.text == "true"); // convert string to boolean
+  $("#showtext").prop('checked', text);
+
+  var deck = originalDeck.slice();
+  var deckLength = deck.length;
   var review = [];
   var card = 0;
   var reviewing = false;
 
-  const order = searchParams.get('order');
-
-  var isNum = setName.startsWith('_') || setName == "tens_teens"; // for sorting
-  if (order == "shuffled") {
-    $("#shuffle").prop('checked', true);
-    deck = FYshuffle(deck);
-  }
-  else if (order == "alphabetical"){
-    $("#shuffle").prop('checked', false);
-    if(isNum) deck.sort(function(a, b){
-      return a.name - b.name}); // sort numerically
+  function setOrder(){
+    if (order == "shuffle") {
+      $("#shuffle").prop('checked', true);
+      deck = FYshuffle(deck);
+    }
+    else if (order == "alphabetical"){
+      $("#shuffle").prop('checked', false);
+      if(isNum) deck.sort(function(a, b){
+        return a.name - b.name}); // sort numerically
+      else {
+        deck.sort(function(a, b){ // sort alphabetically
+          var nameA=a.name.toLowerCase(), nameB=b.name.toLowerCase();
+          if (nameA < nameB) return -1;
+          if (nameA > nameB) return 1;
+          return 0;
+        });
+      }
+    }
     else {
-      deck.sort(function(a, b){ // sort alphabetically
-        var nameA=a.name.toLowerCase(), nameB=b.name.toLowerCase();
-        if (nameA < nameB) return -1;
-        if (nameA > nameB) return 1;
-        return 0;
-      });
+      $("#shuffle").prop('checked', false);
     }
   }
-  else {
-    $("#shuffle").prop('checked', false);
+
+
+  function setText(){
+    if (text) {
+      $("#showtext").prop('checked', true);
+      $("#text").html( deck[card].name );
+    }
+    else {
+      $("#showtext").prop('checked', false);
+      $("#text").html("");
+    }
   }
 
 
@@ -130,24 +145,26 @@ $(function(){
       $("#flash").removeClass("review");
     }
     else{$("#flash").addClass("review")}
+    let content = deckType == 'text' ? deck[card].name 
+                : `<img src="${deck[card].image}" alt="${deck[card].name}">`;
 
-    $("#flash").html( deck[card].image );
+    $("#flash").html(content);
     if ( $("#showtext").prop('checked') ) $("#text").html( deck[card].name );
   }
 
 
-  $("#showtext").on('click', function(){
-    if ( $("#showtext").prop('checked') ) $("#text").html( deck[card].name );
-    else $("#text").html("");
+  $("#shuffle").on('click', function(){
+    if ( $("#shuffle").prop('checked') ) order = "shuffle";
+    else order = "alphabetical";
+    setOrder();
+    card = 0;
+    start();
   });
 
 
-  $("#shuffle").on('click', function(){
-    $("#flashForm input[name='setName']").val(setName);
-    $("#flashForm input[name='deckType']").val(deckType);
-    $("#flashForm input[name='order']").val( $(this).prop('checked') ? "shuffled" : "alphabetical");
-    $("#flashForm input[name='showtext']").val( $("#showtext").prop('checked') ? "true" : "false");
-    $("#flashForm").submit();
+  $("#showtext").on('click', function(){
+    text = $("#showtext").prop('checked');
+    setText();
   });
 
 
@@ -178,14 +195,19 @@ $(function(){
       case "ArrowRight":
         if (card < deck.length - 1) {
           card += 1;
-          $("#flash").html( deck[card].image );
+          let content = deckType == 'text' ? deck[card].name 
+                : `<img src="${deck[card].image}" alt="${deck[card].name}">`;
+
+          $("#flash").html(content);
           if ( $("#showtext").prop('checked') ) $("#text").html( deck[card].name );
         }
         break;
       case "ArrowLeft":
         if (card > 0 && deck.length > 0) {
           card -= 1;
-          $("#flash").html( deck[card].image );
+          let content = deckType == 'text' ? deck[card].name 
+                : `<img src="${deck[card].image}" alt="${deck[card].name}">`;
+          $("#flash").html(content);
           if ( $("#showtext").prop('checked') ) $("#text").html( deck[card].name );
         }
         break;
@@ -196,6 +218,8 @@ $(function(){
     start();
   });
 
+  setOrder();
+  setText();
   start();
 
 });

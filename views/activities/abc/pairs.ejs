@@ -50,14 +50,14 @@ $(function(){
   }
 
   $(".menu").on('click', function(){
-    var setName = $(this).data('value');
+    var deck = $(this).data('value');
     $("#buttons").removeClass('d-block').addClass('d-none');
     $("#grid").empty().removeClass('d-none').addClass('d-flex');
 
     var timer = 0;
     var deck = [];
 
-    switch (setName){
+    switch (deck){
       case 'ABC': 
         deck = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
                 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
@@ -110,16 +110,16 @@ $(function(){
             var time = (Date.now() - timer) / 1000;
             time = time.toFixed(2);
             // if there is a previous time, and this time is less, use this time
-            if (times[setName] && time < times[setName]) {
-              times[setName] = time;
+            if (times[deck] && time < times[deck]) {
+              times[deck] = time;
               localStorage.setItem('pairs', JSON.stringify(times));
-              $(`button[data-value="${setName}"] .time`).text(time);
+              $(`button[data-value="${deck}"] .time`).text(time);
             }
             // if there is no previous time, use this time
-            else if (!times[setName]) {
-              times[setName] = time;
+            else if (!times[deck]) {
+              times[deck] = time;
               localStorage.setItem('pairs', JSON.stringify(times));
-              $(`button[data-value="${setName}"] .time`).text(time);
+              $(`button[data-value="${deck}"] .time`).text(time);
             }
 
             $("#buttons").removeClass('d-none').addClass('d-block');
