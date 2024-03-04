@@ -60,6 +60,8 @@
 <script>
 $(function(){
   const deckType = '<%- deckType %>';
+  document.title = `Recall ${deckType}`;
+
   $("#home").attr('href', `/teachers/${deckType}`);
 
   const params = JSON.parse(<%- JSON.stringify(params) %>);
@@ -96,8 +98,10 @@ $(function(){
           <div class="flip border-primary border-5 rounded-3 m-3" style="height:80%;">
             <div class="flip-card shadow">
               <div class="flip-front bg-white rounded border display-1">
-                <img src="${i.image}" alt="${i.name}" class="rounded" 
-                   style="max-width:90%;max-height:90%;">
+                <img src="${i.image}" class="rounded" 
+                   style="max-width:90%;max-height:90%;
+                   alt="${i.name}" 
+                   onerror="altOnly(this)">
               </div>
               <div class="flip-back rounded border border-primary text-center alert-primary display-${fontsize}">
                 &nbsp;

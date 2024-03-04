@@ -53,6 +53,8 @@
 $(function(){
 // PREPARE THE DECK ////////////////////////////////////////////////////////////
   const deckType = '<%- deckType %>';
+  document.title = `Bingo ${deckType}`;
+
   $("#home").attr('href', `/teachers/${deckType}`);
 
   const params = JSON.parse(<%- JSON.stringify(params) %>);

@@ -15,7 +15,7 @@
     <i class="material-icons">home</i>
   </a>
 
-  <button class="btn btn-sm btn-outline-secondary p-0" data-bs-toggle="modal" data-bs-target="#wordle_modal">
+  <button class="btn btn-sm btn-outline-secondary p-0" data-bs-toggle="modal" data-bs-target="#spell_modal">
     <i class="material-icons">info</i>
   </button>
 
@@ -55,13 +55,15 @@
     </div>
   </div>
 
-<%- include ("../modals/modal_wordle.ejs") %>
+<%- include ("../modals/modal_spell.ejs") %>
 
 <script>
 $(function(){
 
 // PREPARE THE DECK ////////////////////////////////////////////////////////////
-const deckType = '<%- deckType %>';
+  const deckType = '<%- deckType %>';
+  document.title = `Spell ${deckType}`;
+
   const params = JSON.parse(<%- JSON.stringify(params) %>);
   var deck = JSON.parse(params.deck);
   deck = FYshuffle(deck);
@@ -177,8 +179,11 @@ const deckType = '<%- deckType %>';
 
     word = deck.pop();
     if (word){
-      $("#image").html(`<img src="${word.image}" alt="${word.name}" class="img-fluid" />`);
-
+      $("#image").html(`<img src="${word.image}" 
+                             class="img-fluid"
+                             alt="${word.name}" 
+                             onerror="altOnly(this)">`);
+                             
       for (let l = 0; l < word.name.length; l++){
         let wordwrap = [' ', '-'].includes( word.name[l] ) ? true : false;
 

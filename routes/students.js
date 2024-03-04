@@ -49,7 +49,18 @@ router.get('/speech', (req, res)=>{
 
 router.get('/richtext', (req, res)=>{ 
   try{
-    res.render('activities/richtext');
+    res.render('tools/richtext');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
+
+router.get('/names', (req, res)=>{ 
+  try{
+    res.render('tools/names');
   }
   catch(err){
     res.send(err);
@@ -64,7 +75,7 @@ router.get('/brainbox', (req, res)=>{
 
     fs.readdir( path.join(__dirname, '../public/image/brainbox'), (err, brainbox)=>{
       if (err) throw err;
-      res.render('activities/brainbox', {brainbox, selected});
+      res.render('tools/brainbox', {brainbox, selected});
     });
   }
   catch(err){ console.error(err); }
@@ -128,7 +139,7 @@ router.get('/:activity/:id', async (req, res)=>{
 
 
 function valid(activity, params){
-  if ( !["bingo", "flash", "grid", "match", "recall", "reveal", "type", "wordle"].includes(activity)) return false;
+  if ( !["bingo", "flash", "grid", "match", "recall", "reveal", "type", "spell"].includes(activity)) return false;
   if ( !["images", "text", "LT", "NH"].includes(params.deckType) ) return false;
   if ( !params.deck ) return false;
   try{

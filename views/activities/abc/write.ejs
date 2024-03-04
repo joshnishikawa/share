@@ -3,7 +3,7 @@
 
   <div class="d-flex">
     <a href="/abc" class="btn btn-sm btn-outline-secondary py-0">
-      <i class="material-icons">close</i>
+      <i class="material-icons">home</i>
     </a>
   </div>
 
@@ -43,13 +43,22 @@ $(function(){
 
   $(".lc").on("click", function(){
     let letter = $(this).text();
-    $("#penmanship").html(`<div class="write shadow"><img src="/image/abc/${letter}.gif" class="img-fluid" alt="${letter}"></div>`);
+    $("#penmanship").html(`<div class="write shadow">
+                            <img src="/image/abc/${letter}.gif" 
+                            class="img-fluid" 
+                            alt="${letter}"
+                            onerror="altOnly(this)"></div>`);
     // $("#pronunciation").html(`<img src="/image/abc/${sounds[letter]}.png" class="img-fluid" alt="${letter}">`)
   });
 
   $(document).on("keydown", function(e){
     if (letters.includes(e.key)){
-      $("#penmanship").html(`<div class="write shadow"><img src="/image/abc/${e.key}.gif" class="img-fluid" alt="${e.key}"></div>`);
+      $("#penmanship").html(`<div class="write shadow">
+                              <img src="/image/abc/${e.key}.gif" 
+                                   class="img-fluid" 
+                                   alt="${e.key}"
+                                   onerror="altOnly(this)">
+                              </div>`);
     }
     else if (e.key == "Backspace"){
       $("#penmanship").empty();

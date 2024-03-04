@@ -1,11 +1,5 @@
 <%- include('../head'); -%>
 <style>
-  .helper {
-    display: inline-block;
-    height: 100%;
-    vertical-align: middle;
-  }
-
   @media print {
     #menucontainer, #print {
       display: none;
@@ -65,12 +59,14 @@
 <script>
 $(function(){
   const deckType = '<%- deckType %>';
+
   $("#home").attr('href', `/teachers/${deckType}`);
 
   const params = JSON.parse(<%- JSON.stringify(params) %>);
   var deck = JSON.parse(params.deck);
   var spaces = params.spaces;
   $("#numCards").val(spaces);
+  document.title = `Grid ${spaces} ${deckType}`;
   var text = (params.text == "true"); // convert string to boolean
   $("#showtext").prop('checked', text);
 
@@ -110,7 +106,8 @@ $(function(){
             style="position:relative;width:${colspan}vw;height:${colspan}vw;">
           <img src="${workingdeck[i].image}" alt="${workingdeck[i].name}" 
                class="img-fluid position-absolute top-50 translate-middle" 
-               style="max-height:75%;max-width:75%;">
+               style="max-height:75%;max-width:75%;"
+               onerror="altOnly(this)">
 
           <div class="txt text-center UD w-100 position-absolute bottom-0 mb-1" 
               style="text-stroke: 3px white;-webkit-text-stroke: 3px #fff;display:none;">

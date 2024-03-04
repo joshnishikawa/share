@@ -1,3 +1,5 @@
+altOnly = (img)=>{$(img).replaceWith(img.alt);}
+
 getCookieObject = ()=>{
   let cookie = document.cookie;
   let cookieObject = {};
@@ -10,62 +12,6 @@ getCookieObject = ()=>{
     }
   }
   return cookieObject;
-}
-
-
-getDeck = (data)=>{
-  let deckType = data.deckType;
-  let setName = data.deck;
-  let backs = data.backs;
-  let deck = [];
-  let list = [];
-
-  // We need an array of objects. Objects have info and arrays can be shuffled.
-  switch (deckType){
-    case 'text':
-      if ( setName.startsWith('_') ){
-        let vals = setName.split('_');
-        let from = parseInt(vals[1]);
-        let to = parseInt(vals[2]);
-        for (let i=from; i<=to; i++){
-          deck.push({name: i.toString(), image: `<div style="z-index:-1;">${i}</div>`});
-        }
-      }
-      else {
-        list = setName == "lower_case_mix" && backs == "animals" ? text_decks["lower_case_mix"].slice(0, 10) 
-              : setName == "lower_case_mix" && backs == "objects" ? text_decks["lower_case_mix"].slice(10, 20)
-              : text_decks[deck];
-        for (let i of list){
-          deck.push({name: i, image: `<div style="position:absolute;z-index:-1;">${i}</div>`});
-        }
-      }
-      break;
-
-    case 'LT' :
-      list = JSON.parse(setName); // {"vocab word": "file name", "other word": "other file name"}
-      for (let i in list){
-        deck.push({name: i, image: `<img src="/image/LT/${list[i]}" alt="${i}">`});
-      }
-      break;
-
-    case 'NH' :
-      list = JSON.parse(setName); // {"vocab word": "file name", "other word": "other file name"}
-      for (let i in list){
-        deck.push({name: i, image: `<img src="/image/NH/${list[i]}" alt="${i}">`});
-      }
-      break;
-
-    case 'images':
-      list = JSON.parse(setName);
-      for (let i of list){
-        deck.push({name: i.replace(/_/g, ' '), image: `<img src="/image/svg/${i}.svg" alt="${i}">`});
-      }
-      break;
-
-    default:
-      throw new Error("Invalid deck type");
-  }
-  return deck;
 }
 
 
@@ -86,6 +32,7 @@ FYshuffle = (myArray) => {
   }
   return myArray;
 }
+
 
 // apply the exact same shuffle to two arrays of the same length (in place)
 parallelShuffle = (a, b)=>{

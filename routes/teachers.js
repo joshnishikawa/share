@@ -111,47 +111,50 @@ router.get('/yearinreview', (req, res)=>{
 });
 
 
+
 // replace deprecated links and reroute
 router.get('/:activity', async(req, res)=>{
   try{
-    if (!["bingo", "brainbox", "flash", "grid", "match", "recall", "reveal", "richtext", "type", "wordle"].includes(req.params.activity)) res.render('404');
+    if (["bingo", "flash", "grid", "match", "recall", "reveal", 
+         "type", "spell"].includes(req.params.activity)) {
 
-    let activity = req.params.activity;
-    let params = req.query;
-    let deckType = params.deckType;
-    delete params.deckType;
+      let activity = req.params.activity;
+      let params = req.query;
+      let deckType = params.deckType;
+      delete params.deckType;
 
-    if (params.setName){ // Create row for deprecated link. Return new link.
-      var setName = params.setName;
-      delete params.setName;
-      var parseme;
-      var deck = [];
+      if (params.setName){ // Create row for deprecated link. Return new link.
+        var setName = params.setName;
+        delete params.setName;
+        var parseme;
+        var deck = [];
 
-      if (setName.startsWith('{')){ // it's either from NH or LT
-        parseme = JSON.parse(setName);
-        for (var key in parseme){
-          deck.push({name: key, image: `/image/${deckType}/${parseme[key]}`});
+        if (setName.startsWith('{')){ // it's either from NH or LT
+          parseme = JSON.parse(setName);
+          for (var key in parseme){
+            deck.push({name: key, image: `/image/${deckType}/${parseme[key]}`});
+          }
+          params["deck"] = JSON.stringify(deck);
         }
-        params["deck"] = JSON.stringify(deck);
-      }
 
-      else if (setName.startsWith('[')){ // it's an array of images
-        parseme = JSON.parse(setName);
-        for (let key of parseme){
-          deck.push({name: key, image: `/image/svg/${key}.svg`});
+        else if (setName.startsWith('[')){ // it's an array of images
+          parseme = JSON.parse(setName);
+          for (let key of parseme){
+            deck.push({name: key, image: `/image/svg/${key}.svg`});
+          }
+          params["deck"] = JSON.stringify(deck);
         }
-        params["deck"] = JSON.stringify(deck);
-      }
 
-      else { // it's actually the name of a set from the text menu
-        params["deck"] = text_decks[setName]; //FIXME: Deprecate this in 2025
-      }
+        else { // it's actually the name of a set from the text menu
+          params["deck"] = text_decks[setName]; //FIXME: Deprecate this in 2025
+        }
 
-      let link = await addLinktoDB({deckType, activity, params});
-      res.redirect(`/${activity}/${link}?deprecated=true`);
-    }
-    else {
-      res.render('404');
+        let link = await addLinktoDB({deckType, activity, params});
+        res.redirect(`/${activity}/${link}?deprecated=true`);
+      }
+      else {
+        res.render('404');
+      }
     }
   }
   catch (err){
@@ -170,9 +173,9 @@ async function addLinktoDB({deckType, activity, params}){
 
   if (rows.length != 0) return rows[0].id
   else {
-    let newrow = await db.query(`INSERT INTO links (deckType, activity, params) 
-                                 VALUES (?, ?, ?)`, 
-                                [deckType, activity, JSON.stringify(params)]);
+    let newrow = await db.query(`INSERT INTO links (deckType, activity, params, updated) 
+                                 VALUES (?, ?, ?, ?)`, 
+                                [deckType, activity, JSON.stringify(params), 1]);
     return newrow[0].insertId;
   }
 }

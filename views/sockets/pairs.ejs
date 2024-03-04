@@ -42,7 +42,11 @@ $(function(){
 
   // add images to #images and words to words
   for (let i=0; i<set.length; i++) {
-    let img = `<img src="/image/${type}/${set[i].image}" alt="${set[i].word}" class="img-fluid thumb">`;
+    let img = `<img src="/image/${type}/${set[i].image}" 
+                    class="img-fluid thumb"
+                    alt="${set[i].word}" 
+                    onerror="altOnly(this)">`;
+
     $("#images").append(img);
     // add click event to each image
     $(`#images img[alt="${set[i].word}"]`).on('click', ()=>{

@@ -1,0 +1,107 @@
+<%- include('../head'); -%>
+<style>
+  @media print {
+    #menucontainer, #list {
+      display: none;
+    }
+
+    html, body, #sheet {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body, #sheet{ /* Why are there extra page breaks without this stinking border? */
+      border: 1px solid white;
+    }
+
+    #sheet {
+      visibility: visible !important;
+      font-size: 270px;
+      line-height: 240px;
+      width: 273mm;
+      /* center horizontally */
+      margin-left: auto;
+      margin-right: auto;
+      padding: 0;
+    }
+  }
+
+  body{
+    background-image: none !important;
+  }
+</style>
+
+
+<body>
+  <div id="menucontainer"><!-- to hide the entire menu when printing -->
+    <div id="menu" class="d-flex">
+      <a id="home" href="teachers/tools" class="btn btn-sm btn-outline-secondary py-0 me-1">
+        <i class="material-icons">home</i>
+      </a>
+
+      <button class="btn btn-sm btn-outline-secondary p-0 me-3" data-bs-toggle="modal" data-bs-target="#names_modal">
+        <i class="material-icons">info</i>
+      </button>
+
+      <button id="print" class="btn btn-sm btn-outline-success py-0 mx-3">
+        <i class="material-icons">print</i>
+      </button>
+
+    </div>
+  </div>
+  
+  <!-- Haruto, Miyu, Yoshifumi, Ai, Katsunobu, Ryuji, Wakana, Jyo, Joichiro, Megumi -->
+  <div id="list" class="p-5">
+    <textarea class="form-control p-5 alert-secondary" placeholder="Add comma-separated names here."></textarea>
+  </div>
+
+  <div id="sheet" class="sheet d-flex flex-wrap UD text-center" style="visibility:hidden;"></div>
+
+  <%- include ("../modals/modal_names.ejs") %>
+
+<script>
+$(function(){
+  let names = [];
+
+  $("#list").on('input', ()=>{
+    $("#sheet").empty();
+    names = $("#list textarea").val().split(',');
+    for (let i in names) {
+      names[i] = names[i].trim();
+      $("#sheet").append(`
+        <div class="tag w-50 border" style="min-height:20%">
+          <div class="name"><span>${names[i]}</span></div>
+        </div>
+      `);
+    }
+  });
+
+
+  var mediaQueryList = window.matchMedia('print');
+  mediaQueryList.addListener(function(mql) {
+    if (mql.matches) {
+      // The user is starting to print or is opening the print preview
+      $(".name span").each(function(){
+        let namewidth = $(this).width();
+        let tagwidth = $(this).parent().width();
+        let ratio = tagwidth < namewidth ? tagwidth / namewidth : 1;
+        $(this).parent().css({"transform": `scaleX(${ratio})`, "transform-origin": "left"});
+      });
+    } else {
+      // The user has finished printing or has closed the print preview
+      $(".name span").each(function(){
+        $(this).parent().css({"transform": `scaleX(1)`, "transform-origin": "left"});
+      });
+    }
+  });
+
+  $("#print").on('click', ()=>{
+    window.print();
+  });
+
+});
+
+</script>
+  
+<%- include('../foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->

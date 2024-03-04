@@ -61,6 +61,8 @@
   var deck = JSON.parse(params.deck);
   var backs = params.backs;
 
+  document.title = `Match ${backs} ${deckType}`;
+
   let max_num_of_cards = {
     'colors': 20,
     'colorsNumbers': 40,
@@ -152,7 +154,8 @@
       for (let i = 0; i < deck.length; i++){
         backContent.push(`<img style="max-width:70%;max-height:70%;" 
                                src="/image/svg/${text_decks.animals[i]}.svg" 
-                               alt="${text_decks.animals[i]}">`);
+                               alt="${text_decks.animals[i]}"
+                               onerror="altOnly(this)">`);
         backClass.push('alert-primary');
       }
 
@@ -163,7 +166,8 @@
       for (let i = 0; i < deck.length; i++){
         backContent.push(`<img style="max-width:70%;max-height:70%;" 
                                src="/image/svg/${text_decks.objects[i]}.svg" 
-                               alt="${text_decks.animals[i]}">`);
+                               alt="${text_decks.animals[i]}"
+                               onerror="altOnly(this)">`);
         backClass.push('alert-primary');
       }
 

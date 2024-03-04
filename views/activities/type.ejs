@@ -76,6 +76,8 @@
 <script>
 $(function(){
   const deckType = '<%- deckType %>';
+  document.title = `Type ${deckType}`;
+
   const params = JSON.parse(<%- JSON.stringify(params) %>);
   var deck = JSON.parse(params.deck);
 
@@ -152,7 +154,10 @@ $(function(){
     if (word){
       $("#remaining").html(`<span class="display-3">${deck.length}</span><br/>words left`);
 
-      if (deckType != 'text') $("#image").html(`<img src="${word.image}" alt="${word.name}" class="img-fluid" />`);
+      if (deckType != 'text') $("#image").html(`<img src="${word.image}" 
+                                                 class="img-fluid"
+                                                 alt="${word.name}" 
+                                                 onerror="altOnly(this)">`);
       else $("#image").html('');
 
       $("#display").html(`<div class="display-1">${word.name}</div>`);

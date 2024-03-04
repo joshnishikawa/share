@@ -52,8 +52,6 @@
     <i class="material-icons">info</i>
   </button>
 
-  <button id="review" class="btn btn-sm btn-outline-success mx-3" style="display:none;"></button>
-
   <div class="form-check mx-3">
     <input type="checkbox" id="shuffle" class="form-check-input">
     <label for="shuffle" class="form-check-label">Shuffle</label>
@@ -65,9 +63,14 @@
   </div>
 </div>
 
-<div id="content" style="height:100vh;width:100%;">
-  <div id="flash" class="text-center p-4" style="height:75%;width:100%;"></div>
-  <div id="text" class="text-center display-1 UD" style="height:20%;width:100%;"></div>
+<div id="content" style="position:relative;height:100vh;width:100%;">
+  <button id="review" class="btn btn-sm btn-outline-success sticky-top" style="position:absolute;display:none;"></button>
+
+  <div style="height:100%;position:relative;">
+    <div id="flash" class="text-center p-4" style="height:75%;width:100%;"></div>
+    <div id="text" class="text-center display-1 UD" style="height:20%;width:100%;"></div>
+  </div>
+
 </div> 
 
 <%- include ("../modals/modal_flash.ejs") %>
@@ -75,6 +78,8 @@
 <script>
 $(function(){
   const deckType = '<%- deckType %>';
+  document.title = `Flash ${deckType}`;
+
   $("#home").attr('href', `/teachers/${deckType}`);
 
   const params = JSON.parse(<%- JSON.stringify(params) %>);
@@ -146,7 +151,9 @@ $(function(){
     }
     else{$("#flash").addClass("review")}
     let content = deckType == 'text' ? deck[card].name 
-                : `<img src="${deck[card].image}" alt="${deck[card].name}">`;
+                : `<img src="${deck[card].image}" 
+                        alt="${deck[card].name}"
+                        onerror="altOnly(this)" >`;
 
     $("#flash").html(content);
     if ( $("#showtext").prop('checked') ) $("#text").html( deck[card].name );
@@ -169,7 +176,7 @@ $(function(){
 
 
   $(document).on('keydown', (e)=>{
-    if (e.key == "ArrowDown") e.preventDefault();
+    if (e.key == "ArrowDown" || e.key == "ArrowUp") e.preventDefault();
   });
 
 
@@ -196,7 +203,9 @@ $(function(){
         if (card < deck.length - 1) {
           card += 1;
           let content = deckType == 'text' ? deck[card].name 
-                : `<img src="${deck[card].image}" alt="${deck[card].name}">`;
+                : `<img src="${deck[card].image}" 
+                        alt="${deck[card].name}"
+                        onerror="altOnly(this)">`;
 
           $("#flash").html(content);
           if ( $("#showtext").prop('checked') ) $("#text").html( deck[card].name );
@@ -206,7 +215,9 @@ $(function(){
         if (card > 0 && deck.length > 0) {
           card -= 1;
           let content = deckType == 'text' ? deck[card].name 
-                : `<img src="${deck[card].image}" alt="${deck[card].name}">`;
+                : `<img src="${deck[card].image}" 
+                    alt="${deck[card].name}"
+                    onerror="altOnly(this)">`;
           $("#flash").html(content);
           if ( $("#showtext").prop('checked') ) $("#text").html( deck[card].name );
         }
