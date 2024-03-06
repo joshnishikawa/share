@@ -11,7 +11,7 @@
 </style>
 
 <body>
-  <a href="/" class="btn btn-sm btn-outline-secondary py-0">
+  <a id="home" href="/" class="btn btn-sm btn-outline-secondary py-0">
     <i class="material-icons">home</i>
   </a>
 
@@ -19,9 +19,33 @@
     <i class="material-icons">info</i>
   </button>
 
-  
-  <div id="content" class="container g-0" style="min-height:100vh;">
-  
+
+  <div id="info" class="container">
+    <div class="row pb-5">
+
+      <div class="col text-center">
+        <div class="display-1 UD">
+          <%- __('activity.spell.title') %>
+        </div>
+        <%- __('activity.spell.1') %>
+      </div>
+
+    </div>
+    <div class="row text-center">
+
+      <div id="result" class="col" style="display:none;"></div>
+      <div id="controls" class="col d-flex justify-content-center">
+        <div class="d-flex align-items-center">
+          <button id="start" aria-label="next" class="btn btn-lg btn-success ms-3" autofocus>
+            START
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="content" class="container g-0" style="display:none;">
     <div class="row g-0">
 
       <!-- answer -->
@@ -31,7 +55,7 @@
           <div id="answer" class="d-flex flex-wrap justify-content-center">
             <!-- populated dynamically by resetAnswer() -->
           </div>
-          <button id="start" aria-label="next" class="btn btn-lg btn-success" style="display:none;">
+          <button id="next" aria-label="next" class="btn btn-lg btn-success" style="display:none;">
             <i class="material-icons">arrow_forward</i>
           </button>
         </div>
@@ -63,13 +87,22 @@ $(function(){
 // PREPARE THE DECK ////////////////////////////////////////////////////////////
   const deckType = '<%- deckType %>';
   document.title = `Spell ${deckType}`;
+  $("#home").attr('href', `/NH`); // FIXME: This needs to be dynamic
 
   const params = JSON.parse(<%- JSON.stringify(params) %>);
-  var deck = JSON.parse(params.deck);
-  deck = FYshuffle(deck);
+  const originalDeck = JSON.parse(params.deck);
+  var deck = originalDeck.slice();
+
+  var review = [];
   var place = 0;
   var guess = '';
-  var correct = true; // just to get things started
+  var misses = 0;
+  var score = 0;
+  var totalLetters = 0;
+  var totalwords = 0;
+  var finished = true;
+  var correct = true;
+  var firstTry = true;
 
   const letters = ["q","w","e","r","t","y","u","i","o","p",
                   "a","s","d","f","g","h","j","k","l",
@@ -78,6 +111,42 @@ $(function(){
                   "Q","W","E","R","T","Y","U","I","O","P",
                   "A","S","D","F","G","H","J","K","L",
                   "Z","X","C","V","B","N","M"];
+
+  start = () =>{
+    finished = false;
+    score = 0;
+    misses = 0;
+    totalLetters = 0;
+
+    let reviewing = review.length > 0;
+    if (reviewing){
+      deck = review.slice();
+      review = [];
+    }
+    else deck = originalDeck.slice();
+
+    totalwords = deck.length;
+
+    // get total number of letters of all values of 'name' properties
+    totalLetters = deck.reduce((acc, val) => acc + val.name.length, 0);
+
+    deck = FYshuffle(deck);
+    resetAnswer();
+    $("#info").hide();
+    $("#content").show();
+  }
+
+  showResults = ()=>{
+    let missedwords = review.map( w => w.name ).join(', ');
+    $("#result").html(`
+      <div class="fs-1">Words Mastered : ${score}/${totalwords}</div><hr/>
+      <div class="fs-3">Mistakes : ${misses}</div>
+      <div class="fs-5">Accuracy : ${Math.round(100 * totalLetters / (totalLetters + misses)) || 100}%</div>
+      <div class="fs-5">Missed: <span class="text-danger">${missedwords}</span></div>`).show();
+    $("#content").hide();
+    $("#info").show();
+    $("#start").focus();
+  }
 
   // input handlers
   inputLetter = (letter)=>{
@@ -113,8 +182,13 @@ $(function(){
       }
       $("#guess").html('');
       $("#answer").html(`<div class="btn btn-primary" style="font-size:5em;">${guess}</div>`);
-      $("#start").show().focus();
+      $("#next").show().focus();
+
       correct = true;
+
+      if (firstTry) score++;
+      else review.push(word);
+      firstTry = true;
     }
     else {
       $("#guess").html(`<div class="word d-flex"></div>`);
@@ -122,7 +196,7 @@ $(function(){
 
       for(let i = 0; i < word.name.length; i++){
         let wordwrap = [' ', '-'].includes( word.name[i] ) ? true : false;
-        let l = guess[i] == '.' ? 'period' : guess[i] == ' ' ? '_' : guess[i];      // for data-value
+        let l = guess[i] == '.' ? 'period' : guess[i] == ' ' ? '_' : guess[i]; // for data-value
         let d = guess[i] == ' ' ? '&nbsp;' : guess[i]; // for display
 
         if(guess[i] === word.name[i]){
@@ -139,6 +213,7 @@ $(function(){
           $(`[data-value=${l}]`).addClass('bg-warning text-body');
         }
         else{
+          misses++;
           remaining.push(word.name[i]);
           $("#guess .word:last-child").append(`<div class="btn btn-lg bg-secondary text-white" 
                                   style="font-size:2em; width:60px;">${d}</div>`);
@@ -165,6 +240,7 @@ $(function(){
 
       guess = '';
       place = 0;
+      firstTry = false;
       $(".place").text('_');
     }
   }
@@ -196,20 +272,20 @@ $(function(){
 
       $("#answer").show();
 
-      $("#start").hide();
+      $("#next").hide();
       $(".letter").removeClass('bg-primary bg-warning bg-secondary text-white');
     } 
     else {
-      $("#content").html('<div id="alldone">All done!</div>');
+      finished = true;
+      showResults();
     }
   }
 
-  resetAnswer();
 
 
   // set or reset everything
   $("#start").on('click', ()=>{
-    resetAnswer();
+    start();
   });
 
 
@@ -230,11 +306,9 @@ $(function(){
     }
     else if(e.key == 'Enter'){
       e.preventDefault();
-      if(correct){
-        resetAnswer();
-      }else if (place === word.name.length){
-        submitAnswer();
-      }
+      if (finished) start();
+      else if(correct) resetAnswer();
+      else if (place === word.name.length) submitAnswer();
     }
   });
 

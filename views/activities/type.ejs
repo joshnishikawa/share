@@ -11,13 +11,14 @@
 </style>
 
 <body>
-  <a href="/" class="btn btn-sm btn-outline-secondary py-0">
+  <a id="home" href="/" class="btn btn-sm btn-outline-secondary py-0">
     <i class="material-icons">home</i>
   </a>
 
   <button class="btn btn-sm btn-outline-secondary p-0" data-bs-toggle="modal" data-bs-target="#type_modal">
     <i class="material-icons">info</i>
   </button>
+
 
   <div id="info" class="container">
     <div class="row pb-5">
@@ -44,7 +45,7 @@
             <option value="240">4 minutes</option>
             <option value="300">5 minutes</option>
           </select>
-          <button id="start" aria-label="next" class="btn btn-lg btn-success ms-3">
+          <button id="start" aria-label="next" class="btn btn-lg btn-success ms-3" autofocus>
             START
           </button>
         </div>
@@ -77,11 +78,12 @@
 $(function(){
   const deckType = '<%- deckType %>';
   document.title = `Type ${deckType}`;
-
-  const params = JSON.parse(<%- JSON.stringify(params) %>);
-  var deck = JSON.parse(params.deck);
+  $("#home").attr('href', `/NH`); // FIXME: This needs to be dynamic
 
   // PREPARE THE DECK //////////////////////////////////////////////////////////
+  const params = JSON.parse(<%- JSON.stringify(params) %>);
+  const originalDeck = JSON.parse(params.deck);
+  var deck = originalDeck.slice();
   let timeLimit = 0; // seconds
   var finished = false;
   var starttime = 0;
@@ -91,7 +93,7 @@ $(function(){
 
   const letters = ["q","w","e","r","t","y","u","i","o","p",
                   "a","s","d","f","g","h","j","k","l",
-                  "z","x","c","v","b","n","m", "-","'",".",
+                  "z","x","c","v","b","n","m","-","'",".",
                   " ",
                   "Q","W","E","R","T","Y","U","I","O","P",
                   "A","S","D","F","G","H","J","K","L",
@@ -104,14 +106,14 @@ $(function(){
     score = 0;
     misses = 0;
     totalLetters = 0;
-
+    
+    deck = originalDeck.slice();
     FYshuffle(deck);
     resetAnswer();
     requestAnimationFrame(updateAnimation);
     $("#info").hide();
     $("#content").show();
   }
-
 
   showResults = ()=>{
     let elapsedTime = Math.round( (new Date() - starttime) / 1000 );
@@ -124,12 +126,14 @@ $(function(){
       <div class="fs-5">Speed : ${wpm} wpm</div>`).show();
     $("#content").hide();
     $("#info").show();
+    $("#start").focus();
   }
 
 
   updateAnimation = ()=> {
     if (!finished && new Date() - starttime < timeLimit * 1000) {
-      $("#timer").html(`<span class="display-3">${(timeLimit - Math.floor((new Date() - starttime) / 1000)).toString()}</span><br/>seconds left`);
+      let time = timeLimit - Math.floor((new Date() - starttime) / 1000).toString();
+      $("#timer").html(`<span class="display-3">${time}</span><br/>seconds left`);
       requestAnimationFrame(updateAnimation); // Keep the animation going
     } 
     else {
@@ -155,9 +159,9 @@ $(function(){
       $("#remaining").html(`<span class="display-3">${deck.length}</span><br/>words left`);
 
       if (deckType != 'text') $("#image").html(`<img src="${word.image}" 
-                                                 class="img-fluid"
-                                                 alt="${word.name}" 
-                                                 onerror="altOnly(this)">`);
+                                                     class="img-fluid"
+                                                     alt="${word.name}" 
+                                                     onerror="altOnly(this)">`);
       else $("#image").html('');
 
       $("#display").html(`<div class="display-1">${word.name}</div>`);
@@ -233,10 +237,6 @@ $(function(){
     }
     else if(e.key == 'Backspace'){
       backspace();
-    }
-    else if(e.key == 'Enter'){
-      e.preventDefault();
-      if (finished) start();
     }
   });
 

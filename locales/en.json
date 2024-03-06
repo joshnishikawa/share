@@ -59,7 +59,7 @@
 		},
 		"haystack": {
 			"title": "Haystack",
-			"description": "Choose a letter. Then click on all of the same letters. How fast can you find all six?"
+			"description": "Choose a letter. Then click on all of the same letter. How fast can you find all six?"
 		},
 		"sequence": {
 			"title": "Sequence",
@@ -72,7 +72,8 @@
 			"4": "You got it! Now hit the green arrow or <kbd>Enter</kbd> to continue.",
 			"blue": "Great! This is the correct letter for this position.",
 			"yellow": "This letter is needed, but not in this position.",
-			"gray": "This letter is <strong>not</strong> needed in the word."
+			"gray": "This letter is <strong>not</strong> needed in the word.",
+			"title": "Spell"
 		},
 		"type": {
 			"1": "Read the word displayed and type it as accurately as you can. How many words can you type?",
@@ -89,7 +90,7 @@
 		"students": {
 			"1": "These are some activities you can use to practice any time.",
 			"2": "Open the <strong>ABC</strong> tab for some activities that can help you learn the alphabet.",
-			"3": "Open the <strong>New Horizons</strong> tab for some activities to practice vocabulary from your Picture Dicionary.",
+			"3": "Open the <strong>New Horizon</strong> tab for some activities to practice vocabulary from your Picture Dictionary.",
 			"title": "Information"
 		}
 	},

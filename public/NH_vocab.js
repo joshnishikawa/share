@@ -1609,7 +1609,7 @@ const NH_vocab = {
   "family": {
     "family": {
       "meaning": "",
-      "image": "/image/NH/",
+      "image": "/image/NH/family_family.gif",
       "audio": "/audio/words/family.mp3"
     },
     "grandfather": {
