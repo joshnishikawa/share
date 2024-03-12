@@ -195,52 +195,52 @@ const LT_vocab = {
   // red, orange, yellow, green, blue, purple, pink, brown, black, white
   "red": {
     "meaning": "あか",
-    "image": "/image/LT/color_red.jpg",
+    "image": "/image/NH/colors_red.gif",
     "audio": "/audio/words/red.mp3"
   },
   "orange": {
     "meaning": "オレンジ",
-    "image": "/image/LT/color_orange.jpg",
+    "image": "/image/NH/colors_orange.gif",
     "audio": "/audio/words/orange.mp3"
   },
   "yellow": {
     "meaning": "きいろ",
-    "image": "/image/LT/color_yellow.jpg",
+    "image": "/image/NH/colors_yellow.gif",
     "audio": "/audio/words/yellow.mp3"
   },
   "green": {
     "meaning": "みどり",
-    "image": "/image/LT/color_green.jpg",
+    "image": "/image/NH/colors_green.gif",
     "audio": "/audio/words/green.mp3"
   },
   "blue": {
     "meaning": "あお",
-    "image": "/image/LT/color_blue.jpg",
+    "image": "/image/NH/colors_blue.gif",
     "audio": "/audio/words/blue.mp3"
   },
   "purple": {
     "meaning": "むらさき",
-    "image": "/image/LT/color_purple.jpg",
+    "image": "/image/NH/colors_purple.gif",
     "audio": "/audio/words/purple.mp3"
   },
   "pink": {
     "meaning": "ピンク",
-    "image": "/image/LT/color_pink.jpg",
+    "image": "/image/NH/colors_pink.gif",
     "audio": "/audio/words/pink.mp3"
   },
   "brown": {
     "meaning": "ちゃいろ",
-    "image": "/image/LT/color_brown.jpg",
+    "image": "/image/NH/colors_brown.gif",
     "audio": "/audio/words/brown.mp3"
   },
   "black": {
     "meaning": "くろ",
-    "image": "/image/LT/color_black.jpg",
+    "image": "/image/NH/colors_black.gif",
     "audio": "/audio/words/black.mp3"
   },
   "white": {
     "meaning": "しろ",
-    "image": "/image/LT/color_white.jpg",
+    "image": "/image/NH/colors_white.gif",
     "audio": "/audio/words/white.mp3"
   }
 },
@@ -249,37 +249,37 @@ const LT_vocab = {
   // circle, square, triangle, rectangle, diamond, star, heart
   "circle": {
     "meaning": "まる",
-    "image": "/image/LT/shape_circle.jpg",
+    "image": "/image/NH/shapes_circle.gif",
     "audio": "/audio/words/circle.mp3"
   },
   "square": {
     "meaning": "しかく",
-    "image": "/image/LT/shape_square.jpg",
+    "image": "/image/NH/shapes_square.gif",
     "audio": "/audio/words/square.mp3"
   },
   "triangle": {
     "meaning": "さんかく",
-    "image": "/image/LT/shape_triangle.jpg",
+    "image": "/image/NH/shapes_triangle.gif",
     "audio": "/audio/words/triangle.mp3"
   },
   "rectangle": {
     "meaning": "しかく",
-    "image": "/image/LT/shape_rectangle.jpg",
+    "image": "/image/NH/shapes_rectangle.gif",
     "audio": "/audio/words/rectangle.mp3"
   },
   "diamond": {
     "meaning": "ひし形",
-    "image": "/image/LT/shape_diamond.jpg",
+    "image": "/image/NH/shapes_diamond.gif",
     "audio": "/audio/words/diamond.mp3"
   },
   "star": {
     "meaning": "ほし",
-    "image": "/image/LT/shape_star.jpg",
+    "image": "/image/NH/shapes_star.gif",
     "audio": "/audio/words/star.mp3"
   },
   "heart": {
     "meaning": "ハート",
-    "image": "/image/LT/shape_heart.jpg",
+    "image": "/image/NH/shapes_heart.gif",
     "audio": "/audio/words/heart.mp3"
   }
 },

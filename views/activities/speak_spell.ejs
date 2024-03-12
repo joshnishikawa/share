@@ -1,0 +1,75 @@
+<%- include('../head'); -%>
+
+<div class="container pt-3">
+  <div class="row">
+    <div class="col">
+      <div id="listen" class="btn btn-lg btn-success">
+        <i class="material-icons">add</i>
+      </div>
+    </div>
+
+  </div>
+  <div class="row">
+    <div id="words" class="col p-3"></div>
+    <div id="output" class="col"></p>
+  </div>
+</div>
+
+
+<!-- <script src="javascripts/spell.js" type="text/javascript"></script> -->
+
+<script>
+  $(function(){
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SpeechGrammarList =
+      window.SpeechGrammarList || window.webkitSpeechGrammarList;
+    const SpeechRecognitionEvent =
+      window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
+
+    // const words = ["apple", "banana", "cherry", "date", "elderberry", "fig", "grape", "honeydew", "kiwi", "lemon", "mango", "nectarine", "orange", "pear", "raspberry", "strawberry", "tangerine", "watermelon"];
+    // const grammar = `#JSGF V1.0; grammar words; public <word> = ${words.join(" | ")};`;
+    const recognition = new SpeechRecognition();
+    // const speechRecognitionList = new SpeechGrammarList();
+    // speechRecognitionList.addFromString(grammar, 1);
+    // recognition.grammars = speechRecognitionList;
+    recognition.continuous = false;
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+
+    // LISTEN
+    $("#listen").on('mousedown', () => {
+      recognition.start();
+    }).on('mouseup', () => {
+      recognition.stop();
+    });
+
+
+    // SPEECH RECOGNITION
+    recognition.onresult = (event) => {
+      const word = event.results[0][0].transcript;
+      const conf = Math.round(event.results[0][0].confidence*100);
+      $("#output").html(`"${word}" ${conf}%`);
+      $("#words").append(`<div class="word alert-primary badge shadow m-1 fs-3">
+                            ${word} 
+                            <div class="btn btn-close"></div>
+                            </div>`);
+
+      $(".btn-close").off('click').on('click', (event) => {
+        $(event.target).parent().remove();
+      });
+    };
+  
+    recognition.onnomatch = (event) => {
+      $("#output").html("I didn't understand.");
+    };
+  
+    recognition.onerror = (event) => {
+      $("#output").html(`Error occurred in recognition: ${event.error}`);
+    };
+  });
+  </script>
+
+  <%- include('../foot') %>

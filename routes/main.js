@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
+
+var Dictionary = require('japaneasy');
+var dict = new Dictionary();
+
 const abc = require('./abc.js');
 const NH = require('./NH.js');
 
@@ -17,6 +21,31 @@ router.use('/sockets', require('./sockets.js'));
 router.get('/', (req, res)=>{
   try{
     res.redirect('/abc');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
+
+router.get('/speak_spell', (req, res)=>{
+  try{
+    res.render('activities/speak_spell');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
+
+router.get('/japaneasy', (req, res)=>{
+  try{
+    dict('アバウト').then(function(result){
+      console.log(result);
+      res.send(result);
+    });
   }
   catch(err){
     res.send(err);
@@ -127,7 +156,7 @@ router.get('/:activity/:id', async (req, res)=>{
                                         [activity, id]);
     if (rows.length == 0) throw '404';
     let deckType = rows[0].deckType;
-    let params = rows[0].params;
+    let params = rows[0].params; // TODO: "deck" property will need to pe populated with image/audio paths
     res.render(`activities/${req.params.activity}`, {deckType, params});
   }
   catch(err ){

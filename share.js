@@ -60,7 +60,7 @@ const createError = require('http-errors');
 const logger = require('morgan');
 const path = require('path');
 const TRouter = require('./routes/teachers');
-const studentsRouter = require('./routes/students');
+const mainRouter = require('./routes/main');
 
 
 const { I18n } = require('i18n');
@@ -91,7 +91,7 @@ app.use( logger('dev') );
 app.use(  express.static( path.join(__dirname, 'public') )  );
 app.use( i18n.init );
 app.use('/teachers', TRouter);
-app.use('/', studentsRouter);
+app.use('/', mainRouter);
 
 app.use( (req, res, next)=> { next(createError(404)); });
 app.use( (err, req, res, next)=> {

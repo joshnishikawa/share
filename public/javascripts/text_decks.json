@@ -7,7 +7,7 @@
      "31st"],
 
   "capitals":["A","B","C","D","E","F","G","H","I","J","K","L","M",
-             "N","O","P","Q","R","S","T","U","V","W","X","Y","Z"],
+              "N","O","P","Q","R","S","T","U","V","W","X","Y","Z"],
 
   "lower_case":["a","b","c","d","e","f","g","h","i","j","k","l","m",
                 "n","o","p","q","r","s","t","u","v","w","x","y","z"],
@@ -17,14 +17,14 @@
                     "x","a","e","i","o","u"],
 
   "a_or_u":["bad","bud","cap","cup","cat","cut","fan",
-         "fun","ham","hum","mad","mud","ran","run"],
+            "fun","ham","hum","mad","mud","ran","run"],
 
   "o_or_u":["bog","bug","dog","dug","hot","hut","log","lug","not","nut"],
 
   "b_or_d":["big","dig","bad","dad","bug","dug","bog","dog"],
 
   "l_or_r":["lag","rag","lap","rap","lid","rid",
-         "lip","rip","lot","rot","lug","rug"],
+            "lip","rip","lot","rot","lug","rug"],
 
   "f_or_h":["fat","hat","fit","hit","fog","hog","fun","hun"],
 
@@ -46,17 +46,69 @@
                   "cube","cure","dune","fuse","June","lure","lute","mule",
                   "mute","pure","rule","tune","tube"],
 
+  "friendly_h":["that","shut","this","chat","wash","rush","shot","ship","both",
+                "mash","chin","shin","dish","fish","chip","bath","thin","shop",
+                "wish","math"],
+
+  "bossy_r" :["garden","park","scarf","shark","star",
+              "finger","paper","spider","tiger","winter",
+              "bird","dirty","first","shirt","circle", 
+              "corn","fork", "horn","north","sport",
+              "curl","turn","turtle","nurse","purple"],
+  
+  "more_bossy_r":["art","barn","jar","sharp","start","yard","yarn",
+                  "better","fern","her","herd","ladder","teacher","desert",
+                  "dirt","girl","skirt","stir","third","thirsty","birthday",
+                  "forget","porch", "short", "snore","storm", "thorn","torch", 
+                  "curb","burn","fur","purse","burp","furniture", "surprise"],
+
+  "blends":["clap","clip","drop","drum","flag","flip","frog","grab","grow",
+            "plan","plus","slap","slim","snap","spin","spot","step","stop",
+            "swim","twin","bank","belt","best","cold","desk","fast","gift",
+            "golf","hand","camp","lamp","long","mask","milk","mint","port",
+            "raft","sand","self","tent"],
+  
+  "long_vowels":["rain","train","pain","eight","sleigh","weigh","hay","day",
+                 "say","play","tea","meat","key","monkey","chief","field",
+                 "tree","she","he","seed","high","thigh","sigh","pie","lie",
+                 "tie","try","dry","cry","my","go","yo-yo","tomato","toe",
+                 "foe","hoe","boat","coat","snow","show","chew","grew","new",
+                 "screw","glue","blue","clue","food","tool","cool"],
+
+  "sneaky_y":["fly","baby","sky","lily","shy","study","happy","cry","family",
+              "cycle","candy","nylon","city","try","early","my","curry","dry",
+              "funny","fry"],
+   
+  "silent":["lamb","climb","thumb","plumber","debt","doubt","castle","nestle",
+            "listen","fasten","hour","honest","ghost","rhythm","rhyme","white",
+            "whale","knee","know","knife","knock","knot","answer","whole",
+            "wreck","wrench","write","gnu","gnome","sign","design","foreign",
+            "assign","guard","build","rogue","tongue","guitar","guess","guest",
+            "muscle","ascend","descend","science","scythe","half","calf","calm",
+            "palm","walk","talk","salmon","psychic","cupboard","coup","raspberry",
+            "autumn","column","aisle","island","badge","wedge","edge","handsome",
+            "Wednesday","February"],
+
+
+
+
+
+
+
+
+
+
   "animals":["bear", "dog", "fish", "goat", "kangaroo","monkey", "pig", "rabbit", "snake", "tiger", 
              "bat","duck","frog", "gorilla", "koala","mouse", "penguin", "raccoon", "seal", "turtle"],
 
   "objects":["car","hat","jelly","lemon","net","question","van","watch","yarn","zebra",
-           "cat","horse","juice","lion","nail","quilt","violin","worm","yo-yo","zipper"],
+             "cat","horse","juice","lion","nail","quilt","violin","worm","yo-yo","zipper"],
 
   "shapes":["&#10010;", "&#9632;","&#9733;","&#9830;","&#9829;","&#9644;","&#9650;","&#9679;","&#8594;"],
 
   "colors":["red","orange","yellow","green","blue","purple","black","pink",
-           "gray","brown","violet", 
-           "lightBlue","lightGreen","lightBrown",
-           "darkBlue","darkGreen","darkBrown",
-           "white","gold","silver"]
+            "gray","brown","violet", 
+            "lightBlue","lightGreen","lightBrown",
+            "darkBlue","darkGreen","darkBrown",
+            "white","gold","silver"]
 }
