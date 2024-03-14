@@ -64,8 +64,8 @@ $(function(){
 
   $("#home").attr('href', `/teachers/${deckType}`);
 
-  const params = JSON.parse(<%- JSON.stringify(params) %>);
-  var deck = JSON.parse(params.deck);
+  const params = <%- params %>;
+  var deck = <%- JSON.stringify(deck) %>;
   deck = FYshuffle(deck); // Shuffle first so that cards left out are random.
   let {length, colspan, rowheight} = getGrid({length: deck.length, even: false});
   deck = deck.slice(0, length); // Slice the deck to the correct length.
@@ -76,7 +76,7 @@ $(function(){
 
 // PREPARE THE DISPLAY /////////////////////////////////////////////////////////
   function getContent(i){
-    let str = i.name.split('(')[0].replace(/_/g, " ");
+    let str = i.word.split('(')[0].replace(/_/g, " ");
     if (deckType == "text") return `<div class="rounded-3 bg-white border display-1 p-1">${str}</div>`;
     else {
       let img = i.image ? `<image alt="${str}" src="${i.image}" class="img-fluid">` : '';
@@ -94,13 +94,13 @@ $(function(){
     deck = FYshuffle(deck);
     for (let i of deck){
       $("#grid").append(
-      `<div id="${i.name.replace(/[ ()']/g, '_')}" class="col-${colspan} vocab p-0" style="height:${rowheight}vh;">
+      `<div id="${i.word.replace(/[ ()']/g, '_')}" class="col-${colspan} vocab p-0" style="height:${rowheight}vh;">
           <div class="flip border-primary border-5 rounded-3 m-3" style="height:80%;">
             <div class="flip-card shadow">
               <div class="flip-front bg-white rounded border display-1">
                 <img src="${i.image}" class="rounded" 
                    style="max-width:90%;max-height:90%;
-                   alt="${i.name}" 
+                   alt="${i.word}" 
                    onerror="altOnly(this)">
               </div>
               <div class="flip-back rounded border border-primary text-center alert-primary display-${fontsize}">
@@ -157,9 +157,9 @@ $(function(){
 
       let input = $(this).val();
       if (input == ""){return;}
-      let matches = deck.filter((v)=>{return v.name.startsWith(input);});
+      let matches = deck.filter((v)=>{return v.word.startsWith(input);});
       for (let i of matches){
-        let id = i.name.replace(/[ ()']/g, '_');
+        let id = i.word.replace(/[ ()']/g, '_');
         $(`#${id} > .flip`).addClass('border');
         $(`#${id} > .flip > .flip-card > .flip-back`).html(input);
       }

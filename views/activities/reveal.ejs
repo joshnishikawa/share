@@ -58,7 +58,7 @@
     <i class="material-icons">info</i>
   </button>
 
-  <select id="style" class="form-control form-control-sm style="width:fit-content;" name="style">
+  <select id="style" class="form-control form-control-sm" style="width:fit-content;" name="style">
     <option value="" disabled selected>Style</option>
     <option value="spotlight">Spotlight</option>
     <option value="blur">Fog</option>
@@ -78,8 +78,8 @@ $(function(){
   const deckType = '<%- deckType %>';
   $("#home").attr('href', `/teachers/${deckType}`);
 
-  const params = JSON.parse(<%- JSON.stringify(params) %>);
-  var deck = JSON.parse(params.deck);
+  const params = <%- params %>;
+  var deck = <%- JSON.stringify(deck) %>;
   var style = params.style;
   document.title = `Reveal ${style} ${deckType}`;
 
@@ -137,7 +137,7 @@ $(function(){
 
   renderSpotlight = ()=>{
     $("#blurme").html(`<img src="${deck[index].image}" 
-                        alt="${deck[index].name}"><div id="mask"></div>`);
+                        alt="${deck[index].word}"><div id="mask"></div>`);
       document.documentElement.style.setProperty('--cursorX', x + 'px')
       document.documentElement.style.setProperty('--cursorY', y + 'px')
       document.documentElement.style.setProperty('--light', light + 'px')
@@ -182,7 +182,7 @@ $(function(){
             index++;
             if (index < deck.length){
               blr = 100;
-              $("#blurme").html(`<img src="${deck[index].image}" alt="${deck[index].name}">`);
+              $("#blurme").html(`<img src="${deck[index].image}" alt="${deck[index].word}">`);
             }
             else {
               $("#blurme").html("All done!");
@@ -199,7 +199,7 @@ $(function(){
           setBlur(blr);
         });
 
-        $("#blurme").html(`<img src="${deck[index].image}" alt="${deck[index].name}">`);
+        $("#blurme").html(`<img src="${deck[index].image}" alt="${deck[index].word}">`);
         setBlur(blr);
         break;
 
@@ -212,7 +212,7 @@ $(function(){
             index++;
             if (index < deck.length){
               factor = 4;
-              $("#loadme").html(`<img src="${deck[index].image}" alt="${deck[index].name}">`); // load the image
+              $("#loadme").html(`<img src="${deck[index].image}" alt="${deck[index].word}">`); // load the image
             }
             else {
               $("#blurme").html("All done!");
@@ -221,18 +221,18 @@ $(function(){
           else if (e.keyCode == 37){
             e.preventDefault();
             factor = factor <= 4 ? 4 : factor/2;
-            $("#loadme").html(`<img src="${deck[index].image}" alt="${deck[index].name}">`); // load the image
+            $("#loadme").html(`<img src="${deck[index].image}" alt="${deck[index].word}">`); // load the image
           }
           else if (e.keyCode == 39){
             if (e.repeat) return;
             e.preventDefault();
             factor = factor*2;
-            $("#loadme").html(`<img src="${deck[index].image}" alt="${deck[index].name}">`); // load the image
+            $("#loadme").html(`<img src="${deck[index].image}" alt="${deck[index].word}">`); // load the image
           }
           renderPixelated(factor);
         });
 
-        $("#loadme").html(`<img src="${deck[index].image}" alt="${deck[index].name}">`); // load the image
+        $("#loadme").html(`<img src="${deck[index].image}" alt="${deck[index].word}">`); // load the image
         renderPixelated(factor);
         break;
 

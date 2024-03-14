@@ -67,21 +67,20 @@ $(function(){
       let p = $(`input:checked[value="${theme}"]`).parent().parent().attr('id');
 
       for (let word in NH_vocab[p][theme]) {
-        let addme = NH_vocab[p][theme][word];
-        addme["name"] = word;
-        window.deck.push(addme);
+        let val = NH_vocab[p][theme][word];
+        window.deck.push(val);
         $("#list").append(`
           <div class="alert-primary rounded-3 mb-1 me-1 ps-1 d-flex justify-content-between">
             <div>${word}</div>
-            <div id="${word}" class="list btn btn-close" style="font-size:10px;"></div>
+            <div id="${word}" data-value="${val}" class="list btn btn-close" style="font-size:10px;"></div>
           </div>
         `);
       }
     }
 
     $(".list").on('click', function(){
-      let word = $(this).attr('id');
-      window.deck = window.deck.filter(e => e.name !== word);
+      let val = $(this).data('value');
+      window.deck = window.deck.filter(e => e !== val);
       $(this).parent().remove();
       $("#numOfItems").html(`&nbsp;(${window.deck.length})`);
     });

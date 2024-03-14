@@ -87,11 +87,12 @@ $(function(){
 // PREPARE THE DECK ////////////////////////////////////////////////////////////
   const deckType = '<%- deckType %>';
   document.title = `Spell ${deckType}`;
-  $("#home").attr('href', `/NH`); // FIXME: This needs to be dynamic
+  $("#home").attr('href', `/`); // FIXME: This needs to be dynamic
 
-  const params = JSON.parse(<%- JSON.stringify(params) %>);
-  const originalDeck = JSON.parse(params.deck);
+  const params = <%- params %> || {};
+  const originalDeck = <%- JSON.stringify(deck) %>;
   var deck = originalDeck.slice();
+  var item = {};
 
   var review = [];
   var place = 0;
@@ -128,7 +129,7 @@ $(function(){
     totalwords = deck.length;
 
     // get total number of letters of all values of 'name' properties
-    totalLetters = deck.reduce((acc, val) => acc + val.name.length, 0);
+    totalLetters = deck.reduce((acc, val) => acc + val.word.length, 0);
 
     deck = FYshuffle(deck);
     resetAnswer();
@@ -137,7 +138,7 @@ $(function(){
   }
 
   showResults = ()=>{
-    let missedwords = review.map( w => w.name ).join(', ');
+    let missedwords = review.map( w => w.word ).join(', ');
     $("#result").html(`
       <div class="fs-1">Words Mastered : ${score}/${totalwords}</div><hr/>
       <div class="fs-3">Mistakes : ${misses}</div>
@@ -150,7 +151,7 @@ $(function(){
 
   // input handlers
   inputLetter = (letter)=>{
-    if(place < word.name.length){
+    if(place < item.word.length){
       let l = [' ', '_'].includes(letter) ? ' ' : letter == 'period' ? '.' : letter; // for data-value
       let d = [' ', '_'].includes(letter) ? '&nbsp;' : letter == 'period' ? '.' : letter; // for display
 
@@ -158,7 +159,7 @@ $(function(){
       place++;
       guess += l;
     }
-    $("#enter").prop('disabled', place < word.name.length);
+    $("#enter").prop('disabled', place < item.word.length);
   }
 
 
@@ -174,9 +175,9 @@ $(function(){
 
   submitAnswer = ()=>{
     $("#enter").prop('disabled', true);
-    if (guess === word.name){
-      for (let i = 0; i < word.name.length; i++){
-        $(`[data-value=${word.name[i] == '.' ? 'period': word.name[i] == ' ' ? '_' : word.name[i]}]`)
+    if (guess === item.word){
+      for (let i = 0; i < item.word.length; i++){
+        $(`[data-value=${item.word[i] == '.' ? 'period': item.word[i] == ' ' ? '_' : item.word[i]}]`)
             .removeClass('bg-warning text-body')
             .addClass('bg-primary text-white');
       }
@@ -187,34 +188,34 @@ $(function(){
       correct = true;
 
       if (firstTry) score++;
-      else review.push(word);
+      else review.push(item);
       firstTry = true;
     }
     else {
       $("#guess").html(`<div class="word d-flex"></div>`);
       let remaining = []; // keep track of letters not yet guessed
 
-      for(let i = 0; i < word.name.length; i++){
-        let wordwrap = [' ', '-'].includes( word.name[i] ) ? true : false;
+      for(let i = 0; i < item.word.length; i++){
+        let wordwrap = [' ', '-'].includes( item.word[i] ) ? true : false;
         let l = guess[i] == '.' ? 'period' : guess[i] == ' ' ? '_' : guess[i]; // for data-value
         let d = guess[i] == ' ' ? '&nbsp;' : guess[i]; // for display
 
-        if(guess[i] === word.name[i]){
-          $("#guess .word:last-child").append(`<div class="btn btn-lg bg-primary text-white" 
+        if(guess[i] === item.word[i]){
+          $("#guess .item:last-child").append(`<div class="btn btn-lg bg-primary text-white" 
                                    style="font-size:2em; width:60px;">${d}</div>`);
           $(`[data-value=${l}]`)
             .removeClass('bg-warning bg-secondary text-body')
             .addClass('bg-primary text-white');
         }
-        else if (word.name.includes(guess[i])){
-          remaining.push(word.name[i]);
+        else if (item.word.includes(guess[i])){
+          remaining.push(item.word[i]);
           $("#guess .word:last-child").append(`<div class="btn btn-lg bg-warning" 
                                   style="font-size:2em; width:60px;">${d}</div>`);
           $(`[data-value=${l}]`).addClass('bg-warning text-body');
         }
         else{
           misses++;
-          remaining.push(word.name[i]);
+          remaining.push(item.word[i]);
           $("#guess .word:last-child").append(`<div class="btn btn-lg bg-secondary text-white" 
                                   style="font-size:2em; width:60px;">${d}</div>`);
           $(`[data-value=${l}]`)
@@ -253,15 +254,15 @@ $(function(){
     $("#guess").empty();
     $("#answer").html(`<div class="word d-flex"></div>`);
 
-    word = deck.pop();
-    if (word){
-      $("#image").html(`<img src="${word.image}" 
+    item = deck.pop();
+    if (item){
+      $("#image").html(`<img src="${item.image}" 
                              class="img-fluid"
-                             alt="${word.name}" 
+                             alt="${item.word}" 
                              onerror="altOnly(this)">`);
                              
-      for (let l = 0; l < word.name.length; l++){
-        let wordwrap = [' ', '-'].includes( word.name[l] ) ? true : false;
+      for (let l = 0; l < item.word.length; l++){
+        let wordwrap = [' ', '-'].includes( item.word[l] ) ? true : false;
 
         $("#answer .word:last-child").append(`<div id="place${l}"
                                   class="place btn btn-lg alert-primary"
@@ -308,7 +309,7 @@ $(function(){
       e.preventDefault();
       if (finished) start();
       else if(correct) resetAnswer();
-      else if (place === word.name.length) submitAnswer();
+      else if (place === item.word.length) submitAnswer();
     }
   });
 

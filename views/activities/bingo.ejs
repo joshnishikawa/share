@@ -57,12 +57,12 @@ $(function(){
 
   $("#home").attr('href', `/teachers/${deckType}`);
 
-  const params = JSON.parse(<%- JSON.stringify(params) %>);
-  var deck = JSON.parse(params.deck);
+  var deck = <%- JSON.stringify(deck) %>;
+  const params = <%- params %>;
   var index = 0;
 
   function getContent(i){
-    let str = i.name.split('(')[0].replace(/_/g, " ");
+    let str = i.word.split('(')[0].replace(/_/g, " ");
     if (deckType == "text") return `<div class="rounded-3 bg-white border display-1 p-1">${str}</div>`;
     else {
       let img = i.image ? `<image alt="${str}" src="${i.image}" class="img-fluid">` : '';
@@ -70,7 +70,7 @@ $(function(){
     }
   }
   function getSlide(i){
-    let str = i.name.split('(')[0].replace(/_/g, " ");
+    let str = i.word.split('(')[0].replace(/_/g, " ");
     if (deckType == "text") {
       // make size proportional to length of string
       let size = Math.max(10, 20 - str.length*2);

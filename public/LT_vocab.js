@@ -951,7 +951,7 @@ const LT_vocab = {
     "audio": "/audio/phrases/finish_my_dinner.mp3"
   },
   "dream": {
-    "meaning": "かく",
+    "meaning": "ゆめをみる",
     "image": "/image/LT/daily_dream.jpg",
     "audio": "/audio/words/dream.mp3"
   }

@@ -54,36 +54,11 @@ $(function(){
     </div>`);
   }
 
-  $("#firstNum").on("change", (e)=>{
-    let val = parseInt(e.target.value);
-    let max = $("#lastNum").val();
-    max = max ? parseInt(max) : 0;
-    $("#numbers").prop("checked", true);
-    if (max < val) $("#lastNum").val(val);
-  });
-
-  $("#lastNum").on("change", (e)=>{
-    let val = parseInt(e.target.value);
-    let min = $("#firstNum").val();
-    min = min ? parseInt(min) : 0;
-    $("#numbers").prop("checked", true);
-    if (min > val) $("#firstNum").val(val);
-  });
-
   $("#tags").on("change", (e)=>{
     window.deck = [];
-    if ( $("#numbers").prop("checked") ) {
-      let from = parseInt($("#firstNum").val());
-      let to = parseInt($("#lastNum").val());
-      for (let i=from; i<=to; i++) {
-        window.deck.push({name: i});
-      }
-    }
-    else {
-      let deck = text_decks[e.target.value];
-      for (let i=0; i<deck.length; i++) {
-        window.deck.push({name: deck[i]});
-      }
+    let deck = text_decks[e.target.value];
+    for (let i=0; i<deck.length; i++) {
+      window.deck.push({word: deck[i]});
     }
   });
 

@@ -2,9 +2,7 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
-const tagsRouter = require('./tags.js');
-const NH_vocab = require('../public/NH_vocab.js');
-const LT_vocab = require('../public/LT_vocab.js');
+// const tagsRouter = require('./tags.js');
 
 const creds = require('../../creds.js');
 const mysql = require('mysql2/promise');
@@ -35,7 +33,7 @@ router.get('/images', (req, res)=>{
 });
 
 
-router.get('/LT', (req, res)=>{
+router.get('/LT', async (req, res)=>{
   try{
     var colors = {
       "#c5b3e6" : ["fruit", "life", "time"],
@@ -46,6 +44,15 @@ router.get('/LT', (req, res)=>{
       "#fecba1" : ["adjectives", "weekdays"],
       }
 
+    let [rows, schema] = await db.query(`SELECT id, page, theme, word 
+                                         FROM vocab 
+                                         WHERE book='LT'`);
+    let LT_vocab = {};
+    for (let row of rows){
+      if ( !LT_vocab[row.theme] ) LT_vocab[row.theme] = {};
+      LT_vocab[row.theme][row.word] = row.id;
+    }
+
     res.render('teachers/LT', {LT_vocab, colors});
   }
   catch(err){
@@ -55,7 +62,7 @@ router.get('/LT', (req, res)=>{
 });
 
 
-router.get('/NH', (req, res)=>{
+router.get('/NH', async(req, res)=>{ // FIXME: There needs to be a single route to render this menu for students or teachers.
   try{
     var colors = {
       "#c5b3e6" : ["page_4_5", "page_14_15"],
@@ -66,7 +73,17 @@ router.get('/NH', (req, res)=>{
       "#fecba1" : ["page_20_21", "page_24_25"],
       }
 
-    res.render('teachers/NH', {NH_vocab: NH_vocab, colors: colors});
+    let [rows, schema] = await db.query(`SELECT id, page, theme, word 
+                                         FROM vocab 
+                                         WHERE book='NH'`);
+    let NH_vocab = {};
+    for (let row of rows){
+      if ( !NH_vocab[row.page] ) NH_vocab[row.page] = {};
+      if ( !NH_vocab[row.page][row.theme] ) NH_vocab[row.page][row.theme] = {};
+      NH_vocab[row.page][row.theme][row.word] = row.id;
+    }
+
+    res.render('teachers/NH', {NH_vocab, colors});
   }
   catch(err){
     res.send(err);

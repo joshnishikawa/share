@@ -15,7 +15,7 @@ const rooms = [
   "hot", "bug", "dig", "ear", "run", "toy", "wet"];
 
 var publicRooms = ["bug", "dig"]; // array of rooms in use
-var privateRooms = []; // array of teacher-creatd rooms in use
+var privateRooms = []; // array of teacher-created rooms in use
 
 var available = rooms.filter(x => !publicRooms.includes(x) && !privateRooms.includes(x));
 

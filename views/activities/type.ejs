@@ -78,11 +78,11 @@
 $(function(){
   const deckType = '<%- deckType %>';
   document.title = `Type ${deckType}`;
-  $("#home").attr('href', `/NH`); // FIXME: This needs to be dynamic
+  $("#home").attr('href', `/`); // FIXME: This needs to be dynamic
 
   // PREPARE THE DECK //////////////////////////////////////////////////////////
-  const params = JSON.parse(<%- JSON.stringify(params) %>);
-  const originalDeck = JSON.parse(params.deck);
+  const originalDeck = <%- JSON.stringify(deck) %>;
+  const params = <%- params %> || {};
   var deck = originalDeck.slice();
   let timeLimit = 0; // seconds
   var finished = false;
@@ -154,20 +154,20 @@ $(function(){
     $("#display").empty();
     $("#answer").html(`<div class="word d-flex"></div>`);
 
-    word = deck.pop();
-    if (word){
+    item = deck.pop();
+    if (item){
       $("#remaining").html(`<span class="display-3">${deck.length}</span><br/>words left`);
 
-      if (deckType != 'text') $("#image").html(`<img src="${word.image}" 
+      if (deckType != 'text') $("#image").html(`<img src="${item.image}" 
                                                      class="img-fluid"
-                                                     alt="${word.name}" 
+                                                     alt="${item.word}" 
                                                      onerror="altOnly(this)">`);
       else $("#image").html('');
 
-      $("#display").html(`<div class="display-1">${word.name}</div>`);
+      $("#display").html(`<div class="display-1">${item.word}</div>`);
 
-      for (let i = 0; i < word.name.length; i++){
-        let l = word.name[i];
+      for (let i = 0; i < item.word.length; i++){
+        let l = item.word[i];
         let wordwrap = [' ', '-'].includes( l ) ? true : false;
 
         $("#answer .word:last-child").append(`<div id="place${i}"
@@ -213,8 +213,8 @@ $(function(){
     if(e.key.length == 1 && e.key !== fired && letters.includes(e.key)){
       if (finished) return;
       fired = e.key;
-      if (place < word.name.length){
-        if (e.key == word.name[place]){
+      if (place < item.word.length){
+        if (e.key == item.word[place]){
           $("#place"+place).text(e.key).removeClass('alert-danger').addClass('alert-primary');
         }
         else {
@@ -224,11 +224,11 @@ $(function(){
         place++;
         guess += e.key;
 
-        if (guess == word.name){
-          totalLetters += word.name.length;
+        if (guess == item.word){
+          totalLetters += item.word.length;
           score += 1;
           // spaces and hyphens mean more words should be counted
-          let spaces = word.name.match(/[- ]/g);
+          let spaces = item.word.match(/[- ]/g);
           if (spaces) score += spaces.length;
 
           resetAnswer();

@@ -57,8 +57,8 @@
           text_decks = data;
         });
 
-  const params = JSON.parse(<%- JSON.stringify(params) %>);
-  var deck = JSON.parse(params.deck);
+  var deck = <%- JSON.stringify(deck) %>;
+  const params = <%- params %>;
   var backs = params.backs;
 
   document.title = `Match ${backs} ${deckType}`;
@@ -88,7 +88,7 @@
   let numofitems = deck.length;
   for (let i = 0; i < numofitems; i++){
     deck[i]["type"] = ""; // half of cards wont have the class that toggles text
-    deck.push({"name": deck[i].name, "image": deck[i].image, "type": "text"});
+    deck.push({"word": deck[i].word, "image": deck[i].image, "type": "text"});
   }
 
 
@@ -197,13 +197,13 @@
   for (let i = 0; i < deck.length; i++){
     $("#grid").append(
      `<div class="col-${colspan} vocab p-0" style="height:${rowheight}vh;">
-        <div data-value="${deck[i].name}" class="container flip m-3" style="height:80%;">
+        <div data-value="${deck[i].word}" class="container flip m-3" style="height:80%;">
           <div class="flip-card shadow">
 
             <div class="${deck[i].type} flip-front bg-white rounded border UD">
-              <img src="${deck[i].image}" alt="${deck[i].name}" class="rounded" 
+              <img src="${deck[i].image}" alt="${deck[i].word}" class="rounded" 
                    style="max-width:90%;max-height:90%;">
-              <div style="display:none;font-size:30cqh;">${deck[i].name}</div>
+              <div style="display:none;font-size:30cqh;">${deck[i].word}</div>
             </div>
             <div class="flip-back rounded border border-primary text-center ${backClass[i]}"
                  style="font-size:${Math.floor(rowheight * 0.8)}vh;">

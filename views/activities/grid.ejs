@@ -62,8 +62,8 @@ $(function(){
 
   $("#home").attr('href', `/teachers/${deckType}`);
 
-  const params = JSON.parse(<%- JSON.stringify(params) %>);
-  var deck = JSON.parse(params.deck);
+  var deck = <%- JSON.stringify(deck) %>;
+  const params = <%- params %>;
   var spaces = params.spaces;
   $("#numCards").val(spaces);
   document.title = `Grid ${spaces} ${deckType}`;
@@ -104,17 +104,17 @@ $(function(){
       html +=
       `<div class="space border-start border-bottom text-center pt-3" 
             style="position:relative;width:${colspan}vw;height:${colspan}vw;">
-          <img src="${workingdeck[i].image}" alt="${workingdeck[i].name}" 
+          <img src="${workingdeck[i].image}" alt="${workingdeck[i].word}" 
                class="img-fluid position-absolute top-50 translate-middle" 
                style="max-height:75%;max-width:75%;"
                onerror="altOnly(this)">
 
           <div class="txt text-center UD w-100 position-absolute bottom-0 mb-1" 
               style="text-stroke: 3px white;-webkit-text-stroke: 3px #fff;display:none;">
-            ${workingdeck[i].name}
+            ${workingdeck[i].word}
           </div>
           <div class="txt text-center UD w-100 position-absolute bottom-0 mb-1" style="display:none;">
-            ${workingdeck[i].name}
+            ${workingdeck[i].word}
           </div>
 
         </div>`;

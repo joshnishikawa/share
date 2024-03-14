@@ -157,7 +157,7 @@ $(function(){
     words = words.filter(e => e);// remove empty strings
     words = [...new Set(words)]; // remove duplicates
     for (let i in words) {
-      window.deck.push({name: words[i], image: `/image/svg/${words[i]}.svg`});
+      window.deck.push({word: words[i], image: `/image/svg/${words[i]}.svg`});
     }
     $("#numOfItems").html(`&nbsp;(${words.length})`);
     $("#list").val(words.join(', ').replace(/_/g, ' '));
@@ -232,7 +232,7 @@ $(function(){
     $("#numOfItems").html(`&nbsp;&nbsp;&nbsp;(${words.length})`);
     for (let i in words) {
       words[i] = words[i].trim().replace(/\s/g, '_');
-      window.deck.push({name: words[i], image: `/image/svg/${words[i]}.svg`});
+      window.deck.push({word: words[i], image: `/image/svg/${words[i]}.svg`});
     }
   });
 

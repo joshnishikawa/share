@@ -82,10 +82,10 @@ $(function(){
 
   $("#home").attr('href', `/teachers/${deckType}`);
 
-  const params = JSON.parse(<%- JSON.stringify(params) %>);
+  const originalDeck = <%- JSON.stringify(deck) %>;
+  const params = <%- params %>;
   var order = params.order;
-  const originalDeck = JSON.parse(params.deck);
-  var isNum = originalDeck[0].name.match(/^\d+$/);
+  var isNum = originalDeck[0].word.match(/^\d+$/);
   var text = (params.text == "true"); // convert string to boolean
   $("#showtext").prop('checked', text);
 
@@ -103,12 +103,12 @@ $(function(){
     else if (order == "alphabetical"){
       $("#shuffle").prop('checked', false);
       if(isNum) deck.sort(function(a, b){
-        return a.name - b.name}); // sort numerically
+        return a.word - b.word}); // sort numerically
       else {
         deck.sort(function(a, b){ // sort alphabetically
-          var nameA=a.name.toLowerCase(), nameB=b.name.toLowerCase();
-          if (nameA < nameB) return -1;
-          if (nameA > nameB) return 1;
+          var wordA=a.word.toLowerCase(), wordB=b.word.toLowerCase();
+          if (wordA < wordB) return -1;
+          if (wordA > wordB) return 1;
           return 0;
         });
       }
@@ -122,7 +122,7 @@ $(function(){
   function setText(){
     if (text) {
       $("#showtext").prop('checked', true);
-      $("#text").html( deck[card].name );
+      $("#text").html( deck[card].word );
     }
     else {
       $("#showtext").prop('checked', false);
@@ -150,13 +150,13 @@ $(function(){
       $("#flash").removeClass("review");
     }
     else{$("#flash").addClass("review")}
-    let content = deckType == 'text' ? deck[card].name 
+    let content = deckType == 'text' ? deck[card].word 
                 : `<img src="${deck[card].image}" 
-                        alt="${deck[card].name}"
+                        alt="${deck[card].word}"
                         onerror="altOnly(this)" >`;
 
     $("#flash").html(content);
-    if ( $("#showtext").prop('checked') ) $("#text").html( deck[card].name );
+    if ( $("#showtext").prop('checked') ) $("#text").html( deck[card].word );
   }
 
 
@@ -202,24 +202,24 @@ $(function(){
       case "ArrowRight":
         if (card < deck.length - 1) {
           card += 1;
-          let content = deckType == 'text' ? deck[card].name 
+          let content = deckType == 'text' ? deck[card].word 
                 : `<img src="${deck[card].image}" 
-                        alt="${deck[card].name}"
+                        alt="${deck[card].word}"
                         onerror="altOnly(this)">`;
 
           $("#flash").html(content);
-          if ( $("#showtext").prop('checked') ) $("#text").html( deck[card].name );
+          if ( $("#showtext").prop('checked') ) $("#text").html( deck[card].word );
         }
         break;
       case "ArrowLeft":
         if (card > 0 && deck.length > 0) {
           card -= 1;
-          let content = deckType == 'text' ? deck[card].name 
+          let content = deckType == 'text' ? deck[card].word 
                 : `<img src="${deck[card].image}" 
-                    alt="${deck[card].name}"
+                    alt="${deck[card].word}"
                     onerror="altOnly(this)">`;
           $("#flash").html(content);
-          if ( $("#showtext").prop('checked') ) $("#text").html( deck[card].name );
+          if ( $("#showtext").prop('checked') ) $("#text").html( deck[card].word );
         }
         break;
     }
