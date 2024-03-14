@@ -3,17 +3,13 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 const abc = require('./abc.js');
+const labs = require('./labs.js');
 const creds = require('../../creds.js');
 const mysql = require('mysql2/promise');
 const db = mysql.createPool(creds);
 
-// const { validateHeaderName } = require('http');
-
-// var Dictionary = require('japaneasy');
-// var dict = new Dictionary();
-
 router.use('/abc', abc);
-router.use('/sockets', require('./sockets.js'));
+router.use('/labs', labs);
 
 
 router.get('/', (req, res)=>{
@@ -68,53 +64,6 @@ router.get('/NH', async (req, res)=>{
       NH_vocab[row.page][row.theme][row.word] = row.id;
     }
     res.render('students/NH', {NH_vocab, colors});
-  }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
-
-
-router.get('/speak_spell', (req, res)=>{
-  try{
-    res.render('activities/speak_spell');
-  }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
-
-
-router.get('/japaneasy', (req, res)=>{
-  try{
-    dict('アバウト').then(function(result){
-      console.log(result);
-      res.send(result);
-    });
-  }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
-
-
-router.get('/shapes', (req, res)=>{
-  try{
-    res.render('activities/shapes');
-  }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
-
-
-router.get('/speech', (req, res)=>{
-  try{
-    res.render('activities/speech');
   }
   catch(err){
     res.send(err);

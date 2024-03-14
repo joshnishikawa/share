@@ -2,15 +2,15 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
-// const tagsRouter = require('./tags.js');
-
 const creds = require('../../creds.js');
 const mysql = require('mysql2/promise');
 const db = mysql.createPool(creds);
-
 const text_decks = require('../public/javascripts/text_decks.json'); // FIXME: Deprecate this in 2025
 
-// router.use('/tags', tagsRouter); // uncomment to update tags
+
+// router.use('/tags', require('./tags.js')); // uncomment to update tags
+
+
 router.get('/', (req, res)=>{
   try{
     res.redirect('/teachers/images');
@@ -115,18 +115,6 @@ router.get('/tools', (req, res)=>{
     console.error(err);
   }
 });
-
-
-router.get('/yearinreview', (req, res)=>{
-  try{
-    res.render('teachers/yearinreview');
-  }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
-
 
 
 // replace deprecated links and reroute

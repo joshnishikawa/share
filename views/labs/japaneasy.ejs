@@ -1,0 +1,11 @@
+<%- include('../head') %>
+<div class="container m-5">
+  <% for (item of result){ %>
+    <%- '***<br/>'; %>
+    <% for (key in item) { %>
+      <%- `${key}: ${item[key]}<br/>` %>
+    <% } %>
+  <% } %>
+</div>
+
+<%- include('../foot') %>
