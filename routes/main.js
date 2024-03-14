@@ -47,7 +47,7 @@ router.get('/LT', (req, res)=>{
 });
 
 
-router.get('/select_NH', async (req, res)=>{
+router.get('/NH', async (req, res)=>{
   try{
     var colors = {
       "#c5b3e6" : ["page_4_5", "page_14_15"],
