@@ -1,1 +1,167 @@
-here's a fun 404 page
+<%- include('head'); -%>
+
+<body>
+  <a id="home" href="/" class="btn btn-sm btn-outline-secondary py-0">
+    <i class="material-icons">home</i>
+  </a>
+
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col text-center">
+        <div class="display-1 UD">404</div>
+        If that link used to work and doesn't now, I'm sorry. I probably broke it.
+      </div>
+      
+    </div>
+    <div class="row">
+      
+      <div class="col-sm-3">
+        <img src="/image/NH/feelings_hungry.gif" alt="Where is it?" class="img-fluid"/>
+      </div>
+      <div class="col-sm-9 UD">
+        <div id="guess" class="d-flex flex-wrap m-5"></div>
+        <div class="d-flex my-5">
+          <div id="answer" class="d-flex flex-wrap"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+<script>
+$(function(){
+
+// PREPARE THE DECK ////////////////////////////////////////////////////////////
+  var item = {word: 'not found', image: '/images/404.jpg'};
+  var place = 0;
+  var guess = '';
+  var correct = false;
+  let fired = false;
+
+
+  start = () =>{
+    correct = false;
+    place = 0;
+    guess = '';
+    $("#guess").empty();
+    $("#answer").html(`<div class="word d-flex"></div>`);
+    $("#image").html(`<img src="${item.image}" 
+                            class="img-fluid"
+                            alt="${item.word}" 
+                            onerror="altOnly(this)">`);
+                            
+    for (let l = 0; l < item.word.length; l++){
+      let wordwrap = item.word[l] == ' ' ? true : false;
+
+      $("#answer .word:last-child").append(`<div id="place${l}"
+                                class="place btn btn-lg alert-primary"
+                                style="font-size:2em;width:60px;">_</div>`);
+
+      if (wordwrap) $("#answer").append(`<div class="word d-flex"></div>`);
+    } 
+  }
+
+
+  submitAnswer = ()=>{
+    if (guess === item.word){
+      for (let i = 0; i < item.word.length; i++){
+        $(`[data-value=${item.word[i] == ' ' ? '_' : item.word[i]}]`)
+            .removeClass('bg-warning text-body')
+            .addClass('bg-primary text-white');
+      }
+      $("#guess").html('');
+      $("#answer").html(`<div class="btn btn-primary" style="font-size:5em;">${guess}</div>`);
+
+      correct = true;
+    }
+    else {
+      $("#guess").html(`<div class="word d-flex"></div>`);
+      let remaining = []; // keep track of letters not yet guessed
+
+      for(let i = 0; i < item.word.length; i++){
+        let wordwrap = item.word[i] == ' ' ? true : false;
+        let l = guess[i] == ' ' ? '_' : guess[i]; // for data-value
+        let d = guess[i] == ' ' ? '&nbsp;' : guess[i]; // for display
+
+        if(guess[i] === item.word[i]){
+          $("#guess .word:last-child").append(`<div class="btn btn-lg bg-primary text-white" 
+                                   style="font-size:2em; width:60px;">${d}</div>`);
+          $(`[data-value=${l}]`)
+            .removeClass('bg-warning bg-secondary text-body')
+            .addClass('bg-primary text-white');
+        }
+        else if (item.word.includes(guess[i])){
+          remaining.push(item.word[i]);
+          $("#guess .word:last-child").append(`<div class="btn btn-lg bg-warning" 
+                                  style="font-size:2em; width:60px;">${d}</div>`);
+          $(`[data-value=${l}]`).addClass('bg-warning text-body');
+        }
+        else{
+          remaining.push(item.word[i]);
+          $("#guess .word:last-child").append(`<div class="btn btn-lg bg-secondary text-white" 
+                                  style="font-size:2em; width:60px;">${d}</div>`);
+          $(`[data-value=${l}]`)
+            .removeClass('bg-warning text-body')
+            .addClass('bg-secondary text-white');
+        }
+
+        if (wordwrap) $("#guess").append(`<div class="word d-flex"></div>`);
+      }
+
+
+      $("#guess .bg-warning").each(function(){
+        let l = $(this).text();
+        let d = l == '\xa0' ? ' ' : l; //&nbsp; is \xa0 in javascript
+
+        if ( !remaining.includes(d) ){
+          $(this).removeClass('bg-warning text-body').addClass('bg-secondary text-white');
+          $(`[data-value=${l}]`)
+            .removeClass('bg-warning text-body')
+            .addClass('bg-primary text-white');
+        }
+      });
+
+      guess = '';
+      place = 0;
+      $(".place").text('_');
+    }
+  }
+
+
+  $(window).on('keydown', function(e){
+    if (e.key === fired && e.key !== ' ') return;
+    if (e.key === ' ') e.preventDefault();
+
+    if(e.key.length == 1 && e.key !== fired && /[ a-zA-Z]/.test(e.key) ){
+      fired = e.key;
+      if(place < item.word.length){
+        $("#place"+place ).html(e.key);
+        place++;
+        guess += e.key;
+      }
+    }
+    else if(e.key == 'Backspace'){
+      if(place > 0){
+        place--;
+        guess = guess.slice(0, -1);
+        $("#place"+place).text('_');
+      }
+    }
+    else if(e.key == 'Enter'){
+      e.preventDefault();
+      if (place === item.word.length) submitAnswer();
+    }
+  });
+
+  $(window).on('keyup', function(e){
+    fired = false;
+  });
+
+  start();
+
+});
+</script>
+
+
+<%- include('foot'); -%> <!-- FOOT INCLUDES SCRIPTS AND </body> -->

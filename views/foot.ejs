@@ -1,17 +1,3 @@
-<script>
-  // FIXME: delete this warning in 2025
-  // get 'deprecated' from query
-  let url = new URL(window.location.href);
-  let deprecated = url.searchParams.get('deprecated');
-  if(deprecated){
-    // remove query from url
-    url.searchParams.delete('deprecated');
-    window.history.replaceState({}, document.title, url);
-    alert(`Please update your bookmark to the new shorter URL in your address bar. The old URL will be deprecated soon.`);
-  }
-
-</script>
-
 <script src="/javascripts/script.js"></script>
 
 </body>
