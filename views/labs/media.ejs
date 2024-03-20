@@ -1,0 +1,196 @@
+<%- include('../head') %>
+
+<!--SEARCH FOR FILES IN SELECTED LIST. SHOW ALL MISSING FROM SELECTED FOLDER -->
+<div class="container-fluid form">
+  <div class="row">
+    <div class="col-2">
+      <button id="findMedia" class="btn btn-primary my-1">Search</button>
+      <div>
+        <strong>...in here</strong><br>
+        <select id="haystack" class="form-control">
+          <option value="" disabled selected>directory</option>
+          <option value="audio/phrases">audio/phrases</option>
+          <option value="audio/sentences">audio/sentences</option>
+          <option value="audio/sounds">audio/sounds</option>
+          <option value="audio/words">audio/words</option>
+          <option value="image/png">image/png</option>
+          <option value="image/svg">image/svg</option>
+        </select>
+      </div>
+
+      <div>
+        <strong>...for these.</strong><br>
+        <input type="radio" id="sel_needle_dir" name="needle" value="dir">
+        <label for="sel_needle_dir">directory</label>
+        <input type="radio" id="sel_needle_list" name="needle" value="list">
+        <label for="sel_needle_list">list</label><br>
+
+        <select id="needle_dir" class="form-control" style="display:none;">
+          <option value="" disabled selected>directory</option>
+          <option value="audio/phrases">audio/phrases</option>
+          <option value="audio/sentences">audio/sentences</option>
+          <option value="audio/sounds">audio/sounds</option>
+          <option value="audio/words">audio/words</option>
+          <option value="image/png">image/png</option>
+          <option value="image/svg">image/svg</option>
+        </select>
+
+        <textarea id="needle_list" class="form-control" rows="15" style="display:none;"></textarea>
+      </div>
+    </div>
+    
+    <div class="col-5 alert-primary">
+      <strong>Found</strong>
+      <div id="found" class="d-flex flex-wrap"></div>
+    </div>
+    
+    <div class="col-5 alert-warning">
+      <strong>Missing</strong>
+      <div id="missing"></div>
+    </div>
+
+  </div>  
+</div>
+
+<div id="preview" class="bg-white" style="position:fixed;top:0;right:0;width:100px;"></div>
+
+<div class="container-fluid my-3">
+  <div class="row">
+    <div class="col">
+      <div id="list" class="d-flex flex-wrap"></div>
+      <hr/>
+      <div id="themes" class="d-flex flex-wrap"></div>
+    </div>
+  </div>
+</div>
+<div class="form-group d-flex">
+  <button id="removeTags" class="btn btn-danger">Del</button>
+  <button id="addTags" class="btn btn-primary">Add</button>
+  <input id="newTags" type="text" class="form-control" placeholder="new tag(s)">
+</div>
+
+
+<script>
+$(async function(){
+  let files = {};
+  let tags = {};
+  await $.get('/media/files', (data)=>{
+          files = data.files;
+          tags = data.tags;
+        });
+
+  // order files by length of array
+  files = Object.fromEntries(Object.entries(files).sort((a, b) => b[1].length - a[1].length));
+
+  $("#sel_needle_dir").on('click', ()=>{
+    $("#needle_deck").hide();
+    $("#needle_dir").show();
+    $("#needle_list").hide();
+  });
+  $("#sel_needle_list").on('click', ()=>{
+    $("#needle_deck").hide();
+    $("#needle_dir").hide();
+    $("#needle_list").show();
+  });
+
+  $("#findMedia").on('click', (e)=>{
+    var needleType = $("[name=needle]:checked").val();
+    var needle = $(`#needle_${needleType}`).val();
+    var haystack = $(`#haystack`).val();
+    $.get('media/findMissing', {needleType, needle, haystack}, (data)=>{
+
+      $("#found").html('');
+      for (i in data.found){
+        $("#found").append(`<a class="imglink point" data-value="${data.found[i]}">${i}</a>&nbsp;`);
+      }
+
+      $("#missing").html('');
+      for (i of data.missing){
+        $("#missing").append(`${i} `);
+      }
+
+      $(".imglink").on('click', function(){
+        var url = $(this).attr('data-value');
+        var text = $(this).text();
+        $("#preview").html(`<img src="${url}" alt="${url}" style="width:100%;">
+                            <img src="/image/svg/${text}.svg" alt="${text}" style="width:100%;">`);
+      });
+    });
+  });
+
+
+  $("#updateTags").on('click', ()=>{
+    $.post('media/updateTags', (data)=>{
+      console.log(data);
+    });
+  });
+
+  for (let f in files){
+    $("#list").append(`
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="files" id="file_${f}" value="${f}" aria-label="files">
+        <label class="form-check-label me-2" 
+               style="margin-left:-5px;" 
+               title="${files[f].join(', ')}"
+               for="file_${f}">${f.split('.')[0]} (${files[f].length})</label>
+      </div>`);
+  }
+
+  // on check, show the image
+  $("input[name='files']").on('click', function(){
+    var name = $(this).val();
+    $("#preview").html(`<img src="/image/svg/${name}.svg" alt="${name}" style="width:100%;">`);
+  });
+
+  for (let t in tags) {
+    $(`#themes`).append(`
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="tags" id="tag_${t}" value="${t}" aria-label="tags">
+        <label class="form-check-label me-2" 
+               style="margin-left:-5px;" 
+               title="${tags[t].join(', ')}"
+               for="tag_${t}">${t} (${tags[t].length})</label>
+      </div>`);
+  }
+
+
+  // get all selected tags and files and post them to /tags
+  $("#addTags").click(function(){
+    var selectedTags = $("#newTags").val().split(',').map(e => e.trim()).filter(e => e);
+    $("input[name='tags']:checked").each(function(){
+      selectedTags.push($(this).val());
+    });
+    
+    var selectedFiles = [];
+    $("input[name='files']:checked").each(function(){
+      selectedFiles.push($(this).val().split('.')[0]);
+    });
+
+    $.post("media/addTags", {selectedTags, selectedFiles}, function(data){
+      if (data == 'success');
+        setTimeout(function(){ window.location.reload(); }, 3000);
+    });
+  });
+
+
+  $("#removeTags").click(function(){
+    var selectedTags = [];
+    $("input[name='tags']:checked").each(function(){
+      selectedTags.push($(this).val());
+    });
+
+    var selectedFiles = [];
+    $("input[name='files']:checked").each(function(){
+      selectedFiles.push($(this).val().split('.')[0]);
+    });
+
+    $.post("media/removeTags", {selectedTags, selectedFiles}, function(data){
+      if (data == 'success');
+        setTimeout(function(){ window.location.reload(); }, 3000);
+    });
+  });
+
+});
+</script>
+
+<%- include('../foot') %>

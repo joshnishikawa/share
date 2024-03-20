@@ -59,9 +59,9 @@ io.on('error', function(){
 const createError = require('http-errors');
 const logger = require('morgan');
 const path = require('path');
-const TRouter = require('./routes/teachers');
 const mainRouter = require('./routes/main');
-
+const TRouter = require('./routes/teachers');
+const mediaRouter = require('./routes/media');
 
 const { I18n } = require('i18n');
 const i18n = new I18n({
@@ -91,6 +91,7 @@ app.use( logger('dev') );
 app.use(  express.static( path.join(__dirname, 'public') )  );
 app.use( i18n.init );
 app.use('/teachers', TRouter);
+// app.use('/media', mediaRouter);
 app.use('/', mainRouter);
 
 app.use( (req, res, next)=> { next(createError(404)); });
@@ -100,7 +101,8 @@ app.use( (err, req, res, next)=> {
   res.locals.error = req.app.get('env') === 'development' ? err : {};
   // render the error page
   res.status(err.status || 500);
-  res.render('error');
+  if (err.status === 404) res.render('404');
+  else res.render('error');
   return;
 });
 

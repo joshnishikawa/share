@@ -8,9 +8,6 @@ const db = mysql.createPool(creds);
 const text_decks = require('../public/javascripts/text_decks.json'); // FIXME: Deprecate this in 2025
 
 
-// router.use('/tags', require('./tags.js')); // uncomment to update tags
-
-
 router.get('/', (req, res)=>{
   try{
     res.redirect('/teachers/images');
