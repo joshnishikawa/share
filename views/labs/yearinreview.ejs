@@ -1,130 +1,176 @@
 <%- include('../head') %>
-<style>
-  /* hide .deets on everything but mobile */
-  .deets { 
-    display: none; 
-    font-weight: bold;
-  }
-  @media (max-width: 768px) {
-    .deets { display: block; }
-  }
-</style>
+  <style>
+    body {
+      user-select: none;
+    }
 
-<div id="list1" class="accordion">
-  <h2 id="item0_1" class="accordion-header border shadow">
-    <button class="accordion-button collapsed" type="button" 
-            data-bs-toggle="collapse" data-bs-target="#content0_1" 
-            aria-expanded="true" aria-controls="item0_1">
-      It depends on the city.
-    </button>
-  </h2>
-  <div id="content0_1"
-       class="accordion-collapse collapse bg-white border shadow p-5" 
-       style="cursor:pointer;"
-       aria-labelledby="head1_1" data-bs-parent="#list1">
-       <%- include('yearinreview/1_city.ejs') %>
+    .deets {
+      display: none;
+      font-weight: bold;
+    }
+
+    @media (max-width: 768px) {
+
+      /* hide .deets on everything but mobile */
+      .deets {
+        display: block;
+      }
+    }
+  </style>
+
+  <div class="bg-white p-3">
+    <span style="font-size:1.4em">
+      Tatsuno's Approach to English Instruction in Elementary School
+    </span>
+    <p class="deets">
+      This is an attempt to summarize Tatsuno's approach to teaching English in
+      elementary school. The information is based on my experience over the past
+      year in the position of an ALT and my conversations with other ALTs,
+      teachers, members of the Tatsuno Board of Education and parents. Although I'll be
+      speaking English, the target audience includes all of them and anyone else
+      with an interest in the subject. Any leaking opinions are mine alone.
+    </p>
   </div>
 
-
-  <h2 id="item1_1" class="accordion-header border shadow">
-    <button class="accordion-button collapsed" type="button" 
-            data-bs-toggle="collapse" data-bs-target="#content1_1" 
-            aria-expanded="true" aria-controls="item1_1">
-      It depends on the school.
-    </button>
-  </h2>
-  <div id="content1_1"
-       class="accordion-collapse collapse bg-white border shadow ps-5" 
-       style="cursor:pointer;"
-       aria-labelledby="head1_1" data-bs-parent="#list1">
-       <%- include('yearinreview/2_school.ejs') %>
-  </div>
+  <div id="main_a" class="accordion">
+    <h2 id="city_h" class="accordion-header border shadow">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#city_c"
+        aria-expanded="true" aria-controls="city_h">
+        It depends on the city.
+      </button>
+    </h2>
+    <div id="city_c" class="accordion-collapse collapse bg-white border shadow p-3" style="cursor:pointer;"
+      aria-labelledby="city_h" data-bs-parent="#main_a">
+      <%- include('yearinreview/1_city.ejs') %>
+    </div>
 
 
-  <h2 id="item1_2" class="accordion-header border shadow">
-    <button class="accordion-button collapsed" type="button" 
-            data-bs-toggle="collapse" data-bs-target="#content1_2" 
-            aria-expanded="true" aria-controls="item1_2">
-      It depends on the grade.
-    </button>
-  </h2>
-  <div id="content1_2"
-       class="accordion-collapse collapse bg-white border shadow p-5" 
-       style="cursor:pointer;"
-       aria-labelledby="head1_2" data-bs-parent="#list1">
-       <%- include('yearinreview/3_grade.ejs') %>
-  </div>
+    <h2 id="school_h" class="accordion-header border shadow">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#school_c"
+        aria-expanded="true" aria-controls="school_h">
+        It depends on the school.
+      </button>
+    </h2>
+    <div id="school_c" class="accordion-collapse collapse bg-white border shadow ps-5" style="cursor:pointer;"
+      aria-labelledby="school_h" data-bs-parent="#main_a">
+      <%- include('yearinreview/2_school.ejs') %>
+    </div>
 
 
-  <h2 id="item1_3" class="accordion-header border shadow">
-    <button class="accordion-button collapsed" type="button" 
-            data-bs-toggle="collapse" data-bs-target="#content1_3" 
-            aria-expanded="true" aria-controls="item1_3">
-      It depends on the homeroom teacher, the ALT and how they relate to each other.
-    </button>
-  </h2>
-  <div id="content1_3"
-       class="accordion-collapse collapse bg-white border shadow ps-5" 
-       style="cursor:pointer;"
-       aria-labelledby="head1_3" data-bs-parent="#list1">
-       <%- include('yearinreview/4_hrt_alt.ejs') %>
-  </div>
+    <h2 id="grade_h" class="accordion-header border shadow">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#grade_c"
+        aria-expanded="true" aria-controls="grade_h">
+        It depends on the grade.
+      </button>
+    </h2>
+    <div id="grade_c" class="accordion-collapse collapse bg-white border shadow p-3" style="cursor:pointer;"
+      aria-labelledby="grade_h" data-bs-parent="#main_a">
+      <%- include('yearinreview/3_grade.ejs') %>
+    </div>
 
 
-  <h2 id="item1_4" class="accordion-header border shadow">
-    <button class="accordion-button collapsed" type="button" 
-            data-bs-toggle="collapse" data-bs-target="#content1_4" 
-            aria-expanded="true" aria-controls="item1_4">
-      It depends on (the individual students in) the class.
-    </button>
-  </h2>
-  <div id="content1_4"
-       class="accordion-collapse collapse bg-white border shadow p-5" 
-       style="cursor:pointer;"
-       aria-labelledby="head1_4" data-bs-parent="#list1">
-       <%- include('yearinreview/5_class.ejs') %>
-  </div>
+    <h2 id="teachers_h" class="accordion-header border shadow">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#teachers_c"
+        aria-expanded="true" aria-controls="teachers_h">
+        It depends on the HRT(s), the JTE, the ALT and their working relationships.
+      </button>
+    </h2>
+    <div id="teachers_c" class="accordion-collapse collapse bg-white border shadow ps-5" style="cursor:pointer;"
+      aria-labelledby="teachers_h" data-bs-parent="#main_a">
+      <%- include('yearinreview/4_hrt_alt.ejs') %>
+    </div>
 
 
-  <h2 id="item1_5" class="accordion-header border shadow">
-    <button class="accordion-button collapsed" type="button" 
-            data-bs-toggle="collapse" data-bs-target="#content1_5" 
-            aria-expanded="true" aria-controls="item1_5">
-      It depends on precedent.
-    </button>
-  </h2>
-  <div id="content1_5"
-       class="accordion-collapse collapse bg-white border shadow ps-5" 
-       style="cursor:pointer;"
-       aria-labelledby="head1_5" data-bs-parent="#list1">
-       <%- include('yearinreview/6_precedent.ejs') %>
-  </div>
-
-</div>
+    <h2 id="env_h" class="accordion-header border shadow">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#env_c"
+        aria-expanded="true" aria-controls="env_h">
+        It depends on familiarity with teaching resources.
+      </button>
+    </h2>
+    <div id="env_c" class="accordion-collapse collapse bg-white border shadow p-3" style="cursor:pointer;"
+      aria-labelledby="env_h" data-bs-parent="#main_a">
+      <%- include('yearinreview/5_res.ejs') %>
+    </div>
 
 
-<div class="small UD d-none">
-<!-- lorem ipsum in Japanese -->
-長ニ横力づち助都位須めょ朝9学す氏場げぶ犯場チケイラ紆注肉で柳転すあこづ文側私集ろず。生エコテ私際ラニ合31法クょさ補億ロタシ携実ゆ図場案うにッゃ諸5死変ホク深港州タ亡浜き。芸ツ小溶リルコ給目騒よあ議医ワア引常らな輪紙さっは意治ねッドス関査ルのん国由ス済役がすル国女べ置温ともれ細読78形トイフル京式テ備厘架けたい。
-直マウナ謙得キマニネ鉄学ヨシミ現転イヱユサ表政りみゅば国球9死はへラ毎育リ写由ぼにし指族リ授家無オハヤ長有め台水ワルノモ来復ソテレ他示ネ連百切幅採れ。季予応ロヨウ者手後ヨセナ祭4厳ナ業山フを保長ク注緯そ玉味のうゃや意携ラナ織82投治ほぐ当勝イ固円よ宿負ノセヒス創写ミモナア人道けぽイ堤喜栄潟薬ざ。
-質ふづじフ制内ムレマ属県みどね春配すぽ認紀しぐそ権制ヘ町合は可7賀でな実43人ラみろ教究を使内待りよ。記懇位美オ連裏ぎぱ歴切ヤエマ記告ンにや営電オ旅冴表タキナユ免繁ケキマ立芸ノヌ謡創事コテワ記9度メソ時事マス著保浮絵影まぱ。両ろひさで飛万5給ツホハオ支増ぞせへ味編ふやなル考術ネキ著変ねとぼは社手ケモ覇82返がクじら金長けなべド民報地タホサ年最元史ぶむんね。
-7郎た助焦ヲ線被ヌマメヨ三先ルずむ上技オミレ官詳ホヌレ米安断今ユソ火予問ルゆ着早報ぱかうべ映六暮ミ伝著スヌカ体佑ぞしまぶ。入ぜほいド却50週よべッ質申ロスセマ近獣ヨ手度ゅ去気っば今常タソワ伎専げあ年棋りをぎづ芝市家か輝時ー解際ウサチフ生公ーほ度玉めぶ休経侑倣づら。72緩ょる辞超ホレヤタ聞朝ンじこ予社問ミハチコ質撮仲わ当紙一ノヌヲ済供オヤエロ社国そぐぴ二御だぐと。
-主ぐめるづ革47禁っ浅使ハア決取たち新宿選ナラコケ査手テミノ放個く野会委ハア記英シナコユ川体71浜代英幹めやそ。機クく品員中必ゃむりね痛医ヲルナコ尿思ぎ責咋面ホラ写子テケメシ掲来エオ謝麗ート賞也ゅざ約設ル島王はきぱく活理だ権本ホオ面理教ぽ識宿テカヌエ白氏ッ意若亀をべが。福社げ態8賞ク輪上ょ目整表リミス高真ソセ魚組レ著暮セ女98差炭熟耳6試ゅづ気働迎ラぎる。
-便権クゆう食著ヒロ理内かッば意告こでゆ白産定ヒケキ虎任タルテ済津ヱタ解男ハユミ秘8被ッゅとふ出球ムテメ央仕稿かぜゃ年3著全っス民端自クドい。街ルだゅん備事こしづ途細同メク読要やご旅20聞8選岩れえ社勝ムテウリ浦容どえそ作見ヤミ係佐カヲキ森道条ヌフ動投れら性諌ぴぽゆス問立葉んうをい上費ドわおゃ。
-広ウユ深売が多家ナシイ面費私額っぱ更聞ウリラニ気月勝モルニソ済請ぼ値台確株しあべ県座ろ属逃ユロノ有終ヱオ入始レふッ会2冤冶るべずえ。合ソエニヲ貫事ヱ供芸スす経海よ上稿ヨフアラ転大ラべにフ呼著ヘツヱラ底広きん前更ミネヌカ総般がと焼掲ヘ図15第約奏訳4投ラルヱ安宅ぴれンへ面面性トい掲昨侃凸塀り。
-71道マシチノ始際ス水路ざちのら関京トウリマ育例あれてレ多由茂レヒソ重芸ニロヤ側街2辞ユロ境慣和ヤヒシ司飛へ際重政ミワナ入加ほ発詳法製どッそに。七てげゆ申集チ泉早特ノニリ量養能ラ足結ぐ発界コヲセワ元試ト芸恐ねあお用存ぐよ芸掃ニ意敏かレ週握ちもづ稿決ラをイぱ。忘度ちそ真貢たばぜも旅能キトホフ婚写リ額自レのたお治校5絞てぎ索菓ほずぼ弥9禁ラオリテ歩詳賛スか自岩裁抱くルかレ。
-以ヨタリ任著フルハヌ証者ばレ下3国感ま電五ヒチ対一サチ上7団るず試訟テオ征造コウカロ賞学塩抵ださド。1揚れじク片支イえそ乳立ラ土別クちまか撮育住お規禁右康持よゃごく値国誰じどほ。趣枝サ景8一ンべ人朝リ任生レ属政をのこえ切1張ヘミイ業録芸イエセロ速市ニヒ後講エメムキ宣双脈鶴トつむ。
-迷精イウヨル供落アタレケ録督む左戦ヤアヱレ意載改くお情19崎着6知フラエニ文音ぴトづて方事ヨオヲ米海原ねばが。楽島まうへく文低ムヘレロ年増カヲエコ松母セ土引かイ松67医ぜばに社区ぐご者元ち直町日ナヲユ巻25崎着9写れば属教名枝ト能条トやゅせ。回川ル場者ツ映静ょリ介元ユオラ刺校摘をべぼっ人案ルメクテ団聞よまあ解福記ドけろう日当ぜご神廃てひ名滞いン情止こ日九藤広特くり。
-</div>
+    <h2 id="sum_h" class="accordion-header border shadow">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sum_c"
+        aria-expanded="true" aria-controls="sum_h">...
+      </button>
+    </h2>
+    <div id="sum_c" class="accordion-collapse collapse bg-white border shadow p-3" style="cursor:pointer;"
+      aria-labelledby="sum_h" data-bs-parent="#main_a">
+      <p class="deets">
+        I hope I've provided some understanding for how complicated an issue teaching
+        English in elementary school is and how much effort it takes from ALTs,
+        teachers and the Board of Education to make the most of limited classtime and
+        resources and help students get the most out of all that effort.
+      </p>
+      <p>
+        I haven't even touched on many other challenges...
+      </p>
+      <ul>
+        <li>
+          The language barrier between teachers and ALTs.
+        </li>
+        <li>
+          Differences in, not only culture but personality.
+        </li>
+        <li>
+          Students with special needs, students who get themselves stuck in the
+          "I don't speak English" category or students who are very very keen to
+          learn English until in comes to speaking.
+        </li>
+      </ul>
 
-<script>
-  $(function() {
-    $('ul li').on('click', function() {
-      $('ul li').not(this).removeClass('text-primary');
-      $(this).toggleClass('text-primary');
-    });
-  });
-</script>
+      <p class="deets">
+        There is a lot I've left out but I've tried to be thorough. I've also tried to
+        be more constructive than critical. Although, I've probably missed that mark a
+        few times. I hope anyone who's come across this has gained at least
+        some insight. I look forward to gaining further insight myself as time
+        goes on. Thank you.
+      </p>
+    </div>
 
 
-<%- include('../foot') %>
+
+
+
+    <div class="small UD d-none">
+      <!-- lorem ipsum in Japanese -->
+      長ニ横力づち助都位須めょ朝9学す氏場げぶ犯場チケイラ紆注肉で柳転すあこづ文側私集ろず。生エコテ私際ラニ合31法クょさ補億ロタシ携実ゆ図場案うにッゃ諸5死変ホク深港州タ亡浜き。芸ツ小溶リルコ給目騒よあ議医ワア引常らな輪紙さっは意治ねッドス関査ルのん国由ス済役がすル国女べ置温ともれ細読78形トイフル京式テ備厘架けたい。
+      直マウナ謙得キマニネ鉄学ヨシミ現転イヱユサ表政りみゅば国球9死はへラ毎育リ写由ぼにし指族リ授家無オハヤ長有め台水ワルノモ来復ソテレ他示ネ連百切幅採れ。季予応ロヨウ者手後ヨセナ祭4厳ナ業山フを保長ク注緯そ玉味のうゃや意携ラナ織82投治ほぐ当勝イ固円よ宿負ノセヒス創写ミモナア人道けぽイ堤喜栄潟薬ざ。
+      質ふづじフ制内ムレマ属県みどね春配すぽ認紀しぐそ権制ヘ町合は可7賀でな実43人ラみろ教究を使内待りよ。記懇位美オ連裏ぎぱ歴切ヤエマ記告ンにや営電オ旅冴表タキナユ免繁ケキマ立芸ノヌ謡創事コテワ記9度メソ時事マス著保浮絵影まぱ。両ろひさで飛万5給ツホハオ支増ぞせへ味編ふやなル考術ネキ著変ねとぼは社手ケモ覇82返がクじら金長けなべド民報地タホサ年最元史ぶむんね。
+      7郎た助焦ヲ線被ヌマメヨ三先ルずむ上技オミレ官詳ホヌレ米安断今ユソ火予問ルゆ着早報ぱかうべ映六暮ミ伝著スヌカ体佑ぞしまぶ。入ぜほいド却50週よべッ質申ロスセマ近獣ヨ手度ゅ去気っば今常タソワ伎専げあ年棋りをぎづ芝市家か輝時ー解際ウサチフ生公ーほ度玉めぶ休経侑倣づら。72緩ょる辞超ホレヤタ聞朝ンじこ予社問ミハチコ質撮仲わ当紙一ノヌヲ済供オヤエロ社国そぐぴ二御だぐと。
+      主ぐめるづ革47禁っ浅使ハア決取たち新宿選ナラコケ査手テミノ放個く野会委ハア記英シナコユ川体71浜代英幹めやそ。機クく品員中必ゃむりね痛医ヲルナコ尿思ぎ責咋面ホラ写子テケメシ掲来エオ謝麗ート賞也ゅざ約設ル島王はきぱく活理だ権本ホオ面理教ぽ識宿テカヌエ白氏ッ意若亀をべが。福社げ態8賞ク輪上ょ目整表リミス高真ソセ魚組レ著暮セ女98差炭熟耳6試ゅづ気働迎ラぎる。
+      便権クゆう食著ヒロ理内かッば意告こでゆ白産定ヒケキ虎任タルテ済津ヱタ解男ハユミ秘8被ッゅとふ出球ムテメ央仕稿かぜゃ年3著全っス民端自クドい。街ルだゅん備事こしづ途細同メク読要やご旅20聞8選岩れえ社勝ムテウリ浦容どえそ作見ヤミ係佐カヲキ森道条ヌフ動投れら性諌ぴぽゆス問立葉んうをい上費ドわおゃ。
+      広ウユ深売が多家ナシイ面費私額っぱ更聞ウリラニ気月勝モルニソ済請ぼ値台確株しあべ県座ろ属逃ユロノ有終ヱオ入始レふッ会2冤冶るべずえ。合ソエニヲ貫事ヱ供芸スす経海よ上稿ヨフアラ転大ラべにフ呼著ヘツヱラ底広きん前更ミネヌカ総般がと焼掲ヘ図15第約奏訳4投ラルヱ安宅ぴれンへ面面性トい掲昨侃凸塀り。
+      71道マシチノ始際ス水路ざちのら関京トウリマ育例あれてレ多由茂レヒソ重芸ニロヤ側街2辞ユロ境慣和ヤヒシ司飛へ際重政ミワナ入加ほ発詳法製どッそに。七てげゆ申集チ泉早特ノニリ量養能ラ足結ぐ発界コヲセワ元試ト芸恐ねあお用存ぐよ芸掃ニ意敏かレ週握ちもづ稿決ラをイぱ。忘度ちそ真貢たばぜも旅能キトホフ婚写リ額自レのたお治校5絞てぎ索菓ほずぼ弥9禁ラオリテ歩詳賛スか自岩裁抱くルかレ。
+      以ヨタリ任著フルハヌ証者ばレ下3国感ま電五ヒチ対一サチ上7団るず試訟テオ征造コウカロ賞学塩抵ださド。1揚れじク片支イえそ乳立ラ土別クちまか撮育住お規禁右康持よゃごく値国誰じどほ。趣枝サ景8一ンべ人朝リ任生レ属政をのこえ切1張ヘミイ業録芸イエセロ速市ニヒ後講エメムキ宣双脈鶴トつむ。
+      迷精イウヨル供落アタレケ録督む左戦ヤアヱレ意載改くお情19崎着6知フラエニ文音ぴトづて方事ヨオヲ米海原ねばが。楽島まうへく文低ムヘレロ年増カヲエコ松母セ土引かイ松67医ぜばに社区ぐご者元ち直町日ナヲユ巻25崎着9写れば属教名枝ト能条トやゅせ。回川ル場者ツ映静ょリ介元ユオラ刺校摘をべぼっ人案ルメクテ団聞よまあ解福記ドけろう日当ぜご神廃てひ名滞いン情止こ日九藤広特くり。
+    </div>
+
+    <script>
+      $(function () {
+        $('ul li').on('click', function () {
+          $('summary').removeClass('text-primary');
+          $('ul li').not(this).removeClass('text-primary');
+          $(this).toggleClass('text-primary');
+        });
+      });
+
+      $(function () {
+        $('details').on('click', function () {
+          $('details').not(this).removeAttr('open').find('summary').removeClass('text-primary');
+          $('ul li').not($(this).find('li')).removeClass('text-primary');
+          if ($(this).attr('open')) {
+            $(this).find('summary').removeClass('text-primary');
+          } else {
+            $(this).find('summary').addClass('text-primary');
+          }
+        });
+      });
+    </script>
+
+
+    <%- include('../foot') %>
