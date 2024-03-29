@@ -129,7 +129,15 @@ function getNeedleList(needleType, needle){
       var files = fs.readdirSync( path.join(__dirname, `../public/${needle}`) );
       for (let i = 0; i < files.length; i++){
         let str = files[i].replace(`public/${needle}/`, '');
+
+        // remove file extension
         str = str.replace(/\.[^/.]+$/, "");
+
+        // find the first index of '_' in str
+        let underscoreIndex = str.indexOf('_');
+        // keep everything after the underscore
+        if (underscoreIndex > -1) str = str.slice(underscoreIndex+1);
+
         needleList.push( str );
       }
       break;

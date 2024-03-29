@@ -17,6 +17,17 @@ router.get('/yearinreview', (req, res)=>{
 });
 
 
+router.get('/pronunciation', (req, res)=>{
+  try{
+    res.render('labs/pronunciation');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
+
 router.get('/pairs', (req, res)=>{
   try{
     res.render('sockets/pairs');

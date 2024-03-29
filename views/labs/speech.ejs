@@ -28,9 +28,8 @@ $(function(){
   const SpeechRecognitionEvent =
     window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
 
-  const colors = [
-    "red", "orange", "yellow", "green", "blue", "purple", 
-    "black", "white", "pink", "brown", "gray"];
+  const colors = ["red", "orange", "yellow", "green", "blue", "purple", 
+                  "black", "white", "pink", "brown", "gray"];
 
   const grammar = `#JSGF V1.0; grammar colors; public <color> = ${colors.join(
     " | ",

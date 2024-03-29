@@ -150,6 +150,28 @@
       parallelShuffle(backClass, backContent);
       break;
 
+    case 'capital':
+      let capital = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
+                     "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T",
+                     "U", "V", "W", "X", "Y", "Z"];
+      for (let i of capital){
+        backContent.push( i );
+        backClass.push('alert-primary');
+      }
+      FYshuffle(backContent);
+      break;
+
+    case 'lowerCase':
+      let lowerCase = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
+                       "k", "l", "m", "n", "o", "p", "q", "r", "s", "t",
+                       "u", "v", "w", "x", "y", "z"];
+      for (let i of lowerCase){
+        backContent.push( i );
+        backClass.push('alert-primary');
+      }
+      FYshuffle(backContent);
+      break;
+
     case 'animals':
       for (let i = 0; i < deck.length; i++){
         backContent.push(`<img style="max-width:70%;max-height:70%;" 
