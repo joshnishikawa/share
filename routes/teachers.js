@@ -8,6 +8,32 @@ const db = mysql.createPool(creds);
 const text_decks = require('../public/javascripts/text_decks.json'); // FIXME: Deprecate this in 2025
 
 
+// router.get('/vocabulary', async (req, res)=>{
+//   // this is only needed to populate the database
+//   try{
+//     let NH_vocab = require('../public/NH_vocab.js');
+//     for (let page in NH_vocab){
+//       for (let theme in NH_vocab[page]){
+//         for (let word in NH_vocab[page][theme]){
+//           let meaning = NH_vocab[page][theme][word].meaning;
+//           let image = NH_vocab[page][theme][word].image;
+//           let audio = NH_vocab[page][theme][word].audio;
+//           await db.query(`INSERT INTO vocabulary 
+//                           (book, page, theme, word, meaning, image, audio)
+//                           VALUES ('NH', ?, ?, ?, ?, ?, ?)`, 
+//                           [page, theme, word, meaning, image, audio]);
+//         }
+//       }
+//     }    
+//     res.send('ok');
+//   }
+//   catch(err){
+//     res.send(err);
+//     console.error(err);
+//   }
+// });
+
+
 router.get('/', (req, res)=>{
   try{
     res.redirect('/teachers/images');
@@ -42,7 +68,7 @@ router.get('/LT', async (req, res)=>{
       }
 
     let [rows, schema] = await db.query(`SELECT id, page, theme, word 
-                                         FROM vocab 
+                                         FROM vocabulary
                                          WHERE book='LT'`);
     let LT_vocab = {};
     for (let row of rows){
@@ -62,16 +88,17 @@ router.get('/LT', async (req, res)=>{
 router.get('/NH', async(req, res)=>{ // FIXME: There needs to be a single route to render this menu for students or teachers.
   try{
     var colors = {
-      "#c5b3e6" : ["page_4_5", "page_14_15"],
-      "#a3cfbb" : ["page_6_7", "page_12_13", "page_26_27", "page_30_31"],
-      "#ffe69c" : ["page_8_9", "page_16_17", "page_22_23"],
-      "#f1aeb5" : ["page_10_11", "page_28_29"],
-      "#9ec5fe" : ["page_18_19"],
-      "#fecba1" : ["page_20_21", "page_24_25"],
-      }
+      "#ffa9a0" : ["page_8_9", "page_22_23"],   // red
+      "#ddefb7" : ["page_10_11", "page_24_25"], // green
+      "#cdaed2" : ["page_12_13", "page_34_35"], // purple
+      "#ffd3b5" : ["page_14_15", "page_26_27"], // orange
+      "#bfe0fa" : ["page_16_17", "page_28_29"], // blue
+      "#c4bd9a" : ["page_18_19", "page_30_31"], // olive
+      "#ffcbda" : ["page_20_21", "page_32_33"]  // pink
+    }
 
     let [rows, schema] = await db.query(`SELECT id, page, theme, word 
-                                         FROM vocab 
+                                         FROM vocabulary 
                                          WHERE book='NH'`);
     let NH_vocab = {};
     for (let row of rows){
