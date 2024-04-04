@@ -8,30 +8,39 @@ const db = mysql.createPool(creds);
 const text_decks = require('../public/javascripts/text_decks.json'); // FIXME: Deprecate this in 2025
 
 
-// router.get('/vocabulary', async (req, res)=>{
-//   // this is only needed to populate the database
-//   try{
-//     let NH_vocab = require('../public/NH_vocab.js');
-//     for (let page in NH_vocab){
-//       for (let theme in NH_vocab[page]){
-//         for (let word in NH_vocab[page][theme]){
-//           let meaning = NH_vocab[page][theme][word].meaning;
-//           let image = NH_vocab[page][theme][word].image;
-//           let audio = NH_vocab[page][theme][word].audio;
-//           await db.query(`INSERT INTO vocabulary 
-//                           (book, page, theme, word, meaning, image, audio)
-//                           VALUES ('NH', ?, ?, ?, ?, ?, ?)`, 
-//                           [page, theme, word, meaning, image, audio]);
-//         }
-//       }
-//     }    
-//     res.send('ok');
-//   }
-//   catch(err){
-//     res.send(err);
-//     console.error(err);
-//   }
-// });
+router.get('/vocabulary', async (req, res)=>{
+  // this is only needed to populate the database
+  try{
+    // let [rows, schema] = await db.query(`SELECT * FROM vocabulary WHERE book='NH' AND theme='jobs+'`);
+    // // change 'insects' to 'bugs' in the image property
+    // for (let row of rows){
+    //   let image = row.image;
+    //   let new_image = image.replace('jobs', 'jobs+');
+    //   await db.query(`UPDATE vocabulary SET image=? WHERE id=?`, [new_image, row.id]);
+    // }
+
+
+    // let NH_vocab = require('../public/NH_vocab.js');
+    // for (let page in NH_vocab){
+    //   for (let theme in NH_vocab[page]){
+    //     for (let word in NH_vocab[page][theme]){
+    //       let meaning = NH_vocab[page][theme][word].meaning;
+    //       let image = NH_vocab[page][theme][word].image;
+    //       let audio = NH_vocab[page][theme][word].audio;
+    //       await db.query(`INSERT INTO vocabulary 
+    //                       (book, page, theme, word, meaning, image, audio)
+    //                       VALUES ('NH', ?, ?, ?, ?, ?, ?)`, 
+    //                       [page, theme, word, meaning, image, audio]);
+    //     }
+    //   }
+    // }    
+    res.send('ok');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
 
 
 router.get('/', (req, res)=>{
