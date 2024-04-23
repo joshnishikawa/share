@@ -12,9 +12,9 @@
 <div class="container-fluid pb-3">
   <div class="row">
 
-    <div class="col-10"><%- __('themes') %></div>
+    <div class="col-9"><%- __('themes') %></div>
 
-    <div class="col-2 d-flex justify-content-between">
+    <div class="col-3 d-flex justify-content-between">
       <div><%- __('list') %><span id="numOfItems"> (0)</span></div>
       <div class="small text-danger"><%- __('editThisLast') %></div>
     </div>
@@ -22,26 +22,45 @@
   </div>
   <div class="row">
 
-    <div class="col-10">
+    <div class="col-9 g-0 px-1">
       <div id="themes" class="d-flex flex-wrap">
-<% for (let p in NH_vocab) { let color = ''; for (let c in colors) { if (colors[c].includes(p)) { color = c; break;}} %>
+<% for (let p in NH_vocab) { let color = ''; for (let c in colors) { if (colors[c].includes(p)) {color = c; break;}} %>
+  <% if (p == '+'){ %>
+        <div id="deleteme" class="flex-grow-1">.</div>
+        <div id="growme" class="rounded-3 p-1 flex-grow-1" style="margin:1px;background-color:lightgray;">
+          
+          <div id="<%- p %>" class="d-flex flex-wrap">
+
+    <% for (let t in NH_vocab[p]) { %>
+      <% let id = t.replace(/ /g, "_"); %>
+            <div class="form-check" style="width:fit-content;">
+              <input aria-label="themes" class="form-check-input" type="checkbox" id="<%- id %>" name="themes" value="<%- t %>">
+              <label class="form-check-label me-3" style="margin-left:-5px;" for="<%- id %>"><%- __(t) %> <u><%- Object.keys(NH_vocab[p][t]).length %></u></label>
+            </div>
+    <% } %>
+          </div>
+
+        </div>
+  <% } else { %>
         <div class="rounded-3 p-1 d-flex" style="margin:1px;background-color:<%- color %>">
           <div class="vertical-label"><%- p.replace(/_/g, ' ') %></div>
-          <div id="<%- p %>" style="width:170px;">
+          <div id="<%- p %>">
 
-  <% for (let t in NH_vocab[p]) { let id = t.replace(/ /g, "_"); %>
+    <% for (let t in NH_vocab[p]) { %>
+      <% let id = t.replace(/ /g, "_"); %>
             <div class="form-check">
               <input aria-label="themes" class="form-check-input" type="checkbox" id="<%- id %>" name="themes" value="<%- t %>">
-              <label class="form-check-label me-3" style="margin-left:-5px;" for="<%- id %>"><%- __(t) %> (<%- Object.keys(NH_vocab[p][t]).length %>)</label>
+              <label class="form-check-label me-3" style="margin-left:-5px;" for="<%- id %>"><%- __(t) %> <u><%- Object.keys(NH_vocab[p][t]).length %></u></label>
             </div>
-  <% } %>
+    <% } %>
           </div>
         </div>
+  <% } %>
 <% } %>
       </div>
     </div>
 
-    <div class="col-2" style="position:relative;">
+    <div class="col-3" style="position:relative;">
       <div id="list" class="d-flex flex-wrap" style="position:absolute;max-height:100%;overflow-y:scroll;"></div>
     </div>
 
@@ -51,7 +70,24 @@
 
 
 <script>
+  // I could probably populate the menu here using javascript then it wouldn't
+  // conflict with jquery handlers that are set after the page is loaded.
 $(function(){
+  // But I only need that last div to be flex-grow-1 AND d-flex flex-wrap. So...
+  // Set #growme to the width of #deletme. Then hide #deleteme. (also on resize)
+  $("#growme").width($("#deleteme").width() -20);
+  $("#deleteme").hide();
+
+  $(window).on('resize', function(){
+    $("#deleteme").show();
+    $("#growme").width($("#deleteme").width() -20);
+    $("#deleteme").hide();
+  });
+
+
+
+
+
   let NH_vocab = <%- JSON.stringify(NH_vocab) %>;
   window.deckType = 'NH';
   window.deck = [];

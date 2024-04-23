@@ -12,10 +12,14 @@
       <div class="row">
         <div class="col d-flex flex-wrap justify-content-center">
           <div class="display-1 UD"><%- __('activity.pairs.title') %></div>
-          <div id="time" class="px-5 text-center display-5 UD mb-3 mt-auto">
+
+          <div id="result" class="mx-5 p-3 alert-success rounded-3 text-center display-5 UD mb-3 mt-auto"
+                           style="display:none;">
+            <span id="time"></span> seconds!
           </div>
+
         </div>
-        </div>
+      </div>
       <div class="row">
         <div class="col">
           <%- __('activity.pairs.description') %>
@@ -46,7 +50,9 @@ $(function(){
   times = times ? times : {};
   // add times to buttons
   for (let i in times){
-    $(`button[data-value="${i}"] .time`).text(times[i]);
+    // if string, parse to float
+    if (typeof times[i] == 'string') times[i] = parseFloat(times[i]); // for old bug
+    $(`button[data-value="${i}"] .time`).text(times[i].toFixed(2));
   }
 
   $(".menu").on('click', function(){
@@ -108,23 +114,24 @@ $(function(){
           if ($('.flip.flipped').length == 0){
 
             var time = (Date.now() - timer) / 1000;
-            time = time.toFixed(2);
             // if there is a previous time, and this time is less, use this time
-            if (times[deckName] && time < times[deckName]) {
+            console.log(times[deckName], parseFloat(times[deckName]), time);
+            if (times[deckName] && time < parseFloat(times[deckName])) {
               times[deckName] = time;
               localStorage.setItem('pairs', JSON.stringify(times));
-              $(`button[data-value="${deckName}"] .time`).text(time);
+              $(`button[data-value="${deckName}"] .time`).text(time.toFixed(2));
             }
             // if there is no previous time, use this time
             else if (!times[deckName]) {
               times[deckName] = time;
               localStorage.setItem('pairs', JSON.stringify(times));
-              $(`button[data-value="${deckName}"] .time`).text(time);
+              $(`button[data-value="${deckName}"] .time`).text(time.toFixed(2));
             }
 
             $("#buttons").removeClass('d-none').addClass('d-block');
             $("#grid").empty();
-            $("#time").html(`<span class="mx-5 alert-success rounded-3">${time}&nbsp;seconds!</span>`);
+            $("#time").text(time); //html(`<span class="mx-5 alert-success rounded-3">${time}&nbsp;seconds!</span>`);
+            $("#result").show();
           }
         }
         else {

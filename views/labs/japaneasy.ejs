@@ -1,4 +1,15 @@
 <%- include('../head') %>
+<style>
+  .add {
+    /* rounded right */
+    border-top-right-radius: 50%;
+    border-bottom-right-radius: 50%;
+    cursor: pointer;
+  }
+  .add:hover {
+    color: red;
+  }
+</style>
 
 <div class="small UD d-none">
   <!-- lorem ipsum in Japanese -->
@@ -14,14 +25,41 @@
   迷精イウヨル供落アタレケ録督む左戦ヤアヱレ意載改くお情19崎着6知フラエニ文音ぴトづて方事ヨオヲ米海原ねばが。楽島まうへく文低ムヘレロ年増カヲエコ松母セ土引かイ松67医ぜばに社区ぐご者元ち直町日ナヲユ巻25崎着9写れば属教名枝ト能条トやゅせ。回川ル場者ツ映静ょリ介元ユオラ刺校摘をべぼっ人案ルメクテ団聞よまあ解福記ドけろう日当ぜご神廃てひ名滞いン情止こ日九藤広特くり。
 </div>
 
+<div class="container mt-3">
+  <div class="row">
 
-<div class="container m-5">
-  <% for (item of result){ %>
-    <%- '***<br/>'; %>
-    <% for (key in item) { %>
-      <%- `${key}: ${item[key]}<br/>` %>
-    <% } %>
-  <% } %>
+    <div class="col-6">
+      <form id="j_form" class="form d-flex me-5 mb-3" method="POST">
+        <input type="text" class="form-control" id="word" name="word" placeholder="word" autofocus>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+      <div id="result" class="d-flex"></div>
+    </div>
+
+    <div class="col-6">
+      <div class="alert alert-primary" role="alert">
+        <h4 class="alert-heading">Your Title</h4>
+        <p>Your selected words go here.</p>
+      </div>
+    </div>
+  </div>
 </div>
+
+<script type="module">
+  import translate from "https://cdn.jsdelivr.net/npm/translate/index.min.js";
+
+$(function(){
+  $('#j_form').submit(async function(e){
+    e.preventDefault();
+    let input = $('#word').val();
+    let j_candidate = await translate(input, "ja");
+    let e_candidate = await translate(j_candidate);
+    
+
+    $('#result').html(`<div class="alert alert-primary">${input} : ${e_candidate} : ${j_candidate}</div>
+                       <div class="add alert-success px-3"><i class="material-icons">add</i></div>`);
+  });
+});
+</script>
 
 <%- include('../foot') %>

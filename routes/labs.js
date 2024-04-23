@@ -1,13 +1,51 @@
 var Dictionary = require('japaneasy');
 var dict = new Dictionary();
+
+
 const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const https = require('https');
 const path = require('path');
+const creds = require('../../creds.js');
+const mysql = require('mysql2/promise');
+const db = mysql.createPool(creds);
 
 const bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded({extended: true}));
+
+router.get('/lp', (req, res)=>{
+  try{
+    res.render('labs/lp');
+  }
+  catch
+  (err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
+
+router.get('/japaneasy', (req, res)=>{
+  try{
+    res.render('labs/japaneasy');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
+router.post('/japaneasy', async(req, res)=>{
+  try{
+    let word = await translate(req.body.word);
+    res.send(result);
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
 
 
 // EDIT SUBTITLES //////////////////////////////////////////////////////////////
@@ -94,44 +132,6 @@ const download = (url, newfilepath) => new Promise((resolve, reject) => {
 });
 
 
-// router.get('/dlpicdic', async(req, res)=>{
-     // this is a one-time use route to download all the images from New Horizon
-//   try{
-//     let s = 1;
-
-//     for (let i = 1; i <= 987; i++){
-//       if ( [15, 54, 69, 80, 115, 152, 164, 179, 216, 222, 240, 251, 297, 334,
-//             346, 360, 372, 386, 418, 427, 432, 442, 455, 464, 477, 556, 564,
-//             568, 592, 613, 633, 693, 701, 706, 720, 732, 750, 760, 818, 841,
-//             858, 870, 887, 915, 965].includes(i) ) s++;
-
-//       let section = s.toString().padStart(2, '0');
-//       let name = i.toString().padStart(4, '0');
-//       let newfilepath = path.join(__dirname, `../public/image/picdic/${name}.png`);
-//       let url = `https://sw31.tsho.jp/06pk/e/pd/w${section}/assets/${name}.png`;
-
-//       await download(url, newfilepath);
-//     }
-//     console.log("Downloads Completed");
-//     res.send('ok');
-//   }
-//   catch(err){
-//     res.send(err);
-//     console.error(err);
-//   }
-// });
-
-router.get('/pronunciation', (req, res)=>{
-  try{
-    res.render('labs/pronunciation');
-  }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
-
-
 router.get('/pairs', (req, res)=>{
   try{
     res.render('sockets/pairs');
@@ -145,20 +145,16 @@ router.get('/pairs', (req, res)=>{
 
 router.get('/speak_spell', (req, res)=>{
   try{
-    res.render('labs/speak_spell');
-  }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
-
-
-router.get('/japaneasy', (req, res)=>{
-  try{
-    dict('アバウト').then(function(result){
-      res.render('labs/japaneasy', {result});
+    // get array of words from vocabulary table
+    let words = [];
+    db.query('SELECT word FROM vocabulary')
+    .then(([rows, schema])=>{
+      for (let row of rows){
+        words.push(row.word);
+      }
+      res.render('labs/speak_spell', {words});
     });
+
   }
   catch(err){
     res.send(err);

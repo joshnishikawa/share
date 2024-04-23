@@ -36,11 +36,9 @@
   </div>
 </div> 
 
-  <div style="min-height:100vh;user-select: none;">
-    <div id="gridContainer">
-      <div id="grid" class="d-flex flex-wrap"></div>
-    </div>
-  </div>
+<div class="pt-3" style="min-height:100vh;user-select: none;">
+  <div id="grid" class="d-flex flex-wrap"></div>
+</div>
 
 <%- include ("../modals/modal_match.ejs") %>
 
@@ -219,7 +217,7 @@
   for (let i = 0; i < deck.length; i++){
     $("#grid").append(
      `<div class="col-${colspan} vocab p-0" style="height:${rowheight}vh;">
-        <div data-value="${deck[i].word}" class="container flip m-3" style="height:80%;">
+        <div data-value="${deck[i].word}" class="container flip" style="height:80%;">
           <div class="flip-card shadow">
 
             <div class="${deck[i].type} flip-front bg-white rounded border UD">

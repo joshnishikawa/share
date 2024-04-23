@@ -201,7 +201,7 @@ $(function(){
         let d = guess[i] == ' ' ? '&nbsp;' : guess[i]; // for display
 
         if(guess[i] === item.word[i]){
-          $("#guess .item:last-child").append(`<div class="btn btn-lg bg-primary text-white" 
+          $("#guess .word:last-child").append(`<div class="btn btn-lg bg-primary text-white" 
                                    style="font-size:2em; width:60px;">${d}</div>`);
           $(`[data-value=${l}]`)
             .removeClass('bg-warning bg-secondary text-body')

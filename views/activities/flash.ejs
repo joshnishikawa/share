@@ -29,8 +29,8 @@
     z-index:-1;
   }
 
-  /* add box shadow to #flash img if not .svg */
-  #flash img:not([src*=".svg"]){
+  /* add box shadow to #flash img if not .svg or .png */
+  #flash img:not([src$=".svg"]):not([src$=".png"]){
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
   }
 

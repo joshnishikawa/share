@@ -2,15 +2,26 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
+const bodyParser = require('body-parser');
 const abc = require('./abc.js');
 const labs = require('./labs.js');
 const creds = require('../../creds.js');
 const mysql = require('mysql2/promise');
 const db = mysql.createPool(creds);
 
+router.use(bodyParser.urlencoded({extended: true}));
 router.use('/abc', abc);
 router.use('/labs', labs);
 
+router.get('/test', (req, res)=>{
+  try{
+    res.render('tools/test');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
 
 router.get('/', (req, res)=>{
   try{
@@ -25,16 +36,18 @@ router.get('/', (req, res)=>{
 
 router.get('/LT', (req, res)=>{
   try{
-    var colors = {
-      "#c5b3e6" : ["fruit", "life", "time"],
-      "#a3cfbb" : ["vegetable", "body", "supplies"],
-      "#ffe69c" : ["food", "play", "town"],
-      "#f1aeb5" : ["colors", "weather", "school"],
-      "#9ec5fe" : ["shapes", "clothes", "daily"],
-      "#fecba1" : ["adjectives", "weekdays"],
-      }
-    
-    res.render('students/LT', {LT_vocab, colors});
+    res.render('students/LT', {LT_vocab});
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
+
+router.get('/New_Horizons', (req, res)=>{ // Because you borked it dude!
+  try{
+    res.redirect('/NH');
   }
   catch(err){
     res.send(err);
@@ -58,13 +71,27 @@ router.get('/NH', async (req, res)=>{
     let [rows, schema] = await db.query(`SELECT id, page, theme, word 
                                          FROM vocabulary 
                                          WHERE book='NH'`);
+
     let NH_vocab = {};
     for (let row of rows){
       if ( !NH_vocab[row.page] ) NH_vocab[row.page] = {};
       if ( !NH_vocab[row.page][row.theme] ) NH_vocab[row.page][row.theme] = {};
       NH_vocab[row.page][row.theme][row.word] = row.id;
     }
-    res.render('students/NH', {NH_vocab, colors});
+
+    NH_vocab['+'] = {};
+    for (let p in NH_vocab){
+      for (let t in NH_vocab[p]){
+        if (t.indexOf('+') > -1){ // try 'include'
+          let plus = NH_vocab[p][t];
+          delete NH_vocab[p][t];
+          NH_vocab['+'][t] = plus;
+        }
+      }
+    }
+
+
+    res.render('students/NH', {NH_vocab, colors, teacher: false});
   }
   catch(err){
     res.send(err);
@@ -95,29 +122,42 @@ router.get('/names', (req, res)=>{
 });
 
 
-router.get('/brainbox', (req, res)=>{
+router.get('/books', (req, res)=>{
   try{
-    let selected = `/image/brainbox/${req.query.brainbox}`;
+    let book = req.query.book ?? 'brainbox';
+    let page = req.query.page ?? 'airport.png';
 
-    fs.readdir( path.join(__dirname, '../public/image/brainbox'), (err, brainbox)=>{
+    fs.readdir( path.join(__dirname, `../public/image/books/${book}`), (err, pages)=>{
       if (err) throw err;
-      res.render('tools/brainbox', {brainbox, selected});
+      res.render('tools/books', {book, pages, page});
     });
   }
   catch(err){ console.error(err); }
 });
 
 
-router.get('/:activity', async(req, res)=>{
+router.post('/:activity', async(req, res)=>{
   try{
-    if ( !valid(req.params.activity, req.query) ) throw '404';
+    if ( !valid(req.params.activity, req.body) ) throw '404';
 
     let activity = req.params.activity;
-    let params = req.query;
+    let params = req.body;
     let deck = params.deck;
     delete params.deck;
     let deckType = params.deckType;
     delete params.deckType;
+
+    if (deckType == "nolink"){
+      let [rows, schema] = await db.query(`SELECT * FROM vocabulary 
+                                            WHERE word IN (?)
+                                            AND book='NH'`, [JSON.parse(deck)]);
+      deck = await rows.map( row => {
+        return {word: row.word, meaning: row.meaning, image: row.image};
+      });
+      res.render(`activities/${activity}`, {deckType, deck, params: JSON.stringify(params)});
+      return;
+    }
+
 
     let link = '';
     let [rows, schema] = await db.query(`SELECT id FROM links 
@@ -150,6 +190,9 @@ router.get('/:activity', async(req, res)=>{
     console.error(err);
   }
 });
+
+
+
 
 
 router.get('/:activity/:id', async (req, res)=>{

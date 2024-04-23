@@ -21,6 +21,7 @@
     "japaneasy": "^0.2.2",
     "morgan": "^1.10.0",
     "mysql2": "^3.9.1",
-    "socket.io": "^4.7.2"
+    "socket.io": "^4.7.2",
+    "translate": "^3.0.0"
   }
 }

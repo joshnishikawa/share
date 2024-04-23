@@ -1,5 +1,11 @@
 <%- include('../head'); -%>
 <style>
+  /* set page margin */
+  @page {
+    size: A4;
+    margin: 50px 50px;
+  }
+
   @media print {
     #menucontainer, #list {
       display: none;
@@ -11,19 +17,12 @@
       padding: 0;
     }
 
-    html, body, #sheet{ /* Why are there extra page breaks without this stinking border? */
-      border: 1px solid white;
-    }
-
     #sheet {
       visibility: visible !important;
       font-size: 270px;
       line-height: 240px;
-      width: 273mm;
-      /* center horizontally */
       margin-left: auto;
       margin-right: auto;
-      padding: 0;
     }
   }
 
@@ -51,14 +50,14 @@
     </div>
   </div>
   
-  <!-- Haruto, Miyu, Yoshifumi, Ai, Katsunobu, Ryuji, Wakana, Jyo, Joichiro, Megumi -->
   <div id="list" class="p-5">
-    <textarea class="form-control p-5 alert-secondary" placeholder="Add comma-separated names here."></textarea>
+    <textarea class="form-control p-5 alert-secondary" rows="10" placeholder="Add comma-separated names here."></textarea>
   </div>
 
   <div id="sheet" class="sheet d-flex flex-wrap UD text-center" style="visibility:hidden;"></div>
 
   <%- include ("../modals/modal_names.ejs") %>
+
 
 <script>
 $(function(){

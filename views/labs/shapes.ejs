@@ -1,96 +1,69 @@
 <%- include('../head'); -%>
 
 <style>
-  .selected {
-    filter: drop-shadow(0 0 0.5rem #0f0);
-  }
-
-  /* #colorMenu, #shapeMenu {
-    background-image:none !important;
-  } */
-
-  #colorMenu .vert-tabs .nav-item, #tagMenuFiller {
-    font-weight: bold;
-    background: none;
-    border: 1px solid #d3d3d4;
-    border-top-left-radius: 0.25rem;
-    border-bottom-left-radius: 0.25rem;
-  }
-
-  #colorMenu .vert-tabs .nav-item:hover, 
-  .vert-tabs .nav-item:focus {
-    cursor: pointer;
-    border-color: #6c757d;
-    isolation: isolate;
-  }
-
-  #colorMenu .vert-tabs .nav-item.active, 
-  #colorMenu .vert-tabs .nav-item.show {
-    background-color: #d3d3d4;
-    border-color: #d3d3d4;
-    border-right: 0px solid;
-  }
-
+  .shape{height:14%;}
+  .selected {filter: drop-shadow(0 0 0.5rem #0f0);}
+  #colorMenu ul li, #tagMenuFiller {font-weight: bold;height:9%;}
+  #colorMenu ul li:hover{cursor: pointer;}
 </style>
 
 
-
-
-
-
-
-
-
-
 <div class="container-fluid g-0">
-  <div class="row g-0">
-    <div id="colorMenu" style="height:100vh;overflow:hidden;white-space:nowrap;" class="col-1 ps-1">
+  <div class="row g-0" style="height:100vh;">
+    <div id="colorMenu" class="col ps-1" style="max-width:100px;">
       <ul class="nav vert-tabs d-flex flex-column" style="height:100%;">
         <li class="nav-item rounded-start p-2" style="color:white;background-color:red;">RED</li>
         <li class="nav-item rounded-start p-2" style="background-color: orange;">ORANGE</li>
-          <li class="nav-item rounded-start p-2" style="background-color: yellow;">YELLOW</li>
+        <li class="nav-item rounded-start p-2" style="background-color: yellow;">YELLOW</li>
         <li class="nav-item rounded-start p-2" style="color:white;background-color: green;">GREEN</li>
         <li class="nav-item rounded-start p-2" style="color:white;background-color: blue;">BLUE</li>
         <li class="nav-item rounded-start p-2" style="color:white;background-color: purple;">PURPLE</li>
         <li class="nav-item rounded-start p-2" style="color:white;background-color: black;">BLACK</li>
         <li class="nav-item rounded-start p-2" style="background-color: pink;">PINK</li>
         <li class="nav-item rounded-start p-2" style="color:white;background-color: brown">BROWN</li>
-        <div id="tagMenuFiller" class="bg-white border-end-0" style="border-top-left-radius: 0.25rem;flex: auto"></div>
+        <div id="tagMenuFiller" class="bg-white border-end-0" style="position:relative;border-top-left-radius: 0.25rem;flex: auto">
+          <!-- this button will open a modal to confirm clearing the canvas and saving to local storage -->
+          <button id="clearCanvas" class="btn btn-danger" style="position:absolute;bottom:5px;">
+            <i class="material-icons">delete</i>
+          </button>
+
+        </div>
       </ul>
+
     </div>
 
-    <div id="shapeMenu" class="col-1 bg-white g-0 p-1" style="border:10px solid rgba(0,0,0,0);">
-      <div class="shape svg-shape" data-shape="circle">
+    <div id="shapeMenu" class="col bg-white p-2" style="height:100%;max-width:100px;border:10px solid rgba(0,0,0,0);">
+      <div class="shape" data-shape="circle">
         <svg class="circle-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="50" cy="50" r="45" fill="red"/>
         </svg>
       </div>
-      <div class="shape svg-shape" data-shape="square">
+      <div class="shape" data-shape="square">
         <svg class="square-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect x="10" y="10" width="80" height="80" fill="blue"/>
         </svg>
       </div>
-      <div class="shape svg-shape" data-shape="triangle">
+      <div class="shape" data-shape="triangle">
         <svg class="triangle-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
           <polygon points="50,5 95,95 5,95" fill="green"/>
         </svg>
       </div>
-      <div class="shape svg-shape" data-shape="rectangle">
+      <div class="shape" data-shape="rectangle">
         <svg class="rectangle-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect x="10" y="20" width="80" height="60" fill="yellow"/>
         </svg>
       </div>
-      <div class="shape svg-shape" data-shape="diamond">
+      <div class="shape" data-shape="diamond">
         <svg class="diamond-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
           <polygon points="50,5 85,50 50,95 15,50" fill="pink"/>
         </svg>
       </div>
-      <div class="shape svg-shape" data-shape="star">
+      <div class="shape" data-shape="star">
         <svg class="star-svg" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 245">
           <path d="m56,237 74-228 74,228L10,96h240" fill="yellow"/>
         </svg>
       </div>
-      <div class="shape svg-shape" data-shape="heart">
+      <div class="shape" data-shape="heart">
         <svg class="heart-svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="purple"/>
         </svg>
@@ -98,144 +71,159 @@
     </div>
 
   <!-- Canvas area for dragging and dropping shapes -->
-    <div class="col-10">
-      <div id="canvas" class="border" style="height: 100vh;">
+    <div class="col">
+      <div id="canvas" class="border" style="height: 100%;">
         <!-- Shapes will be added here -->
       </div>
     </div>
   </div>
 </div>
 
-<div id="info" class="border border primary"></div>
+<div class="modal fade" id="clearCanvasModal" tabindex="-1" aria-labelledby="clearCanvasModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="clearCanvasModalLabel">Are you sure you want to clear the canvas?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" id="clearCanvasConfirm">Clear</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
 
 <script>
   $(function() {
-    // get canvas from local storage if exists
-    const canvas = localStorage.getItem("canvas");
-    if (canvas) {
-      $("#canvas").html(canvas, function() {
-        // make shapes resizable
-        $(".existing-shape").resizable({
-          containment: "#canvas",
-          handles: "all",
-          resize: function(event, ui) {
-            // Get the current width and height
-            const width = ui.size.width;
-            const height = ui.size.height;
+    let z = 1; // makes sure the last selected item is on top
 
-            // Update the info box with the new dimensions
-            $("#info").text(`${width} x ${height}`);
-          },
+    function setSelected(){
+      $(".canvas-shape").removeClass("selected");
+      $(this).addClass("selected");
+      $(this).css("z-index", z++);
+    }
+
+    function makeTouchable(item){
+      const mc = new Hammer(item[0]);
+
+      let lastScale = 1;
+      let lastRotation = 0;
+      mc.get('pinch').set({ enable: true });
+      mc.on("pan", function(ev) {
+        item.css({
+          top: ev.center.y - item.height() / 2,
+          left: ev.center.x - item.width() / 2,
         });
+      });
+      mc.on("pinch", function(ev) {
+        let scale = Math.max(0.5, Math.min(lastScale * ev.scale, 2));
+        let rotation = lastRotation + ev.rotation;
+        item.css({
+          transform: `scale(${scale}) rotate(${rotation}deg)`,
+        });
+        if (ev.isFinal) {
+          lastScale = scale;
+          lastRotation = rotation;
+        }
+      });
+      mc.on("pinchend", function(){
+        localStorage.setItem("canvas", $("#canvas").html());
+     });
+     mc.on("panend", function(){
+        localStorage.setItem("canvas", $("#canvas").html());
+     });
+    }
+
+
+    // get canvas from local storage if exists
+    var canvas = localStorage.getItem("canvas");
+    if (canvas) {
+      $("#canvas").html(canvas);
+      $("#canvas .canvas-shape").each(function() {
+        makeTouchable($(this));
       });
     }
 
-    // add active class to clicked nav-item
+    // set all shapes to selected color
     $('#colorMenu .nav-item').on('click', function() {
       let color = $(this).text().toLowerCase();
-      $('#colorMenu .nav-item').removeClass('active shadow');
       $('#shapeMenu').css('border', `10px solid ${color}`);
-      $('#shapeMenu .svg-shape svg').each(function() {
+      $('#shapeMenu .shape svg').each(function() {
         $(this).find('path, circle, rect, polygon').attr('fill', color);
       });
-      $(this).addClass('active shadow');
     });
 
-
-
-
+    $("#canvas").on("mousedown touchstart", ".canvas-shape", setSelected);
     // Remove .selected only when clicking on the canvas outside any shapes.
     $("#canvas").on("mousedown", function(event) {
       if (event.target.id === "canvas") {
-        $(".shape").removeClass("selected");
+        $(".canvas-shape").removeClass("selected");
       }
     });
 
 
-    // remove selected shape when delete key pressed
     $(document).on("keydown", function(event) {
       if (event.key === "Delete") {
         $(".selected").remove();
-      }
-    });
-
-
-    function setSelected() {
-      // Remove the selected class from all shapes
-      $(".shape").removeClass("selected").css("z-index", "0");
-
-      // Add the selected class to the clicked shape
-      $(this).addClass("selected svg").css("z-index", "1").resizable({
-        containment: "#canvas",
-        handles: "all",
-        resize: function(event, ui) {
-          // Get the current width and height
-          const width = ui.size.width;
-          const height = ui.size.height;
-
-          // Update the info box with the new dimensions
-          $("#info").text(`${width} x ${height}`);
-        },
-      });
-    }
-
-
-    // Make shapes draggable from the menu
-    $(".shape").draggable({
-      helper: "clone", // Allows dragging a copy
-      revert: "invalid", // Returns the shape if not dropped on canvas
-    });
-
-    $("#menu").on("mousedown", ".shape", setSelected);
-    $("#canvas").on("mousedown", ".existing-shape", setSelected);
-    $("#canvas").on("touchstart", ".existing-shape", setSelected);
-
-    // Make canvas droppable
-    $("#canvas").droppable({
-      drop: function(event, ui) {
-        const shapeType = $(ui.draggable).data("shape");
-        const isExistingShape = $(ui.helper).hasClass("existing-shape");
-
-        if (!isExistingShape) {
-          const $shape = $(ui.helper).clone();
-          $shape.removeClass("ui-draggable-dragging"); // Remove the dragging class
-          $shape.removeAttr("style"); // Remove inline styles added by jQuery UI
-          $shape.addClass("existing-shape selected");
-          const menuWidth = $("#colorMenu").width() + $("#shapeMenu").width();
-          const canvasOffset = $(this).offset();
-          const relativeTop = ui.offset.top - canvasOffset.top;
-          const relativeLeft = ui.offset.left - canvasOffset.left + menuWidth;
-
-          $shape.css({
-            position: "absolute",
-            top: relativeTop,
-            left: relativeLeft,
-          });
-
-          $(this).append($shape);
-  
-          $shape.draggable({
-            containment: "#canvas",
-          });
-
-          setSelected.call($shape);
-        } 
-        else {
-          $(ui.helper).css({
-            top: ui.position.top,
-            left: ui.position.left,
-          });
-        }
-        // save canvas to local storage
         localStorage.setItem("canvas", $("#canvas").html());
       }
+    });    
 
+    $("#clearCanvas").on("click", function() {
+      $("#clearCanvasModal").modal("show");
+    });
+
+    $("#clearCanvasConfirm").on("click", function() {
+      $("#canvas").empty();
+      localStorage.setItem("canvas", "");
+      $("#clearCanvasModal").modal("hide");
+      z = 1;
+    });
+
+
+    var shapeMenu = new Hammer(document.getElementById('shapeMenu'));
+
+    // Handle the panstart event
+    shapeMenu.on('panstart', function(e) {
+      // deselect
+      $(".canvas-shape").removeClass("selected");
+      // Get the shape that was touched
+      var $shape = $(e.target).closest('.shape');
+
+      // Clone the shape and add it to the canvas
+      var $clone = $shape.clone().removeClass('shape').addClass('canvas-shape selected');
+      $('#canvas').append($clone);
+      // Add touch to pan and pinch to zoom functionality using hammer
+      makeTouchable($clone);
+
+      // Start dragging the clone
+      $clone.css({
+        position: 'absolute',
+        left: e.center.x - $clone.width() / 2,
+        top: e.center.y - $clone.height() / 2
+      });
+    });
+
+    shapeMenu.on('panmove', function(e) {
+      // Get the clone and move it
+      var $clone = $('#canvas .canvas-shape.selected');
+      $clone.css({
+        left: e.center.x - $clone.width() / 2,
+        top: e.center.y - $clone.height() / 2
+      });
+    });
+
+    // Handle the panend event
+    shapeMenu.on('panend', function() {
+      // Save the canvas to local storage
+      localStorage.setItem('canvas', $('#canvas').html());
     });
   });
-</script>
 
-<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+
+</script>
 
 <%- include('../foot'); -%>
