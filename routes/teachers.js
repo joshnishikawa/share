@@ -105,10 +105,7 @@ router.get('/text', (req, res)=>{
 
 router.get('/tools', (req, res)=>{
   try{
-    fs.readdir( path.join(__dirname, '../public/image/brainbox'), (err, brainbox)=>{
-      if (err) throw err;
-      res.render('teachers/tools', {brainbox});
-    });
+    res.render('teachers/tools');
   }
   catch(err){
     res.send(err);

@@ -1,0 +1,16 @@
+<div class="rounded-3 border p-1 shadow d-flex">
+  <i class="material-icons text-secondary" 
+    style="line-height:1.4rem;font-size:1.4rem;cursor:pointer;" 
+    data-bs-toggle="modal" data-bs-target="#lp_modal">
+    info
+  </i>
+  <strong class="text-primary h3">LESSON PLANNER</strong>
+  
+  <form action="/lp" method="GET" class="d-flex justify-content-end flex-grow-1">
+    <button type="submit" class="btn btn-primary" style="height:100%">
+      Start
+    </button>
+  </form>
+</div>
+
+<%- include ("../modals/modal_lp.ejs") %>

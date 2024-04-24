@@ -14,17 +14,6 @@ const db = mysql.createPool(creds);
 const bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded({extended: true}));
 
-router.get('/lp', (req, res)=>{
-  try{
-    res.render('labs/lp');
-  }
-  catch
-  (err){
-    res.send(err);
-    console.error(err);
-  }
-});
-
 
 router.get('/japaneasy', (req, res)=>{
   try{

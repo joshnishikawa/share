@@ -1,0 +1,137 @@
+<%- include('../head'); -%>
+<style>
+  #sheet {
+    width: 21cm;
+    height: 29.7cm;
+  }
+  @media print {
+    #menucontainer {
+      display: none;
+    }
+  }
+  body{background-image: none !important;}
+</style>
+
+
+<body>
+  <div id="menucontainer"><!-- to hide the entire menu when printing -->
+    <div id="menu" class="d-flex">
+      <a id="home" href="teachers/tools" class="btn btn-sm btn-outline-secondary py-0 me-1">
+        <i class="material-icons">home</i>
+      </a>
+
+      <button class="btn btn-sm btn-outline-secondary p-0 me-3" data-bs-toggle="modal" data-bs-target="#lp_modal">
+        <i class="material-icons">info</i>
+      </button>
+
+      <button id="print" class="btn btn-sm btn-outline-success py-0 mx-3">
+        <i class="material-icons">print</i>
+      </button>
+
+    </div>
+  </div>
+
+
+<!-- ####################################################################### -->
+<div class="p-5">
+  <div id="sheet" class="container-fluid UD bg-white text-muted border rounded-3">
+    <div class="row" style="height:5%;">
+
+      <div class="col-2 border rounded-3">
+        <p>Date:</p>
+      </div>
+      <div class="col-2 border rounded-3">
+        <p>Class:</p>
+      </div>
+      <div class="col-8 border rounded-3">
+        <p>Today's Goal:</p>
+      </div>
+
+    </div>
+    <div class="row" style="height:11%;">
+
+      <div class="col-3 border rounded-3">
+        <span class="fs-3">① </span>
+        <u class="align-top">Get Started</u>
+        <p class="small">Greetings, Day/Date, Weather, Small Talk, Today's Word</p>
+
+      </div>
+      <div class="col-9 border rounded-3" style="position:relative;">
+        <div class="small" style="position:absolute;bottom:0;">
+          挨拶・曜日・日付・天気・スモールトーク・今日の英単語
+        </div>
+      </div>
+
+    </div>
+    <div class="row" style="height:15%;">
+
+      <div class="col-3 border rounded-3">
+        <span class="fs-3">② </span>
+        <u class="align-top">Warm Up / Review</u>
+        <p class="small">Practice what you learned last time in pairs or groups. Speaking time!</p>
+      </div>
+      <div class="col-9 border rounded-3" style="position:relative;">
+        <div class="small" style="position:absolute;bottom:0;">
+          前回学んだことを復習・ペアやグループで練習・スピーキングタイム
+        </div>
+      </div>
+
+    </div>
+    <div class="row" style="height:29%;">
+
+      <div class="col-3 border rounded-3">
+        <span class="fs-3">③ </span>
+        <u class="align-top">Something New</u>
+        <p class="small">Focus on today's goal. Listen, watch, think, ask, discuss, learn.</p>
+        <p class="small">今日の目標に集中する・聞く・見る・考える・尋ねる・話す・学ぶ</p>
+        <p class="small">JTE リード<br/>ALT モデリング</p>
+      </div>
+      <div class="col-9 border rounded-3" style="position:relative;">
+        <div class="bg-white" style="height:6px;position:absolute;bottom:-3px;left:50px;right:50px;">&nbsp;</div>
+      </div>
+
+    </div>
+    <div class="row" style="height:29%;">
+
+      <div class="col-3 border rounded-3">
+        <span class="fs-3">④ </span>
+        <u class="align-top">Something Fun</u>
+        <p class="small">Do an activity to practice what you learned today.
+          Switch to a different topic. Try out new things. Have fun!</p>
+        <p class="small">今日学んだことを練習・違うトピックに移る・新しいことを試す・楽しむ</p>
+        <p class="small">ALT リード<br/>JTE 生徒をサポート</p>
+      </div>
+      <div class="col-9 border rounded-3"></div>
+
+    </div>
+    <div class="row" style="height:11%;">
+
+      <div class="col-3 border rounded-3">
+        <span class="fs-3">⑤ </span>
+        <u class="align-top">Think Back/Ahead</u>
+        <p class="small">What did you learn today? When's the next class? Good-byes.</p>
+      </div>
+      <div class="col-9 border rounded-3" style="position:relative;">
+        <div class="small" style="position:absolute;bottom:0;">
+          今日何を学んだか？友達と共有・次回の授業日・さようなら
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<script>
+$(function(){
+  // Make #sheet so that the user can write on it with a touch pen.
+  
+
+  $("#print").on('click', ()=>{
+    window.print();
+  });
+});
+
+</script>
+  
+<%- include('../foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->

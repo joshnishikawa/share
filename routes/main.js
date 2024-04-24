@@ -122,6 +122,17 @@ router.get('/names', (req, res)=>{
 });
 
 
+router.get('/lp', (req, res)=>{ 
+  try{
+    res.render('tools/lp');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
+
 router.get('/books', (req, res)=>{
   try{
     let book = req.query.book ?? 'brainbox';
