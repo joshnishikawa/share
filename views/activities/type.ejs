@@ -11,9 +11,6 @@
 </style>
 
 <body>
-  <a id="home" href="/" class="btn btn-sm btn-outline-secondary py-0">
-    <i class="material-icons">home</i>
-  </a>
 
   <button class="btn btn-sm btn-outline-secondary p-0" data-bs-toggle="modal" data-bs-target="#type_modal">
     <i class="material-icons">info</i>
@@ -78,10 +75,10 @@
 $(function(){
   const deckType = '<%- deckType %>';
   document.title = `Type ${deckType}`;
-  $("#home").attr('href', `/`); // FIXME: This needs to be dynamic
 
   // PREPARE THE DECK //////////////////////////////////////////////////////////
   const originalDeck = <%- JSON.stringify(deck) %>;
+
   const params = <%- params %> || {};
   var deck = originalDeck.slice();
   let timeLimit = 0; // seconds

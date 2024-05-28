@@ -5,12 +5,12 @@
   <div class="row">
 
     <div class="col">
-      <div class="d-flex">
+      <form id="type" class="form d-flex">
         <input type="text" class="form-control" id="typed" placeholder="comma-separated words or phrases">
-        <div id="type" class="btn btn-lg btn-success">
+        <button type="submit" class="btn btn-lg btn-success">
           <i class="material-icons">add</i>
-        </div>
-      </div>
+        </button>
+      </form>
     </div>
 
     <div class="col d-flex">
@@ -67,7 +67,8 @@
     });
 
     // TYPE
-    $("#type").on('click', () => {
+    $("#type").on('submit', (e) => {
+      e.preventDefault();
       let typed = $("#typed").val();
       typed = typed.split(',').map((w) => w.trim());
 
@@ -78,9 +79,13 @@
             continue;
           }
         }
+        console.log('adding word: ' + word);
         addWord(word);
       }
+      $("#typed").val('');
     });
+
+
 
 
     // SPEECH RECOGNITION

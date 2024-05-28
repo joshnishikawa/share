@@ -61,8 +61,8 @@
 			"title": "Haystack",
 			"description": "文字を選んでください。そして同じ文字をクリックしてください。全ての文字を見つけるのにどれだけ早くできるかな？"
 		},
-		"sequence": {
-			"title": "Sequence",
+		"alphabetical": {
+			"title": "Alphabetical",
 			"description": "欠けている文字を入力してください。何個入力できるかな？"
 		},
 		"spell": {

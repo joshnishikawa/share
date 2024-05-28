@@ -11,14 +11,10 @@
 </style>
 
 <body>
-  <a id="home" href="/" class="btn btn-sm btn-outline-secondary py-0">
-    <i class="material-icons">home</i>
-  </a>
 
   <button class="btn btn-sm btn-outline-secondary p-0" data-bs-toggle="modal" data-bs-target="#spell_modal">
     <i class="material-icons">info</i>
   </button>
-
 
   <div id="info" class="container">
     <div class="row pb-5">
@@ -87,7 +83,6 @@ $(function(){
 // PREPARE THE DECK ////////////////////////////////////////////////////////////
   const deckType = '<%- deckType %>';
   document.title = `Spell ${deckType}`;
-  $("#home").attr('href', `/`); // FIXME: This needs to be dynamic
 
   const params = <%- params %> || {};
   const originalDeck = <%- JSON.stringify(deck) %>;
@@ -289,6 +284,9 @@ $(function(){
     start();
   });
 
+  $("#next").on('click', ()=>{
+    resetAnswer();
+  });
 
   // input
 

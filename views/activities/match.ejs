@@ -22,9 +22,6 @@
 
 <body>
 <div class="d-flex">
-  <a id="home" href="/" class="btn btn-sm btn-outline-secondary py-0 me-1">
-    <i class="material-icons">home</i>
-  </a>
 
   <button class="btn btn-sm btn-outline-secondary p-0 me-3" data-bs-toggle="modal" data-bs-target="#match_modal">
     <i class="material-icons">info</i>
@@ -45,7 +42,6 @@
 
 <script>
   const deckType = '<%- deckType %>';
-  $("#home").attr('href', `/teachers/${deckType}`);
 
   $(async function(){
   var text_decks;

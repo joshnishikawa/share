@@ -1,0 +1,103 @@
+
+<!DOCTYPE html>
+<html lang="en-US" translate="no">
+<head>
+  <title>English Jones</title>
+  
+  <meta charset="utf-8">
+  <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons%7CMaterial+Icons+Outlined">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Yusei+Magic&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/stylesheets/style.css">
+  <link rel="stylesheet" href="/stylesheets/progress.css">
+</head>
+
+<body><style>
+  #sheet {
+    margin-right:50px;
+    width: 21cm;
+    height: 29.7cm;
+    text-align:top;
+    text-shadow: 30px 30px 50px #999;
+    -webkit-text-stroke: 1rem #000;
+    font-size: 70em; line-height:64rem;
+  }
+
+  #sheet span div {
+    text-align:center;
+    width:90%;
+    margin: 0 auto;
+    background: linear-gradient(
+      180deg, 
+        rgba(0,0,0,0) 0px,
+        rgba(0,0,0,0) 14%, 
+        cornflowerblue 14%, 
+        cornflowerblue calc(14% + 5px), 
+
+        rgba(0,0,0,0) calc(14% + 5px),
+        rgba(0,0,0,0) 40%, 
+
+        magenta 40%, 
+        magenta calc(40% + 5px), 
+
+        rgba(0,0,0,0) calc(40% + 5px),
+        rgba(0,0,0,0) calc(99% - 15px), 
+
+        cornflowerblue calc(99% - 15px), 
+        cornflowerblue 99%,
+        rgba(0,0,0,0) 99%,
+        rgba(0,0,0,0) 10%
+
+    );
+
+  }
+
+  @media print {
+    #menucontainer {
+      display: none;
+    }
+  }
+  body{background-image: none !important;}
+</style>
+
+
+<body>
+  <div id="sheet" class="UD text-center text-shadow w-100">
+    <span style="color:deepskyblue;"><div>a</div><div>e</div><div>i</div><div>o</div><div>u</div><div>y</div></span>
+    <span style="color:chartreuse;"><div>c</div><div>t</div><div>h</div><div>p</div><div>w</div><div>s</div></span>
+    <span style="color:darkorange;"><div>b</div><div>d</div><div>f</div><div>r</div><div>l</div><div>v</div><div>n</div><div>m</div></span>
+    <span style="color:mediumorchid;"><div>g</div><div>j</div><div>k</div><div>q</div><div>x</div><div>z</div></span>
+
+    <span style="color:deepskyblue;"><div>A</div><div>E</div><div>I</div><div>O</div><div>U</div><div>Y</div></span>
+    <span style="color:chartreuse;"><div>C</div><div>T</div><div>H</div><div>P</div><div>W</div><div>S</div></span>
+    <span style="color:darkorange;"><div>B</div><div>D</div><div>F</div><div>R</div><div>L</div><div>V</div><div>N</div><div>M</div></span>
+    <span style="color:mediumorchid;"><div>G</div><div>J</div><div>K</div><div>Q</div><div>X</div><div>Z</div></span>
+
+  </div>
+
+</body>
+
+<script>
+$(function(){
+  $("#print").on('click', ()=>{
+    window.print();
+  });
+});
+
+</script>
+  
+<script src="/javascripts/script.js"></script>
+
+</body>
+</html>
+<!-- FOOT INCLUDES SCRIPTS AND </body> -->

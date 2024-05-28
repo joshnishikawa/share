@@ -174,7 +174,7 @@ router.post('/:activity', async(req, res)=>{
     let [rows, schema] = await db.query(`SELECT id FROM links 
                                          WHERE deckType=? 
                                          AND activity=? 
-                                         AND deck=? 
+                                         AND deck= BINARY ? 
                                          AND params=?`, 
                                         [deckType, 
                                          activity,

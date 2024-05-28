@@ -44,10 +44,6 @@
 <body>
 <div class="d-flex">
 
-  <a id="home" href="/teachers" class="btn btn-sm btn-outline-secondary py-0 me-1">
-    <i class="material-icons">home</i>
-  </a>
-
   <button class="btn btn-sm btn-outline-secondary p-0 me-3" data-bs-toggle="modal" data-bs-target="#flash_modal">
     <i class="material-icons">info</i>
   </button>
@@ -79,8 +75,6 @@
 $(function(){
   const deckType = '<%- deckType %>';
   document.title = `Flash ${deckType}`;
-
-  $("#home").attr('href', `/teachers/${deckType}`);
 
   const originalDeck = <%- JSON.stringify(deck) %>;
   const params = <%- params %>;

@@ -40,21 +40,21 @@ router.get('/haystack', (req, res)=>{
   }
 });
 
-
 router.get('/sequence', (req, res)=>{
   try{
-    res.render('activities/abc/sequence');
+    res.redirect('/abc/alphabetical');
   }
-  catch(err){
+  catch
+  (err){
     res.send(err);
     console.error(err);
   }
 });
 
 
-router.get('/SRS', (req, res)=>{
+router.get('/alphabetical', (req, res)=>{
   try{
-    res.render('activities/abc/SRS');
+    res.render('activities/abc/alphabetical');
   }
   catch(err){
     res.send(err);

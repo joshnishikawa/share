@@ -1,3 +1,6 @@
+text to speech for spelling activity
+audio samples for all static vocab
+
 ////////// BUGS ////////////////////////////////////////////////////////////////
 RECALL 'rice ball' persists after 'rice' is entered
 
@@ -33,6 +36,8 @@ Time Bomb: Pause for 3 seconds = die. Don't finish in 1 minute = die. Three stri
 
 
 spot-it (for letters or pictures)
+
+socket.io page for giving directions
 
 
 // LONG TERM GOALS /////////////////////////////////////////////////////////////

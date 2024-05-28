@@ -132,6 +132,17 @@ router.get('/pairs', (req, res)=>{
 });
 
 
+router.get('/SRS', (req, res)=>{
+  try{
+    res.render('activities/labs/SRS');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
+
 router.get('/speak_spell', (req, res)=>{
   try{
     // get array of words from vocabulary table
