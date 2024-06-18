@@ -1,7 +1,6 @@
 var Dictionary = require('japaneasy');
 var dict = new Dictionary();
 
-
 const express = require('express');
 const router = express.Router();
 const fs = require('fs');
@@ -145,12 +144,13 @@ router.get('/SRS', (req, res)=>{
 
 router.get('/speak_spell', (req, res)=>{
   try{
+
     // get array of words from vocabulary table
-    let words = [];
-    db.query('SELECT word FROM vocabulary')
+    let words = {};
+    db.query('SELECT word, meaning, image, audio FROM vocabulary')
     .then(([rows, schema])=>{
       for (let row of rows){
-        words.push(row.word);
+        words[row.word] = {meaning: row.meaning, image: row.image, audio: row.audio};
       }
       res.render('labs/speak_spell', {words});
     });
@@ -185,6 +185,16 @@ router.get('/speech', (req, res)=>{
 });
 
 
+
+router.get('/schedule', (req, res)=>{
+  try{
+    res.render('labs/schedule');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
 
 
 module.exports = router;

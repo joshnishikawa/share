@@ -79,16 +79,14 @@
 
 <script>
 $(function(){
-
-// PREPARE THE DECK ////////////////////////////////////////////////////////////
   const deckType = '<%- deckType %>';
   document.title = `Spell ${deckType}`;
 
+  // PREPARE THE DECK ////////////////////////////////////////////////////////////
   const params = <%- params %> || {};
   const originalDeck = <%- JSON.stringify(deck) %>;
   var deck = originalDeck.slice();
   var item = {};
-
   var review = [];
   var place = 0;
   var guess = '';
@@ -123,7 +121,7 @@ $(function(){
 
     totalwords = deck.length;
 
-    // get total number of letters of all values of 'name' properties
+    // get total number of letters of all values of 'word' properties
     totalLetters = deck.reduce((acc, val) => acc + val.word.length, 0);
 
     deck = FYshuffle(deck);
@@ -251,11 +249,13 @@ $(function(){
 
     item = deck.pop();
     if (item){
-      $("#image").html(`<img src="${item.image}" 
-                             class="img-fluid"
-                             alt="${item.word}" 
-                             onerror="altOnly(this)">`);
-                             
+      $("#image").html(
+        item.image ? `<img src="${item.image}" 
+                        class="img-fluid"
+                        alt="${item.word}" 
+                        onerror="altOnly(this)">`
+                   : `<div class="display-6 border border-primary rounded-3 text-primary">${item.meaning}</div>`);
+
       for (let l = 0; l < item.word.length; l++){
         let wordwrap = [' ', '-'].includes( item.word[l] ) ? true : false;
 

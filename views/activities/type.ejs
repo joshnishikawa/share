@@ -77,9 +77,8 @@ $(function(){
   document.title = `Type ${deckType}`;
 
   // PREPARE THE DECK //////////////////////////////////////////////////////////
-  const originalDeck = <%- JSON.stringify(deck) %>;
-
   const params = <%- params %> || {};
+  const originalDeck = <%- JSON.stringify(deck) %>;
   var deck = originalDeck.slice();
   let timeLimit = 0; // seconds
   var finished = false;
@@ -155,10 +154,14 @@ $(function(){
     if (item){
       $("#remaining").html(`<span class="display-3">${deck.length}</span><br/>words left`);
 
-      if (deckType != 'text') $("#image").html(`<img src="${item.image}" 
-                                                     class="img-fluid"
-                                                     alt="${item.word}" 
-                                                     onerror="altOnly(this)">`);
+      if (deckType != 'text'){
+        $("#image").html(
+          item.image ? `<img src="${item.image}" 
+                          class="img-fluid"
+                          alt="${item.word}" 
+                          onerror="altOnly(this)">`
+                     : `<div class="display-6 border border-primary rounded-3 text-primary">${item.meaning}</div>`);
+      }
       else $("#image").html('');
 
       $("#display").html(`<div class="display-1">${item.word}</div>`);

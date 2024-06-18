@@ -158,13 +158,8 @@ router.post('/:activity', async(req, res)=>{
     let deckType = params.deckType;
     delete params.deckType;
 
-    if (deckType == "nolink"){
-      let [rows, schema] = await db.query(`SELECT * FROM vocabulary 
-                                            WHERE word IN (?)
-                                            AND book='NH'`, [JSON.parse(deck)]);
-      deck = await rows.map( row => {
-        return {word: row.word, meaning: row.meaning, image: row.image};
-      });
+    if (deckType == "nolink"){ // expect deck to be an array of objects
+      deck = JSON.parse(deck);
       res.render(`activities/${activity}`, {deckType, deck, params: JSON.stringify(params)});
       return;
     }

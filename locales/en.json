@@ -290,5 +290,10 @@
 	"adjectives+": "adjectives+",
 	"jobs+": "jobs+",
 	"objects": "objects",
-	"objects+": "objects+"
+	"objects+": "objects+",
+
+  "speak_spell": {
+    "text": "Enter English or Japanese separated by ',' or '、'",
+    "speech": "Hold for speech recognition (English only)"
+  }
 }

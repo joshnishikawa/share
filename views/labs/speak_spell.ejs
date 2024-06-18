@@ -1,43 +1,112 @@
 <%- include('../head'); -%>
+<style>
+  .add {
+    border-top-right-radius: 50%;
+    border-bottom-right-radius: 50%;
+    cursor: pointer;
+  }
+  .add:hover {
+    color: red;
+  }
+</style>
+
 
 <div class="container pt-3">
 
   <div class="row">
-
     <div class="col">
-      <form id="type" class="form d-flex">
-        <input type="text" class="form-control" id="typed" placeholder="comma-separated words or phrases">
+      <form id="text_form" class="form d-flex">
+        <input type="text" class="form-control" id="input" name="word" 
+               placeholder="<%- __('speak_spell.text') %>">
         <button type="submit" class="btn btn-lg btn-success">
           <i class="material-icons">add</i>
         </button>
       </form>
-    </div>
 
-    <div class="col d-flex">
-      <div id="listen" class="btn btn-lg btn-success">
+      <div id="listen" class="btn btn-lg btn-success" style="float:right;">
         <i class="material-icons">mic</i>
       </div>
-      <div id="output"></div>
+      <span class="btn btn-lg disabled"><%- __('speak_spell.speech') %></span>
+      <div id="output" style="min-height:1.5em;"></div>
+    </div>
+
+    <div class="col">
+      <div id="words" class="col p-3"></div>
     </div>
 
   </div>
-  <div class="row">
-
-    <div id="words" class="col p-3"></div>
-
-  </div>
-  <div class="d-flex"><%- include('../menu/menu_spell') %></div>
 </div>
-
+<hr>
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <%- include('../menu/menu_type') %>
+    </div>
+    <div class="col">
+      <%- include('../menu/menu_spell') %>
+    </div>
+    <div class="col">
+    </div>
+  </div>
+</div>
 
 
 <!-- <script src="javascripts/spell.js" type="text/javascript"></script> -->
 
-<script>
+<script type="module">
+  import translate from "https://cdn.jsdelivr.net/npm/translate/index.min.js";
+
   $(function(){
     window.deckType = 'nolink';
     window.deck = [];
+    const words = <%- JSON.stringify(words) %>;
 
+// TEXT INPUT //////////////////////////////////////////////////////////////////
+    $('#text_form').submit(async function(e){
+      e.preventDefault();
+
+      let input = $("#input").val();
+      input = input.split(/、|,/).map((w) => w.trim());
+
+      for (let word of input){
+        let EnglishWord = '';
+        let JapaneseWord = '';
+        let image = '';
+        let audio = '';
+        let isJapanese = word.match(/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/);
+
+        if (isJapanese) {
+          JapaneseWord = word;
+          EnglishWord = await translate(word, { from: "ja", to: "en" });
+        } else {
+          EnglishWord = word;
+          JapaneseWord = await translate(word, { from: "en", to: "ja" });
+        }
+
+        if (Object.keys(words).includes(EnglishWord)) {
+          image = words[EnglishWord].image;
+          audio = words[EnglishWord].audio;
+          if (JapaneseWord != words[EnglishWord].meaning) {
+            JapaneseWord += `, ${words[EnglishWord].meaning}`;
+          }
+        } else {
+          let lc = EnglishWord.toLowerCase();
+          if (Object.keys(words).includes(lc)) {
+            EnglishWord = lc;
+            image = words[lc].image;
+            audio = words[lc].audio;
+            if (JapaneseWord != words[lc].meaning) {
+              JapaneseWord += `, ${words[lc].meaning}`;
+            }
+          }
+        }
+        addWord({word: EnglishWord, meaning: JapaneseWord, image, audio});
+      }
+      $("#input").val('');
+    });
+
+
+// SPEECH RECOGNITION //////////////////////////////////////////////////////////
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
     const SpeechGrammarList =
@@ -45,9 +114,7 @@
     const SpeechRecognitionEvent =
       window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
 
-      
     var recognition = new SpeechRecognition();
-    const words = <%- JSON.stringify(words) %>;
     // const grammar = `#JSGF V1.0; grammar words; public <word> = ${words.join(" | ")};`;
     // var speechRecognitionList = new SpeechGrammarList();
     // speechRecognitionList.addFromString(grammar, 1);
@@ -57,8 +124,6 @@
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
 
-
-    // LISTEN
     $("#listen").on('mousedown', () => {
       recognition.start();
     }).on('mouseup', () => {
@@ -66,63 +131,79 @@
       recognition.stop();
     });
 
-    // TYPE
-    $("#type").on('submit', (e) => {
-      e.preventDefault();
-      let typed = $("#typed").val();
-      typed = typed.split(',').map((w) => w.trim());
-
-      for (let word of typed){
-        if (!words.includes(word)) {
-          word = word.toLowerCase();
-          if (!words.includes(word)) {
-            continue;
-          }
-        }
-        console.log('adding word: ' + word);
-        addWord(word);
-      }
-      $("#typed").val('');
-    });
-
-
-
-
-    // SPEECH RECOGNITION
     recognition.onstart = () => {
       $("#output").html("Listening...");
     };
 
-    recognition.onresult = (event) => {
-      let word = event.results[0][0].transcript;
+    recognition.onresult = async (event) => {
+      let image = '';
+      let audio = '';
+      let EnglishWord = event.results[0][0].transcript;
       let conf = Math.round(event.results[0][0].confidence*100);
-      console.log(`"${word}" ${conf}%`);
+      let JapaneseWord = await translate(EnglishWord, { from: "en", to: "ja" });
 
-      if (!words.includes(word)) {
-        word = word.toLowerCase();
-        if (!words.includes(word)) {
-          return;
+      if (Object.keys(words).includes(EnglishWord)) {
+          image = words[EnglishWord].image;
+          audio = words[EnglishWord].audio;
+        if (JapaneseWord != words[EnglishWord].meaning) {
+          JapaneseWord += `, ${words[EnglishWord].meaning}`;
+        }
+      } else {
+        let lc = EnglishWord.toLowerCase();
+        if (Object.keys(words).includes(lc)) {
+          EnglishWord = lc;
+          image = words[lc].image;
+          audio = words[lc].audio;
+          if (JapaneseWord != words[lc].meaning) {
+            JapaneseWord += `, ${words[lc].meaning}`;
+          }
         }
       }
-      addWord(word);
+      addWord({word: EnglishWord, meaning: JapaneseWord, image, audio});
     };
-  
+
     recognition.onerror = (event) => {
       console.error(event);
       $("#output").html(`Error occurred in recognition: ${event.error}`);
     };
 
+    recognition.onend = () => {
+      $("#output").html('');
+    };
+
+
+// FUNCTIONS ///////////////////////////////////////////////////////////////////
     function addWord(w) {
+      // check window.deck for w.word
+      for (let d of window.deck) {
+        if (d.word == w.word) {
+          // append w.meaning to d.meaning if not already there
+          if (!d.meaning.includes(w.meaning)) {
+            d.meaning += `, ${w.meaning}`;
+          }
+          // update dom
+          $(`#${w.word}`).html(`${w.word} - ${d.meaning}<div class="btn btn-close"></div>`);
+          $(".btn-close").off('click').on('click', (event) => {
+            $(event.target).parent().remove();
+            window.deck = window.deck.filter((d) => d.word != $(event.target).parent().attr('id'));
+          });
+
+          return;
+        }
+      }
+
       window.deck.push(w);
-      console.log(window.deck);
-      $("#words").append(`<div class="word alert-primary badge shadow m-1 fs-3">
-                            ${w} 
-                            <div class="btn btn-close"></div>
-                            </div>`);
+      $("#words").append(
+       `<div id="${w.word}" class="alert-primary badge shadow m-1">
+          ${w.word} - ${w.meaning}
+          <div class="btn btn-close"></div>
+        </div>`);
 
       $(".btn-close").off('click').on('click', (event) => {
         $(event.target).parent().remove();
+        window.deck = window.deck.filter((d) => d.word != $(event.target).parent().attr('id'));
       });
+      console.log(window.deck);
     }
 
   });

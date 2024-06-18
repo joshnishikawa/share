@@ -1,5 +1,14 @@
 <%- include('../head'); -%>
 <style>
+  @media print {
+    #menucontainer {
+      display: none;
+    }
+    body{
+      background-image: none !important;
+    }
+  }
+
   #flash{
     position:relative;
     font-family: "UD Digi Kyokasho NP-B", sans-serif;
@@ -42,20 +51,22 @@
 </style>
 
 <body>
-<div class="d-flex">
+<div id="menucontainer">
+  <div class="d-flex">
 
-  <button class="btn btn-sm btn-outline-secondary p-0 me-3" data-bs-toggle="modal" data-bs-target="#flash_modal">
-    <i class="material-icons">info</i>
-  </button>
+    <button class="btn btn-sm btn-outline-secondary p-0 me-3" data-bs-toggle="modal" data-bs-target="#flash_modal">
+      <i class="material-icons">info</i>
+    </button>
 
-  <div class="form-check mx-3">
-    <input type="checkbox" id="shuffle" class="form-check-input">
-    <label for="shuffle" class="form-check-label">Shuffle</label>
-  </div>
+    <div class="form-check mx-3">
+      <input type="checkbox" id="shuffle" class="form-check-input">
+      <label for="shuffle" class="form-check-label">Shuffle</label>
+    </div>
 
-  <div class="form-check mx-3">
-    <input type="checkbox" id="showtext" class="form-check-input">
-    <label for="showtext" class="form-check-label">Text</label>
+    <div class="form-check mx-3">
+      <input type="checkbox" id="showtext" class="form-check-input">
+      <label for="showtext" class="form-check-label">Text</label>
+    </div>
   </div>
 </div>
 
