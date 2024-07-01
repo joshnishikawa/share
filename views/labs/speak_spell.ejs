@@ -1,5 +1,8 @@
 <%- include('../head'); -%>
 <style>
+  ::-webkit-input-placeholder { text-align:right; }
+  input:-moz-placeholder { text-align:right; }
+
   .add {
     border-top-right-radius: 50%;
     border-bottom-right-radius: 50%;
@@ -11,41 +14,107 @@
 </style>
 
 
-<div class="container pt-3">
+<div class="container-fluid pt-3">
 
   <div class="row">
-    <div class="col">
-      <form id="text_form" class="form d-flex">
-        <input type="text" class="form-control" id="input" name="word" 
-               placeholder="<%- __('speak_spell.text') %>">
-        <button type="submit" class="btn btn-lg btn-success">
+<!-- SELECT VOCAB FORMS ------------------------------------------------------->
+    <div class="col-md">
+
+      <form id="vocab_add_form" class="form d-flex mb-3">
+        <input id="input" type="text" class="form-control" name="word" 
+              placeholder="<%- __('speak_spell.text') %>">
+        <button type="submit" class="btn btn-success">
           <i class="material-icons">add</i>
         </button>
       </form>
 
-      <div id="listen" class="btn btn-lg btn-success" style="float:right;">
-        <i class="material-icons">mic</i>
+      <div class="d-flex justify-content-end">
+        <div class="text-muted me-3"><%- __('speak_spell.speech') %></div>
+        <div id="speech_recognition" class="btn btn-success">
+          <i class="material-icons">mic</i>
+        </div>
       </div>
-      <span class="btn btn-lg disabled"><%- __('speak_spell.speech') %></span>
-      <div id="output" style="min-height:1.5em;"></div>
+      <div id="output" style="min-height:1.5em;">&nbsp;</div>
     </div>
 
-    <div class="col">
+    <div class="col-md h-100 border rounded-3 bg-white pt-2">
+      <%- __('speak_spell.list_select') %>
+      <div class="d-flex justify-content-between">
+        <form id="add_list_form" class="form w-75">
+          <select id="list_select" class="form-control form-control-lg">
+          </select>
+        </form>
+
+        <button id="list_modal" type="submit" class="btn btn-success">
+          <i class="material-icons">note_add</i>
+        </button>
+
+        <button id="delete_deck" class="btn btn-danger">
+          <i class="material-icons">delete</i>
+        </button>
+
+      </div>
+
       <div id="words" class="col p-3"></div>
     </div>
 
   </div>
 </div>
+
 <hr>
-<div class="container">
+<!-- ACTIVITIES --------------------------------------------------------------->
+<div class="container-fluid">
   <div class="row">
-    <div class="col">
+    <div class="col-sm">
       <%- include('../menu/menu_type') %>
     </div>
-    <div class="col">
+    <div class="col-sm">
       <%- include('../menu/menu_spell') %>
     </div>
-    <div class="col">
+    <div class="col-sm">
+      &nbsp;
+    </div>
+  </div>
+</div>
+
+
+<!-- modal to confirm delete -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Delete List</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="deleteModalBody">
+        Are you sure you want to delete this list?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-danger" id="deleteList">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- modal to add new list -->
+<div id="addModal" class="modal fade" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addModalLabel">Add New List</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="addModalBody">
+        Please choose a name for this list.
+        <form id="add_list_form" class="form d-flex">
+          <input id="list_name" type="text" class="form-control mx-3" name="list_name" 
+          placeholder="<%- __('speak_spell.list_name') %>" required>
+          <button id="list_submit" type="submit" class="btn btn-success w-50" disabled>
+            <i class="material-icons">note_add</i>
+          </button>
+        </form>
+      </div>
     </div>
   </div>
 </div>
@@ -56,13 +125,23 @@
 <script type="module">
   import translate from "https://cdn.jsdelivr.net/npm/translate/index.min.js";
 
-  $(function(){
+  $(window).on('pageshow', function(){
     window.deckType = 'nolink';
     window.deck = [];
     const words = <%- JSON.stringify(words) %>;
 
+    $("#list_select").html('<option value=""></option>');
+    // populate list_select from local storage
+    let lists = JSON.parse(localStorage.getItem('vocab_lists'));
+    if (lists) {
+      for (let l of Object.keys(lists) ) {
+        $("#list_select").append(`<option value="${l}">${l}</option>`);
+      }
+    }
+
+
 // TEXT INPUT //////////////////////////////////////////////////////////////////
-    $('#text_form').submit(async function(e){
+    $('#vocab_add_form').submit(async function(e){
       e.preventDefault();
 
       let input = $("#input").val();
@@ -124,7 +203,7 @@
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
 
-    $("#listen").on('mousedown', () => {
+    $("#speech_recognition").on('mousedown', () => {
       recognition.start();
     }).on('mouseup', () => {
       $("#output").html('');
@@ -172,7 +251,95 @@
     };
 
 
+    // LIST SELECT /////////////////////////////////////////////////////////////////
+    $("#list_select").change(() => {
+      let list = $("#list_select").val();
+      if (list) {
+        window.deck = lists[list];
+        $("#words").html('');
+        for (let w of window.deck) {
+          $("#words").append(
+            `<div id="${w.word}" class="alert-primary badge shadow m-1">
+              ${w.word} - ${w.meaning}
+              <div class="btn btn-close"></div>
+            </div>`);
+        }
+        $(".btn-close").off('click').on('click', (event) => {
+          $(event.target).parent().remove();
+          window.deck = window.deck.filter((w) => w.word != $(event.target).parent().attr('id'));
+        });
+      }
+    });
+
+
+// ADD LIST ////////////////////////////////////////////////////////////////////
+    $("#list_name").on('input', () => {
+      let listname = $("#list_name").val();
+      if (!listname) {
+        $("#list_submit").prop('disabled', true);
+      } else {
+        $("#list_submit").prop('disabled', false);
+        if (Object.keys(lists).includes(listname)) {
+          $("#list_submit").html('<i class="material-icons">edit_note</i>Update');
+        }
+        else {
+          $("#list_submit").html('<i class="material-icons">note_add</i>Add');
+        }
+      }
+    });
+
+
+    $("#list_modal").on('click', () => {
+      $("#addModal").modal('show');
+    });
+
+
+    $('#addModal').on('shown.bs.modal', function () {
+      $('#list_name').trigger('focus');
+    });
+
+
+    // use $(document) to bind to dynamically created elements
+    $(document).on('submit', "#add_list_form", (e) => {
+      e.preventDefault();
+      let listname = $("#list_name").val();
+      $("#list_submit").prop('disabled', true);
+
+      lists = lists ? lists : {};
+      lists[listname] = window.deck;
+      localStorage.setItem('vocab_lists', JSON.stringify(lists));
+
+      if (!lists[listname]){
+        $("#list_select").append(`<option value="${listname}">${listname}</option>`);
+      }
+
+      $("#list_select").val(listname);
+      $("#addModal").modal('hide');
+    });
+
+
+    $("#delete_deck").on('click', () => {
+      $("#deleteModal").modal('show');
+    });
+
+    $("#deleteList").on('click', ()=>{
+      deleteList();
+      $("#deleteModal").modal('hide');
+    });
+
+    
 // FUNCTIONS ///////////////////////////////////////////////////////////////////
+    function deleteList(){
+      window.deck = [];
+      $("#words").html('');
+      let list = $("#list_select").val();
+      if (list) {
+        delete lists[list];
+        localStorage.setItem('vocab_lists', JSON.stringify(lists));
+        $("#list_select option:selected").remove();
+      }
+    }
+
     function addWord(w) {
       // check window.deck for w.word
       for (let d of window.deck) {

@@ -186,15 +186,4 @@ router.get('/speech', (req, res)=>{
 
 
 
-router.get('/schedule', (req, res)=>{
-  try{
-    res.render('labs/schedule');
-  }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
-
-
 module.exports = router;

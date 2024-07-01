@@ -1,5 +1,7 @@
 <%- include('../head'); -%>
-<div style="background-color:black;color:white;">
+<body>
+  
+<div style="background-color:black;color:white;height:100vh;">
   <div class="text-center pt-3">
     <button id="listen" class="btn btn-lg btn-success">Listen</button>
   </div>
@@ -45,7 +47,7 @@ $(function(){
   recognition.maxAlternatives = 1;
 
   const diagnostic = document.querySelector(".output");
-  const bg = document.querySelector("html");
+  const bg = document.querySelector("body");
 
   // DISPLAY HINTS
   const hints = document.querySelector(".hints");

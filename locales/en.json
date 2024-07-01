@@ -291,9 +291,12 @@
 	"jobs+": "jobs+",
 	"objects": "objects",
 	"objects+": "objects+",
-
-  "speak_spell": {
-    "text": "Enter English or Japanese separated by ',' or '、'",
-    "speech": "Hold for speech recognition (English only)"
-  }
+	"speak_spell": {
+		"text": "Enter EN or JA separated by ',' or '、'",
+		"speech": "Hold for speech recognition (EN only)",
+		"save": "Save",
+		"list_name": "Enter deck name",
+		"list_select": "Select a list (if any)",
+		"list_create": "Add words to a list"
+	}
 }
