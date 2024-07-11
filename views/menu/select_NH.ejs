@@ -9,63 +9,43 @@
     }
 </style>
 
-<div class="container-fluid pb-3">
-  <div class="row">
+<span class="ms-3"><%- __('NewHorizon.vocab') %></span>
 
-    <div class="col-9"><%- __('themes') %></div>
 
-    <div class="col-3 d-flex justify-content-between">
-      <div><%- __('list') %><span id="numOfItems"> (0)</span></div>
-      <div class="small text-danger"><%- __('editThisLast') %></div>
-    </div>
-
-  </div>
-  <div class="row">
-
-    <div class="col-9 g-0 px-1">
-      <div id="themes" class="d-flex flex-wrap">
+<div id="themes" class="d-flex flex-wrap">
 <% for (let p in NH_vocab) { let color = ''; for (let c in colors) { if (colors[c].includes(p)) {color = c; break;}} %>
   <% if (p == '+'){ %>
-        <div id="deleteme" class="flex-grow-1">.</div>
-        <div id="growme" class="rounded-3 p-1 flex-grow-1" style="margin:1px;background-color:lightgray;">
-          
-          <div id="<%- p %>" class="d-flex flex-wrap">
+  <div id="deleteme" class="flex-grow-1">.</div>
+  <div id="growme" class="rounded-3 p-1 flex-grow-1" style="margin:1px;background-color:lightgray;">
+    
+    <div id="<%- p %>" class="d-flex flex-wrap">
 
     <% for (let t in NH_vocab[p]) { %>
       <% let id = t.replace(/ /g, "_"); %>
-            <div class="form-check" style="width:fit-content;">
-              <input aria-label="themes" class="form-check-input" type="checkbox" id="<%- id %>" name="themes" value="<%- t %>">
-              <label class="form-check-label me-3" style="margin-left:-5px;" for="<%- id %>"><%- __(t) %> <u><%- Object.keys(NH_vocab[p][t]).length %></u></label>
-            </div>
-    <% } %>
-          </div>
-
-        </div>
-  <% } else { %>
-        <div class="rounded-3 p-1 d-flex" style="margin:1px;background-color:<%- color %>">
-          <div class="vertical-label"><%- p.replace(/_/g, ' ') %></div>
-          <div id="<%- p %>">
-
-    <% for (let t in NH_vocab[p]) { %>
-      <% let id = t.replace(/ /g, "_"); %>
-            <div class="form-check">
-              <input aria-label="themes" class="form-check-input" type="checkbox" id="<%- id %>" name="themes" value="<%- t %>">
-              <label class="form-check-label me-3" style="margin-left:-5px;" for="<%- id %>"><%- __(t) %> <u><%- Object.keys(NH_vocab[p][t]).length %></u></label>
-            </div>
-    <% } %>
-          </div>
-        </div>
-  <% } %>
-<% } %>
+      <div class="form-check" style="width:fit-content;">
+        <input aria-label="themes" class="form-check-input" type="checkbox" id="<%- id %>" name="themes" value="<%- t %>">
+        <label class="form-check-label me-3" style="margin-left:-5px;" for="<%- id %>"><%- __(t) %> <u><%- Object.keys(NH_vocab[p][t]).length %></u></label>
       </div>
-    </div>
-
-    <div class="col-3" style="position:relative;">
-      <div id="list" class="d-flex flex-wrap" style="position:absolute;max-height:100%;overflow-y:scroll;"></div>
+    <% } %>
     </div>
 
   </div>
+  <% } else { %>
+  <div class="rounded-3 p-1 d-flex" style="margin:1px;background-color:<%- color %>">
+    <div class="vertical-label"><%- p.replace(/_/g, ' ') %></div>
+    <div id="<%- p %>">
 
+    <% for (let t in NH_vocab[p]) { %>
+      <% let id = t.replace(/ /g, "_"); %>
+      <div class="form-check">
+        <input aria-label="themes" class="form-check-input" type="checkbox" id="<%- id %>" name="themes" value="<%- t %>">
+        <label class="form-check-label me-3" style="margin-left:-5px;" for="<%- id %>"><%- __(t) %> <u><%- Object.keys(NH_vocab[p][t]).length %></u></label>
+      </div>
+    <% } %>
+    </div>
+  </div>
+  <% } %>
+<% } %>
 </div>
 
 
@@ -85,30 +65,22 @@ $(function(){
   });
 
 
-
-
-
   let NH_vocab = <%- JSON.stringify(NH_vocab) %>;
   window.deckType = 'NH';
   window.deck = [];
+  window.local= [];
 
-  function updateWordList(){
-    window.deck = [];
-    $("#list").empty();
 
-    let checkedThemes = $("#themes input:checked").toArray().map(e => e.value);
-    checkedThemes = checkedThemes.filter(e => e);  // remove empty strings
-
-    for (let theme of checkedThemes) {
-      let p = $(`input:checked[value="${theme}"]`).parent().parent().attr('id');
-
-      for (let word in NH_vocab[p][theme]) {
-        let val = NH_vocab[p][theme][word];
-        window.deck.push(val);
+  addWords = (list) => {
+    for (let l of list) {
+      // add word if the id doesn't exist in window.deck
+      if (!window.deck.includes(l.id)) {
+        window.deck.push(l.id);
+        window.local.push(l);
         $("#list").append(`
           <div class="alert-primary rounded-3 mb-1 me-1 ps-1 d-flex justify-content-between">
-            <div>${word}</div>
-            <div id="${word}" data-value="${val}" class="list btn btn-close" style="font-size:10px;"></div>
+            <div>${l.word}</div>
+            <div id="${l.word}" data-value="${l.id}" class="list btn btn-close" style="font-size:10px;"></div>
           </div>
         `);
       }
@@ -117,6 +89,7 @@ $(function(){
     $(".list").on('click', function(){
       let val = $(this).data('value');
       window.deck = window.deck.filter(e => e !== val);
+      window.local = window.local.filter(e => e.id !== val);
       $(this).parent().remove();
       $("#numOfItems").html(`&nbsp;(${window.deck.length})`);
     });
@@ -125,8 +98,31 @@ $(function(){
   }
 
 
-  $("#themes input").on('change', ()=>{
-    updateWordList();
+  removeWords = (list) => {
+    for (let l of list) {
+      window.deck = window.deck.filter(e => e !== l.id);
+      window.local = window.local.filter(e => e.id !== l.id);
+      $(`#${l.word}`).parent().remove();
+    }
+    $("#numOfItems").html(`&nbsp;(${window.deck.length})`);
+  }
+
+  
+  $("#themes input").on('change', function(){
+    let list = [];
+    let p = $(this).parent().parent().attr('id');
+    let theme = $(this).val();
+
+    for (let word in NH_vocab[p][theme]) {
+      let id = NH_vocab[p][theme][word];
+      list.push({word, id});
+    }
+
+    if ($(this).is(':checked')) {
+      addWords(list);
+    } else {
+      removeWords(list);
+    }
   });
 
 });

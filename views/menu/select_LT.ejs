@@ -1,37 +1,16 @@
-<div class="container-fluid pb-3">
-  <div class="row">
+<span class="ms-3"><%- __('LetsTry.vocab') %></span>
 
-    <div class="col-6"><%- __('themes') %></div>
-
-    <div class="col-6 d-flex justify-content-between">
-      <div><%- __('list') %><span id="numOfItems"> (0)</span></div>
-      <div class="small text-danger"><%- __('editThisLast') %></div>
-    </div>
-
-  </div>
-  <div class="row">
-
-    <div class="col-6">
-      <div id="themes" class="d-flex flex-wrap">
+<div id="themes" class="d-flex flex-wrap">
 <% for (let t in LT_vocab) { %>
-        <div class="rounded-3 p-1 d-flex" style="margin:1px;">
+  <div class="rounded-3 p-1 d-flex" style="margin:1px;">
 
-          <div class="form-check">
-            <input aria-label="themes" class="form-check-input" type="checkbox" id="<%- t %>" name="themes" value="<%- t %>">
-            <label class="form-check-label me-3" style="margin-left:-5px;" for="<%- t %>"><%- __(t) %> (<%- Object.keys(LT_vocab[t]).length %>)</label>
-          </div>
-
-        </div>
-<% } %>
-      </div>
-    </div>
-
-    <div class="col-6" style="position:relative;">
-      <div id="list" class="d-flex flex-wrap" style="position:absolute;max-height:100%;overflow-y:scroll;"></div>
+    <div class="form-check">
+      <input aria-label="themes" class="form-check-input" type="checkbox" id="<%- t %>" name="themes" value="<%- t %>">
+      <label class="form-check-label me-3" style="margin-left:-5px;" for="<%- t %>"><%- __(t) %> (<%- Object.keys(LT_vocab[t]).length %>)</label>
     </div>
 
   </div>
-
+<% } %>
 </div>
 
 
@@ -40,6 +19,7 @@ $(function(){
   let LT_vocab = <%- JSON.stringify(LT_vocab) %>;
   window.deckType = 'LT';
   window.deck = [];
+  window.local = [];
 
   function updateWordList(){
     window.deck = [];
@@ -51,12 +31,14 @@ $(function(){
     for (let theme of checkedThemes) {
 
       for (let word in LT_vocab[theme]) {
-        let val = LT_vocab[theme][word];
-        window.deck.push(val);
+        let id = LT_vocab[theme][word];
+        window.deck.push(id);
+        window.local.push({word, id})
+
         $("#list").append(`
           <div class="alert-primary rounded-3 mb-1 me-1 ps-1 d-flex justify-content-between">
             <div>${word}</div>
-            <div id="${word}" data-value="${val}" class="list btn btn-close" style="font-size:10px;"></div>
+            <div id="${word}" data-value="${id}" class="list btn btn-close" style="font-size:10px;"></div>
           </div>`);
       }
     }

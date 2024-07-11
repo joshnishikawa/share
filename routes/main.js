@@ -198,9 +198,6 @@ router.post('/:activity', async(req, res)=>{
 });
 
 
-
-
-
 router.get('/:activity/:id', async (req, res)=>{
   try{
     let activity = req.params.activity;
@@ -226,7 +223,7 @@ router.get('/:activity/:id', async (req, res)=>{
       [rows, schema] = await db.query(`SELECT * FROM vocabulary WHERE id IN (?)`, [ids]);
       // convert to array of objects
       deck = await rows.map( row => {
-        return {word: row.word, meaning: row.meaning, image: row.image};
+        return {id: row.id, word: row.word, meaning: row.meaning, image: row.image};
       });
     }
 

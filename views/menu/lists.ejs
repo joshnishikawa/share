@@ -1,0 +1,167 @@
+<%- __('list_select') %>
+
+<div class="d-flex justify-content-between">
+  <form id="add_list_form" class="form w-75">
+    <select id="list_select" class="form-control form-control-lg">
+    </select>
+  </form>
+
+  <button id="list_modal" type="submit" class="btn btn-success">
+    <i class="material-icons">note_add</i>
+  </button>
+
+  <button id="delete_deck" class="btn btn-danger">
+    <i class="material-icons">delete</i>
+  </button>
+</div>
+
+<div><%- __('list') %><span id="numOfItems"> (0)</span></div>
+
+  
+<div id="list" class="d-flex flex-wrap"></div>
+
+
+<!-- MODALS ------------------------------------------------------------------->
+<!-- modal to confirm delete -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Delete List</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="deleteModalBody">
+        Are you sure you want to delete this list?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-danger" id="deleteList">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- modal to add new list -->
+<div id="addModal" class="modal fade" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addModalLabel">Add New List</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="addModalBody">
+        Please choose a name for this list.
+        <form id="add_list_form" class="form d-flex">
+          <input id="list_name" type="text" class="form-control mx-3" name="list_name" 
+          placeholder="<%- __('list_name') %>" required>
+          <input type="hidden" name="list" value="getlist()">
+          <button id="list_submit" type="submit" class="btn btn-success w-50" disabled>
+            <i class="material-icons">note_add</i>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CODE --------------------------------------------------------------------->
+<script>
+$(window).on('pageshow', function(){
+
+  $("#list_select").html('<option value=""></option>');
+  // populate list_select from local storage
+  let lists = JSON.parse(localStorage.getItem(`${window.deckType}`));
+
+  if (lists) {
+    for (let l of Object.keys(lists) ) {
+      $("#list_select").append(`<option value="${l}">${l}</option>`);
+    }
+  }
+
+  getlist = () => {
+    return window.local;
+  }
+
+// LIST SELECT /////////////////////////////////////////////////////////////////
+  $("#list_select").change(() => {
+    let list = [];
+    let listName = $("#list_select").val();
+    removeWords(window.local);
+
+    if (listName){
+      for (let item of lists[listName]) {
+        list.push(item);
+      }
+      addWords(list);
+    }
+  });
+
+
+// ADD LIST ////////////////////////////////////////////////////////////////////
+  $("#list_modal").on('click', () => {
+    $("#addModal").modal('show');
+  });
+
+
+  $('#addModal').on('shown.bs.modal', function () {
+    $('#list_name').trigger('focus');
+  });
+
+
+  $("#list_name").on('input', () => {
+    let listname = $("#list_name").val();
+    if (!listname) {
+      $("#list_submit").prop('disabled', true);
+    } else {
+      $("#list_submit").prop('disabled', false);
+      if (Object.keys(lists).includes(listname)) {
+        $("#list_submit").html('<i class="material-icons">edit_note</i>Update');
+      }
+      else {
+        $("#list_submit").html('<i class="material-icons">note_add</i>Add');
+      }
+    }
+  });
+
+
+  // use $(document) to bind to dynamically created elements
+  $(document).on('submit', "#add_list_form", (e) => {
+    e.preventDefault();
+    let listname = $("#list_name").val();
+
+    lists = lists ? lists : {};
+    lists[listname] = window.local;
+
+    localStorage.setItem(`${window.deckType}`, JSON.stringify(lists));
+
+    // create and select new list item
+    $("#list_select").append(`<option value="${listname}">${listname}</option>`);
+    $("#list_select").val(listname);
+    $("#list_submit").prop('disabled', true);
+    $("#addModal").modal('hide');
+  });
+
+
+// DELETE LIST /////////////////////////////////////////////////////////////////
+  $("#delete_deck").on('click', () => {
+    $("#deleteModal").modal('show');
+  });
+
+  $("#deleteList").on('click', ()=>{
+    deleteList();
+    $("#deleteModal").modal('hide');
+  });
+
+
+  function deleteList(){
+    removeWords(window.local);
+    let list = $("#list_select").val();
+    if (list) {
+      delete lists[list];
+      localStorage.setItem(`${window.deckType}`, JSON.stringify(lists));
+      $("#list_select option:selected").remove();
+    }
+  }
+
+});
+</script>
