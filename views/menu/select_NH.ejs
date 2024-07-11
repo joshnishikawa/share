@@ -70,6 +70,23 @@ $(function(){
   window.deck = [];
   window.local= [];
 
+  
+  $("#themes input").on('change', function(){
+    let list = [];
+    let p = $(this).parent().parent().attr('id');
+    let theme = $(this).val();
+
+    for (let word in NH_vocab[p][theme]) {
+      let id = NH_vocab[p][theme][word];
+      list.push({word, id});
+    }
+
+    if ($(this).is(':checked')) {
+      addWords(list);
+    } else {
+      removeWords(list);
+    }
+  });
 
   addWords = (list) => {
     for (let l of list) {
@@ -80,7 +97,7 @@ $(function(){
         $("#list").append(`
           <div class="alert-primary rounded-3 mb-1 me-1 ps-1 d-flex justify-content-between">
             <div>${l.word}</div>
-            <div id="${l.word}" data-value="${l.id}" class="list btn btn-close" style="font-size:10px;"></div>
+            <div id="${l.word.split(' ').join('_')}" data-value="${l.id}" class="list btn btn-close" style="font-size:10px;"></div>
           </div>
         `);
       }
@@ -102,28 +119,10 @@ $(function(){
     for (let l of list) {
       window.deck = window.deck.filter(e => e !== l.id);
       window.local = window.local.filter(e => e.id !== l.id);
-      $(`#${l.word}`).parent().remove();
+      $(`#${l.word.split(' ').join('_')}`).parent().remove();
     }
     $("#numOfItems").html(`&nbsp;(${window.deck.length})`);
   }
-
-  
-  $("#themes input").on('change', function(){
-    let list = [];
-    let p = $(this).parent().parent().attr('id');
-    let theme = $(this).val();
-
-    for (let word in NH_vocab[p][theme]) {
-      let id = NH_vocab[p][theme][word];
-      list.push({word, id});
-    }
-
-    if ($(this).is(':checked')) {
-      addWords(list);
-    } else {
-      removeWords(list);
-    }
-  });
 
 });
 </script>

@@ -21,43 +21,62 @@ $(function(){
   window.deck = [];
   window.local = [];
 
-  function updateWordList(){
-    window.deck = [];
-    $("#list").empty();
 
-    let checkedThemes = $("#themes input:checked").toArray().map(e => e.value);
-    checkedThemes = checkedThemes.filter(e => e);  // remove empty strings
+  $("#themes input").on('change', function(){
+    let list = [];
+    let p = $(this).parent().parent().attr('id');
+    let theme = $(this).val();
 
-    for (let theme of checkedThemes) {
+    for (let word in LT_vocab[theme]) {
+      let id = LT_vocab[theme][word];
+      list.push({word, id});
+    }
 
-      for (let word in LT_vocab[theme]) {
-        let id = LT_vocab[theme][word];
-        window.deck.push(id);
-        window.local.push({word, id})
+    if ($(this).is(':checked')) {
+      addWords(list);
+    } else {
+      removeWords(list);
+    }
+  });
 
+
+  addWords = (list) => {
+    for (let l of list) {
+      // add word if the id doesn't exist in window.deck
+      if (!window.deck.includes(l.id)) {
+        window.deck.push(l.id);
+        window.local.push(l);
         $("#list").append(`
           <div class="alert-primary rounded-3 mb-1 me-1 ps-1 d-flex justify-content-between">
-            <div>${word}</div>
-            <div id="${word}" data-value="${id}" class="list btn btn-close" style="font-size:10px;"></div>
-          </div>`);
+            <div>${l.word}</div>
+            <div id="${l.word.split(' ').join('_')}" data-value="${l.id}" class="list btn btn-close" style="font-size:10px;"></div>
+          </div>
+        `);
       }
     }
 
     $(".list").on('click', function(){
       let val = $(this).data('value');
       window.deck = window.deck.filter(e => e !== val);
+      window.local = window.local.filter(e => e.id !== val);
       $(this).parent().remove();
       $("#numOfItems").html(`&nbsp;(${window.deck.length})`);
-      console.log(window.deck);
     });
-console.log(window.deck);
+
     $("#numOfItems").html(`&nbsp;(${window.deck.length})`);
   }
 
 
-  $("#themes input").on('change', ()=>{
-    updateWordList();
-  });
+  removeWords = (list) => {
+    for (let l of list) {
+      window.deck = window.deck.filter(e => e !== l.id);
+      window.local = window.local.filter(e => e.id !== l.id);
+
+      $(`#${l.word.split(' ').join('_')}`).parent().remove();
+
+    }
+    $("#numOfItems").html(`&nbsp;(${window.deck.length})`);
+  }
 
 });
 </script>
