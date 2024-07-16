@@ -157,7 +157,8 @@ router.post('/:activity', async(req, res)=>{
     delete params.deck;
     let deckType = params.deckType;
     delete params.deckType;
-
+    if (deckType != 'text'){ delete params.deckName; }
+    
     if (deckType == "nolink"){ // expect deck to be an array of objects
       deck = JSON.parse(deck);
       res.render(`activities/${activity}`, {deckType, deck, params: JSON.stringify(params)});

@@ -40,11 +40,11 @@
 </div>
 
 <script>
-$(function(){
-  $(`#text-tab`).addClass("active");
   let text_decks = <%- JSON.stringify(text_decks) %>;
   window.deck = [];
   window.deckType = 'text';
+$(function(){
+  $(`#text-tab`).addClass("active");
 
   for (let t in text_decks) {
     if ( ["animals", "objects", "shapes", "colors"].includes(t) ) continue;

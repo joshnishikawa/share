@@ -1,8 +1,8 @@
 <%- include('../head.ejs') -%>
 <%- include('navbar.ejs') -%>
 
-<div class="container-fluid pb-3 g-0">
-  <div class="row mb-3">
+<div class="container-fluid pb-3">
+  <div class="row pb-3">
     <div class="col-9">
       <%- include('../menu/select_LT.ejs') -%>
     </div>
@@ -42,23 +42,14 @@
       <%- include('../menu/menu_grid.ejs') -%>
     </div>
   </div>
-
-  <hr>
-
-  <div class="row pb-3">
-    <div class="col">
-      <%- include('../menu/menu_supplies.ejs') -%>
-    </div>
-
-    <div class="col">
-      <%- include('../menu/menu_pizza.ejs') -%>
-    </div>
-
-    <div class="col">
-      <%- include('../menu/menu_parfait.ejs') -%>
-    </div>
+  <hr />
   
+  <div class="row pb-3">
+    <%- include('../menu/menu_3_4.ejs') -%>
   </div>
+</div>
+
+
 
 
 <script>

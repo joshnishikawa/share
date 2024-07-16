@@ -4487,11 +4487,6 @@ const NH_vocab = {
         "meaning": "楽しい",
         "image": "/image/NH/adjectives_fun.png",
         "audio": "/audio/words/fun.mp3"
-      },
-      "special": {
-        "meaning": "特別な",
-        "image": "/image/NH/adjectives_special.png",
-        "audio": "/audio/words/special.mp3"
       }
     },
 
@@ -4647,6 +4642,11 @@ const NH_vocab = {
         "meaning": "年をとった",
         "image": "/image/NH/adjectives2_old.png",
         "audio": "/audio/words/old.mp3"
+      },
+      "special": {
+        "meaning": "特別な",
+        "image": "/image/NH/adjectives_special.png",
+        "audio": "/audio/words/special.mp3"
       }
     }
   },

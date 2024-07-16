@@ -53,8 +53,12 @@
 
   var deck = <%- JSON.stringify(deck) %>;
   const params = <%- params %>;
+  var deckName = params.deckName;
   var backs = params.backs;
 
+  if (deckName == "lower_case_mix" && backs == "animals") deck = deck.slice(0, 10);
+  else if (deckName == "lower_case_mix" && backs == "objects") deck = deck.slice(10, 20);
+  console.log(deck);
   document.title = `Match ${backs} ${deckType}`;
 
   let max_num_of_cards = {
@@ -70,7 +74,7 @@
 
   // SET UP THE DECK ///////////////////////////////////////////////////////////
   // Shuffle first so that cards left out are random (unless doing letters).
-  if ( deck != "lower_case_mix" ) FYshuffle(deck);
+  if ( deckName != "lower_case_mix" ) FYshuffle(deck);
   
   // FIRST whittle down the deck to half the number of card backs available.
   while (deck.length * 2 > max_num_of_cards[backs]) deck.pop();
@@ -175,19 +179,19 @@
         backClass.push('alert-primary');
       }
 
-      if (deck != 'lower_case_mix') FYshuffle(backContent);
+      if (deckName != 'lower_case_mix') FYshuffle(backContent);
       break;
 
     case 'objects':
       for (let i = 0; i < deck.length; i++){
         backContent.push(`<img style="max-width:70%;max-height:70%;" 
                                src="/image/svg/${text_decks.objects[i]}.svg" 
-                               alt="${text_decks.animals[i]}"
+                               alt="${text_decks.objects[i]}"
                                onerror="altOnly(this)">`);
         backClass.push('alert-primary');
       }
 
-      if (deck != "lower_case_mix") FYshuffle(backContent);
+      if (deckName != 'lower_case_mix') FYshuffle(backContent);
       break;
 
     default:
@@ -199,8 +203,8 @@
   }
 
 
-  // letters need to be shuffled in parallel with the objects they represent
-  if ( deck == "lower_case_mix" ) {
+  // need to shuffle letters in parallel with the animals/objects they represent
+  if ( deckName == "lower_case_mix" ) {
     parallelShuffle(deck, backContent);
     FYshuffle(backClass);
   }
@@ -229,6 +233,10 @@
         </div>
       </div>`);
   }
+  // add onerror handler to all flip-front images
+  $(".flip-front img").on('error', function(){
+    altOnly(this);
+  });
 
 
   $(".flip").on('click', function(){

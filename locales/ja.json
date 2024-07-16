@@ -109,6 +109,20 @@
 	"objects+": "物+",
 	"adjectives+": "形容詞+",
 	"jobs+": "仕事+",
-  "text": "英語または日本語の単語を','または'、'で区切る",
-  "speech": "音声認識を保持する (英語のみ)"
+	"text": "英語または日本語の単語を','または'、'で区切る",
+	"speech": "音声認識を保持する (英語のみ)",
+	"NewHorizon": {
+		"vocab": "New Horizon - Vocabulary"
+	},
+  "list_select": "リストを選択してください",
+  "list_name": "デッキ名を入力してください",
+	"LetsTry": {
+    "vocab": "Let's Try - 語彙"
+	},
+	"fruit": "果物",
+	"vegetable": "野菜",
+	"life": "生き物",
+	"weekdays": "曜日",
+	"supplies": "文房具",
+	"town": "町"
 }
