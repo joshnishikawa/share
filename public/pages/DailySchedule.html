@@ -1,0 +1,128 @@
+
+<!DOCTYPE html>
+<html lang="en-US" translate="no">
+<head>
+  <title>English Jones</title>
+  
+  <meta charset="utf-8">
+  <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons%7CMaterial+Icons+Outlined">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Yusei+Magic&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/stylesheets/style.css">
+</head>
+
+<body>
+
+<style>
+  html, body{ height:100% };
+
+  #sheet {
+    width: 21cm;
+    height: 29.7cm;
+  }
+  body{background-image: none !important;}
+</style>
+
+
+
+<body>
+<div id="sheet" class="container-fluid d-flex flex-wrap text-center">
+</div>
+
+
+
+<script>
+$(function(){
+  schedule = [
+    ["7:15","7:45","8:15","3:55","5:40","9:00","12:00"],
+    ["7:00","7:40","8:10","3:50","5:20","8:40","11:30"],
+    ["6:45","7:35","8:05","3:45","5:00","8:20","11:00"],
+    ["6:30","7:30","8:00","3:40","4:40","7:00","10:30"],
+    ["6:15","7:25","7:55","3:35","4:20","6:40","10:00"],
+    ["6:00","7:20","7:50","3:30","4:00","6:20","9:30"],
+    ["7:15","7:20","7:50","3:30","4:00","6:20","9:30"],
+    ["7:00","7:45","8:15","3:55","5:40","9:00","12:00"],
+    ["6:45","7:40","8:10","3:50","5:20","8:40","11:30"],
+    ["6:30","7:35","8:05","3:45","5:00","8:20","11:00"],
+    ["6:15","7:30","8:00","3:40","4:40","7:00","10:30"],
+    ["6:00","7:25","7:55","3:35","4:20","6:40","10:00"],
+    ["7:15","7:20","7:55","3:35","4:20","6:40","10:00"],
+    ["7:00","7:45","7:50","3:30","4:00","6:20","9:30"],
+    ["6:45","7:40","8:15","3:55","5:40","9:00","12:00"],
+    ["6:30","7:35","8:10","3:50","5:20","8:40","11:30"],
+    ["6:15","7:30","8:05","3:45","5:00","8:20","11:00"],
+    ["6:00","7:25","8:00","3:40","4:40","7:00","10:30"],
+    ["7:15","7:20","7:55","3:40","4:40","7:00","10:30"],
+    ["7:00","7:45","7:50","3:35","4:20","6:40","10:00"],
+    ["6:45","7:40","8:15","3:30","4:00","6:20","9:30"],
+    ["6:30","7:35","8:10","3:55","5:40","9:00","12:00"],
+    ["6:15","7:30","8:05","3:50","5:20","8:40","11:30"],
+    ["6:00","7:25","8:00","3:45","5:00","8:20","11:00"],
+    ["7:15","7:20","7:55","3:40","5:00","8:20","11:00"],
+    ["7:00","7:45","7:50","3:35","4:40","7:00","10:30"],
+    ["6:45","7:40","8:15","3:30","4:20","6:40","10:00"],
+    ["6:30","7:35","8:10","3:55","4:00","6:20","9:30"],
+    ["6:15","7:30","8:05","3:50","5:40","9:00","12:00"],
+    ["6:00","7:25","8:00","3:45","5:20","8:40","11:30"],
+    ["7:15","7:20","7:55","3:40","5:00","8:40","11:30"],
+    ["7:00","7:45","7:50","3:35","4:40","8:20","11:00"],
+    ["6:45","7:40","8:15","3:30","4:20","7:00","10:30"],
+    ["6:30","7:35","8:10","3:55","4:00","6:40","10:00"],
+    ["6:15","7:30","8:05","3:50","5:40","6:20","9:30"],
+    ["6:00","7:25","8:00","3:45","5:20","9:00","12:00"],
+    ["7:15","7:20","7:55","3:40","5:00","8:40","12:00"],
+    ["7:00","7:45","7:50","3:35","4:40","8:20","11:30"],
+    ["6:45","7:40","8:15","3:30","4:20","7:00","11:00"],
+    ["6:30","7:35","8:10","3:55","4:00","6:40","10:30"],
+    ["6:15","7:30","8:05","3:50","5:40","6:20","10:00"],
+    ["6:00","7:25","8:00","3:45","5:20","9:00","9:30"]
+  ];
+
+  const activities = [
+    {"name": "get up", "image": "/image/NH/daily_get_up.png"},
+    {"name": "have breakfast", "image": "/image/NH/daily_have_breakfast.png"},
+    {"name": "go to school", "image": "/image/NH/daily_go_to_school.png"},
+    {"name": "go home", "image": "/image/NH/daily_go_home.png"},
+    {"name": "do my homework", "image": "/image/NH/daily_do_my_homework.png"},
+    {"name": "have dinner", "image": "/image/NH/daily_have_dinner.png"},
+    {"name": "go to bed", "image": "/image/NH/daily_go_to_bed.png"}
+  ];
+
+  let count = 0;
+  let point = 0;
+
+  for (let w of schedule){
+    let str = `<div class="row mb-3">`;
+    for (let a = 0; a < w.length; a++){
+      let activity = activities[a];
+      let img = `<img class="img-fluid" src="${activity.image}" alt="${activity.name}" title="${activity.name}">`;
+      str +=
+        `<div class="col border" style="min-height:100%;position:relative;">
+          <div class="border-bottom h5 UD w-100">${w[a]}</div>
+          ${point==a?`<div style="position:absolute;bottom:0;left:0;">.</div>`:``}
+          ${img}${activities[a].name}
+        </div>`;
+      }
+    str += `</div>`;
+    $("#sheet").append(str);
+    count = count == 5 ? 0 : count+1;
+    point = count == 0 ? point+1 : point;
+  }
+
+
+});  
+</script>
+<script src="/javascripts/script.js"></script>
+
+</body>
+</html>

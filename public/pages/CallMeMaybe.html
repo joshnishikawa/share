@@ -34,12 +34,9 @@
 </style>
 
 
-
 <body>
-<div id="sheet" class="container-fluid d-flex flex-wrap g-0" style="min-height:100%;">
-
-</div>
-
+<div id="nums" class="container-fluid" style="min-height:100%;"></div>
+<div id="sheet" class="container-fluid d-flex flex-wrap g-0" style="min-height:100%;"></div>
 
 
 <script>
@@ -60,7 +57,14 @@ $(function(){
 ];
 
 // fill #sheet with cards 6 columns wide for each item in numbers array
+  var hr = 0;
+  var num = 'Phone numbers for Page 1<div class="row d-flex flex-wrap justify-content-between border">';
+
   numbers.forEach(function(number){
+    hr++;
+    num += `<div class="h2 bg-secondary text-white text-center rounded-3" style="width:33%;">${number}</div>`;
+    num += hr % 6 == 0 && hr != 36? `</div>Phone numbers for Page ${hr/6 + 1}<div class="row d-flex flex-wrap justify-content-between border">` : '';
+
     let card = `
       <div class="col-6 p-1" style="height:50%;">
         <div class="border rounded-3 px-3" style="height:100%;">
@@ -85,8 +89,12 @@ $(function(){
         </div>
       </div>
     `;
+
     $('#sheet').append(card);
-  });  
+  });
+
+  num += '</div>';
+  $('#nums').append(num);
 });
 </script>
 <script src="/javascripts/script.js"></script>
