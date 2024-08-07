@@ -38,7 +38,6 @@
 
 <body>
 <div id="sheet" class="container-fluid d-flex flex-wrap text-center">
-
 </div>
 
 
@@ -112,23 +111,26 @@ $(function(){
     ["ba", "bk", "sh", "co", "vi", "ga", "da"], 
     ["cl", "bk", "si", "gu", "so", "te", "tv"], 
     ["ba", "ru", "pi", "co", "vi", "cl", "tv"]
-  ];
+];
 
   const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   let count = 0;
   let point = 0;
 
   for (let w of schedule){
-
+    let str = `<div class="row mb-3">`;
     for (let a = 0; a < w.length; a++){
-      let activity = activities[w[a]];
-      let img = `<img class="img-fluid" src="${activity.image}" alt="${activity.name}" title="${activity.name}">`;
-      $("#sheet").append(`<div class="border mb-1" style="width:14%;height:16%;position:relative;">
+      let name = w[a];
+      let img = `<img class="img-fluid" src="${images[name]}" alt="${name}" title="${name}">`;
+      str += 
+        `<div class="col border" style="width:14%;min-height:100%;position:relative;">
           <div class="border-bottom h5 UD w-100">${weekdays[a]}</div>
           ${point==a?`<div style="position:absolute;bottom:0;left:0;">.</div>`:``}
-          ${img}${activity.name}
-        </div>`);
+          ${img}${name}
+        </div>`;
     }
+    str += `</div>`;
+    $("#sheet").append(str);
     count = count == 5 ? 0 : count+1;
     point = count == 0 ? point+1 : point;
   }
