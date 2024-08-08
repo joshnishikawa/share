@@ -112,31 +112,33 @@
       let lastScale = 1;
       let lastRotation = 0;
       mc.get('pinch').set({ enable: true });
-      mc.on("pan", function(ev) {
+      mc.get('rotate').set({ enable: true });
+
+      mc.on("panmove", function(ev) {
         item.css({
           top: ev.center.y - item.height() / 2,
           left: ev.center.x - item.width() / 2,
         });
       });
-      mc.on("pinch", function(ev) {
+
+      mc.on("pinchmove", function(ev) {
         let scale = Math.max(0.5, Math.min(lastScale * ev.scale, 2));
         let rotation = lastRotation + ev.rotation;
         item.css({
           transform: `scale(${scale}) rotate(${rotation}deg)`,
         });
-        if (ev.isFinal) {
-          lastScale = scale;
-          lastRotation = rotation;
-        }
       });
-      mc.on("pinchend", function(){
-        localStorage.setItem("canvas", $("#canvas").html());
-     });
-     mc.on("panend", function(){
-        localStorage.setItem("canvas", $("#canvas").html());
-     });
-    }
 
+      mc.on("pinchend", function(ev) {
+        lastScale *= ev.scale;
+        lastRotation += ev.rotation;
+        localStorage.setItem("canvas", $("#canvas").html());
+      });
+
+      mc.on("panend", function(){
+        localStorage.setItem("canvas", $("#canvas").html());
+      });
+    }
 
     // get canvas from local storage if exists
     var canvas = localStorage.getItem("canvas");
@@ -164,13 +166,12 @@
       }
     });
 
-
     $(document).on("keydown", function(event) {
       if (event.key === "Delete") {
         $(".selected").remove();
         localStorage.setItem("canvas", $("#canvas").html());
       }
-    });    
+    });
 
     $("#clearCanvas").on("click", function() {
       $("#clearCanvasModal").modal("show");
@@ -182,7 +183,6 @@
       $("#clearCanvasModal").modal("hide");
       z = 1;
     });
-
 
     var shapeMenu = new Hammer(document.getElementById('shapeMenu'));
 
@@ -222,8 +222,6 @@
       localStorage.setItem('canvas', $('#canvas').html());
     });
   });
-
-
 </script>
 
 <%- include('../foot'); -%>

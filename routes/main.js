@@ -147,6 +147,26 @@ router.get('/books', (req, res)=>{
 });
 
 
+router.get('/speak_spell', (req, res)=>{
+  try{
+    // get array of words from vocabulary table
+    let words = {};
+    db.query('SELECT word, meaning, image, audio FROM vocabulary')
+    .then(([rows, schema])=>{
+      for (let row of rows){
+        words[row.word] = {meaning: row.meaning, image: row.image, audio: row.audio};
+      }
+      res.render('activities/speak_spell', {words});
+    });
+  }
+  catch
+  (err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
+
 router.post('/:activity', async(req, res)=>{
   try{
     if ( !valid(req.params.activity, req.body) ) throw '404';
