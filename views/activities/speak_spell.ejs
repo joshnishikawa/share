@@ -19,24 +19,25 @@
   <div class="row">
 <!-- SELECT VOCAB FORMS ------------------------------------------------------->
     <div class="col-md-4">
+      <div class="border border-white rounded-3 alert-secondary p-3 mb-3">
+        <form id="vocab_add_form" class="form d-flex mb-3">
+          <input id="input" type="text" class="form-control" name="word" 
+                placeholder="<%- __('text') %>">
+          <button type="submit" class="btn btn-success">
+            <i class="material-icons">add</i>
+          </button>
+        </form>
 
-      <form id="vocab_add_form" class="form d-flex mb-3">
-        <input id="input" type="text" class="form-control" name="word" 
-              placeholder="<%- __('text') %>">
-        <button type="submit" class="btn btn-success">
-          <i class="material-icons">add</i>
-        </button>
-      </form>
-
-      <div class="d-flex justify-content-end">
-        <div class="text-muted me-3"><%- __('speech') %></div>
-        <div id="speech_recognition" class="btn btn-success">
-          <i class="material-icons">mic</i>
+        <div class="d-flex justify-content-end">
+          <div class="text-muted me-3"><%- __('speech') %></div>
+          <div id="speech_recognition" class="btn btn-success">
+            <i class="material-icons">mic</i>
+          </div>
         </div>
+        <div id="output" style="min-height:1.5em;">&nbsp;</div>
       </div>
-      <div id="output" style="min-height:1.5em;">&nbsp;</div>
 
-      <div class="border rounded-3 bg-white p-3">
+      <div class="border border-white rounded-3 alert-secondary p-3">
         <%- include('../menu/lists') %>
       </div>
   
@@ -193,7 +194,7 @@
       window.deck.push(w);
       window.local.push(w);
       $("#list").append( // in menu/lists.ejs
-      `<div class="alert-primary rounded-3 mb-1 me-1 ps-1 d-flex justify-content-between">
+      `<div class="alert-primary rounded-3 m-1 ps-1 d-flex justify-content-between">
           <div id="${w.word.split(' ').join('_')}">${w.word} - ${w.meaning}</div>
           <div data-value="${w.word.split(' ').join('_')}" class="list btn btn-close" style="font-size:10px;"></div>
         </div>`);

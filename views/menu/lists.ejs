@@ -1,6 +1,6 @@
 <%- __('list_select') %>
 
-<div class="d-flex justify-content-between">
+<div class="d-flex justify-content-between mb-3">
   <form id="add_list_form" class="form w-75">
     <select id="list_select" class="form-control form-control-lg">
     </select>
@@ -18,7 +18,7 @@
 <div><%- __('list') %><span id="numOfItems"> (0)</span></div>
 
   
-<div id="list" class="d-flex flex-wrap"></div>
+<div id="list" class="d-flex flex-wrap bg-white border rounded-3"></div>
 
 
 <!-- MODALS ------------------------------------------------------------------->
@@ -92,7 +92,7 @@ $(window).on('pageshow', function(){
         window.deckType == 'nolink' ? window.deck.push(l) : window.deck.push(l.id);
         window.local.push(l);
         $("#list").append(`
-          <div class="alert-primary rounded-3 mb-1 me-1 ps-1 d-flex justify-content-between">
+          <div class="alert-primary rounded-3 m-1 ps-1 d-flex justify-content-between">
             <div id="${l.word.split(' ').join('_')}">${l.word}${l.meaning ? ' - ' + l.meaning : ''}</div>
             <div data-value="${l.id}" class="list btn btn-close" style="font-size:10px;"></div>
           </div>`);
@@ -112,13 +112,15 @@ $(window).on('pageshow', function(){
 
 
   removeWords = (list) => {
-    for (let l of list) {
-      window.deck = window.deck.filter(e => e !== l.id || e !== l.word);
-      window.local = window.local.filter(e => e.id !== l.id || e !== l.word);
+    // console.log(window.deck);
+    for (let i of list) {
+      window.deck = window.deck.filter(d => d !== i && d !== i.id && d !== i.word);
+      window.local = window.local.filter(l => l.id !== i.id && l.id !== i.word);
 
-      $(`#${l.word.split(' ').join('_')}`).parent().remove();
+      $(`#${i.word.split(' ').join('_')}`).parent().remove();
     }
     $("#numOfItems").html(`&nbsp;(${window.deck.length})`);
+    // console.log(window.deck);
   }
 
 // LIST SELECT /////////////////////////////////////////////////////////////////
