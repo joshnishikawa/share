@@ -1,22 +1,16 @@
 <%- include('../head'); -%>
 <body>
   
-<div style="background-color:black;color:white;height:100vh;">
+<div id="target" style="background-color:black;color:white;height:100vh;">
   <div class="text-center pt-3">
-    <button id="listen" class="btn btn-lg btn-success">Listen</button>
-  </div>
-
-  <div>
-    <p>Tap/click then say a color to change the background color of the app.</p>
+    <button id="listen" class="btn btn-lg btn-success"><i class="material-icons">record_voice_over</i></button>
+    <button id="stop" class="btn btn-lg btn-danger"><i class="material-icons">stop</i></button>
   </div>
 
   <div>
     <p class="hints p-3"></p>
   </div>
 
-  <div>
-    <p class="output p-3"></p>
-  </div>
 </div>
 
 
@@ -41,12 +35,11 @@ $(function(){
   const speechRecognitionList = new SpeechGrammarList();
   speechRecognitionList.addFromString(grammar, 1);
   recognition.grammars = speechRecognitionList;
-  recognition.continuous = false;
+  recognition.continuous = true;
   recognition.lang = "en-US";
   recognition.interimResults = false;
   recognition.maxAlternatives = 1;
 
-  const diagnostic = document.querySelector(".output");
   const bg = document.querySelector("body");
 
   // DISPLAY HINTS
@@ -70,23 +63,27 @@ $(function(){
     console.log("Ready to receive a color command.");
   });
 
+  // STOP
+  $("#stop").on('click', () => {
+    recognition.stop();
+    console.log("Stopped listening.");
+  });
+  
   recognition.onresult = (event) => {
-    const color = event.results[0][0].transcript;
-    diagnostic.textContent = `Result received: ${color}.`;
-    bg.style.backgroundColor = color;
-    console.log(`Confidence: ${event.results[0][0].confidence}`);
+    let color = event.results[event.resultIndex][0].transcript.trim().toLowerCase();
+    $("#target").css("background-color", color);
+    console.log(`Color: ${color}, Confidence: ${event.results[event.resultIndex][0].confidence}`);
   };
 
-  // recognition.onspeechend = () => {
-  //   recognition.stop();
-  // };
+  recognition.onspeechend = () => {
+  };
 
   recognition.onnomatch = (event) => {
-    diagnostic.textContent = "I didn't recognise that color.";
+    console.log("I didn't recognise that color.");
   };
 
   recognition.onerror = (event) => {
-    diagnostic.textContent = `Error occurred in recognition: ${event.error}`;
+    console.log(`Error occurred in recognition: ${event.error}`);
   };
 });
 </script>

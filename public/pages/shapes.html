@@ -26,6 +26,44 @@
 
 <script>
 $(function() {
+// DYNAMIC ALGORITHM TO CREATE A SET OF CARDS //////////////////////////////////
+// COULD BE INTEGRATED TO MAKE A SOCKET.IO GAME ////////////////////////////////
+const colours = ["orange", "green", "purple", "blue"];
+const shapes = ["circle", "triangle", "square", "star"];
+
+function getAllCombinations(colours, shapes) {
+    let results = [];
+
+    function generateCombinations(colourArr, shapeArr, combination = []) {
+        if (combination.length === Math.min(colours.length, shapes.length)) {
+            results.push(combination);
+            return;
+        }
+
+        for (let i = 0; i < colourArr.length; i++) {
+            for (let j = 0; j < shapeArr.length; j++) {
+                const newCombination = combination.concat([[colourArr[i], shapeArr[j]]]);
+                const remainingColours = colourArr.filter((_, index) => index !== i);
+                const remainingShapes = shapeArr.filter((_, index) => index !== j);
+                generateCombinations(remainingColours, remainingShapes, newCombination);
+            }
+        }
+    }
+
+    generateCombinations(colours, shapes);
+    return results;
+}
+
+const allCombinations = getAllCombinations(colours, shapes);
+console.log(allCombinations.length);
+console.log(allCombinations);
+// END /////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
 
   function getShape(color, shape){
     let str = `<svg class="${shape}-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">`;
@@ -44,7 +82,42 @@ $(function() {
 
 
   let cards = [
-    ["orange circle","green square","purple triangle"],     ["orange circle","purple square","green triangle"],     ["orange circle","green triangle","purple square"],     ["orange circle","purple triangle","green square"],     ["green circle","orange square","purple triangle"],     ["green circle","purple square","orange triangle"],     ["green circle","orange triangle","purple square"],     ["green circle","purple triangle","orange square"],     ["purple circle","orange square","green triangle"],     ["purple circle","green square","orange triangle"],     ["purple circle","orange triangle","green square"],     ["purple circle","green triangle","orange square"],     ["orange square","green circle","purple triangle"],     ["orange square","purple circle","green triangle"],     ["orange square","green triangle","purple circle"],     ["orange square","purple triangle","green circle"],     ["green square","orange circle","purple triangle"],     ["green square","purple circle","orange triangle"],     ["green square","orange triangle","purple circle"],     ["green square","purple triangle","orange circle"],     ["purple square","orange circle","green triangle"],     ["purple square","green circle","orange triangle"],     ["purple square","orange triangle","green circle"],     ["purple square","green triangle","orange circle"],     ["orange triangle","green circle","purple square"],     ["orange triangle","purple circle","green square"],     ["orange triangle","green square","purple circle"],     ["orange triangle","purple square","green circle"],     ["green triangle","orange circle","purple square"],     ["green triangle","purple circle","orange square"],     ["green triangle","orange square","purple circle"],     ["green triangle","purple square","orange circle"],     ["purple triangle","orange circle","green square"],     ["purple triangle","green circle","orange square"],     ["purple triangle","orange square","green circle"],     ["purple triangle","green square","orange circle"]
+    ["orange circle","green square","purple triangle"],
+    ["orange circle","purple square","green triangle"],
+    ["orange circle","green triangle","purple square"],
+    ["orange circle","purple triangle","green square"],
+    ["green circle","orange square","purple triangle"],
+    ["green circle","purple square","orange triangle"],
+    ["green circle","orange triangle","purple square"],
+    ["green circle","purple triangle","orange square"],
+    ["purple circle","orange square","green triangle"],
+    ["purple circle","green square","orange triangle"],
+    ["purple circle","orange triangle","green square"],
+    ["purple circle","green triangle","orange square"],
+    ["orange square","green circle","purple triangle"],
+    ["orange square","purple circle","green triangle"],
+    ["orange square","green triangle","purple circle"],
+    ["orange square","purple triangle","green circle"],
+    ["green square","orange circle","purple triangle"],
+    ["green square","purple circle","orange triangle"],
+    ["green square","orange triangle","purple circle"],
+    ["green square","purple triangle","orange circle"],
+    ["purple square","orange circle","green triangle"],
+    ["purple square","green circle","orange triangle"],
+    ["purple square","orange triangle","green circle"],
+    ["purple square","green triangle","orange circle"],
+    ["orange triangle","green circle","purple square"],
+    ["orange triangle","purple circle","green square"],
+    ["orange triangle","green square","purple circle"],
+    ["orange triangle","purple square","green circle"],
+    ["green triangle","orange circle","purple square"],
+    ["green triangle","purple circle","orange square"],
+    ["green triangle","orange square","purple circle"],
+    ["green triangle","purple square","orange circle"],
+    ["purple triangle","orange circle","green square"],
+    ["purple triangle","green circle","orange square"],
+    ["purple triangle","orange square","green circle"],
+    ["purple triangle","green square","orange circle"]
   ];
 
 

@@ -133,7 +133,7 @@ router.get('/pairs', (req, res)=>{
 
 router.get('/SRS', (req, res)=>{
   try{
-    res.render('activities/labs/SRS');
+    res.render('labs/SRS');
   }
   catch(err){
     res.send(err);

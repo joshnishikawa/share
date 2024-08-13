@@ -1,4 +1,4 @@
-<%- include('../../head'); -%>
+<%- include('../head'); -%>
 <body class="lightBG">
 <div style="min-height:100vh;" class="noselect"><!-- just for keeping the footer at the bottom-->
   <div id="rank" style="position:fixed;bottom:0;right:0;"></div>
@@ -11,7 +11,7 @@
       <audio id="player"><source id="audioSource" type="audio/mpeg"></audio>
 
       <!-- 'play' button is shown unless reading is required.-->
-      <div id="playbutton" class="col-4 btn text-success" 
+      <div id="playbutton" class="col-3 btn text-success" 
           style="visibility:hidden;text-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important">
         <i class="material-icons" style="font-size:4em;">
           record_voice_over
@@ -20,7 +20,7 @@
 
       <!-- display daily progress and difficulty indicator 
           yellow means you're a bit behind. red means more than a bit -->
-      <div id="feedback" class="col-4 d-flex justify-content-center pt-3 border-start border-end">
+      <div id="feedback" class="col-3 d-flex justify-content-center pt-3 border-start border-end">
         <div id="progress" class="radial-progress-bar shadow">
           <div class="right-half"></div>
           <div class="left-half-mask"></div>
@@ -31,9 +31,14 @@
         <div id="confetti" style="position: absolute;top:-2em;"></div>
       </div>
 
+      <!-- 'exit' button -->
+      <div id="exit" class="col-3 btn text-shadow border-end">
+        <span class="icon-exit text-success svg-shadow" style="font-size:4em;"></span>
+      </div>
+      
       <!-- 'next' button appears after you answer correctly -->
-      <div id="next" class="col-4 btn text-primary" 
-          style="visibility:hidden;text-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important">
+      <div id="next" class="col-3 btn text-primary text-shadow" 
+          style="visibility:hidden;">
         <i class="material-icons" style="font-size:4em;">
           forward
         </i>
@@ -60,25 +65,26 @@
 
 </div>
 
-<script src="https://members.englishjones.com/javascripts/study_utilities.js"></script>
-<script src="https://members.englishjones.com/javascripts/study_activities.js"></script>
+<script src="/javascripts/study_utilities.js"></script>
+<script src="/javascripts/study_activities.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/bevacqua/dragula@3.7.3/dist/dragula.min.js"></script>
 
 <script>
-  var ranks = [];
   var aim = [];
-
+  var ranks = [];
+  
   update = (card, success) => {
     if (success){
       confetti(); // confetti is for closers...ONLY!
       if(aim[card] == 0){ // first try
         aim[card] = 2;
         ranks[card] = Math.min(ranks[card] + 1, 5);
-        $.post('/abc/SRS', {ranks}, (data)=>{
-        });
-      }
+        // set local storage abc_SRS to ranks
+        localStorage.setItem('abc_SRS', JSON.stringify(ranks));
+
+              }
       else { aim[card] += 1; }
-      progressToPercent(aim, 0); //do this after you calculate aim
+      progressPie.progress(progressToPercent(aim, 0)); //do this after you calculate aim
     }
     else { aim[card] = 1; }
   }
@@ -113,13 +119,16 @@
 
 $(function(){
   window.scrollTo(0,0);
-
+  ranks = JSON.parse(localStorage.getItem('abc_SRS')) 
+              || [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
   aim = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-  ranks = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-  let {abcranks} = getCookieObject();
-  if (abcranks) ranks = abcranks.split(",").map(Number);
 
   $("#playbutton").on("click", ()=>{ playaudio(); });
+
+  $("#exit").on("click", ()=>{ 
+    clearTable();
+    window.location.replace('/');
+  });
 
   checkProgress();
 });
@@ -128,4 +137,4 @@ $(function(){
 <!-- define this after update() and checkProgress() are defined above -->
 <script src="/javascripts/abc.js"></script>
 
-<%- include('../../foot'); -%>
+<%- include('../foot'); -%>
