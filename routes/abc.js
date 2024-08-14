@@ -40,17 +40,6 @@ router.get('/haystack', (req, res)=>{
   }
 });
 
-router.get('/sequence', (req, res)=>{
-  try{
-    res.redirect('/abc/alphabetical');
-  }
-  catch
-  (err){
-    res.send(err);
-    console.error(err);
-  }
-});
-
 
 router.get('/alphabetical', (req, res)=>{
   try{
@@ -88,16 +77,5 @@ router.post('/SRS', (req, res)=>{
   }
 });
 
-
-router.post('/reset', (req, res)=>{
-  try{
-    res.clearCookie('abcranks', {path: '/abc'});
-    res.send('success');
-  }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
 
 module.exports = router;

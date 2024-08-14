@@ -291,16 +291,19 @@
 	"jobs+": "jobs+",
 	"objects": "objects",
 	"objects+": "objects+",
-  "text": "Enter EN or JA separated by ',' or '、'",
-  "speech": "Hold for speech recognition (EN only)",
-  "save": "Save",
-  "list_name": "Enter deck name",
-  "list_select": "Select a list (if any)",
-  "list_create": "Add words to a list",
+	"text": "Enter EN or JA separated by ',' or '、'",
+	"speech": "Hold for speech recognition (EN only)",
+	"save": "Save",
+	"list_name": "Enter deck name",
+	"list_select": "Select a list (if any)",
+	"list_create": "Add words to a list",
 	"LetsTry": {
 		"vocab": "Let's Try - Vocabulary"
 	},
 	"NewHorizon": {
 		"vocab": "New Horizon - Vocabulary"
-	}
+	},
+  "shapesName": "Please enter a name for this picture.",
+  "shapesCant": "You can't delete the 'empty' picture.",
+  "shapesDelete": "Press \"Delete\" if you're sure you want to delete this picture?"
 }
