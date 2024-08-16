@@ -10,7 +10,7 @@
 
 <div class="container-fluid g-0">
   <div class="row g-0" style="height:100vh;">
-    <div id="colorMenu" class="col ps-1 bg-light" style="max-width:100px;">
+    <div id="colorMenu" class="col ps-1 pt-1 bg-light" style="max-width:100px;">
       <ul class="nav vert-tabs d-flex flex-column" style="height:100%;">
         <li class="nav-item rounded-start p-2" style="color:white;background-color:red;">RED</li>
         <li class="nav-item rounded-start p-2" style="background-color: orange;">ORANGE</li>
@@ -48,27 +48,27 @@
     <div id="shapeMenu" class="col bg-light p-2" style="height:100%;max-width:100px;border:10px solid rgba(0,0,0,0);">
       <div class="shape" data-shape="circle">
         <svg class="circle-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="50" cy="50" r="45" fill="red" stroke="black" stroke-width="1"/>
+          <circle cx="50" cy="50" r="45" fill="purple" stroke="black" stroke-width="1"/>
         </svg>
       </div>
       <div class="shape" data-shape="square">
         <svg class="square-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="10" y="10" width="80" height="80" fill="blue" stroke="black" stroke-width="1"/>
+          <rect x="10" y="10" width="80" height="80" fill="green" stroke="black" stroke-width="1"/>
         </svg>
       </div>
       <div class="shape" data-shape="triangle">
         <svg class="triangle-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="50,5 95,95 5,95" fill="green" stroke="black" stroke-width="1"/>
+          <polygon points="50,5 95,95 5,95" fill="hotpink" stroke="black" stroke-width="1"/>
         </svg>
       </div>
       <div class="shape" data-shape="rectangle">
         <svg class="rectangle-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="10" y="20" width="80" height="60" fill="yellow" stroke="black" stroke-width="1"/>
+          <rect x="10" y="20" width="80" height="60" fill="orange" stroke="black" stroke-width="1"/>
         </svg>
       </div>
       <div class="shape" data-shape="diamond">
         <svg class="diamond-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="50,5 85,50 50,95 15,50" fill="hotpink" stroke="black" stroke-width="1"/>
+          <polygon points="50,5 85,50 50,95 15,50" fill="blue" stroke="black" stroke-width="1"/>
         </svg>
       </div>
       <div class="shape" data-shape="star">
@@ -79,14 +79,14 @@
       <div class="shape" data-shape="heart">
         <svg class="heart-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="m 11.109127,15 a 27.5,27.5 0 0 0 0,38.890872 L 50,92.781746 88.890873,53.890872 A 27.5,27.5 0 0 0 88.890873,15 27.5,27.5 0 0 0 50,15 27.5,27.5 0 0 0 11.109127,15 Z" 
-          fill="purple" stroke="black" stroke-width="1"/>
+          fill="red" stroke="black" stroke-width="1"/>
         </svg>
       </div>
     </div>
 
   <!-- Canvas area for dragging and dropping shapes -->
-    <div class="col">
-      <div id="canvas" class="border bg-med" style="height: 100%;"></div>
+    <div class="col" style="max-height:100vh;overflow:hidden;">
+      <div id="canvas" class="border bg-med" style="height: 100%;overflow:hidden;"></div>
     </div>
   </div>
 </div>
@@ -112,6 +112,8 @@
   $(function() {
     var canvases = {};
     var workingCanvas = "";
+    var minScale = 0.5; // Minimum scale factor
+    var maxScale = 3.0; // Maximum scale factor
 
     // load default canvas from local storage if it exists. create a new canvas if it doesn't.
     if (localStorage.getItem("shapes")) {
@@ -133,8 +135,8 @@
         });
       }
     } else {
+      canvases.empty = "";
       workingCanvas = "empty";
-      canvases[workingCanvas] = $("#canvas").html();
       localStorage.setItem("shapes", JSON.stringify(canvases));
     }
 
@@ -165,7 +167,7 @@
       }
     });
 
-    
+
     let z = 1; // makes sure the last selected item is on top
 
     function setSelected(){
@@ -174,13 +176,26 @@
       $(this).css("z-index", z++);
     }
 
+
+    function adjustRotation(lastRotation, currentRotation){
+      const normalizedAngle = (currentRotation + 360) % 360; // Normalize the angle to be within [0, 360)
+      let cur = (270 - normalizedAngle + 360) % 360;
+      console.log(cur);
+      console.log(lastRotation);
+      console.log('');
+      return cur;
+    }
+
+
     function makeTouchable(item){
       const mc = new Hammer(item[0]);
 
       let lastScale = 1;
       let lastRotation = 0;
+      let moving = false; // flag to prevent over-logging
+
       mc.get('pinch').set({ enable: true });
-      mc.get('rotate').set({ enable: true });
+      mc.get('rotate').set({ enable: false });
 
       mc.on("panmove", function(ev) {
         item.css({
@@ -189,9 +204,14 @@
         });
       });
 
+      mc.on("pinchstart", function(ev) {
+        lastScale = 1;
+        lastRotation = adjustRotation(lastRotation, ev.rotation);
+      });
+
       mc.on("pinchmove", function(ev) {
-        let scale = Math.max(0.5, Math.min(lastScale * ev.scale, 2));
-        let rotation = lastRotation + ev.rotation;
+        let scale = Math.max(0.3, Math.min(lastScale * ev.scale, 3));
+        let rotation = ev.rotation - lastRotation;
         item.css({
           transform: `scale(${scale}) rotate(${rotation}deg)`,
         });
@@ -199,7 +219,7 @@
 
       mc.on("pinchend", function(ev) {
         lastScale *= ev.scale;
-        lastRotation += ev.rotation;
+        lastRotation = adjustRotation(lastRotation, ev.rotation);
         canvases[workingCanvas] = $("#canvas").html();
         localStorage.setItem("shapes", JSON.stringify(canvases));
       });
@@ -215,7 +235,7 @@
     $('#colorMenu .nav-item').on('click', function() {
       let color = $(this).text().toLowerCase();
       color = color === "pink" ? "hotpink" : color;
-      $('#shapeMenu').css('border', `10px solid ${color}`);
+      $('#shapeMenu').addClass("rounded-3").css('border', `10px solid ${color}`);
       $('#shapeMenu .shape svg').each(function() {
         $(this).find('path, circle, rect, polygon').attr('fill', color);
       });
@@ -238,22 +258,23 @@
     });
 
     $("#clearCanvas").on("click", function() {
-      if (workingCanvas === "empty") alert("<%- __('shapesCant') %>");
-      else $("#clearCanvasModal").modal("show");
+      $("#clearCanvasModal").modal("show");
     });
 
     $("#clearCanvasConfirm").on("click", function() {
-      delete canvases[workingCanvas];
+      if (workingCanvas === "empty") {
+        canvases.empty = "";
+      } else {
+        delete canvases[workingCanvas];
+        $(`#loadCanvas option[value="${workingCanvas}"]`).remove();
+        workingCanvas = "empty";
+        $("#loadCanvas").val("empty");
+      }
+
+      $("#canvas").empty();
       localStorage.setItem("shapes", JSON.stringify(canvases));
-      $("#loadCanvas option[value='" + workingCanvas + "']").remove();
-      workingCanvas = "empty";
-      $("#loadCanvas").val("empty");
-      $("#canvas").html(canvases.empty);
-      $("#canvas .canvas-shape").each(function() {
-        makeTouchable($(this));
-      });
-      $("#clearCanvasModal").modal("hide");
       z = 1;
+      $("#clearCanvasModal").modal("hide");
     });
 
     var shapeMenu = new Hammer(document.getElementById('shapeMenu'));

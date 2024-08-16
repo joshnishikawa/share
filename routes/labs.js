@@ -164,4 +164,14 @@ router.get('/speech', (req, res)=>{
 });
 
 
+router.get('/snake', (req, res)=>{
+  try{
+    res.render('labs/snake');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
 module.exports = router;

@@ -1,0 +1,85 @@
+<%- include('../head.ejs') %>
+
+<canvas id="gameCanvas" width="600" height="450" class="alert-success mx-auto"></canvas>
+
+<script>
+  var canvas = document.getElementById('gameCanvas');
+  var context = canvas.getContext('2d');
+  var gridSize = 150;
+  var snake = [{ x: 150, y: 150 }];
+  var direction = 'right';
+  var food = { x: 300, y: 300 };
+  var score = 0;
+
+  function getRandomGridPosition() {
+    return {
+      x: Math.floor(Math.random() * (canvas.width / gridSize)) * gridSize,
+      y: Math.floor(Math.random() * (canvas.height / gridSize)) * gridSize
+    };
+  }
+
+  function drawModule() {
+    return {
+      bodySnake: function(x, y) {
+        context.fillStyle = 'green';
+        context.fillRect(x, y, gridSize, gridSize);
+      },
+      pizza: function(x, y) {
+        context.fillStyle = 'red';
+        context.fillRect(x, y, gridSize, gridSize);
+      },
+      scoreText: function() {
+        context.fillStyle = 'black';
+        context.fillText('Score: ' + score, 10, 10);
+      },
+      init: function() {
+        $(document).off('keydown').on('keydown', function(event) {
+          if (event.key === 'ArrowUp' && direction !== 'down') direction = 'up';
+          if (event.key === 'ArrowDown' && direction !== 'up') direction = 'down';
+          if (event.key === 'ArrowLeft' && direction !== 'right') direction = 'left';
+          if (event.key === 'ArrowRight' && direction !== 'left') direction = 'right';
+          gameLoop();
+        });
+      }
+    };
+  }
+
+  function gameLoop() {
+    context.clearRect(0, 0, canvas.width, canvas.height);
+
+    var head = { ...snake[0] };
+
+    if (direction === 'up') head.y -= gridSize;
+    if (direction === 'down') head.y += gridSize;
+    if (direction === 'left') head.x -= gridSize;
+    if (direction === 'right') head.x += gridSize;
+
+    if (head.x === food.x && head.y === food.y) {
+      score++;
+      food = getRandomGridPosition();
+    } else {
+      snake.pop();
+    }
+
+    if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height || snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+      snake = [{ x: 150, y: 150 }];
+      direction = 'right';
+      score = 0;
+      food = getRandomGridPosition();
+    }
+
+    snake.unshift(head);
+
+    for (var i = 0; i < snake.length; i++) {
+      drawModule().bodySnake(snake[i].x, snake[i].y);
+    }
+
+    drawModule().pizza(food.x, food.y);
+    drawModule().scoreText();
+  }
+
+  drawModule().init();
+  gameLoop();
+
+</script>
+<%- include('../foot.ejs') %>
