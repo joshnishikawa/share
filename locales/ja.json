@@ -126,6 +126,6 @@
 	"supplies": "文房具",
 	"town": "町",
   "shapesName": "この絵の名前を入力してください。",
-  "shapesCant": "'empty'の絵を削除できません。",
+  "shapesCant": "'default'の絵を削除できません。",
   "shapesDelete": "この絵を削除してもよろしかったら「Delete]を押してください？"
 }

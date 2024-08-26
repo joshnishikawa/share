@@ -119,9 +119,9 @@
     if (localStorage.getItem("shapes")) {
       canvases = JSON.parse(localStorage.getItem("shapes"));
       // load the default canvas
-      if (canvases.empty) {
-        workingCanvas = "empty";
-        $("#canvas").html(canvases.empty);
+      if (canvases.default) {
+        workingCanvas = "default";
+        $("#canvas").html(canvases.default);
         $("#canvas .canvas-shape").each(function() {
           makeTouchable($(this));
         });
@@ -135,8 +135,8 @@
         });
       }
     } else {
-      canvases.empty = "";
-      workingCanvas = "empty";
+      canvases.default = "";
+      workingCanvas = "default";
       localStorage.setItem("shapes", JSON.stringify(canvases));
     }
 
@@ -159,7 +159,7 @@
       let name = prompt("<%- __("shapesName") %>");
       if (name) {
         workingCanvas = name;
-        canvases["empty"] = "";
+        canvases["default"] = "";
         canvases[workingCanvas] = $("#canvas").html();
         localStorage.setItem("shapes", JSON.stringify(canvases));
         $("#loadCanvas").append(`<option value="${name}">${name}</option>`);
@@ -183,27 +183,13 @@
       const values = matrixString.match(/matrix\(([^)]+)\)/)[1].split(', ');
       const a = parseFloat(values[0]); // Corresponds to cos(θ)
       const b = parseFloat(values[1]); // Corresponds to sin(θ)
-
-      // Calculate the angle in radians
       const radians = Math.atan2(b, a);
-
-      // Convert radians to degrees
       const degrees = radians * (180 / Math.PI);
-
-      // Return the angle in degrees
       return degrees;
     }
 
-    function degreesToMatrix(degrees){
-      const radians = degrees * (Math.PI / 180);
-      const cos = Math.cos(radians);
-      const sin = Math.sin(radians);
-    
-      // Create the matrix
-      return `matrix(${cos}, ${sin}, ${-sin}, ${cos}, 0, 0)`;
-    }
 
-    function touchToCSS(initial, current) {
+    function touchToDegrees(initial, current) {
       // Normalize the initial and current values to be within the range [0, 360)
       const initialNormalized = (initial + 360) % 360;
       const currentNormalized = (current + 360) % 360;
@@ -229,8 +215,7 @@
       const mc = new Hammer(item[0]);
 
       let lastScale = 1;
-      let lastTouchRotation = 0; // only used while touching
-      let log = true;
+      let startingTouchRotation = 0; // only used while touching
 
       mc.get('pinch').set({ enable: true });
       mc.get('rotate').set({ enable: false });
@@ -248,30 +233,20 @@
       });
 
       mc.on("pinchstart", function(ev) {
-        lastScale = 1;
-        lastTouchRotation = ev.rotation;
-        console.log(item.css("transform"));
-        lastCSSRotation = item.css("transform").split("(")[1].split(")")[0].split(",")[1];
-        lastCSSRotation = parseInt(lastCSSRotation);
-        console.log(lastCSSRotation);
+        startingTouchRotation = ev.rotation;
+        lastCSSRotation = matrixToDegrees(item.css("transform") );
       });
 
       mc.on("pinchmove", function(ev) {
         let scale = Math.max(0.3, Math.min(lastScale * ev.scale, 3));
-
-        if (log) console.log(lastTouchRotation);
-
-        let CSSRotation = touchToCSS(lastTouchRotation, ev.rotation) + lastCSSRotation;
+        let CSSRotation = touchToDegrees(startingTouchRotation, ev.rotation) + lastCSSRotation;
         CSSRotation = parseInt(CSSRotation);
-        if (log) console.log(CSSRotation);
-        log = false;
         item.css({
           transform: `scale(${scale}) rotate(${CSSRotation}deg)`,
         });
       });
 
       mc.on("pinchend", function(ev) {
-        log = true;
         lastScale *= ev.scale;
         canvases[workingCanvas] = $("#canvas").html();
         localStorage.setItem("shapes", JSON.stringify(canvases));
@@ -311,13 +286,13 @@
     });
 
     $("#clearCanvasConfirm").on("click", function() {
-      if (workingCanvas === "empty") {
-        canvases.empty = "";
+      if (workingCanvas === "default") {
+        canvases.default = "";
       } else {
         delete canvases[workingCanvas];
         $(`#loadCanvas option[value="${workingCanvas}"]`).remove();
-        workingCanvas = "empty";
-        $("#loadCanvas").val("empty");
+        workingCanvas = "default";
+        $("#loadCanvas").val("default");
       }
 
       $("#canvas").empty();
