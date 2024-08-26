@@ -83,7 +83,18 @@ router.get('/NH', async(req, res)=>{
       }
     }
 
-    res.render('teachers/NH', {NH_vocab, colors, teacher: true});
+    res.render('teachers/NH', {NH_vocab, colors});
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
+
+router.get('/nolink', async(req, res)=>{
+  try{
+    res.render('teachers/nolink');
   }
   catch(err){
     res.send(err);

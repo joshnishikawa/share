@@ -6,11 +6,11 @@
     </select>
   </form>
 
-  <button id="list_modal" type="submit" class="btn btn-success">
+  <button id="add_list_modal" type="submit" class="btn btn-success">
     <i class="material-icons">note_add</i>
   </button>
 
-  <button id="delete_deck" class="btn btn-danger">
+  <button id="delete_list_modal" class="btn btn-danger">
     <i class="material-icons">delete</i>
   </button>
 </div>
@@ -139,7 +139,7 @@ $(window).on('pageshow', function(){
 
 
 // ADD LIST ////////////////////////////////////////////////////////////////////
-  $("#list_modal").on('click', () => {
+  $("#add_list_modal").on('click', () => {
     $("#addModal").modal('show');
   });
 
@@ -184,7 +184,7 @@ $(window).on('pageshow', function(){
 
 
 // DELETE LIST /////////////////////////////////////////////////////////////////
-  $("#delete_deck").on('click', () => {
+  $("#delete_list_modal").on('click', () => {
     $("#deleteModal").modal('show');
   });
 
