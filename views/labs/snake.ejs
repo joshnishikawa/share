@@ -1,7 +1,7 @@
 <%- include('../head.ejs') %>
-
-<canvas id="gameCanvas" width="600" height="450" class="alert-success mx-auto"></canvas>
-
+<div class="container text-center mt-5">
+  <canvas id="gameCanvas" width="600" height="450" class="alert-success mx-auto"></canvas>
+</div>
 <script>
   var canvas = document.getElementById('gameCanvas');
   var context = canvas.getContext('2d');
@@ -12,14 +12,27 @@
   var score = 0;
 
   function getRandomGridPosition() {
-    return {
-      x: Math.floor(Math.random() * (canvas.width / gridSize)) * gridSize,
-      y: Math.floor(Math.random() * (canvas.height / gridSize)) * gridSize
-    };
+    let position;
+    let isOnSnake;
+
+    do {
+      position = {
+        x: Math.floor(Math.random() * (canvas.width / gridSize)) * gridSize,
+        y: Math.floor(Math.random() * (canvas.height / gridSize)) * gridSize
+      };
+
+      isOnSnake = snake.some(segment => segment.x === position.x && segment.y === position.y);
+    } while (isOnSnake);
+
+    return position;
   }
 
   function drawModule() {
     return {
+      headSnake: function(x, y) {
+        context.fillStyle = 'black';
+        context.fillRect(x, y, gridSize, gridSize);
+      },
       bodySnake: function(x, y) {
         context.fillStyle = 'green';
         context.fillRect(x, y, gridSize, gridSize);
@@ -40,6 +53,7 @@
           if (event.key === 'ArrowRight' && direction !== 'left') direction = 'right';
           gameLoop();
         });
+        // setInterval(gameLoop, 1000 / 10); // to auto-move the snake
       }
     };
   }
@@ -70,7 +84,9 @@
 
     snake.unshift(head);
 
-    for (var i = 0; i < snake.length; i++) {
+    drawModule().headSnake(snake[0].x, snake[0].y);
+
+    for (var i = 1; i < snake.length; i++) {
       drawModule().bodySnake(snake[i].x, snake[i].y);
     }
 

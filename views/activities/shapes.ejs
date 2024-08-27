@@ -177,45 +177,30 @@
     }
 
 
-// FUCKTIONS!!! ////////////////////////////////////////////////////////////////
     function matrixToDegrees(matrixString) {
       // Extract the matrix values
       const values = matrixString.match(/matrix\(([^)]+)\)/)[1].split(', ');
       const a = parseFloat(values[0]); // Corresponds to cos(θ)
       const b = parseFloat(values[1]); // Corresponds to sin(θ)
-      const radians = Math.atan2(b, a);
-      const degrees = radians * (180 / Math.PI);
+      const radians = Math.atan2(b, a); // Extract the angle in radians
+      const degrees = radians * (180 / Math.PI); // Convert to degrees
       return degrees;
     }
 
 
     function touchToDegrees(initial, current) {
-      // Normalize the initial and current values to be within the range [0, 360)
-      const initialNormalized = (initial + 360) % 360;
-      const currentNormalized = (current + 360) % 360;
-
-      // Calculate the delta between the normalized current and initial angles
-      let delta = currentNormalized - initialNormalized;
-
-      // Adjust the delta to ensure it is between -180 and 180 degrees
-      if (delta > 180) {
-          delta -= 360;
-      } else if (delta < -180) {
-          delta += 360;
-      }
-
-      // Map delta to corresponding CSS value
-      const degrees = delta / 2;
+      let delta = current - initial;
+      let degrees = (delta + 180) % 360 - 180; // Normalize to [-180, 180] range
       return degrees;
     }
 
-    var lastCSSRotation = 0;   // stored to add rotation to
-
+    
     function makeTouchable(item){
       const mc = new Hammer(item[0]);
-
-      let lastScale = 1;
-      let startingTouchRotation = 0; // only used while touching
+      
+      let lastScale = 1;             // current scale of the shape
+      var itemRotation = 0;          // current rotation of the shape
+      let startingTouchRotation = 0; // reference for how much rotation to add
 
       mc.get('pinch').set({ enable: true });
       mc.get('rotate').set({ enable: false });
@@ -234,15 +219,15 @@
 
       mc.on("pinchstart", function(ev) {
         startingTouchRotation = ev.rotation;
-        lastCSSRotation = matrixToDegrees(item.css("transform") );
+        itemRotation = matrixToDegrees(item.css("transform") );
       });
 
       mc.on("pinchmove", function(ev) {
         let scale = Math.max(0.3, Math.min(lastScale * ev.scale, 3));
-        let CSSRotation = touchToDegrees(startingTouchRotation, ev.rotation) + lastCSSRotation;
-        CSSRotation = parseInt(CSSRotation);
+        let newItemRotation = touchToDegrees(startingTouchRotation, ev.rotation) + itemRotation;
+        newItemRotation = parseInt(newItemRotation);
         item.css({
-          transform: `scale(${scale}) rotate(${CSSRotation}deg)`,
+          transform: `scale(${scale}) rotate(${newItemRotation}deg)`,
         });
       });
 
@@ -273,6 +258,8 @@
       }
     });
 
+
+
     $(document).on("keydown", function(event) {
       if (event.key === "Delete") {
         $(".selected").remove();
@@ -301,41 +288,35 @@
       $("#clearCanvasModal").modal("hide");
     });
 
+
+// Handle dragging shapes from the shape menu to the canvas ////////////////////
     var shapeMenu = new Hammer(document.getElementById('shapeMenu'));
 
-    // Handle the panstart event
     shapeMenu.on('panstart', function(e) {
-      // deselect
       $(".canvas-shape").removeClass("selected");
-      // Get the shape that was touched
-      var $shape = $(e.target).closest('.shape');
+      var shape = $(e.target).closest('.shape');
+      var clone = shape.clone().removeClass('shape').addClass('canvas-shape selected');
+      $('#canvas').append(clone);
+      makeTouchable(clone);
 
-      // Clone the shape and add it to the canvas
-      var $clone = $shape.clone().removeClass('shape').addClass('canvas-shape selected');
-      $('#canvas').append($clone);
-      // Add touch to pan and pinch to zoom functionality using hammer
-      makeTouchable($clone);
-
-      // Start dragging the clone
-      $clone.css({
+      clone.css({
         position: 'absolute',
-        left: e.center.x - $clone.width() / 2,
-        top: e.center.y - $clone.height() / 2
+        left: e.center.x - clone.width() / 2,
+        top: e.center.y - clone.height() / 2
       });
     });
 
     shapeMenu.on('panmove', function(e) {
-      // Get the clone and move it
-      var $clone = $('#canvas .canvas-shape.selected');
-      $clone.css({
-        left: e.center.x - $clone.width() / 2,
-        top: e.center.y - $clone.height() / 2
+      var clone = $('#canvas .canvas-shape.selected');
+
+      clone.css({
+        left: e.center.x - clone.width() / 2,
+        top: e.center.y - clone.height() / 2,
+        transform: `scale(1) rotate(0deg)`
       });
     });
 
-    // Handle the panend event
     shapeMenu.on('panend', function() {
-      // Save the canvas to local storage
       canvases[workingCanvas] = $("#canvas").html();
       localStorage.setItem("shapes", JSON.stringify(canvases));
     });
