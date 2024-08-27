@@ -7,8 +7,9 @@
     <button id="stop" class="btn btn-lg btn-danger"><i class="material-icons">stop</i></button>
   </div>
 
-  <div class="text-center">
-    <p id="hints" class="p-3"></p>
+  <div class="text-center pt-3">
+    Tap or click then say a color to change the background color of the app. Try...<br />
+    <div id="hints" class="p-3"></div>
   </div>
 
 </div>
@@ -35,17 +36,14 @@ $(function(){
   recognition.interimResults = false;
   recognition.maxAlternatives = 1;
 ////////////////////////////////////////////////////////////////////////////////
+vocab.forEach((color, i) => {
 
-  let hints = `Tap or click then say a color to change the background color of the app. <br /> Try`;
-
-  vocab.forEach((color, i) => {
     if (["black", "gray", "purple", "brown", "green", "blue"].includes(color)) {
-      hints += `<span style="background-color:${color};"> ${color} </span>`;
+      $("#hints").append(`<span class="p-3" style="background-color:${color};"> ${color} </span>`);
     } else {
-      hints += `<span style="color:black;background-color:${color};"> ${color} </span>`;
+      $("#hints").append(`<span class="p-3" style="color:black;background-color:${color};"> ${color} </span>`);
     }
   });
-  $("#hints").html(hints);
 
 
   // LISTEN
