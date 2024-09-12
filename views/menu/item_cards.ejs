@@ -1,0 +1,44 @@
+<div class="rounded-3 border p-1 shadow d-flex">
+  <i class="material-icons text-secondary" 
+    style="line-height:1.4rem;font-size:1.4rem;cursor:pointer;" 
+    data-bs-toggle="modal" data-bs-target="#cards_modal">
+    info
+  </i>
+  <strong class="text-primary h3">CARDS</strong>
+
+
+  <form id="cardsForm" action="/printcards" method="POST" class="d-flex justify-content-end w-100">
+
+    <div class="d-flex" style="height:100%;">
+      <input type="hidden" value="" name="deck">
+      <input type="hidden" value="" name="deckType">
+
+      <div class="form-check me-3">
+        <input type="checkbox" value="true" name="text" class="form-check-input">
+        <label class="form-check-label small text-center" for="text">Text</label>
+      </div>
+
+      <button id="cardsButton" type="submit" class="btn btn-primary" style="height:100%;">Start</button>
+    </div>
+  </form>
+
+</div>
+
+<%- include ("../modals/modal_cards.ejs") %>
+
+<script>
+$(function(){
+  $("#cardsButton").on('click', (e)=>{
+    e.preventDefault();
+    if (!window.deck || window.deck.length == 0) {
+      alert("<%- __('pleaseSelect') %>");
+    }
+    else {
+      $("#cardsForm input[name='deck']").val(JSON.stringify(window.deck));
+      $("#cardsForm input[name='deckType']").val('nolink');
+      $("#cardsForm").submit();
+    }
+  });
+});
+
+</script>

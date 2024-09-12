@@ -36,19 +36,19 @@
 <script>
 $(function() {
   const letters = {
-  "A a": ["apple","angel","arrow"],   "B b": ["banana","bear","ball"],   "C c": ["cookie","cat","camera"],   "D d": ["donut","dog","doll"],   "E e": ["egg","Earth","ear"],   "F f": ["fish","flower","fan"],   "G g": ["grapes","giraffe","green"],   "H h": ["honey","heart","hand"],   "I i": ["ice cream","igloo","island"],   "J j": ["jellyfish","jump rope","jelly"],   "K k": ["kiwi","kangaroo","kite"],   "L l": ["lemon","lion","leg"],   "Mm": ["money","monkey","mouth"],   "N n": ["nuts","net","nose"],   "O o": ["octopus","olive","orange"],   "P p": ["peach","pig","pink"],   "Q q": ["queen","quilt","quarter"],   "R r": ["robot","rabbit","red"],   "S s": ["salad","snake","square"],   "T t": ["tomato","triangle","tent"],   "U u": ["unicorn","unicycle","ukulele"],   "V v": ["vegetables","van","violin"],   "Ww": ["watermelon","whale","wagon"],   "X x": ["fox","box","mixer"],   "Y y": ["yogurt","yo-yo","yellow"],   "Z z": ["zucchini","zebra","zipper"]
+  "A a": ["apple","angel","arrow"],   "B b": ["banana","bear","ball"],   "C c": ["cookie","cat","circle"],   "D d": ["donut","dog","doll"],   "E e": ["egg","Earth","ear"],   "F f": ["fish","flower","fan"],   "G g": ["grapes","giraffe","green"],   "H h": ["honey","heart","hand"],   "I i": ["ice cream","igloo","island"],   "J j": ["jellyfish","jump rope","jelly"],   "K k": ["kiwi","kangaroo","kite"],   "L l": ["lemon","lion","leg"],   "Mm": ["money","monkey","mouth"],   "N n": ["nuts","net","nose"],   "O o": ["octopus","olive","orange"],   "P p": ["peach","pig","pink"],   "Q q": ["queen","quilt","quarter"],   "R r": ["robot","rabbit","red"],   "S s": ["salad","snake","square"],   "T t": ["tomato","triangle","tent"],   "U u": ["umbrella","unicycle","ukulele"],   "V v": ["vegetables","van","vampire"],   "Ww": ["watermelon","whale","wagon"],   "X x": ["fox","box","mixer"],   "Y y": ["yogurt","yo-yo","yellow"],   "Z z": ["zucchini","zebra","zipper"]
 }
 
 for (let key in letters){
   let str = `
-    <div class="row UD" style="height:10.5cm;">
+    <div class="row UD" style="height:9.6cm;">
       <div class="col-3 text-primary" style="font-size:9rem;">${key}</div>
       <div class="col-9"><div class="d-flex flex-wrap justify-content-between">`;
   for (let word of letters[key]){
     let file = word.replace(/ /g,"_");
     // let size = ["ice cream", "jump rope"].includes(word) ? '6' : '3';
     str += `
-    <div class="text-center display-3" style="height:10.5cm;max-width:30%;">
+    <div class="text-center display-3" style="height:9.6cm;max-width:30%;">
       <img src="/image/svg/${file}.svg" alt="${file}" class="img-fluid me-3 mt-3" style="max-height:50%;"><br/>
       ${word}
     </div>`;
@@ -59,19 +59,19 @@ for (let key in letters){
 
 // /////////////////////////////////////////////////////////////////////////////
 const misc = {
-  "Books":{"Hungry Caterpillar": "/image/books/hungry_caterpillar.jpg", "Brown Bear": "/image/books/brown_bear.jpg", "Head to Toe": "/image/books/head_to_toe.jpg", "Big Green Monster": "/image/books/green_monster.jpg", "Where's Spot": "/image/books/wheres_spot.jpg"},   "Games": {"tag": "/image/NH/play_tag.png", "hide-and-seek": "/image/NH/play_hide_and_seek.png", "dodgeball": "/image/NH/sports_dodgeball.png", "cards": "/image/NH/play_cards.png", "othello": "/image/svg/othello.svg"},   "Recreation": {"camping": "/image/NH/play_camping.png", "fishing": "/image/NH/play_fishing.png", "hiking": "/image/NH/play_hiking.png", "swimming": "/image/NH/sports_swimming.png", "skateboardinging": "/image/NH/sports_skateboarding.png"},   "Uniforms": {"pilot": "/image/NH/jobs_pilot.png", "firefighter": "/image/NH/jobs_fire_fighter.png", "police": "/image/NH/jobs_police_officer.png", "baseball player": "/image/NH/jobs_baseball_player.png", "cook": "/image/NH/jobs_cook.png"}
+  "Books":{"Hungry Caterpillar": "/image/books/hungry_caterpillar.jpg", "Brown Bear": "/image/books/brown_bear.jpg", "Head to Toe": "/image/books/head_to_toe.jpg", "Big Green Monster": "/image/books/green_monster.jpg", "Where's Spot": "/image/books/wheres_spot.jpg"},   "Games": {"tag": "/image/NH/play_tag.png", "hide-and-seek": "/image/NH/play_hide_and_seek.png", "dodgeball": "/image/NH/sports_dodgeball.png", "cards": "/image/NH/play_cards.png", "othello": "/image/svg/othello.svg"},   "Recreation": {"camping": "/image/NH/play_camping.png", "fishing": "/image/NH/play_fishing.png", "swimming": "/image/NH/sports_swimming.png", "skating": "/image/NH/sports_skateboarding.png", "hiking": "/image/NH/play_hiking.png"},   "Uniforms": {"pilot": "/image/NH/jobs_pilot.png", "firefighter": "/image/NH/jobs_fire_fighter.png", "police": "/image/NH/jobs_police_officer.png", "baseball player": "/image/NH/jobs_baseball_player.png", "cook": "/image/NH/jobs_cook.png"}
 }
 
 for (let key in misc){
   let str = `
-    <div class="row UD" style="height:10.5cm;">
+    <div class="row UD" style="height:9.6cm;">
       <div class="col-2 text-success" style="font-size:3rem;">${key}</div>
       <div class="col-10"><div class="d-flex flex-wrap justify-content-between">`;
   for (let word in misc[key]){
     let src = misc[key][word];
     word = key == "Books" ? "" : word;
     str += `
-    <div class="text-center display-6" style="height:10.5cm;max-width:20%;">
+    <div class="text-center display-6" style="height:9.6cm;max-width:20%;">
       <img src="${src}" alt="${key}" class="img-fluid me-3 mt-3" style="max-height:50%;"><br/>
       ${word}
     </div>`;
@@ -81,18 +81,18 @@ for (let key in misc){
 }
 // /////////////////////////////////////////////////////////////////////////////
 const categories = {
-  "Art": ["paint","paper","glue","scissors","crayons"],   "Clothes": ["hat","shirt","pants","skirt","socks"],   "Drinks": ["milk","juice","water","tea","coffee"],   "Elec-tronics": ["TV","tablet","game system","phone","timer"],   "Fun": ["swing","slide","sandbox","jungle gym","seesaw"],   "House": ["door","window","roof","table","chair"],   "Insects": ["mantis","ant","bee","beetle","dragonfly"],   "Japan": ["kimono","sumo","sushi","manga","karaoke"],   "Kitchen": ["pan","pot","knife","fork","spoon"],   "Lunch": ["milk","rice","tray","bowl","plate"],   "Music": ["piano","guitar","drum","recorder","violin"],   "Nature": ["ocean","mountain","desert","forest","river"],   "Office": ["stapler","paper clip","ruler","notebook","calendar"],   "Plants": ["tree","flower","cactus","wheat","bamboo"],   "Quests": ["sword","shield","dragon","treasure","horse"],   "Sports": ["soccer","baseball","tennis","volleyball","basketball"],   "Tools": ["hammer","wrench","pliers","saw","chisel"],   "Vehicles": ["car","train","bus","bicycle","motorcycle"],   "Writing": ["pencil","eraser","sharpener","pen","marker"],   "X words": ["x-ray","xylophone","axe","T-Rex","exit"],   "Youth": ["puppy","kitten","chick","cub","pony"],   "Zoo": ["elephant","tiger","panda","gorilla","hippo"]
+  "Art": ["paint","paper","glue","scissors","crayons"],   "Clothes": ["hat","shirt","pants","skirt","socks"],   "Drinks": ["milk","juice","water","tea","coffee"],   "Elec-tronics": ["TV","tablet","game system","phone","timer"],   "Fun": ["swing","slide","sandbox","jungle gym","seesaw"],   "House": ["door","window","roof","table","chair"],   "Insects": ["mantis","ant","bee","beetle","dragonfly"],   "Japan": ["kimono","sumo","sushi","anime","karaoke"],   "Kitchen": ["pan","pot","knife","fork","spoon"],   "Lunch": ["milk","rice","tray","bowl","plate"],   "Music": ["piano","guitar","drum","recorder","violin"],   "Nature": ["ocean","mountain","desert","forest","river"],   "Office": ["stapler","paper clip","ruler","notebook","calendar"],   "Plants": ["tree","flower","cactus","wheat","bamboo"],   "Quests": ["sword","shield","dragon","treasure","horse"],   "Sports": ["soccer","baseball","tennis","volleyball","basketball"],   "Tools": ["hammer","wrench","pliers","saw","chisel"],   "Vehicles": ["car","train","bus","bicycle","motorcycle"],   "Writing": ["pencil","eraser","sharpener","pen","marker"],   "X words": ["x-ray","xylophone","axe","T-Rex","exit"],   "Youth": ["puppy","kitten","chick","cub","pony"],   "Zoo": ["elephant","tiger","panda","gorilla","hippo"]
 }
 
 for (let key in categories){
   let str = `
-    <div class="row UD" style="height:10.5cm;">
+    <div class="row UD" style="height:9.6cm;">
       <div class="col-2 text-success" style="font-size:3rem;">${key}</div>
       <div class="col-10"><div class="d-flex flex-wrap justify-content-between">`;
   for (let word of categories[key]){
     let file = word.replace(/ /g,"_");
     str += `
-    <div class="text-center display-6" style="height:10.5cm;max-width:20%;">
+    <div class="text-center display-6" style="height:9.6cm;max-width:20%;">
       <img src="/image/svg/${file}.svg" alt="${file}" class="img-fluid me-3 mt-3" style="max-height:50%;"><br/>
       ${word}
     </div>`;

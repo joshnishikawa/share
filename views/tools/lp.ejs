@@ -9,6 +9,28 @@
       display: none;
     }
   }
+
+  [contenteditable="true"] {
+    cursor:pointer;
+  }
+
+  [contenteditable="true"].single-line {
+    white-space: nowrap;
+    overflow: hidden;
+  } 
+  [contenteditable="true"].single-line br {
+      display:none;
+  }
+  [contenteditable="true"].single-line * {
+      display:inline;
+      white-space:nowrap;
+  }
+  [contenteditable="true"].multi-line {
+    height: calc(100% - 1.5rem);
+    white-space: pre-wrap;
+    overflow: hidden;
+  }
+
   body{background-image: none !important;}
 </style>
 
@@ -16,17 +38,15 @@
 <body>
   <div id="menucontainer"><!-- to hide the entire menu when printing -->
     <div id="menu" class="d-flex">
-      <a id="home" href="teachers/tools" class="btn btn-sm btn-outline-secondary py-0 me-1">
-        <i class="material-icons">home</i>
-      </a>
-
       <button class="btn btn-sm btn-outline-secondary p-0 me-3" data-bs-toggle="modal" data-bs-target="#lp_modal">
         <i class="material-icons">info</i>
       </button>
 
-      <button id="print" class="btn btn-sm btn-outline-success py-0 mx-3">
+      <button id="print" class="btn btn-sm btn-outline-success py-0 me-3">
         <i class="material-icons">print</i>
       </button>
+
+      <button id="clear" class="btn btn-sm btn-outline-danger" style="display:none;">CLEAR</button>
 
     </div>
   </div>
@@ -37,13 +57,16 @@
     <div class="row" style="height:5%;">
 
       <div class="col-2 border rounded-3">
-        <p>Date:</p>
+        Date:
+        <div contenteditable="true" class="single-line"></div>
       </div>
       <div class="col-2 border rounded-3">
-        <p>Class:</p>
+        Class:
+        <div contenteditable="true" class="single-line"></div>
       </div>
       <div class="col-8 border rounded-3">
-        <p>Today's Goal:</p>
+        Today's Goal:
+        <div contenteditable="true" class="single-line"></div>
       </div>
 
     </div>
@@ -56,6 +79,7 @@
 
       </div>
       <div class="col-9 border rounded-3" style="position:relative;">
+        <div class="editor multi-line" contenteditable="true"></div>
         <div class="small" style="position:absolute;bottom:0;">
           挨拶・曜日・日付・天気・スモールトーク・今日の英単語
         </div>
@@ -70,6 +94,7 @@
         <p class="small">Practice what you learned last time in pairs or groups. Speaking time!</p>
       </div>
       <div class="col-9 border rounded-3" style="position:relative;">
+        <div class="editor multi-line" contenteditable="true"></div>
         <div class="small" style="position:absolute;bottom:0;">
           前回学んだことを復習・ペアやグループで練習・スピーキングタイム
         </div>
@@ -86,6 +111,7 @@
         <p class="small">JTE リード<br/>ALT モデリング</p>
       </div>
       <div class="col-9 border rounded-3" style="position:relative;">
+        <div class="editor multi-line" contenteditable="true"></div>
         <div class="bg-white" style="height:6px;position:absolute;bottom:-3px;left:50px;right:50px;">&nbsp;</div>
       </div>
 
@@ -100,7 +126,9 @@
         <p class="small">今日学んだことを練習・違うトピックに移る・新しいことを試す・楽しむ</p>
         <p class="small">ALT リード<br/>JTE 生徒をサポート</p>
       </div>
-      <div class="col-9 border rounded-3"></div>
+      <div class="col-9 border rounded-3">
+        <div class="editor multi-line" contenteditable="true"></div>
+      </div>
 
     </div>
     <div class="row" style="height:11%;">
@@ -111,6 +139,7 @@
         <p class="small">What did you learn today? When's the next class? Good-byes.</p>
       </div>
       <div class="col-9 border rounded-3" style="position:relative;">
+        <div class="editor multi-line" contenteditable="true"></div>
         <div class="small" style="position:absolute;bottom:0;">
           今日何を学んだか？友達と共有・次回の授業日・さようなら
         </div>
@@ -122,16 +151,54 @@
 
 <%- include('../modals/modal_lp'); -%>
 
+
 <script>
 $(function(){
-  // Make #sheet so that the user can write on it with a touch pen.
-  
+  let lp = localStorage.getItem('lp');
+  if (lp) {
+    $('#sheet').html(lp);
+    $('#clear').show();
+  }
 
   $("#print").on('click', ()=>{
     window.print();
   });
-});
 
+  $("#clear").on('click', function(){
+    $(".single-line").empty();
+    $(".editor").empty();
+    $(this).hide();
+  });
+
+  $(".editor").on('blur', function(){
+    localStorage.setItem('lp', $('#sheet').html());
+  });
+
+  $('.editor').on('keydown', function(e) {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      document.execCommand('insertText', false, '    ');
+    }
+    // CTRL + SHIFT + R
+    if (e.ctrlKey && e.shiftKey && e.key === 'R') {
+      e.preventDefault();
+      document.execCommand('justifyRight', false, null);
+    }
+    // CTRL + SHIFT + E
+    if (e.ctrlKey && e.shiftKey && e.key === 'E') {
+      e.preventDefault();
+      document.execCommand('justifyCenter', false, null);
+    }
+    // CTRL + SHIFT + L
+    if (e.ctrlKey && e.shiftKey && e.key === 'L') {
+      e.preventDefault();
+      document.execCommand('justifyLeft', false, null);
+    }
+  });
+
+});
 </script>
+
+
   
 <%- include('../foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->

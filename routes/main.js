@@ -34,6 +34,17 @@ router.get('/', (req, res)=>{
 });
 
 
+router.get('/groups', (req, res)=>{
+  try{
+    res.render('students/groups');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
+
 router.get('/LT', (req, res)=>{
   try{
     res.render('students/LT', {LT_vocab});
@@ -187,6 +198,7 @@ router.get('/speak_spell', (req, res)=>{
 });
 
 
+
 router.post('/:activity', async(req, res)=>{
   try{
     if ( !valid(req.params.activity, req.body) ) throw '404';
@@ -279,7 +291,7 @@ router.get('/:activity/:id', async (req, res)=>{
 
 
 function valid(activity, params){
-  if ( !["bingo", "flash", "grid", "match", "recall", "reveal", "type", "spell"].includes(activity)) return false;
+  if ( !["bingo", "flash", "grid", "match", "recall", "reveal", "type", "spell", "printcards"].includes(activity)) return false;
   if ( !params.deck ) return false;
   try{
     JSON.parse(params.deck);

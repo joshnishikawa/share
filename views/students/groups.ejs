@@ -1,0 +1,101 @@
+<%- include('../head.ejs') -%>
+<%- include('navbar.ejs') -%>
+
+<div class="container">
+  <div class="row">
+    <div class="col-3 border">
+      Your user name is: <div id="player" class="btn btn-lg btn-success display-1"></div>
+      <button id="getName" class="btn btn-lg btn-success display-1">Change</button>
+
+      Share your private group with a few friends.
+      <div id="room" class="btn btn-lg btn-success display-1"></div>
+    </div>
+    <div class="col-9 border">
+      <div id="choose" class="activity btn btn-lg btn-success display-1">Choose</div>
+    </div>
+  </div>
+
+
+<script src="https://cdn.socket.io/4.0.1/socket.io.js"></script>
+
+<script>
+$(function(){
+  $(`#groups-tab`).addClass("active");
+
+  var myRoom = null;
+  var room = null;
+  var socket = io();
+  var stored_room = {};
+  var stored_player = {};
+
+  socket.on('connect', ()=>{
+    console.log('socket connected');
+    stored_player = JSON.parse(localStorage.getItem('player'));
+    stored_room = JSON.parse(localStorage.getItem('room'));
+    
+    if (stored_room) {
+      myRoom = stored_room.myRoom;
+
+      let now = new Date();
+      if (now - new Date(stored_room.date) > 1000*60*60*12) {
+        localStorage.removeItem('room');
+        console.log('local storage expired');
+        socket.emit('join', null, ()=>{});
+      }
+      else {
+        console.log('attempting to join: ', stored_room.room);
+        socket.emit('join', {room: stored_room.room, type: stored_room.type}, ()=>{});
+      }
+    }
+    else {
+      console.log('finding a new room');
+      socket.emit('join', null, ()=>{});
+    }
+
+
+    if (stored_player) {
+      console.log('rejoining player: ', stored_player);
+      socket.emit('rejoin', stored_player, (data)=>{
+        console.log('rejoined player: ', data);
+        localStorage.setItem('player', JSON.stringify(data));
+      });
+    }
+    else {
+      console.log('creating new player');
+      socket.emit('new player', null, (data)=>{
+        console.log('new player: ', data);
+        localStorage.setItem('player', JSON.stringify(data));
+      });
+    }
+  });
+
+
+  socket.on('joined', (data)=>{
+    if (data) {
+      room = data.room;
+      if (data.myRoom) myRoom = data.myRoom;
+      localStorage.setItem('room', JSON.stringify(data));
+      $(`#room`).text(room);
+    }
+    else {
+      localStorage.removeItem('room');
+      socket.emit('join', null, ()=>{});
+    }
+  });
+
+  $("#getName").on('click', ()=>{
+    socket.emit('getName', null, (data)=>{
+      $("#player").text(data.username);
+      stored_player.username = data.username;
+      localStorage.setItem('player', JSON.stringify(stored_player));
+    });
+  });
+
+
+
+});
+
+</script>
+
+<%- include('../foot.ejs') -%>
+  

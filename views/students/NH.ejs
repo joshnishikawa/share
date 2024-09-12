@@ -13,10 +13,10 @@
 
   <div class="row pb-3">
     <div class="col">
-      <%- include('../menu/menu_spell.ejs') -%>
+      <%- include('../menu/item_spell.ejs') -%>
     </div>
     <div class="col">
-      <%- include('../menu/menu_type.ejs') -%>
+      <%- include('../menu/item_type.ejs') -%>
     </div>
     <div class="col"></div>
   </div>
@@ -28,6 +28,24 @@
 <script>
 $(function(){
   $(`#NH-tab`).addClass("active");
+
+  addWords = (list) => {
+    for (let l of list) {
+      if (!window.deck.includes(l.id)) {
+        window.deck.push(l.id);
+        window.local.push(l);
+      }
+    }
+  }
+
+
+  removeWords = (list) => {
+    for (let i of list) {
+      window.deck = window.deck.filter(d => d !== i && d !== i.id && d !== i.word);
+      window.local = window.local.filter(l => l.id !== i.id && l.id !== i.word);
+    }
+  }
+
 });
 </script>
 

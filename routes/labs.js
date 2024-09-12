@@ -13,29 +13,6 @@ const db = mysql.createPool(creds);
 const bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded({extended: true}));
 
-
-router.get('/japaneasy', (req, res)=>{
-  try{
-    res.render('labs/japaneasy');
-  }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
-
-router.post('/japaneasy', async(req, res)=>{
-  try{
-    let word = await translate(req.body.word);
-    res.send(result);
-  }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
-
-
 // EDIT SUBTITLES //////////////////////////////////////////////////////////////
 function convertSRTtoOBJ(subs){
   var subobj = {};
@@ -120,9 +97,10 @@ const download = (url, newfilepath) => new Promise((resolve, reject) => {
 });
 
 
-router.get('/pairs', (req, res)=>{
+router.get('/:activity', (req, res)=>{
   try{
-    res.render('sockets/pairs');
+    const activity = req.params.activity;
+    res.render('labs/' + activity);
   }
   catch(err){
     res.send(err);
@@ -130,48 +108,5 @@ router.get('/pairs', (req, res)=>{
   }
 });
 
-
-router.get('/SRS', (req, res)=>{
-  try{
-    res.render('labs/SRS');
-  }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
-
-
-router.get('/shapes', (req, res)=>{
-  try{
-    res.render('labs/shapes');
-  }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
-
-
-router.get('/speech', (req, res)=>{
-  try{
-    res.render('labs/speech');
-  }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
-
-
-router.get('/snake', (req, res)=>{
-  try{
-    res.render('labs/snake');
-  }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
 
 module.exports = router;

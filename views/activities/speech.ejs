@@ -36,8 +36,7 @@ $(function(){
   recognition.interimResults = false;
   recognition.maxAlternatives = 1;
 ////////////////////////////////////////////////////////////////////////////////
-vocab.forEach((color, i) => {
-
+  vocab.forEach((color, i) => {
     if (["black", "gray", "purple", "brown", "green", "blue"].includes(color)) {
       $("#hints").append(`<span class="p-3" style="background-color:${color};"> ${color} </span>`);
     } else {
