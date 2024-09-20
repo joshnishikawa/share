@@ -15,7 +15,8 @@ const adjectives = [
   "Blazing", "Gleaming", "Harmonic", "Savage", "Serene", "Transcendent", "Whispering", "Diligent", "Ferocious",
   "Flickering", "Rumbling", "Vast", "Mighty", "Paradoxical", "Whimsical", "Shadowy", "Jagged", "Crimson", 
   "Frosty", "Galactic", "Golden", "Silver", "Azure", "Ebony", "Scarlet", "Breezy", "Gleeful", "Hidden",
-  "Jagged", "Keen", "Light", "Mystical", "Obsidian", "Puzzling", "Roaring", "Silent", "Twinkling", "Uplifted"
+  "Jagged", "Keen", "Light", "Mystical", "Obsidian", "Puzzling", "Roaring", "Silent", "Twinkling", "Uplifted",
+  "Vivid", "Wandering", "Yawning", "Zesty", "Astral", "Blissful", "Dazzling", "Emerald", "Major", "Noble"
 ];
 
 const nouns = [
@@ -32,7 +33,10 @@ const nouns = [
   "Blademaster", "Stormcaller", "Starwalker", "Flameweaver", "Bonecrusher", "Soulstealer", "Dreamweaver", "Sunwalker",
   "Wanderer", "Pathfinder", "Moonwalker", "Windrunner", "Skybreaker", "Seafarer", "Cloudstrider", "Flamestrider",
   "Mech", "Crawler", "Overseer", "Observer", "Pilot", "Thief", "Healer", "Commander", "Pilot", "Seeker",
-  "Titan", "Destroyer", "Tempest", "Cobra", "Chimera", "Specter", "Golem", "Wraith", "Revenant", "Shade"
+  "Titan", "Destroyer", "Tempest", "Cobra", "Chimera", "Specter", "Golem", "Wraith", "Revenant", "Shade", "Fungus",
+  "Amoeba", "Jellyfish", "Squid", "Starfish", "Crab", "Lobster", "Shrimp", "Scorpion", "Spider", "Beetle",
+  "Ant", "Mantis", "Caterpillar", "Butterfly", "Dragonfly", "Grasshopper", "Locust", "Cicada", "Ladybug"
+
 ];
 
 
@@ -114,14 +118,10 @@ function getNewName(){
 io.sockets.on('connection', socket =>{
   console.log('socket connected: ', socket.id);
 
-  socket.on('join', async function(data){ // data = {room: 'room1', type: 'public'}
+  socket.on('join', async function(data){ // data = {room: 'room1', type: 'public', player: {} }
+    console.log('join: ', data);
     if (data){
-      if (data.date && Date.now() - data.date > 43200000){ //replace if > 12 hrs
-        joinNewPrivateRoom(socket);
-        return;
-      }
-
-      else if (data.type === 'public' && Object.keys(publicRooms).includes(data.room)){
+      if (data.type === 'public' && Object.keys(publicRooms).includes(data.room)){
         joinPublicRoom(socket, data.room);
       }
       else if (data.type === 'private' && Object.keys(privateRooms).includes(data.room)){
@@ -132,7 +132,7 @@ io.sockets.on('connection', socket =>{
 
         // if the room doesn't exist or there are less than 4 connected sockets, add the new socket
         if (!clients || clients.size < 4){
-          socket.broadcast.to(data.room).emit('joined', socket.id);
+          socket.broadcast.to(data.room).emit('playerJoined', data.player);
           socket.emit('joined', {room: data.room, myRoom: data.room, type: 'private'});
         }
         else {
@@ -162,10 +162,19 @@ io.sockets.on('connection', socket =>{
 
   socket.on('getName', function(){
     let name = getNewName();
-    socket.emit('name', name);
+    console.log(name);
+    socket.emit('setName', name);
   });
 
-
+  socket.on('roomSearch', function(data){
+    console.log('roomSearch: ', data);
+    if (Object.keys(privateRooms).includes(data)){
+      socket.emit('roomFound', true);
+    }
+    else {
+      socket.emit('roomFound', false);
+    }
+  });
 
 
 
@@ -191,14 +200,12 @@ io.sockets.on('connection', socket =>{
     console.log('selectedword: ', data.word);
   });
 
+  socket.on('disconnect', function(){
+    console.log('socket disconnected: ', socket.id);
+  });
 });
 
-io.on('disconnect', function(){
-  console.log('io disconnect');
-});
-io.on('error', function(){
-  console.log('io error');
-});
+
 };
 
 
