@@ -111,6 +111,17 @@ router.get('/NH', async (req, res)=>{
 });
 
 
+router.get('/slots', (req, res)=>{ 
+  try{
+    res.render('activities/slots/slots');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
+
 router.get('/richtext', (req, res)=>{ 
   try{
     res.render('tools/richtext');

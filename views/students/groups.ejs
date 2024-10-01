@@ -3,7 +3,7 @@
 
 <div class="container-fluid">
   <div class="row">
-    <div class="col-4">
+    <div class="col-sm-4 mb-3">
 
 <!-- MY GROUP -->
       <div id="myGroup" class="container alert-primary text-center border border-primary rounded-3 pb-3 mb-3">
@@ -18,13 +18,13 @@
 
         <div class="row bg-light border border-primary rounded-3 px-1">
           <div class="col-2 g-0">
-            <div id="pawncontainer" class="my-1" style="margin:auto;width:32px;"></div>
+            <div id="myPawn" class="my-1" style="margin:auto;width:32px;"></div>
           </div>
           <div class="col-10">
-            <div id="player" class="fs-3" style="text-shadow:1px 1px 2px #666"></div>
+            <div id="myName" class="fs-3" style="text-shadow:0px 0px 2px #555"></div>
             <div class="d-flex mb-1 justify-content-center">
-              <input id="color" type="color">
               <button id="getName" class="btn btn-sm btn-outline-primary px-1 py-0">Change Name</button>
+              <input id="color" type="color">
             </div>
           </div>
         </div>
@@ -37,19 +37,24 @@
 <!-- FRIEND'S GROUP -->
       <div id="group" class="container alert-success text-center border border-success rounded-3 py-3">
         <div class="row">
-          <div class="col-12 d-flex g-0">
-            <button id="join" class="btn btn-success" disabled>
-              <i class="material-icons fs-1">groups</i>
-            </button>
-            <input id="roomSearch" class="form-control fs-1 text-success text-center" placeholder="join">
+          <div class="col-12 g-0">
+
+            <form id="roomSearchForm" class="form d-flex">
+              <button id="join" class="btn btn-success" disabled>
+                <i class="material-icons fs-1">groups</i>
+              </button>
+              <input id="roomSearch" class="form-control fs-1 text-success text-center" placeholder="join">
+            </form>
+
           </div>
         </div>
+<!-- players will be added dynamically here -->
       </div>
 <!-- end of friend's group -->
 
     </div>
     
-    <div class="col-8 border border-primary rounded-3">
+    <div class="col-sm-8 border border-primary rounded-3 mb-3">
       <!-- <div id="choose" class="activity btn btn-lg btn-success display-1">Choose</div> -->
     </div>
 
@@ -64,26 +69,27 @@
 
   function getPawn(color) {
     let shadow = reduceBrightness(color, 20);
+    let def = shadow.replace("#", "");
     return `
 <svg class="img-fluid" width="64" height="128" viewBox="0 0 64 128" xmlns="http://www.w3.org/2000/svg">
     <!-- Body of the pawn -->
     <path transform="matrix(0.78482373,0,0,0.3410327,-40.6,58)" d="m 54.796244,189.05536 c -12.062025,-20.89204 13.56978,-65.28763 37.693831,-65.28763 24.124055,0 49.755855,44.39559 37.693825,65.28763 -12.06202,20.89204 -63.325631,20.89204 -75.387656,0 z" fill="${color}" />
-    <path transform="matrix(0.78482373,0,0,0.3410327,-40.6,58)" d="m 54.796244,189.05536 c -12.062025,-20.89204 13.56978,-65.28763 37.693831,-65.28763 24.124055,0 49.755855,44.39559 37.693825,65.28763 -12.06202,20.89204 -63.325631,20.89204 -75.387656,0 z" fill="url(#grad1)" />
+    <path transform="matrix(0.78482373,0,0,0.3410327,-40.6,58)" d="m 54.796244,189.05536 c -12.062025,-20.89204 13.56978,-65.28763 37.693831,-65.28763 24.124055,0 49.755855,44.39559 37.693825,65.28763 -12.06202,20.89204 -63.325631,20.89204 -75.387656,0 z" fill="url(#${def}1)" />
     <path transform="matrix(0.45050681,0,0,0.62867557,3.2,35)" d="m 105,121.60049 c -11.851854,8.65104 -69.62828,8.77896 -81.518324,0.1805 C 11.591632,113.18252 -6.3839294,58.273407 -1.8805296,44.308232 2.6228701,30.343057 49.289789,-3.7205685 63.963086,-3.7530573 78.636384,-3.785546 125.45369,30.071092 130.01888,44.016188 134.58408,57.961284 116.85185,112.94946 105,121.60049 Z" fill="${color}" />
-    <path transform="matrix(0.45050681,0,0,0.62867557,3.2,35)" d="m 105,121.60049 c -11.851854,8.65104 -69.62828,8.77896 -81.518324,0.1805 C 11.591632,113.18252 -6.3839294,58.273407 -1.8805296,44.308232 2.6228701,30.343057 49.289789,-3.7205685 63.963086,-3.7530573 78.636384,-3.785546 125.45369,30.071092 130.01888,44.016188 134.58408,57.961284 116.85185,112.94946 105,121.60049 Z" fill="url(#grad1)" />
+    <path transform="matrix(0.45050681,0,0,0.62867557,3.2,35)" d="m 105,121.60049 c -11.851854,8.65104 -69.62828,8.77896 -81.518324,0.1805 C 11.591632,113.18252 -6.3839294,58.273407 -1.8805296,44.308232 2.6228701,30.343057 49.289789,-3.7205685 63.963086,-3.7530573 78.636384,-3.785546 125.45369,30.071092 130.01888,44.016188 134.58408,57.961284 116.85185,112.94946 105,121.60049 Z" fill="url(#${def}1)" />
 
     <!-- Head of the pawn -->
     <circle cx="32" cy="22" r="22" fill="${color}" />
-    <circle cx="32" cy="22" r="22" fill="url(#grad2)" />
+    <circle cx="32" cy="22" r="22" fill="url(#${def}2)" />
   
     <!-- Shading gradients -->
     <defs>
-      <radialGradient id="grad1" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+      <radialGradient id="${def}1" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
         <stop offset="50%" style="stop-color:${shadow};stop-opacity:0" />
         <stop offset="100%" style="stop-color:${shadow};stop-opacity:1" />
       </radialGradient>
 
-      <radialGradient id="grad2" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+      <radialGradient id="${def}2" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
         <stop offset="50%" style="stop-color:${shadow};stop-opacity:0" />
         <stop offset="100%" style="stop-color:${shadow};stop-opacity:1" />
       </radialGradient>
@@ -98,86 +104,90 @@
         G = (num >> 8 & 0x00FF) - amt,
         B = (num & 0x0000FF) - amt;
     let returnme = "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 + (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 + (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
-    console.log(returnme);
     return returnme;
   }
+
 
 $(function(){
   $(`#groups-tab`).addClass("active");
 
-  var myRoom = null;
   var socket = io();
   var room = {};
-  var player = {username: null, color: null, last_socket: null};
+  var player = {username: null, color: "#cccccc", number: 1, last_socket: null};
+
+  function setMyColor(color) {
+    player.color = color;
+    localStorage.setItem('player', JSON.stringify(player));
+    $("#color").val(color);
+    $("#myPawn").html(getPawn(color));
+    $("#myName").css('color', color);
+  }
+
+  function setPlayerColor(number, color) {
+    $(`#pawn${number}`).html(getPawn(color));
+    $(`#name${number}`).css('color', color);
+    // add other things to change color or make #pawn & #name into classes?
+  }
 
   $("#roomSearch").on('input', ()=>{
-    console.log($("#roomSearch").val());
     socket.emit('roomSearch', $("#roomSearch").val());
-  });
-
-  socket.on('roomFound', (data)=>{
-    if (data) {
-      $("#join").prop('disabled', false);
-    }
-    else {
-      $("#join").prop('disabled', true);
-    }
   });
 
   $("#join").on('click', ()=>{
     let data = {room: $("#roomSearch").val(), type: 'private', player: player};
-    socket.emit('join', data, ()=>{});
+    socket.emit('join', data);
+  });
+
+  $("#roomSearchForm").on('submit', (e)=>{
+    e.preventDefault();
+    // if #join is disabled, then the room does not exist
+    if ($("#join").prop('disabled')) return;
+    let data = {room: $("#roomSearch").val(), type: 'private', player: player};
+    socket.emit('join', $("#roomSearch").val());
+  });
+
+  $("#getName").on('click', ()=>{
+    socket.emit('getName');
+  });
+
+  $("#color").on('change', ()=>{
+    setMyColor($("#color").val());
+    socket.emit('setPlayer', player);
   });
 
 
-  socket.on('playerJoined', (data)=>{
-    console.log(data);
-    $(`#myGroup`).append(`
-      <div class="row bg-light border border-primary rounded-3">
-        <div class="col-2">
-          <div class="p-3">${getPawn(data.color)}</div>
-        </div>
-        <div class="col-10">
-          <div style="color: ${data.color};text-shadow:1px 1px 2px #666;">${data.username}</div>
-        </div>
-      </div>
-    `);
-  });
 
   socket.on('connect', ()=>{
     let stored_player = JSON.parse(localStorage.getItem('player'));
     let stored_room = JSON.parse(localStorage.getItem('room'));
-    
-    if (stored_room) {
-      room = stored_room;
-
-      let now = new Date();
-      if (now - new Date(room.date) > 1000*60*60*12) {
-        localStorage.removeItem('room');
-        socket.emit('join', null, ()=>{});
-      }
-      else {
-        console.log(room);
-        socket.emit('join', room, ()=>{});
-      }
-    }
-    else {
-      socket.emit('join', null, ()=>{});
-    }
 
 
     if (stored_player){
       player = stored_player;
-      $("#color").val(player.color);
-      $("#pawncontainer").html(getPawn(player.color));
-      $("#player").text(player.username);
-      $("#player").css('color', player.color);
-      socket.emit('rejoin', player, ()=>{});
+      $("#myName").text(player.username);
+      setMyColor(player.color);
+      socket.emit('setPlayer', player);
     }
     else {
-      player.color = "#cccccc";
-      $("#pawncontainer").html(getPawn(player.color));
+      $("#myPawn").html(getPawn(player.color));
       socket.emit('getName');
+
+    }
+
+
+    if (stored_room) {
+      room = stored_room;
+      let now = new Date();
+      if (now - new Date(room.date) > 1000*60*60*12) {
+        localStorage.removeItem('room');
+        socket.emit('join', null);
+      }
+      else {
+        socket.emit('join', room);
+      }
+    }
+    else {
+      socket.emit('join', null, ()=>{});
     }
   });
 
@@ -185,13 +195,12 @@ $(function(){
   socket.on('joined', (data)=>{
     if (data) {
       room = data.room;
-      if (data.myRoom) myRoom = data.myRoom;
       localStorage.setItem('room', JSON.stringify(data));
       $(`#room`).text(room);
     }
     else {
       localStorage.removeItem('room');
-      socket.emit('join', null, ()=>{});
+      socket.emit('join', null);
     }
   });
 
@@ -201,18 +210,39 @@ $(function(){
     localStorage.setItem('player', JSON.stringify(player));
   });
 
-  $("#getName").on('click', ()=>{
-    socket.emit('getName');
+  socket.on('roomSearch', (data)=>{
+    if (data) {
+      $("#join").prop('disabled', false);
+    }
+    else {
+      $("#join").prop('disabled', true);
+    }
   });
 
-  $("#color").on('change', ()=>{
-    player.color = $("#color").val();
-    localStorage.setItem('player', JSON.stringify(player));
-    $("#pawncontainer").html(getPawn(player.color));
-    $("#player").css('color', player.color);
-    socket.emit('setPlayer', player);
+
+// OTHER PLAYERS ///////////////////////////////////////////////////////////////
+  socket.on('playerJoined', (data)=>{
+    $(`#myGroup`).append(`
+      <div class="row bg-light border border-primary rounded-3">
+        <div class="col-2">
+          <div id="pawn${data.number} class="mx-2 my-1">${setPlayerColor(data.number, data.color)}</div>
+        </div>
+        <div class="col-10">
+          <div id="name${data.number} class="fs-4" style="color: ${data.color};text-shadow:0px 0px 2px #555;">${data.username}</div>
+        </div>
+      </div>
+    `);
   });
 
+  socket.on('setPlayer', (data)=>{
+    if (data.number == player.number) {
+      player = data;
+      localStorage.setItem('player', JSON.stringify(player));
+    }
+    else {
+      setPlayerColor(data.number, data.color);
+    }
+  });
 });
 
 </script>

@@ -1,0 +1,216 @@
+<%- include('../../head.ejs') %>
+<style>
+  #names, #relationships, #personalities, #skills{
+    height:4rem;
+    overflow: hidden;
+  }
+  .inshade{
+    box-shadow: inset 0 0 6px #777;
+    box-shadow: inset 0 0 12px #aaa;
+  }
+</style>
+
+
+<div id="SPIN" class="btn btn-lg btn-primary">SPIN</div>
+
+<div id="intro" class="container YM fs-1 mt-5" style="display:none;">
+
+  <div class="row">
+    <div class="col-4" style="text-align: right;">This is</div>
+    <div id="names" class="col-4 text-center inshade border rounded-3 border-secondary"></div>
+    <div class="col-4">.</div>
+  </div>
+
+  <div class="row">
+    <div class="col-4" style="text-align:right;">
+      <span class="pron"></span> is my
+    </div>
+    <div id="relationships" class="col-4 text-center inshade border rounded-3 border-secondary"></div>
+    <div class="col-4">.</div>
+  </div>
+
+  <div class="row">
+    <div class="col-4" style="text-align:right;">
+      <span class="pron"></span> is
+    </div>
+    <div id="personalities" class="col-4 text-center inshade border rounded-3 border-secondary"></div>
+    <div class="col-4">.</div>
+  </div>
+
+  <div class="row">
+    <div class="col-4" style="text-align:right;">
+      <span class="pron"></span> can
+    </div>
+    <div id="skills" class="col-4 text-center inshade border rounded-3 border-secondary"></div>
+    <dev class="col-4">well.</div>
+  </div>
+
+</div>
+
+
+<script>
+$(function(){
+  var name = "";
+  var relationship = "";
+  var personality = "";
+  var skill = "";
+  const NAMES = {
+    "Keiko": "f",
+    "Ami": "f",
+    "Taisei": "m",
+    "Kazuki": "m",
+    "Deepa": "f",
+    "Takeru": "m",
+    "Sayo": "f",
+    "Brian": "m",
+    "Saki": "f"
+  }
+  var names = {...NAMES};
+
+
+  const RELATIONSHIPS = {
+    "friend": "x",
+    "classmate": "x",
+    "grandmother": "f",
+    "grandfather": "m",
+    "mother": "f",
+    "father": "m",
+    "sister": "f",
+    "brother": "m",
+    "aunt": "f",
+    "uncle": "m",
+    "cousin": "x",
+    "teacher": "x"
+  }
+  var relationships = {...RELATIONSHIPS};
+
+  const PERSONALITIES = [
+    "amazing",
+    "interesting",
+    "cool",
+    "famous",
+    "kind",
+    "funny",
+    "smart",
+    "shy",
+    "quiet",
+    "friendly"
+  ]
+  var personalities = PERSONALITIES.slice();
+
+  const SKILLS = [
+    "dance",
+    "sing",
+    "draw",
+    "swim",
+    "skateboard",
+    "jump rope",
+    "play piano",
+    "play guitar",
+    "play drums",
+    "play soccer",
+    "play basketball",
+    "play baseball"
+  ]
+  var skills = SKILLS.slice();
+
+
+  for (let name in NAMES){
+    $("#names").append(`<div id="${name}" class="fs-1">${name}</div>`);
+  }
+  for (let relationship in RELATIONSHIPS){
+    $("#relationships").append(`<div id="${relationship}" class="fs-1">${relationship}</div>`);
+  }
+  for (let personality of PERSONALITIES){
+    $("#personalities").append(`<div id="${personality}" class="fs-1">${personality}</div>`);
+  }
+  for (let skill of SKILLS){
+    $("#skills").append(`<div id="${skill.replace(' ', '')}" class="fs-1">${skill}</div>`);
+  }
+
+
+  spinit = (slot, val)=>{
+    let slotElement = $(`#${slot}`);
+    let slotChildren = slotElement.children();
+    let slotChildHeight = $(slotChildren[0]).height();
+    let slotChildCount = slotChildren.length;
+    let slotChildIndex = slotChildren.index($(`#${val.replace(' ', '')}`));
+    let slotChildOffset = slotChildHeight * slotChildIndex;
+    let slotHeight = slotElement.height();
+    let slotOffset = slotChildOffset - slotHeight / 2 + slotChildHeight / 2;
+    let slotDuration = slotOffset * 0.9;
+
+    slotElement.animate({
+      scrollTop: slotOffset
+    }, slotDuration, "swing", () => {
+      slotElement.scrollTop(slotChildOffset);
+    });
+  }
+
+
+  $("#SPIN").on('click', function(){
+    let name = getName();
+    let sex = NAMES[name];
+    let relationship = getRelationship(sex);
+    let personality = getPersonality();
+    let skill = getSkill();
+    $(".pron").text( sex == 'm' ? "He" : "She");
+    $("#intro").show();
+    console.log(name, sex, relationship, personality, skill);
+  });
+
+
+  function getName(){
+    if (Object.keys(names).length == 0){
+      names = {...NAMES};
+    }
+    let name = Object.keys(names)[Math.floor(Math.random() * Object.keys(names).length)];
+    delete names[name];
+    spinit("names", name);
+    return name;
+  }
+
+
+  function getRelationship(sex){
+    if (Object.keys(relationships).length == 0) relationships = {...RELATIONSHIPS};
+    let filteredRelationships = Object.keys(relationships).filter((key)=>{return relationships[key] == sex || relationships[key] == 'x'});
+    if ( filteredRelationships.length == 0 ) {
+      relationships = {...RELATIONSHIPS};
+      filteredRelationships = Object.keys(relationships).filter((key)=>{return relationships[key] == sex || relationships[key] == 'x'});
+    }
+    let relationship = filteredRelationships[Math.floor(Math.random() * filteredRelationships.length)];
+    delete relationships[relationship];
+    spinit("relationships", relationship);
+    return relationship;
+  }
+
+
+  function getPersonality(){
+    if (Object.keys(personalities).length == 0){
+      personalities = PERSONALITIES.slice();
+    }
+
+    let index = Math.floor(Math.random() * personalities.length);
+    let personality = personalities[index];
+    personalities.splice(index, 1);
+    spinit("personalities", personality);
+    return personality;
+  }
+
+
+  function getSkill(){
+    if (Object.keys(skills).length == 0){
+      skills = SKILLS.slice();
+    }
+    
+    let index = Math.floor(Math.random() * skills.length);
+    let skill = skills[index];
+    skills.splice(index, 1);
+    spinit("skills", skill);
+    return skill;
+  }
+
+});
+</script>
+
+<%- include('../../foot.ejs') %>

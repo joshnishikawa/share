@@ -95,7 +95,7 @@ function joinNewPrivateRoom(socket){
   console.log(`${socket.id} joined the private room. "${room}"`);
   // current unix timecode
   let date = Date.now();
-  socket.emit('joined', {date, room, myRoom: room, type: 'private', open: true, 
+  socket.emit('joined', {date, room, type: 'private', open: true, 
                          activity: null, players: {}, turn: null});
 }
 
@@ -106,7 +106,7 @@ function joinPublicRoom(socket, room){
   console.log(`${socket.id} joined the public room. "${room}"`);
   socket.broadcast.to(room).emit('joined', socket.id);
   let date = Date.now();
-  socket.emit('joined', {date, room, myRoom: room, type: 'public'});
+  socket.emit('joined', {date, room, type: 'public'});
 }
 
 function getNewName(){
@@ -126,14 +126,17 @@ io.sockets.on('connection', socket =>{
       }
       else if (data.type === 'private' && Object.keys(privateRooms).includes(data.room)){
         socket.join(data.room);
-        console.log(`${socket.id} joined the private room. "${data.room}"`);
+        // assigns player number in order of joining
+        let number = io.sockets.adapter.rooms.get(data.room).size + 1;
+        console.log(`${socket.id} joined the private room. "${data.room}" as player ${number}`);
         // check how many sockets are in the room
         let clients = io.sockets.adapter.rooms.get(data.room);
 
-        // if the room doesn't exist or there are less than 4 connected sockets, add the new socket
+        // if the room is empty or there are less than 4 connected sockets, add the new socket
         if (!clients || clients.size < 4){
+          data.player.number = number;
           socket.broadcast.to(data.room).emit('playerJoined', data.player);
-          socket.emit('joined', {room: data.room, myRoom: data.room, type: 'private'});
+          socket.emit('joined', {room: data.room, type: 'private'});
         }
         else {
           // choose a random available room and return it
@@ -146,10 +149,10 @@ io.sockets.on('connection', socket =>{
           socket.join(room);
           console.log(`${socket.id} joined the private room. "${room}"`);
           socket.broadcast.to(room).emit('joined', socket.id);
-          socket.emit('joined', {room, myRoom: room, type: 'private'});
+          socket.emit('joined', {room, type: 'private'});
         }
 
-        socket.emit('joined', {room: data.room, myRoom: '', type: 'private'});
+        socket.emit('joined', {room: data.room, type: 'private'});
       }
       else {
         socket.emit('joined', null);
@@ -169,14 +172,16 @@ io.sockets.on('connection', socket =>{
   socket.on('roomSearch', function(data){
     console.log('roomSearch: ', data);
     if (Object.keys(privateRooms).includes(data)){
-      socket.emit('roomFound', true);
+      socket.emit('roomSearch', true);
     }
     else {
-      socket.emit('roomFound', false);
+      socket.emit('roomSearch', false);
     }
   });
 
-
+  socket.on('setPlayer', function(data){
+    socket.broadcast.to(data.room).emit('setPlayer', data.player);
+  });
 
 
   socket.on('leave', async function(data){ // data = {room: 'room1'}
