@@ -1,0 +1,42 @@
+<%- include('../head.ejs') %>
+<div id="menu" class="btn-group m-1">
+  <div id="SPIN" class="btn btn-lg btn-success me-1">SPIN</div>
+  <div id="thisis" class="item btn btn-lg btn-primary me-1">This is...</div>
+</div>
+
+<div id="content"></div>
+
+
+<script>
+$(function(){
+  $('.item').click(function(){
+    $('#content').load(`/public/pages/slots/${$(this).attr('id')}.html`);
+  });
+  
+  $("#SPIN").on('click', function(){
+    runit();
+  });
+
+  spinit = (slot, val)=>{
+    let slotElement = $(`#${slot}`);
+    let slotChildren = slotElement.children();
+    let slotChildHeight = $(slotChildren[0]).height();
+    let slotChildCount = slotChildren.length;
+    let slotChildIndex = slotChildren.index($(`#${val.replace(' ', '')}`));
+    let slotChildOffset = slotChildHeight * slotChildIndex;
+    let slotHeight = slotElement.height();
+    let slotOffset = slotChildOffset - slotHeight / 2 + slotChildHeight / 2;
+    let slotDuration = slotOffset * 0.9;
+
+    slotElement.animate({
+      scrollTop: slotOffset
+    }, slotDuration, "swing", () => {
+      slotElement.scrollTop(slotChildOffset);
+    });
+  }
+
+});
+</script>
+
+
+<%- include('../foot.ejs') %>

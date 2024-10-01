@@ -1,39 +1,37 @@
-<%- include('../../head.ejs') %>
 <style>
   #names, #relationships, #personalities, #skills{
     height:4rem;
     overflow: hidden;
   }
   .inshade{
-    box-shadow: inset 0 0 6px #777;
-    box-shadow: inset 0 0 12px #aaa;
+    box-shadow: 
+    rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset, 
+    rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;
   }
 </style>
 
 
-<div id="SPIN" class="btn btn-lg btn-primary">SPIN</div>
+<div id="intro" class="container YM fs-1 mt-5">
 
-<div id="intro" class="container YM fs-1 mt-5" style="display:none;">
-
-  <div class="row">
+  <div class="row mb-2">
     <div class="col-4" style="text-align: right;">This is</div>
-    <div id="names" class="col-4 text-center inshade border rounded-3 border-secondary"></div>
+    <div id="names" class="col-4 text-center inshade border rounded-3 bg-light"></div>
     <div class="col-4">.</div>
   </div>
 
-  <div class="row">
+  <div class="row mb-2">
     <div class="col-4" style="text-align:right;">
       <span class="pron"></span> is my
     </div>
-    <div id="relationships" class="col-4 text-center inshade border rounded-3 border-secondary"></div>
+    <div id="relationships" class="col-4 text-center inshade border rounded-3 bg-light"></div>
     <div class="col-4">.</div>
   </div>
 
-  <div class="row">
+  <div class="row mb-2">
     <div class="col-4" style="text-align:right;">
       <span class="pron"></span> is
     </div>
-    <div id="personalities" class="col-4 text-center inshade border rounded-3 border-secondary"></div>
+    <div id="personalities" class="col-4 text-center inshade border rounded-3 bg-light"></div>
     <div class="col-4">.</div>
   </div>
 
@@ -41,7 +39,7 @@
     <div class="col-4" style="text-align:right;">
       <span class="pron"></span> can
     </div>
-    <div id="skills" class="col-4 text-center inshade border rounded-3 border-secondary"></div>
+    <div id="skills" class="col-4 text-center inshade border rounded-3 bg-light"></div>
     <dev class="col-4">well.</div>
   </div>
 
@@ -129,35 +127,15 @@ $(function(){
   }
 
 
-  spinit = (slot, val)=>{
-    let slotElement = $(`#${slot}`);
-    let slotChildren = slotElement.children();
-    let slotChildHeight = $(slotChildren[0]).height();
-    let slotChildCount = slotChildren.length;
-    let slotChildIndex = slotChildren.index($(`#${val.replace(' ', '')}`));
-    let slotChildOffset = slotChildHeight * slotChildIndex;
-    let slotHeight = slotElement.height();
-    let slotOffset = slotChildOffset - slotHeight / 2 + slotChildHeight / 2;
-    let slotDuration = slotOffset * 0.9;
-
-    slotElement.animate({
-      scrollTop: slotOffset
-    }, slotDuration, "swing", () => {
-      slotElement.scrollTop(slotChildOffset);
-    });
-  }
-
-
-  $("#SPIN").on('click', function(){
+  runit = ()=>{
     let name = getName();
     let sex = NAMES[name];
     let relationship = getRelationship(sex);
     let personality = getPersonality();
     let skill = getSkill();
     $(".pron").text( sex == 'm' ? "He" : "She");
-    $("#intro").show();
     console.log(name, sex, relationship, personality, skill);
-  });
+  }
 
 
   function getName(){
@@ -210,7 +188,7 @@ $(function(){
     return skill;
   }
 
+  runit();
+
 });
 </script>
-
-<%- include('../../foot.ejs') %>

@@ -113,7 +113,7 @@ router.get('/NH', async (req, res)=>{
 
 router.get('/slots', (req, res)=>{ 
   try{
-    res.render('activities/slots/slots');
+    res.render('activities/slots');
   }
   catch(err){
     res.send(err);
