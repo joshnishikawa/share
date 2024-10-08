@@ -8,10 +8,10 @@
 
 
   <form id="cardsForm" action="/printcards" method="POST" class="d-flex justify-content-end w-100">
+    <input type="hidden" value="" name="deck">
+    <input type="hidden" value="nolink" name="deckType">
 
     <div class="d-flex" style="height:100%;">
-      <input type="hidden" value="" name="deck">
-      <input type="hidden" value="" name="deckType">
 
       <div class="form-check me-3">
         <input type="checkbox" value="true" name="text" class="form-check-input">
@@ -34,9 +34,11 @@ $(function(){
       alert("<%- __('pleaseSelect') %>");
     }
     else {
-      $("#cardsForm input[name='deck']").val(JSON.stringify(window.deck));
-      $("#cardsForm input[name='deckType']").val('nolink');
-      $("#cardsForm").submit();
+      var words = {};
+      $.get('/vocablist', {deck: window.deck}, async (data) => {
+        await $("#cardsForm input[name='deck']").val(JSON.stringify(data));
+        $("#cardsForm").submit();
+      });
     }
   });
 });

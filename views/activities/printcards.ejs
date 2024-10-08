@@ -37,24 +37,24 @@
 
 <script>
 $(function(){
-  const deckType = 'nolink';
-
-  var deck = <%- JSON.stringify(deck) %>;
-  const params = <%- params %>;
   document.title = `Print Cards`;
+
+  // PREPARE THE DECK //////////////////////////////////////////////////////////
+  var deck = <%- JSON.stringify(deck) %>;
+  const params = <%- params %> || {};
   var text = (params.text == "true"); // convert string to boolean
   $("#showtext").prop('checked', text);
   $("#menucontainer").show();
 
-  for (let i = 0; i < deck.length; i++){
+  for (let i in deck){
     $('#sheet').append(`
       <div class="text-center" style="width:100%;height:100%;">
-        <img src="${deck[i].image}" alt="${deck[i].word}" 
+        <img src="${deck[i].image}" alt="${i}" 
               class="img-fluid" style="width:100%;" 
               onerror="altOnly(this)">
 
         <div class="txt text-center YM w-100" style="font-size:5rem;display:none;">
-          ${deck[i].word}
+          ${i}
         </div>
 
       </div>`);
@@ -69,7 +69,6 @@ $(function(){
     if (text) $('.txt').show();
     else $('.txt').hide();
   });
-
 
 
   $("#print").on('click', ()=>{

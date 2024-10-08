@@ -92,17 +92,6 @@ router.get('/NH', async(req, res)=>{
 });
 
 
-router.get('/nolink', async(req, res)=>{
-  try{
-    res.render('teachers/nolink');
-  }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
-
-
 router.get('/text', (req, res)=>{
   try{
     res.render('teachers/text', {text_decks});

@@ -63,7 +63,10 @@
   $(function(){
     window.deck = [];
     window.local = [];
-    const words = <%- JSON.stringify(words) %>;
+    var words = {};
+    $.get('/vocablist', (data) => {
+      words = data;
+    });
 
 // TEXT INPUT //////////////////////////////////////////////////////////////////
     $('#vocab_add_form').submit(async function(e){

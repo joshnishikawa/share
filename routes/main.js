@@ -189,17 +189,10 @@ router.get('/speech', (req, res)=>{
   }
 });
 
+
 router.get('/speak_spell', (req, res)=>{
   try{
-    // get array of words from vocabulary table
-    let words = {};
-    db.query('SELECT word, meaning, image, audio FROM vocabulary')
-    .then(([rows, schema])=>{
-      for (let row of rows){
-        words[row.word] = {meaning: row.meaning, image: row.image, audio: row.audio};
-      }
-      res.render('activities/speak_spell', {words});
-    });
+    res.render('activities/speak_spell');
   }
   catch
   (err){
@@ -208,6 +201,32 @@ router.get('/speak_spell', (req, res)=>{
   }
 });
 
+
+router.get('/vocablist', async (req, res)=>{
+  try{
+    // get array of words from vocabulary table
+    let words = {};
+    var rows, schema;
+    var deck = req.query.deck;
+
+    if (req.query.deck) { 
+      [rows, schema] = await db.query(`SELECT word, meaning, image, audio 
+                                 FROM vocabulary 
+                                 WHERE id IN (?)`, 
+                                 [deck]);
+    }
+    else { [rows, schema] = await db.query(`SELECT word, meaning, image, audio FROM vocabulary`);}
+
+    for (let row of rows){
+      words[row.word] = {meaning: row.meaning, image: row.image, audio: row.audio};
+    }
+    res.json(words);
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
 
 
 router.post('/:activity', async(req, res)=>{
@@ -224,6 +243,7 @@ router.post('/:activity', async(req, res)=>{
     
     if (deckType == "nolink"){ // expect deck to be an array of objects
       deck = JSON.parse(deck);
+      console.log(deck);
       res.render(`activities/${activity}`, {deckType, deck, params: JSON.stringify(params)});
       return;
     }
