@@ -10,48 +10,66 @@
   }
 </style>
 
-
-<div id="intro" class="container YM fs-1 mt-5">
-
-  <div class="row mb-2">
-    <div class="col-4" style="text-align: right;">This is</div>
-    <div id="names" class="col-4 text-center inshade border rounded-3 bg-light"></div>
-    <div class="col-4">.</div>
-  </div>
-
-  <div class="row mb-2">
-    <div class="col-4" style="text-align:right;">
-      <span class="pron"></span> is my
-    </div>
-    <div id="relationships" class="col-4 text-center inshade border rounded-3 bg-light"></div>
-    <div class="col-4">.</div>
-  </div>
-
-  <div class="row mb-2">
-    <div class="col-4" style="text-align:right;">
-      <span class="pron"></span> is
-    </div>
-    <div id="personalities" class="col-4 text-center inshade border rounded-3 bg-light"></div>
-    <div class="col-4">.</div>
-  </div>
-
+<div class="container-fluid">
   <div class="row">
-    <div class="col-4" style="text-align:right;">
-      <span class="pron"></span> can
+    <div class="col-1 text-center">
+      <div id="SPIN" class="btn btn-lg btn-success">SPIN</div>
     </div>
-    <div id="skills" class="col-4 text-center inshade border rounded-3 bg-light"></div>
-    <dev class="col-4">well.</div>
-  </div>
+    <div class="col-11">
+      <div class="container YM fs-1">
 
+        <div class="row mb-2">
+          <div class="col-4" style="text-align: right;">This is</div>
+          <div id="names" class="col-4 text-center inshade border rounded-3 bg-light"></div>
+          <div class="col-4">.</div>
+        </div>
+      
+        <div class="row mb-2">
+          <div class="col-4" style="text-align:right;">
+            <span class="pron"></span> is my
+          </div>
+          <div id="relationships" class="col-4 text-center inshade border rounded-3 bg-light"></div>
+          <div class="col-4">.</div>
+        </div>
+      
+        <div class="row mb-2">
+          <div class="col-4" style="text-align:right;">
+            <span class="pron"></span> is
+          </div>
+          <div id="personalities" class="col-4 text-center inshade border rounded-3 bg-light"></div>
+          <div class="col-4">.</div>
+        </div>
+      
+        <div class="row">
+          <div class="col-4" style="text-align:right;">
+            <span class="pron"></span> can
+          </div>
+          <div id="skills" class="col-4 text-center inshade border rounded-3 bg-light"></div>
+          <dev class="col-4">well.</div>
+        </div>
+      
+      </div>
+      
+    </div>
+  </div>
 </div>
+
+
 
 
 <script>
 $(function(){
+  $(".item").removeClass("active disabled");
+  $("#thisis").addClass("active disabled");
+  $("#SPIN").on('click', function(){
+    runit();
+  });
+
   var name = "";
   var relationship = "";
   var personality = "";
   var skill = "";
+
   const NAMES = {
     "Keiko": "f",
     "Ami": "f",

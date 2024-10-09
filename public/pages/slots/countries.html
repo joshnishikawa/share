@@ -1,0 +1,284 @@
+<style>
+  #country, #adj, #see, #eat, #enjoy, #buy{
+    height:4rem;
+    overflow: hidden;
+    font-size: 1rem;
+  }
+  .inshade{
+    box-shadow: 
+    rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset, 
+    rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;
+  }
+</style>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-1 text-center">
+      <div id="SPIN" class="btn btn-lg btn-success">SPIN</div>
+    </div>
+    <div class="col-11">
+      <div class="container YM fs-1">
+
+        <div class="row mb-2">
+          <div class="col-4" style="text-align: right;">I want to go to</div>
+          <div id="country" class="col-6 text-center inshade border rounded-3 bg-light"></div>
+          <div class="col-2">.</div>
+        </div>
+      
+        <div class="row mb-2">
+          <div id="its" class="col-4" style="text-align: right;"></div>
+          <div id="adj" class="col-6 text-center inshade border rounded-3 bg-light"></div>
+          <div class="col-2">country.</div>
+        </div>
+      
+        <div class="row mb-2">
+          <div class="col-4" style="text-align: right;">You can see</div>
+          <div id="see" class="col-6 text-center inshade border rounded-3 bg-light"></div>
+          <div class="col-2">.</div>
+        </div>
+        <div class="row mb-2">
+          <div class="col-4" style="text-align: right;">You can eat</div>
+          <div id="eat" class="col-6 text-center inshade border rounded-3 bg-light"></div>
+          <div class="col-2">.</div>
+        </div>
+        <div class="row mb-2">
+          <div class="col-4" style="text-align: right;">You can enjoy</div>
+          <div id="enjoy" class="col-6 text-center inshade border rounded-3 bg-light"></div>
+          <div class="col-2">.</div>
+        </div>
+        <div class="row mb-2">
+          <div class="col-4" style="text-align: right;">You can buy</div>
+          <div id="buy" class="col-6 text-center inshade border rounded-3 bg-light"></div>
+          <div class="col-2">.</div>
+        </div>
+      
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+<script>
+$(function(){
+  $(".item").removeClass("active disabled");
+  $("#countries").addClass("active disabled");
+  $("#SPIN").on('click', function(){
+    runit();
+  });
+
+  const ADJ = [
+    "nice",
+    "amazing",
+    "fantastic",
+    "wonderful",
+    "beautiful",
+    "interesting",
+    "exciting",
+    "fun"
+  ];
+  var adj = ADJ.slice();
+
+  const COUNTRIES = {
+    "The U.K.": {
+      "see": ["Big Ben", "Buckingham Palace", "Stonehenge", "The Tower of London"], 
+      "eat": ["fish and chips", "scones and tea", "bangers and mash"], 
+      "enjoy": ["the countryside", "the museums", "the theatre"], 
+      "buy": ["a bowler hat", "a tea cozy", "a Beatles album"]
+    },
+    "France": {
+      "see": ["the Eiffel Tower", "the Louvre", "Notre Dame", "Versailles"], 
+      "eat": ["croissants", "escargot", "macarons"], 
+      "enjoy": ["the wine", "the art", "the fashion"], 
+      "buy": ["a beret", "a bottle of perfume", "a painting"]
+    },
+    "Italy": {
+      "see": ["the Colosseum", "the Leaning Tower of Pisa", "the Sistine Chapel", "Venice"], 
+      "eat": ["pizza", "pasta", "gelato"], 
+      "enjoy": ["the art", "the architecture", "the history"], 
+      "buy": ["a gondola ride", "a mask", "a bottle of wine"]
+    },
+    "Australia": {
+      "see": ["the Great Barrier Reef", "Uluru", "the Sydney Opera House", "the Twelve Apostles"], 
+      "eat": ["Vegemite", "meat pies", "lamingtons"], 
+      "enjoy": ["the beaches", "the wildlife", "the outback"], 
+      "buy": ["a boomerang", "a didgeridoo", "a jar of honey"]
+    },
+    "The U.S": {
+      "see": ["the Grand Canyon", "the Statue of Liberty", "the White House", "Hollywood"], 
+      "eat": ["hamburgers", "hot dogs", "apple pie"], 
+      "enjoy": ["the national parks", "the music", "the sports"], 
+      "buy": ["a cowboy hat", "a baseball cap", "a Route 66 sign"]
+    },
+    "Canada": {
+      "see": ["Niagara Falls", "Banff National Park", "the CN Tower", "the Parliament Buildings"], 
+      "eat": ["poutine", "butter tarts", "maple syrup"], 
+      "enjoy": ["the mountains", "the lakes", "the festivals"], 
+      "buy": ["a toque", "a hockey jersey", "a beaver keychain"]
+    },
+    "Egypt": {
+      "see": ["the Pyramids", "the Sphinx", "the Valley of the Kings", "the Nile"], 
+      "eat": ["koshari", "falafel", "baklava"], 
+      "enjoy": ["the history", "the culture", "the beaches"], 
+      "buy": ["a pyramid souvenir", "a papyrus painting", "a cartouche necklace"]
+    },
+    "China": {
+      "see": ["the Great Wall", "the Forbidden City", "the Terracotta Army", "the pandas"], 
+      "eat": ["dim sum", "Peking duck", "mooncakes"], 
+      "enjoy": ["the tea", "the festivals", "the martial arts"], 
+      "buy": ["a silk robe", "a jade bracelet", "a paper lantern"]
+    },
+    "Brazil": {
+      "see": ["Christ the Redeemer", "Iguazu Falls", "the Amazon Rainforest", "Carnival"], 
+      "eat": ["feijoada", "acai", "brigadeiros"], 
+      "enjoy": ["the music", "the beaches", "the wildlife"], 
+      "buy": ["a samba CD", "a Havaianas flip-flop", "a carnival mask"]
+    },
+    "India": {
+      "see": ["the Taj Mahal", "the Ganges River", "the Red Fort", "the temples"], 
+      "eat": ["curry", "naan", "lassi"], 
+      "enjoy": ["the festivals", "the yoga", "the Bollywood movies"], 
+      "buy": ["a sari", "a statue of a god", "a henna tattoo"]
+    },
+    "Germany": {
+      "see": ["the Brandenburg Gate", "Neuschwanstein Castle", "the Black Forest", "the Rhine River"], 
+      "eat": ["bratwurst", "sauerkraut", "pretzels"], 
+      "enjoy": ["the beer", "the Christmas markets", "the autobahn"], 
+      "buy": ["a cuckoo clock", "a beer stein", "a piece of the Berlin Wall"]
+    },
+    "Mexico": {
+      "see": ["Chichen Itza", "the beaches", "the pyramids", "the Day of the Dead celebrations"], 
+      "eat": ["tacos", "tamales", "churros"], 
+      "enjoy": ["the music", "the tequila", "the art"], 
+      "buy": ["a sombrero", "a lucha libre mask", "a piece of pottery"]
+    },
+    "Spain": {
+      "see": ["the Sagrada Familia", "the Alhambra", "the Prado Museum", "the beaches"], 
+      "eat": ["paella", "tapas", "churros"], 
+      "enjoy": ["the flamenco", "the siestas", "the festivals"], 
+      "buy": ["a fan", "a bottle of wine", "a flamenco dress"]
+    },
+    "Greece": {
+      "see": ["the Acropolis", "the islands", "the Parthenon", "the ancient ruins"], 
+      "eat": ["gyros", "souvlaki", "baklava"], 
+      "enjoy": ["the beaches", "the history", "the mythology"], 
+      "buy": ["a worry bead", "a bottle of ouzo", "a piece of pottery"]
+    },
+    "Thailand": {
+      "see": ["Bangkok", "the temples", "the beaches", "the markets"], 
+      "eat": ["pad Thai", "green curry", "mango sticky rice"], 
+      "enjoy": ["the elephants", "the festivals", "the nightlife"], 
+      "buy": ["a Buddha statue", "a silk scarf", "a piece of jewelry"]
+    },
+    "New Zealand": {
+      "see": ["Milford Sound", "the glowworm caves", "the mountains", "the beaches"], 
+      "eat": ["kiwifruit", "pavlova", "hokey pokey ice cream"], 
+      "enjoy": ["the adventure sports", "the Maori culture", "the scenery"], 
+      "buy": ["a Maori carving", "a sheepskin rug", "a jar of Manuka honey"]
+    },
+    "South Korea": {
+      "see": ["Seoul", "the palaces", "Jeju Island", "the DMZ"], 
+      "eat": ["kimchi", "bulgogi", "bibimbap"], 
+      "enjoy": ["the K-pop", "the temples", "the shopping"], 
+      "buy": ["a hanbok", "a K-pop album", "a piece of celadon"]
+    },
+    "Vietnam": {
+      "see": ["Halong Bay", "Hanoi", "Hoi An", "the Mekong Delta"], 
+      "eat": ["pho", "banh mi", "spring rolls"], 
+      "enjoy": ["the history", "the culture", "the beaches"], 
+      "buy": ["a conical hat", "a silk lantern", "a water puppet"]
+    },
+    "Singapore": {
+      "see": ["Marina Bay Sands", "Gardens by the Bay", "Sentosa", "Chinatown"], 
+      "eat": ["chili crab", "Hainanese chicken rice", "kaya toast"], 
+      "enjoy": ["the shopping", "the food", "the gardens"], 
+      "buy": ["a Merlion souvenir", "a piece of jade", "a durian snack"]
+    },
+    "Malaysia": {
+      "see": ["Kuala Lumpur", "Penang", "Borneo", "the islands"], 
+      "eat": ["nasi lemak", "roti canai", "satay"], 
+      "enjoy": ["the rainforests", "the culture", "the festivals"], 
+      "buy": ["a batik item", "a piece of pewter", "a bottle of teh tarik"]
+    },
+    "Indonesia": {
+      "see": ["Bali", "Jakarta", "Yogyakarta", "the temples"], 
+      "eat": ["nasi goreng", "rendang", "sate"], 
+      "enjoy": ["the beaches", "the culture", "the wildlife"], 
+      "buy": ["a batik item", "a piece of wood carving", "a bottle of sambal"]
+    },
+    "Kenya": {
+      "see": ["Nairobi", "Maasai Mara", "Mount Kenya", "the beaches"], 
+      "eat": ["ugali", "nyama choma", "mandazi"], 
+      "enjoy": ["the wildlife", "the culture", "the safaris"], 
+      "buy": ["a Maasai beadwork", "a kikoy", "a piece of soapstone"]
+    },
+    "Ghana": {
+      "see": ["Accra", "Cape Coast", "Kumasi", "the markets"], 
+      "eat": ["jollof rice", "banku", "kelewele"], 
+      "enjoy": ["the music", "the culture", "the festivals"], 
+      "buy": ["a kente cloth", "a piece of adinkra", "a djembe drum"]
+    },
+    "Kenya": {
+      "see": ["Nairobi", "Maasai Mara", "Mount Kenya", "the beaches"], 
+      "eat": ["ugali", "nyama choma", "mandazi"], 
+      "enjoy": ["the wildlife", "the culture", "the safaris"], 
+      "buy": ["a Maasai beadwork", "a kikoy", "a piece of soapstone"]
+    }
+  };
+  var countries = {...COUNTRIES};
+
+  for (let country in COUNTRIES){
+    $("#country").append(`<div id="${country}" class="fs-1">${country}</div>`);
+  }
+  for (let adj of ADJ){
+    $("#adj").append(`<div id="${adj}" class="fs-1">${adj}</div>`);
+  }
+
+
+  runit = ()=>{
+    let country = getCountry();
+    fillit(country);
+    getAdj();
+  }
+
+  fillit = (country)=>{
+    for (let s of ["see", "eat", "enjoy", "buy"]){
+      for (let i of COUNTRIES[country][s]){
+        // replace all spaces with nothing
+        let id = i.replace(/ /g, '');
+        console.log(id);
+        $(`#${s}`).append(`<div id="${id}" class="fs-1">${i}</div>`);
+      }
+      let i = COUNTRIES[country][s][Math.floor(Math.random() * COUNTRIES[country][s].length)];
+      let id = i.replace(/ /g, '');
+      spinit(s, id);
+    }
+  }
+
+  function getCountry(){
+    if (Object.keys(countries).length == 0){
+      countries = {...COUNTRIES};
+    }
+    let country = Object.keys(countries)[Math.floor(Math.random() * Object.keys(countries).length)];
+    delete countries[country];
+    spinit("country", country);
+    return country;
+  }
+
+  function getAdj(){
+    if (adj.length == 0){
+      adj = ADJ.slice();
+    }
+    let a = adj[Math.floor(Math.random() * adj.length)];
+    // if the first letter is a vowel, use "an" instead of "a"
+    let a_an = ['a', 'e', 'i', 'o', 'u'].includes(a[0].toLowerCase()) ? "an" : "a";
+    $("#its").text(`It's ${a_an}`);
+    adj.splice(adj.indexOf(a), 1);
+    spinit("adj", a);
+  }
+  runit();
+
+});
+</script>

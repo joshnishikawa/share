@@ -1,0 +1,239 @@
+<style>
+  #day, #month, #date, #hour, #minute, #ampm{
+    height:4rem;
+    overflow: hidden;
+    font-size: 1rem;
+  }
+  .inshade{
+    box-shadow: 
+    rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset, 
+    rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;
+  }
+</style>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-1 text-center">
+      <div id="SPIN" class="btn btn-lg btn-success">SPIN</div>
+    </div>
+    <div class="col-11">
+      <div class="container YM fs-1">
+
+        <div class="row mb-2">
+          <div id="day" class="col-6 text-center inshade border rounded-3 bg-light"></div>
+          <div class="col-6"></div>
+        </div>
+      
+        <div class="row mb-2">
+          <div id="month" class="col-6 text-center inshade border rounded-3 bg-light"></div>
+          <div id="date" class="col-2 text-center inshade border rounded-3 bg-light"></div>
+          <div id="year" class="col-4"></div>
+        </div>
+      
+        <div class="row mb-2">
+          <div id="hour" class="col-2 text-center inshade border rounded-3 bg-light"></div>
+          <div class="col-1 text-center">:</div>
+          <div id="minute" class="col-2 text-center inshade border rounded-3 bg-light"></div>
+          <div id="ampm" class="col-1 text-center" style="text-align:right;"></div>
+          <div class="col-6"></div>
+        </div>
+      
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+<script>
+$(function(){
+  $(".item").removeClass("active disabled");
+  $("#datetime").addClass("active disabled");
+  $("#SPIN").on('click', function(){
+    runit();
+  });
+
+  const DAYS = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday"
+  ];
+  var days = DAYS.slice();
+
+  const MONTHS = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+  ];
+  var months = MONTHS.slice();
+
+  const DATES = [
+    "1st",
+    "2nd",
+    "3rd",
+    "4th",
+    "5th",
+    "6th",
+    "7th",
+    "8th",
+    "9th",
+    "10th",
+    "11th",
+    "12th",
+    "13th",
+    "14th",
+    "15th",
+    "16th",
+    "17th",
+    "18th",
+    "19th",
+    "20th",
+    "21st",
+    "22nd",
+    "23rd",
+    "24th",
+    "25th",
+    "26th",
+    "27th",
+    "28th",
+    "29th",
+    "30th",
+    "31st"
+  ];
+  var dates = DATES.slice();
+
+
+  for (let day of DAYS){
+    $("#day").append(`<div id="${day}" class="fs-1">${day}</div>`);
+  }
+  for (let month of MONTHS){
+    $("#month").append(`<div id="${month}" class="fs-1">${month}</div>`);
+  }
+  for (let d of DATES){
+    $("#date").append(`<div id="_${d}" class="fs-1">${d}</div>`);
+  }
+  for (i=1; i<=12; i++){
+    $("#hour").append(`<div id="_${i}" class="fs-1">${i}</div>`);
+  }
+  for (i=0; i<60; i+=5){
+    let m = i < 10 ? `0${i}` : i;
+    $("#minute").append(`<div id="_${m}" class="fs-1">${m}</div>`);
+  }
+  $("#ampm").append(`<div id="AM" class="fs-1">AM</div>`);
+  $("#ampm").append(`<div id="PM" class="fs-1">PM</div>`);
+
+
+  runit = ()=>{
+    let day = getDay();
+    let month = getMonth();
+    let date = getDate(month);
+    getTime();
+    getMostRecentYear(day, month, date);
+  }
+
+
+  function getDay(){
+    if (days.length == 0){
+      days = DAYS.slice();
+    }
+    let day = days[Math.floor(Math.random() * days.length)];
+    days.splice(days.indexOf(day), 1);
+    spinit("day", day);
+    return day;
+  }
+
+
+  function getMonth(){
+    if (months.length == 0){
+      months = MONTHS.slice();
+    }
+    let month = months[Math.floor(Math.random() * months.length)];
+    months.splice(months.indexOf(month), 1);
+    spinit("month", month);
+    return month;
+  }
+
+
+  function getDate(month){
+    let date = '';
+    if (dates.length == 0) dates = DATES.slice();
+
+    do {
+      date = dates[Math.floor(Math.random() * dates.length)];
+      if ((month == "February" && ["29th", "30th", "31st"].includes(date)) ||
+          (["April", "June", "September", "November"].includes(month) && date == "31st")) {
+        continue; // Skip invalid dates
+      }
+      dates.splice(dates.indexOf(date), 1);
+      if (dates.length == 0){
+        dates = DATES.slice();
+      }
+      break; // Exit the loop once a valid date is found
+    } while (true);
+
+    spinit("date", '_' + date);
+    return date;
+  }
+
+
+  function getTime(){
+    let hour = Math.floor(Math.random() * 12) + 1;
+    let minute = Math.floor(Math.random() * 12) * 5;
+    let ampm = Math.random() < 0.5 ? "AM" : "PM";
+    spinit("hour", '_' + hour);
+    spinit("minute", '_' + minute);
+    spinit("ampm", ampm);
+    return `${hour}:${minute} ${ampm}`;
+  }
+
+  function getMostRecentYear(weekday, month, date) {
+    // convert month to number
+    month = MONTHS.indexOf(month) + 1;
+    // convert any date to number
+    date = parseInt(date.replace(/\D/g, ''));
+
+    const targetWeekday = weekday.toLowerCase(); // Ensure consistent case
+    const weekdays = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+
+    // Find the weekday number (0 for Sunday, 1 for Monday, etc.)
+    const targetWeekdayIndex = weekdays.indexOf(targetWeekday);
+    if (targetWeekdayIndex === -1) {
+      throw new Error('Invalid weekday entered.');
+    }
+
+    // Get current year
+    let year = new Date().getFullYear();
+
+    // Check each previous year to find when the date fell on the given weekday
+    while (year > 0) {
+      const checkDate = new Date(year, month - 1, date); // JavaScript months are 0-indexed
+      if (checkDate.getDay() === targetWeekdayIndex) {
+        $("#year").text(year);
+        return year;
+      }
+      year--; // Decrement year if the date didn't fall on the target weekday
+    }
+
+    return null; // In case we somehow never find it (which shouldn't happen in reality)
+  }
+
+
+  runit();
+
+});
+</script>
