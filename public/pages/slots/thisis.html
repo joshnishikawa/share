@@ -65,21 +65,54 @@ $(function(){
     runit();
   });
 
-  var name = "";
-  var relationship = "";
-  var personality = "";
-  var skill = "";
-
   const NAMES = {
-    "Keiko": "f",
-    "Ami": "f",
-    "Taisei": "m",
-    "Kazuki": "m",
     "Deepa": "f",
-    "Takeru": "m",
-    "Sayo": "f",
+    "Olivia": "f",
+    "Sophia": "f",
+    "Petra": "f",
+    "Bella": "f",
+    "Yona": "f",
+    "Ruby": "f",
+    "Jessica": "f",
+    "Erika": "f",
+    "Priya": "f",
+    "Mahealani": "f",
+    "Nadia": "f",
+    "Clara": "f",
+    "Helmi": "f",
+    "Emma": "f",
+    "Aisha": "f",
+    "Eva": "f",
+    "Paula": "f",
+    "Bianca": "f",
+    "Jing": "f",
     "Brian": "m",
-    "Saki": "f"
+    "Lucas": "m",
+    "Edward": "m",
+    "Peter": "m",
+    "Oscar": "m",
+    "Gabriel": "m",
+    "Jonathan": "m",
+    "Billy": "m",
+    "Oliver": "m",
+    "Carlos": "m",
+    "Kevin": "m",
+    "Rogier": "m",
+    "Rodrigue": "m",
+    "Samuth": "m",
+    "Brendan": "m",
+    "Samuel": "m",
+    "Scott": "m",
+    "Eric": "m",
+    "Carl": "m",
+    "Malik": "m",
+    "Johan": "m",
+    "Emir": "m",
+    // "Pat": "x",
+    // "Pham": "x",
+    // "Lee": "x",
+    // "Gail": "x",
+    "Roberto": "m"
   }
   var names = {...NAMES};
 
@@ -141,7 +174,7 @@ $(function(){
     $("#personalities").append(`<div id="${personality}" class="fs-1">${personality}</div>`);
   }
   for (let skill of SKILLS){
-    $("#skills").append(`<div id="${skill.replace(' ', '')}" class="fs-1">${skill}</div>`);
+    $("#skills").append(`<div id="${skill.replace(/ /g, '')}" class="fs-1">${skill}</div>`);
   }
 
 
@@ -152,7 +185,6 @@ $(function(){
     let personality = getPersonality();
     let skill = getSkill();
     $(".pron").text( sex == 'm' ? "He" : "She");
-    console.log(name, sex, relationship, personality, skill);
   }
 
 

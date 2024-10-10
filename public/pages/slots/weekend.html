@@ -1,0 +1,224 @@
+<style>
+  #adj, #went, #ate, #saw, #enjoyed{
+    height:4rem;
+    overflow: hidden;
+  }
+  .inshade{
+    box-shadow: 
+    rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset, 
+    rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;
+  }
+</style>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-1 text-center">
+      <div id="SPIN" class="btn btn-lg btn-success">SPIN</div>
+    </div>
+    <div class="col-11">
+      <div class="container YM fs-1">
+
+        <div class="row mb-2">
+          <div class="col-4" style="text-align: right;">It was </div>
+          <div id="adj" class="col-4 text-center inshade border rounded-3 bg-light"></div>
+          <div class="col-4">.</div>
+        </div>
+      
+        <div class="row mb-2">
+          <div class="col-4" style="text-align:right;">I went to</div>
+          <div id="went" class="col-4 text-center inshade border rounded-3 bg-light"></div>
+          <div class="col-4">.</div>
+        </div>
+      
+        <div class="row mb-2">
+          <div class="col-4" style="text-align:right;">I saw</div>
+          <div id="saw" class="col-4 text-center inshade border rounded-3 bg-light"></div>
+          <div class="col-4">.</div>
+        </div>
+      
+        <div class="row">
+          <div class="col-4" style="text-align:right;">I ate</div>
+          <div id="ate" class="col-4 text-center inshade border rounded-3 bg-light"></div>
+          <div class="col-4">.</div>
+        </div>
+      
+        <div class="row">
+          <div class="col-4" style="text-align:right;">I enjoyed</div>
+          <div id="enjoyed" class="col-4 text-center inshade border rounded-3 bg-light"></div>
+          <div class="col-4">.</div>
+        </div>
+
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+<script>
+$(function(){
+  $(".item").removeClass("active disabled");
+  $("#weekend").addClass("active disabled");
+  $("#SPIN").on('click', function(){
+    runit();
+  });
+
+  const ADJ = [
+    "great",
+    "amazing",
+    "fantastic",
+    "wonderful",
+    "interesting",
+    "exciting",
+    "fun",
+  ];
+  var adj = ADJ.slice();
+
+
+  const PLACES = [
+    "the beach",
+    "the park",
+    "the zoo",
+    "the museum",
+    "the library",
+    "the store",
+    "the aquarium",
+    "a party",
+    "a concert"
+  ];
+  var places = PLACES.slice();
+
+
+  const SIGHTS = [
+    "my friend",
+    "a deer",
+    "my grandmother",
+    "a movie",
+    "a game",
+    "my cousin",
+    "a parade",
+    "a concert",
+    "a play",
+    "my teacher"
+  ];
+  var sights = SIGHTS.slice();
+
+
+  const FOODS = [
+    "a hotdog",
+    "a hamburger",
+    "a pizza",
+    "a sandwich",
+    "a salad",
+    "a taco",
+    "a burrito",
+    "a cookie",
+    "a cake",
+    "a pie"
+  ];
+  var foods = FOODS.slice();
+
+
+  const ACTIVITIES = [
+    "playing games",
+    "watching a movie",
+    "playing sports",
+    "reading a book",
+    "listening to music",
+    "dancing",
+    "singing",
+    "drawing",
+    "painting",
+    "writing"
+  ];
+  var activities = ACTIVITIES.slice();
+
+
+  for (let a of ADJ){
+    $("#adj").append(`<div id="${a}" class="fs-1">${a}</div>`);
+  }
+  for (let place of PLACES){
+    $("#went").append(`<div id="${place.replace(/ /g, '')}" class="fs-1">${place}</div>`);
+  }
+  for (let sight of SIGHTS){
+    $("#saw").append(`<div id="${sight.replace(/ /g, '')}" class="fs-1">${sight}</div>`);
+  }
+  for (let food of FOODS){
+    $("#ate").append(`<div id="${food.replace(/ /g, '')}" class="fs-1">${food}</div>`);
+  }
+  for (let activity of ACTIVITIES){
+    $("#enjoyed").append(`<div id="${activity.replace(/ /g, '')}" class="fs-1">${activity}</div>`);
+  }
+
+
+  runit = ()=>{
+    getAdj();
+    getPlace();
+    getSight();
+    getFood();
+    getActivity();
+  }
+
+
+  function getAdj(){
+    if (adj.length == 0){
+      adj = ADJ.slice();
+    }
+    let a = adj[Math.floor(Math.random() * adj.length)];
+    adj.splice(adj.indexOf(a), 1);
+    let id = a.replace(/ /g, '');
+    spinit("adj", id);
+    return a;
+  }
+
+
+  function getPlace(){
+    if (places.length == 0){
+      places = PLACES.slice();
+    }
+    let place = places[Math.floor(Math.random() * places.length)];
+    places.splice(places.indexOf(place), 1);
+    let id = place.replace(/ /g, '');
+    spinit("went", id);
+    return place;
+  }
+
+  function getSight(){
+    if (sights.length == 0){
+      sights = SIGHTS.slice();
+    }
+    let sight = sights[Math.floor(Math.random() * sights.length)];
+    sights.splice(sights.indexOf(sight), 1);
+    let id = sight.replace(/ /g, '');
+    spinit("saw", id);
+    return sight;
+  }
+
+  function getFood(){
+    if (foods.length == 0){
+      foods = FOODS.slice();
+    }
+    let food = foods[Math.floor(Math.random() * foods.length)];
+    foods.splice(foods.indexOf(food), 1);
+    let id = food.replace(/ /g, '');
+    spinit("ate", id);
+    return food;
+  }
+
+  function getActivity(){
+    if (activities.length == 0){
+      activities = ACTIVITIES.slice();
+    }
+    let activity = activities[Math.floor(Math.random() * activities.length)];
+    activities.splice(activities.indexOf(activity), 1);
+    let id = activity.replace(/ /g, '');
+    spinit("enjoyed", id);
+    return activity;
+  }
+
+  runit();
+
+});
+</script>
