@@ -18,7 +18,6 @@
   var snake = [];
   var food = {};
   var direction = '';
-  var previousDirection = '';
 
   function getFoodPosition(s) {
     let index = snake.indexOf(s);
@@ -73,7 +72,9 @@
       }
       if (!isOnSnake) availablePositions.push(positions[i]);
     }
+    // console.log(availablePositions);
     let position = availablePositions[Math.floor(Math.random() * availablePositions.length)];
+    // console.log(position);
     return position;
   }
 
@@ -106,44 +107,6 @@
       headSnake: function(part) {
         let x = part.x;
         let y = part.y;
-        let d = part.dir;
-        context.fillStyle = 'red';
-        switch (d) {
-          case 'down':
-            context.clearRect(x+10, y+gridSize-10, gridSize-20, 20);
-            context.beginPath();
-            context.moveTo(x+10, y+gridSize-10);
-            context.lineTo(x+(gridSize/2), y+gridSize+1);
-            context.lineTo(x+gridSize-10, y+gridSize-10);
-            context.fill();
-            break;
-          case 'up':
-            context.clearRect(x+10, y-10, gridSize-20, 20);
-            context.beginPath();
-            context.moveTo(x+10, y+10);
-            context.lineTo(x+(gridSize/2), y-1);
-            context.lineTo(x+gridSize-10, y+10);
-            context.fill();
-            break;
-          case 'right':
-            context.clearRect(x+gridSize-10, y+10, 20, gridSize-20);
-            context.beginPath();
-            context.moveTo(x+gridSize-10, y+10);
-            context.lineTo(x+gridSize+1, y+(gridSize/2));
-            context.lineTo(x+gridSize-10, y+gridSize-10);
-            context.fill();
-            break;
-          case 'left':
-            context.clearRect(x-10, y+10, 20, gridSize-20);
-            context.beginPath();
-            context.moveTo(x+10, y+10);
-            context.lineTo(x-1, y+(gridSize/2));
-            context.lineTo(x+10, y+gridSize-10);
-            context.fill();
-            break;
-          default:
-            break;
-        }
         context.fillStyle = 'black';
         context.fillRect(x+10, y+10, gridSize-20, gridSize-20);
       },
@@ -195,12 +158,6 @@
       },
       init: function() {
         $(document).off('keydown').on('keydown', function(event) {
-          // if (event.key === 'ArrowUp' && previousDirection === 'down'
-          //     || event.key === 'ArrowDown' && previousDirection === 'up'
-          //     || event.key === 'ArrowLeft' && previousDirection === 'right'
-          //     || event.key === 'ArrowRight' && previousDirection === 'left') return;
-
-          previousDirection = direction;
           if (event.key === 'ArrowUp') direction = 'up';
           if (event.key === 'ArrowDown') direction = 'down';
           if (event.key === 'ArrowLeft') direction = 'left';
@@ -239,7 +196,6 @@
     for (let i = 1; i < snake.length; i++) {
       if (head.x === snake[i].x && head.y === snake[i].y) {
         hitself = true;
-        message = 'You bit yourself!';
         break;
       }
     }
