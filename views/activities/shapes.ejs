@@ -3,6 +3,15 @@
 <style>
   .shape{height:14%;}
   .selected {filter: drop-shadow(0 0 0.5rem #0f0);}
+  .drag-handle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: #0f0;
+    bottom: 0px;
+    right: 0px;
+    cursor: se-resize;
+  }
   #colorMenu ul li, #tagMenuFiller {font-weight: bold;height:9%;}
   #colorMenu ul li:hover{cursor: pointer;}
 </style>
@@ -109,135 +118,142 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
 
 <script>
-  $(function() {
-    var canvases = {};
-    var workingCanvas = "";
-    var minScale = 0.5; // Minimum scale factor
-    var maxScale = 3.0; // Maximum scale factor
+$(function() {
+  var canvases = {};
+  var workingCanvas = "";
+  var minScale = 0.5; // Minimum scale factor
+  var maxScale = 3.0; // Maximum scale factor
 
-    // load default canvas from local storage if it exists. create a new canvas if it doesn't.
-    if (localStorage.getItem("shapes")) {
-      canvases = JSON.parse(localStorage.getItem("shapes"));
-      // load the default canvas
-      if (canvases.default) {
-        workingCanvas = "default";
-        $("#canvas").html(canvases.default);
-        $("#canvas .canvas-shape").each(function() {
-          makeTouchable($(this));
-        });
-      }
-      else {
-        // load the first item in the object
-        workingCanvas = Object.keys(canvases)[0];
-        $("#canvas").html(canvases[workingCanvas]);
-        $("#canvas .canvas-shape").each(function() {
-          makeTouchable($(this));
-        });
-      }
-    } else {
-      canvases.default = "";
+  // load default canvas from local storage if it exists. create a new canvas if it doesn't.
+  if (localStorage.getItem("shapes")) {
+    canvases = JSON.parse(localStorage.getItem("shapes"));
+    // load the default canvas
+    if (canvases.default) {
       workingCanvas = "default";
-      localStorage.setItem("shapes", JSON.stringify(canvases));
-    }
-
-    // populate the load canvas dropdown
-    for (let canvas in canvases) {
-      $("#loadCanvas").append(`<option value="${canvas}">${canvas}</option>`);
-    }
-
-    // load canvas from local storage
-    $("#loadCanvas").on("change", function() {
-      workingCanvas = $(this).val();
-      $("#canvas").html(canvases[workingCanvas]);
+      $("#canvas").html(canvases.default);
       $("#canvas .canvas-shape").each(function() {
         makeTouchable($(this));
       });
+    }
+    else {
+      // load the default canvas
+      $("#canvas").html(canvases.default);
+      $("#canvas .canvas-shape").each(function() {
+        makeTouchable($(this));
+      });
+    }
+  } else {
+    canvases.default = "";
+    workingCanvas = "default";
+    localStorage.setItem("shapes", JSON.stringify(canvases));
+  }
+
+  // populate the load canvas dropdown
+  for (let canvas in canvases) {
+    $("#loadCanvas").append(`<option value="${canvas}">${canvas}</option>`);
+  }
+
+  // load canvas from local storage
+  $("#loadCanvas").on("change", function() {
+    workingCanvas = $(this).val();
+    $("#canvas").html(canvases[workingCanvas]);
+    $("#canvas .canvas-shape").each(function() {
+      makeTouchable($(this));
     });
+  });
 
-    // save canvas to local storage
-    $("#saveCanvas").on("click", function() {
-      let name = prompt("<%- __("shapesName") %>");
-      if (name) {
-        workingCanvas = name;
-        canvases["default"] = "";
-        canvases[workingCanvas] = $("#canvas").html();
-        localStorage.setItem("shapes", JSON.stringify(canvases));
-        $("#loadCanvas").append(`<option value="${name}">${name}</option>`);
-        $("#loadCanvas").val(name);
-      }
-    });
-
-
-    let z = 1; // makes sure the last selected item is on top
-
-    function setSelected(){
-      $(".canvas-shape").removeClass("selected");
-      $(this).addClass("selected");
-      $(this).css("z-index", z++);
+  // save canvas to local storage
+  $("#saveCanvas").on("click", function() {
+    let name = prompt("<%- __("shapesName") %>");
+    if (name) {
+      workingCanvas = name;
+      canvases["default"] = "";
+      canvases[workingCanvas] = $("#canvas").html();
+      localStorage.setItem("shapes", JSON.stringify(canvases));
+      $("#loadCanvas").append(`<option value="${name}">${name}</option>`);
+      $("#loadCanvas").val(name);
     }
+  });
 
 
-    function matrixToDegrees(matrixString) {
-      // Extract the matrix values
-      const values = matrixString.match(/matrix\(([^)]+)\)/)[1].split(', ');
-      const a = parseFloat(values[0]); // Corresponds to cos(θ)
-      const b = parseFloat(values[1]); // Corresponds to sin(θ)
-      const radians = Math.atan2(b, a); // Extract the angle in radians
-      const degrees = radians * (180 / Math.PI); // Convert to degrees
-      return degrees;
-    }
+  let z = 1; // makes sure the last selected item is on top
+
+  function setSelected(){
+    $(".canvas-shape").removeClass("selected");
+    $(this).addClass("selected");
+    $(this).css("z-index", z++);
+  }
 
 
-    function touchToDegrees(initial, current) {
-      let delta = current - initial;
-      let degrees = (delta + 180) % 360 - 180; // Normalize to [-180, 180] range
-      return degrees;
-    }
+  function matrixToDegrees(matrixString) {
+    // Extract the matrix values
+    const values = matrixString.match(/matrix\(([^)]+)\)/)[1].split(', ');
+    const a = parseFloat(values[0]); // Corresponds to cos(θ)
+    const b = parseFloat(values[1]); // Corresponds to sin(θ)
+    const radians = Math.atan2(b, a); // Extract the angle in radians
+    const degrees = radians * (180 / Math.PI); // Convert to degrees
+    return degrees;
+  }
 
+
+  function touchToDegrees(initial, current) {
+    let delta = current - initial;
+    let degrees = (delta + 180) % 360 - 180; // Normalize to [-180, 180] range
+    return degrees;
+  }
+
+  
+  function makeTouchable(item){
+    const mc = new Hammer(item[0]);
     
-    function makeTouchable(item){
-      const mc = new Hammer(item[0]);
-      
-      let lastScale = 1;             // current scale of the shape
-      var itemRotation = 0;          // current rotation of the shape
-      let startingTouchRotation = 0; // reference for how much rotation to add
+    let lastScale = 1;             // current scale of the shape
+    var itemRotation = 0;          // current rotation of the shape
+    let startingTouchRotation = 0; // reference for how much rotation to add
 
-      mc.get('pinch').set({ enable: true });
-      mc.get('rotate').set({ enable: false });
+    mc.get('pinch').set({ enable: true });
+    mc.get('rotate').set({ enable: false });
 
-      mc.on("panmove", function(ev) {
-        item.css({
-          top: ev.center.y - item.height() / 2,
-          left: ev.center.x - item.width() / 2,
+        mc.on("panmove", function(ev) {
+          item.css({
+            top: ev.center.y - item.height() / 2,
+            left: ev.center.x - item.width() / 2,
+          });
         });
-      });
 
-      mc.on("panend", function(){ 
-        canvases[workingCanvas] = $("#canvas").html();
-        localStorage.setItem("shapes", JSON.stringify(canvases));
-      });
-
-      mc.on("pinchstart", function(ev) {
-        startingTouchRotation = ev.rotation;
-        itemRotation = matrixToDegrees(item.css("transform") );
-      });
-
-      mc.on("pinchmove", function(ev) {
-        let scale = Math.max(0.3, Math.min(lastScale * ev.scale, 3));
-        let newItemRotation = touchToDegrees(startingTouchRotation, ev.rotation) + itemRotation;
-        newItemRotation = parseInt(newItemRotation);
-        item.css({
-          transform: `scale(${scale}) rotate(${newItemRotation}deg)`,
+        mc.on("panend", function(){ 
+          // If the shape is dragged off the canvas, remove it
+          if (parseInt(item.css("left")) < 0) {
+            item.remove();
+          }
+          if (workingCanvas === "default"){
+            canvases.default = $("#canvas").html();
+            localStorage.setItem("shapes", JSON.stringify(canvases));
+          }
         });
-      });
 
-      mc.on("pinchend", function(ev) {
-        lastScale *= ev.scale;
-        canvases[workingCanvas] = $("#canvas").html();
-        localStorage.setItem("shapes", JSON.stringify(canvases));
-      });
+        mc.on("pinchstart", function(ev) {
+          startingTouchRotation = ev.rotation;
+          itemRotation = matrixToDegrees(item.css("transform") );
+        });
 
-    }
+        mc.on("pinchmove", function(ev) {
+          let scale = Math.max(0.3, Math.min(lastScale * ev.scale, 3));
+          let newItemRotation = touchToDegrees(startingTouchRotation, ev.rotation) + itemRotation;
+          newItemRotation = parseInt(newItemRotation);
+          item.css({
+            transform: `scale(${scale}) rotate(${newItemRotation}deg)`,
+          });
+        });
+
+        mc.on("pinchend", function(ev) {
+          lastScale *= ev.scale;
+          if (workingCanvas === "default"){
+            canvases.default = $("#canvas").html();
+            localStorage.setItem("shapes", JSON.stringify(canvases));
+          }
+        });
+        
+      }
 
 
     // set all shapes to selected color
@@ -263,8 +279,10 @@
     $(document).on("keydown", function(event) {
       if (event.key === "Delete") {
         $(".selected").remove();
-        canvases[workingCanvas] = $("#canvas").html();
-        localStorage.setItem("shapes", JSON.stringify(canvases));
+        if (workingCanvas === "default"){
+          canvases.default = $("#canvas").html();
+          localStorage.setItem("shapes", JSON.stringify(canvases));
+        }
       }
     });
 
@@ -317,10 +335,13 @@
     });
 
     shapeMenu.on('panend', function() {
-      canvases[workingCanvas] = $("#canvas").html();
-      localStorage.setItem("shapes", JSON.stringify(canvases));
+      if (workingCanvas === "default"){
+          canvases.default = $("#canvas").html();
+          localStorage.setItem("shapes", JSON.stringify(canvases));
+        }
     });
   });
+
 </script>
 
 <%- include('../foot'); -%>
