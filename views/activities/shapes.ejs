@@ -2,7 +2,7 @@
 
 <style>
   .shape{height:14%;}
-  .selected {filter: drop-shadow(0 0 0.5rem #0f0);}
+  .selected {filter: drop-shadow(0 0 0.5rem #0f0); border:1px solid red;}
   .drag-handle {
     position: absolute;
     width: 10px;
@@ -56,23 +56,23 @@
 
     <div id="shapeMenu" class="col bg-light p-2" style="height:100%;max-width:100px;border:10px solid rgba(0,0,0,0);">
       <div class="shape" data-shape="circle">
-        <svg class="circle-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="50" cy="50" r="45" fill="purple" stroke="black" stroke-width="1"/>
+        <svg class="circle-svg" width="100%" height="100%" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="45" cy="45" r="44" fill="purple" stroke="black" stroke-width="1"/>
         </svg>
       </div>
       <div class="shape" data-shape="square">
-        <svg class="square-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="10" y="10" width="80" height="80" fill="green" stroke="black" stroke-width="1"/>
+        <svg class="square-svg" width="100%" height="100%" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="0" width="80" height="80" fill="green" stroke="black" stroke-width="1"/>
         </svg>
       </div>
       <div class="shape" data-shape="triangle">
-        <svg class="triangle-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="50,5 95,95 5,95" fill="hotpink" stroke="black" stroke-width="1"/>
+        <svg class="triangle-svg" width="100%" height="100%" viewBox="0 0 100 87" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="50,0 100,86 0,86" fill="hotpink" stroke="black" stroke-width="1"/>
         </svg>
       </div>
       <div class="shape" data-shape="rectangle">
-        <svg class="rectangle-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="10" y="20" width="80" height="60" fill="orange" stroke="black" stroke-width="1"/>
+        <svg class="rectangle-svg" width="100%" height="100%" viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="0" width="80" height="60" fill="orange" stroke="black" stroke-width="1"/>
         </svg>
       </div>
       <div class="shape" data-shape="diamond">
@@ -136,17 +136,14 @@ $(function() {
       });
     }
     else {
-      // load the default canvas
-      $("#canvas").html(canvases.default);
-      $("#canvas .canvas-shape").each(function() {
-        makeTouchable($(this));
-      });
+      $("#canvas").html("");
     }
   } else {
     canvases.default = "";
     workingCanvas = "default";
     localStorage.setItem("shapes", JSON.stringify(canvases));
   }
+
 
   // populate the load canvas dropdown
   for (let canvas in canvases) {

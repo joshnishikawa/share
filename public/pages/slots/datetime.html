@@ -9,37 +9,111 @@
     rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset, 
     rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;
   }
+
+  :root {
+    --vh: 1vh;
+    --clock-size: min(100vw, 80 * var(--vh));
+    --hourhand: 60deg;
+    --minutehand: 720deg;
+  }
+
+  #clock {
+    position: relative;
+    height: var(--clock-size);
+    width: var(--clock-size);
+  }
+
+  #clock_minute {
+    position: absolute;
+    left: calc((var(--clock-size) / 2) - (20px));
+    top: calc((var(--clock-size) / 2) - (145px));
+    transform-origin: 20px 145px;
+    z-index: 1;
+    width: 40px;
+    height: 165px;
+    transition: transform 1s;
+  }
+
+  #clock_hour {
+    position: absolute;
+    left: calc((var(--clock-size) / 2) - (20px));
+    top: calc((var(--clock-size) / 2) - (109px));
+    transform-origin: 20px 109px;
+    z-index: 2;
+    width: 40px;
+    height: 129px;
+    transition: transform 1s;
+  }
+
+  #clock_back {
+    position: absolute;
+    left: calc((var(--clock-size) / 2) - (478px / 2));
+    top: calc((var(--clock-size) / 2) - (479px / 2));
+    z-index: 0;
+    width: 479px;
+    height: 478px;
+  }
+
+  /* Hide number arrows */
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 </style>
+
 
 <div class="container-fluid">
   <div class="row">
-    <div class="col-1 text-center">
+    <div class="col-1">
       <div id="SPIN" class="btn btn-lg btn-success">SPIN</div>
+      <form id="intervalForm" class="form w-100">
+        <!-- radio buttons for 1 hour, 30 minute, 15 minute and 5 minute intervals -->
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="interval" value="60"></input>
+          <label class="form-check-label" for="interval">1 hour</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="interval" value="30"></input>
+          <label class="form-check-label" for="interval">30 min</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="interval" value="15" checked></input>
+          <label class="form-check-label" for="interval">15 min</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="interval" value="5"></input>
+          <label class="form-check-label" for="interval">5 min</label>
+        </div>
+      </form>
+
     </div>
-    <div class="col-11">
+    <div class="col-5">
       <div class="container YM fs-1">
 
         <div class="row mb-2">
-          <div id="day" class="col-6 text-center inshade border rounded-3 bg-light"></div>
-          <div class="col-6"></div>
+          <div id="day" class="col-12 text-center inshade border rounded-3 bg-light"></div>
         </div>
       
         <div class="row mb-2">
-          <div id="month" class="col-6 text-center inshade border rounded-3 bg-light"></div>
-          <div id="date" class="col-2 text-center inshade border rounded-3 bg-light"></div>
-          <div id="year" class="col-4"></div>
+          <div id="month" class="col-9 text-center inshade border rounded-3 bg-light"></div>
+          <div id="date" class="col-3 text-center inshade border rounded-3 bg-light"></div>
         </div>
-      
+        
         <div class="row mb-2">
-          <div id="hour" class="col-2 text-center inshade border rounded-3 bg-light"></div>
-          <div class="col-1 text-center">:</div>
-          <div id="minute" class="col-2 text-center inshade border rounded-3 bg-light"></div>
-          <div id="ampm" class="col-1 text-center" style="text-align:right;"></div>
-          <div class="col-6"></div>
+          <div id="year"></div>
         </div>
-      
       </div>
-      
+    </div>
+    
+    <div class="col-6 d-flex justify-content-center">
+      <div id="clock" style="position:relative;">
+        <div id="ampm" style="position:absolute;top:0;left:0;"></div>
+        <img src="image/clock_face.png" id="clock_back">
+        <img src="image/clock_long_hand.png" id="clock_minute" style="transform: rotate(720deg);">
+        <img src="image/clock_short_hand.png" id="clock_hour" style="transform: rotate(60deg);">
+      </div>
+
     </div>
   </div>
 </div>
@@ -54,6 +128,12 @@ $(function(){
   $("#SPIN").on('click', function(){
     runit();
   });
+
+  var hour = 0;
+  var minute = 0;
+  var hourhand = 0;
+  var minutehand = 0;
+  var interval = 15;
 
   const DAYS = [
     "Sunday",
@@ -127,13 +207,6 @@ $(function(){
   for (let d of DATES){
     $("#date").append(`<div id="_${d}" class="fs-1">${d}</div>`);
   }
-  for (i=1; i<=12; i++){
-    $("#hour").append(`<div id="_${i}" class="fs-1">${i}</div>`);
-  }
-  for (i=0; i<60; i+=5){
-    let m = i < 10 ? `0${i}` : i;
-    $("#minute").append(`<div id="_${m}" class="fs-1">${m}</div>`);
-  }
   $("#ampm").append(`<div id="AM" class="fs-1">AM</div>`);
   $("#ampm").append(`<div id="PM" class="fs-1">PM</div>`);
 
@@ -142,8 +215,10 @@ $(function(){
     let day = getDay();
     let month = getMonth();
     let date = getDate(month);
-    getTime();
     getMostRecentYear(day, month, date);
+    getRandomTime();
+    $('#clock_hour').css('transform', 'rotate(' + hourhand + 'deg)');
+    $('#clock_minute').css('transform', 'rotate(' + minutehand + 'deg)');
   }
 
 
@@ -191,16 +266,6 @@ $(function(){
   }
 
 
-  function getTime(){
-    let hour = Math.floor(Math.random() * 12) + 1;
-    let minute = Math.floor(Math.random() * 12) * 5;
-    let ampm = Math.random() < 0.5 ? "AM" : "PM";
-    spinit("hour", '_' + hour);
-    spinit("minute", '_' + minute);
-    spinit("ampm", ampm);
-    return `${hour}:${minute} ${ampm}`;
-  }
-
   function getMostRecentYear(weekday, month, date) {
     // convert month to number
     month = MONTHS.indexOf(month) + 1;
@@ -233,7 +298,23 @@ $(function(){
   }
 
 
-  runit();
+  function getRandomTime(){
+    hour = Math.floor(Math.random() * 12);
+    minute = Math.floor(Math.random() * 60);
+    minute = Math.floor(minute / interval) * interval;
+    hourhand = 30 * hour + 0.5 * minute;
+    minutehand = 6 * minute;
 
+    let ampm = Math.random() < 0.5 ? "AM" : "PM";
+    spinit("ampm", ampm);
+  }
+
+  
+  $("#intervalForm input").change(function(){
+    interval = parseInt($(this).val());
+  });
+
+
+  runit();
 });
 </script>
