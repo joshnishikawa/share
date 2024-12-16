@@ -1,8 +1,16 @@
 <%- include('../head'); -%>
 
 <style>
-  .shape{height:14%;}
-  .selected {filter: drop-shadow(0 0 0.5rem #0f0); border:1px solid red;}
+  .shape {
+    height: 14%;
+    position: relative;
+  }
+
+  .selected {
+    filter: drop-shadow(0 0 0.5rem #0f0);
+    border: 1px solid red;
+  }
+
   .drag-handle {
     position: absolute;
     width: 10px;
@@ -10,10 +18,18 @@
     background-color: #0f0;
     bottom: 0px;
     right: 0px;
-    cursor: se-resize;
+    cursor: e-resize;
   }
-  #colorMenu ul li, #tagMenuFiller {font-weight: bold;height:9%;}
-  #colorMenu ul li:hover{cursor: pointer;}
+
+  #colorMenu ul li,
+  #tagMenuFiller {
+    font-weight: bold;
+    height: 9%;
+  }
+
+  #colorMenu ul li:hover {
+    cursor: pointer;
+  }
 </style>
 
 
@@ -51,56 +67,66 @@
           </div>
         </div>
 
-      </ul> 
+      </ul>
     </div>
 
     <div id="shapeMenu" class="col bg-light p-2" style="height:100%;max-width:100px;border:10px solid rgba(0,0,0,0);">
       <div class="shape" data-shape="circle">
-        <svg class="circle-svg" width="100%" height="100%" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="45" cy="45" r="44" fill="purple" stroke="black" stroke-width="1"/>
+        <svg class="circle-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="49" fill="purple" stroke="black" stroke-width="1" />
         </svg>
       </div>
       <div class="shape" data-shape="square">
-        <svg class="square-svg" width="100%" height="100%" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="0" y="0" width="80" height="80" fill="green" stroke="black" stroke-width="1"/>
+        <svg class="square-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="0" width="100" height="100" fill="green" stroke="black" stroke-width="1" />
         </svg>
       </div>
       <div class="shape" data-shape="triangle">
-        <svg class="triangle-svg" width="100%" height="100%" viewBox="0 0 100 87" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="50,0 100,86 0,86" fill="hotpink" stroke="black" stroke-width="1"/>
+        <svg class="triangle-svg" width="100%" height="100%" viewBox="0 0 100 87" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <polygon points="50,0 100,86 0,86" fill="hotpink" stroke="black" stroke-width="1" />
         </svg>
       </div>
       <div class="shape" data-shape="rectangle">
-        <svg class="rectangle-svg" width="100%" height="100%" viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="0" y="0" width="80" height="60" fill="orange" stroke="black" stroke-width="1"/>
+        <svg class="rectangle-svg" width="100%" height="100%" viewBox="0 0 100 60" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="0" width="100" height="60" fill="orange" stroke="black" stroke-width="1" />
         </svg>
       </div>
       <div class="shape" data-shape="diamond">
-        <svg class="diamond-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="50,5 85,50 50,95 15,50" fill="blue" stroke="black" stroke-width="1"/>
+        <svg class="diamond-svg" width="100%" height="100%" viewBox="0 0 100 80" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <polygon points="50,0 100,40 50,80 0,40" fill="blue" stroke="black" stroke-width="1" />
         </svg>
       </div>
       <div class="shape" data-shape="star">
-        <svg class="star-svg" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
-          <polygon points="50,5 61,35 95,35 68,57 78,90 50,70 22,90 32,57 5,35 39,35" fill="yellow" stroke="black" stroke-width="1"/>
+        <svg class="star-svg" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 85"
+          fill="none">
+          <polygon points="45,0 56,30 90,30 63,52 73,85 45,65 17,85 27,52 0,30 34,30" fill="yellow" stroke="black"
+            stroke-width="1" />
         </svg>
       </div>
       <div class="shape" data-shape="heart">
-        <svg class="heart-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="m 11.109127,15 a 27.5,27.5 0 0 0 0,38.890872 L 50,92.781746 88.890873,53.890872 A 27.5,27.5 0 0 0 88.890873,15 27.5,27.5 0 0 0 50,15 27.5,27.5 0 0 0 11.109127,15 Z" 
-          fill="red" stroke="black" stroke-width="1"/>
+        <svg class="heart-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="m 29.703568,1.0010808 a 28.70313,31.396622 0 0 0 -20.2964316,9.1950552 28.70313,31.396622 0 0 0 -1e-7,44.401932 L 49.999999,99 90.592864,54.598068 a 28.70313,31.396622 0 0 0 0,-44.401932 28.70313,31.396622 0 0 0 -40.592864,0 28.70313,31.396622 0 0 0 -20.296432,-9.1950552 z"
+            fill="red" stroke="black" stroke-width="1" />
         </svg>
       </div>
     </div>
 
-  <!-- Canvas area for dragging and dropping shapes -->
+    <!-- Canvas area for dragging and dropping shapes -->
     <div class="col" style="max-height:100vh;overflow:hidden;">
       <div id="canvas" class="border bg-med" style="height: 100%;overflow:hidden;"></div>
     </div>
   </div>
 </div>
 
-<div class="modal fade" id="clearCanvasModal" tabindex="-1" aria-labelledby="clearCanvasModalLabel" aria-hidden="true">
+<div class="modal fade" id="clearCanvasModal" tabindex="-1" aria-labelledby="clearCanvasModalLabel"
+  aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -118,7 +144,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
 
 <script>
-$(function() {
+$(function () {
   var canvases = {};
   var workingCanvas = "";
   var minScale = 0.5; // Minimum scale factor
@@ -131,7 +157,7 @@ $(function() {
     if (canvases.default) {
       workingCanvas = "default";
       $("#canvas").html(canvases.default);
-      $("#canvas .canvas-shape").each(function() {
+      $("#canvas .canvas-shape").each(function () {
         makeTouchable($(this));
       });
     }
@@ -151,16 +177,16 @@ $(function() {
   }
 
   // load canvas from local storage
-  $("#loadCanvas").on("change", function() {
+  $("#loadCanvas").on("change", function () {
     workingCanvas = $(this).val();
     $("#canvas").html(canvases[workingCanvas]);
-    $("#canvas .canvas-shape").each(function() {
+    $("#canvas .canvas-shape").each(function () {
       makeTouchable($(this));
     });
   });
 
   // save canvas to local storage
-  $("#saveCanvas").on("click", function() {
+  $("#saveCanvas").on("click", function () {
     let name = prompt("<%- __("shapesName") %>");
     if (name) {
       workingCanvas = name;
@@ -175,9 +201,13 @@ $(function() {
 
   let z = 1; // makes sure the last selected item is on top
 
-  function setSelected(){
+  function setSelected() {
     $(".canvas-shape").removeClass("selected");
     $(this).addClass("selected");
+    // if rectangle, add drag handle
+    if ($(this).attr("data-shape") === "rectangle") {
+      $(this).append('<div class="drag-handle"></div>');
+    }
     $(this).css("z-index", z++);
   }
 
@@ -199,145 +229,194 @@ $(function() {
     return degrees;
   }
 
-  
-  function makeTouchable(item){
+
+  function makeTouchable(item) {
     const mc = new Hammer(item[0]);
-    
-    let lastScale = 1;             // current scale of the shape
+    var scale = 1;                 // current scale of the shape
+    var lastScale = 1;             // current scale of the shape
     var itemRotation = 0;          // current rotation of the shape
-    let startingTouchRotation = 0; // reference for how much rotation to add
+    var startingTouchRotation = 0; // reference for how much rotation to add
+    var initialLeft = 0;           // initial left position of the shape
+    var initialTop = 0;            // initial top position of the shape
 
     mc.get('pinch').set({ enable: true });
     mc.get('rotate').set({ enable: false });
 
-        mc.on("panmove", function(ev) {
-          item.css({
-            top: ev.center.y - item.height() / 2,
-            left: ev.center.x - item.width() / 2,
-          });
-        });
+    mc.on("panstart", function (e) {
+      if (isDraggingHandle) return; // Disable Hammer.js events if the drag handle is active
+      initialLeft = parseInt(item.css("left"), 10) || 0;
+      initialTop = parseInt(item.css("top"), 10) || 0;
+    });
 
-        mc.on("panend", function(){ 
-          // If the shape is dragged off the canvas, remove it
-          if (parseInt(item.css("left")) < 0) {
-            item.remove();
-          }
-          if (workingCanvas === "default"){
-            canvases.default = $("#canvas").html();
-            localStorage.setItem("shapes", JSON.stringify(canvases));
-          }
-        });
-
-        mc.on("pinchstart", function(ev) {
-          startingTouchRotation = ev.rotation;
-          itemRotation = matrixToDegrees(item.css("transform") );
-        });
-
-        mc.on("pinchmove", function(ev) {
-          let scale = Math.max(0.3, Math.min(lastScale * ev.scale, 3));
-          let newItemRotation = touchToDegrees(startingTouchRotation, ev.rotation) + itemRotation;
-          newItemRotation = parseInt(newItemRotation);
-          item.css({
-            transform: `scale(${scale}) rotate(${newItemRotation}deg)`,
-          });
-        });
-
-        mc.on("pinchend", function(ev) {
-          lastScale *= ev.scale;
-          if (workingCanvas === "default"){
-            canvases.default = $("#canvas").html();
-            localStorage.setItem("shapes", JSON.stringify(canvases));
-          }
-        });
-        
-      }
-
-
-    // set all shapes to selected color
-    $('#colorMenu .nav-item').on('click', function() {
-      let color = $(this).text().toLowerCase();
-      color = color === "pink" ? "hotpink" : color;
-      $('#shapeMenu').addClass("rounded-3").css('border', `10px solid ${color}`);
-      $('#shapeMenu .shape svg').each(function() {
-        $(this).find('path, circle, rect, polygon').attr('fill', color);
+    mc.on("panmove", function (e) {
+      if (isDraggingHandle) return; // Disable Hammer.js events if the drag handle is active
+      let dx = e.deltaX;
+      let dy = e.deltaY;
+      item.css({
+        left: `${initialLeft + dx}px`,
+        top: `${initialTop + dy}px`,
       });
     });
 
-    $("#canvas").on("mousedown touchstart", ".canvas-shape", setSelected);
-    // Remove .selected only when clicking on the canvas outside any shapes.
-    $("#canvas").on("mousedown", function(event) {
-      if (event.target.id === "canvas") {
-        $(".canvas-shape").removeClass("selected");
+    mc.on("panend", function () {
+      if (isDraggingHandle) return; // Disable Hammer.js events if the drag handle is active
+      // If the shape is dragged off the canvas, remove it
+      if (parseInt(item.css("left")) < 0) {
+        item.remove();
       }
-    });
-
-
-
-    $(document).on("keydown", function(event) {
-      if (event.key === "Delete") {
-        $(".selected").remove();
-        if (workingCanvas === "default"){
-          canvases.default = $("#canvas").html();
-          localStorage.setItem("shapes", JSON.stringify(canvases));
-        }
-      }
-    });
-
-    $("#clearCanvas").on("click", function() {
-      $("#clearCanvasModal").modal("show");
-    });
-
-    $("#clearCanvasConfirm").on("click", function() {
       if (workingCanvas === "default") {
-        canvases.default = "";
-      } else {
-        delete canvases[workingCanvas];
-        $(`#loadCanvas option[value="${workingCanvas}"]`).remove();
-        workingCanvas = "default";
-        $("#loadCanvas").val("default");
+        canvases.default = $("#canvas").html();
+        localStorage.setItem("shapes", JSON.stringify(canvases));
       }
-
-      $("#canvas").empty();
-      localStorage.setItem("shapes", JSON.stringify(canvases));
-      z = 1;
-      $("#clearCanvasModal").modal("hide");
     });
 
+    mc.on("pinchstart", function (ev) {
+      startingTouchRotation = ev.rotation;
+      itemRotation = matrixToDegrees(item.css("transform"));
+    });
 
-// Handle dragging shapes from the shape menu to the canvas ////////////////////
-    var shapeMenu = new Hammer(document.getElementById('shapeMenu'));
-
-    shapeMenu.on('panstart', function(e) {
-      $(".canvas-shape").removeClass("selected");
-      var shape = $(e.target).closest('.shape');
-      var clone = shape.clone().removeClass('shape').addClass('canvas-shape selected');
-      $('#canvas').append(clone);
-      makeTouchable(clone);
-
-      clone.css({
-        position: 'absolute',
-        left: e.center.x - clone.width() / 2,
-        top: e.center.y - clone.height() / 2
+    mc.on("pinchmove", function (ev) {
+      let scale = Math.max(minScale, Math.min(lastScale * ev.scale, maxScale));
+      let newItemRotation = touchToDegrees(startingTouchRotation, ev.rotation) + itemRotation;
+      newItemRotation = parseInt(newItemRotation);
+      item.css({
+        transform: `scale(${scale}) rotate(${newItemRotation}deg)`,
       });
     });
 
-    shapeMenu.on('panmove', function(e) {
-      var clone = $('#canvas .canvas-shape.selected');
-
-      clone.css({
-        left: e.center.x - clone.width() / 2,
-        top: e.center.y - clone.height() / 2,
-        transform: `scale(1) rotate(0deg)`
-      });
+    mc.on("pinchend", function (ev) {
+      lastScale *= ev.scale;
+      if (workingCanvas === "default") {
+        canvases.default = $("#canvas").html();
+        localStorage.setItem("shapes", JSON.stringify(canvases));
+      }
     });
 
-    shapeMenu.on('panend', function() {
-      if (workingCanvas === "default"){
-          canvases.default = $("#canvas").html();
-          localStorage.setItem("shapes", JSON.stringify(canvases));
-        }
+  }
+
+
+  // set all shapes to selected color
+  $('#colorMenu .nav-item').on('click', function () {
+    let color = $(this).text().toLowerCase();
+    color = color === "pink" ? "hotpink" : color;
+    $('#shapeMenu').addClass("rounded-3").css('border', `10px solid ${color}`);
+    $('#shapeMenu .shape svg').each(function () {
+      $(this).find('path, circle, rect, polygon').attr('fill', color);
     });
   });
+
+
+  $("#canvas").on("mousedown touchstart", ".canvas-shape", setSelected);
+  // Remove .selected only when clicking on the canvas outside any shapes.
+  $("#canvas").on("mousedown", function (event) {
+    if (event.target.id === "canvas") {
+      $(".canvas-shape").removeClass("selected");
+    }
+  });
+
+
+  $(document).on("keydown", function (event) {
+    if (event.key === "Delete") {
+      $(".selected").remove();
+      if (workingCanvas === "default") {
+        canvases.default = $("#canvas").html();
+        localStorage.setItem("shapes", JSON.stringify(canvases));
+      }
+    }
+  });
+
+
+  $("#clearCanvas").on("click", function () {
+    $("#clearCanvasModal").modal("show");
+  });
+
+
+  $("#clearCanvasConfirm").on("click", function () {
+    if (workingCanvas === "default") {
+      canvases.default = "";
+    } else {
+      delete canvases[workingCanvas];
+      $(`#loadCanvas option[value="${workingCanvas}"]`).remove();
+      workingCanvas = "default";
+      $("#loadCanvas").val("default");
+    }
+
+    $("#canvas").empty();
+    localStorage.setItem("shapes", JSON.stringify(canvases));
+    z = 1;
+    $("#clearCanvasModal").modal("hide");
+  });
+
+
+  // Handle dragging shapes from the shape menu to the canvas ////////////////////
+  var shapeMenu = new Hammer(document.getElementById('shapeMenu'));
+
+  shapeMenu.on('panstart', function (e) {
+    $(".canvas-shape").removeClass("selected");
+    var shape = $(e.target).closest('.shape');
+    var clone = shape.clone().removeClass('shape').addClass('canvas-shape selected');
+    $('#canvas').append(clone);
+    makeTouchable(clone);
+
+    clone.css({
+      position: 'absolute',
+      left: e.center.x - clone.width() / 2,
+      top: e.center.y - clone.height() / 2
+    });
+  });
+
+  shapeMenu.on('panmove', function (e) {
+    var clone = $('#canvas .canvas-shape.selected');
+
+    clone.css({
+      left: e.center.x - clone.width() / 2,
+      top: e.center.y - clone.height() / 2,
+      transform: `scale(1) rotate(0deg)`
+    });
+  });
+
+  shapeMenu.on('panend', function () {
+    if (workingCanvas === "default") {
+      canvases.default = $("#canvas").html();
+      localStorage.setItem("shapes", JSON.stringify(canvases));
+    }
+  });
+
+
+
+
+  var isDraggingHandle = false;
+  // Drag handle functionality
+  $(document).on("mousedown touchstart", ".drag-handle", function (e) {
+    isDraggingHandle = true;
+    var item = $(this).closest("#rectangle");
+    var svg = item.find('svg');
+    var rect = svg.find('rect');
+    var startWidth = item.width();
+    var startX = e.type === "mousedown" ? e.pageX : e.originalEvent.touches[0].pageX;
+
+    $(document).on("mousemove touchmove", function (e) {
+      var currentX = e.type === "mousemove" ? e.pageX : e.originalEvent.touches[0].pageX;
+      var newWidth = startWidth + (currentX - startX);
+      item.css({
+        width: `${newWidth}px`,
+      });
+      svg.attr('viewBox', `0 0 ${newWidth} 60`);
+      rect.attr('width', newWidth);
+    });
+
+    $(document).on("mouseup touchend", function () {
+      isDraggingHandle = false;
+      $(document).off("mousemove touchmove");
+      $(document).off("mouseup touchend");
+    });
+  });
+
+
+
+
+
+});
 
 </script>
 

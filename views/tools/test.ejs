@@ -1,0 +1,127 @@
+<%- include('../head'); -%>
+
+<style>
+  .drag-handle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: #0f0;
+    bottom: 0px;
+    right: 0px;
+    cursor: e-resize;
+  }
+</style>
+
+<div id="canvas" class="bg-med" style="height: 100vh;">
+
+  <div id="rectangle" data-shape="rectangle" style="width:100px;position:relative;border:solid cyan 0px;">
+    <svg class="rectangle-svg" width="100%" height="100%" viewBox="0 0 100 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="100" height="60" fill="orange" stroke="black" stroke-width="1" />
+    </svg>
+    <div class="drag-handle"></div>
+  </div>
+
+</div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+
+<script>
+$(function () {
+  var minScale = 0.5; // Minimum scale factor
+  var maxScale = 6.0; // Maximum scale factor
+
+  function matrixToDegrees(matrixString) {
+    // Extract the matrix values
+    const values = matrixString.match(/matrix\(([^)]+)\)/)[1].split(', ');
+    const a = parseFloat(values[0]); // Corresponds to cos(θ)
+    const b = parseFloat(values[1]); // Corresponds to sin(θ)
+    const radians = Math.atan2(b, a); // Extract the angle in radians
+    const degrees = radians * (180 / Math.PI); // Convert to degrees
+    return degrees;
+  }
+
+  function touchToDegrees(initial, current) {
+    let delta = current - initial;
+    let degrees = (delta + 180) % 360 - 180;   // Normalize to [-180, 180] range
+    return degrees;
+  }
+
+  function makeTouchable(item) {
+    const mc = new Hammer(item[0]);
+    var scale = 1;                 // current scale of the shape
+    var lastScale = 1;             // last scale of the shape
+    var itemRotation = 0;          // current rotation of the shape
+    var startingTouchRotation = 0; // reference for how much rotation to add
+    var initialLeft = 0;           // initial left position of the shape
+    var initialTop = 0;            // initial top position of the shape
+
+    mc.get('pinch').set({ enable: true });
+    mc.get('rotate').set({ enable: false });
+
+    mc.on("panstart", function (e) {
+      initialLeft = parseInt(item.css("left"), 10) || 0;
+      initialTop = parseInt(item.css("top"), 10) || 0;
+    });
+
+    mc.on("panmove", function (e) {
+      if (isDraggingHandle) return; // Disable Hammer.js events if the drag handle is active
+      let dx = e.deltaX;
+      let dy = e.deltaY;
+      item.css({
+        left: `${initialLeft + dx}px`,
+        top: `${initialTop + dy}px`,
+      });
+    });
+
+    mc.on("pinchstart", function (e) {
+      startingTouchRotation = e.rotation;
+      itemRotation = matrixToDegrees(item.css("transform"));
+    });
+
+    mc.on("pinchmove", function (e) {
+      let scale = Math.max(minScale, Math.min(lastScale * e.scale, maxScale));
+      let newItemRotation = touchToDegrees(startingTouchRotation, e.rotation) + itemRotation;
+      newItemRotation = parseInt(newItemRotation);
+      item.css({
+        transform: `scale(${scale}) rotate(${newItemRotation}deg)`,
+      });
+    });
+
+    mc.on("pinchend", function (e) {
+      lastScale *= e.scale;
+    });
+  }
+
+  var isDraggingHandle = false;
+
+  $(".drag-handle").on("mousedown touchstart", function (e) {
+    isDraggingHandle = true;
+    var item = $(this).closest("#rectangle");
+    var svg = item.find('svg');
+    var rect = svg.find('rect');
+    var startWidth = item.width();
+    var startX = e.type === "mousedown" ? e.pageX : e.originalEvent.touches[0].pageX;
+
+    $(document).on("mousemove touchmove", function (e) {
+      var currentX = e.type === "mousemove" ? e.pageX : e.originalEvent.touches[0].pageX;
+      var newWidth = startWidth + (currentX - startX);
+      item.css({
+        width: `${newWidth}px`,
+      });
+      svg.attr('viewBox', `0 0 ${newWidth} 60`);
+      rect.attr('width', newWidth);
+    });
+
+    $(document).on("mouseup touchend", function () {
+      isDraggingHandle = false;
+      $(document).off("mousemove touchmove");
+      $(document).off("mouseup touchend");
+    });
+  });
+
+  makeTouchable($("#rectangle")); 
+});
+</script>
+
+<%- include('../foot'); -%>
