@@ -13,12 +13,13 @@
 
   .drag-handle {
     position: absolute;
-    width: 10px;
-    height: 10px;
+    width: 30px;
+    height: 15px;
     background-color: #0f0;
     bottom: 0px;
-    right: 0px;
-    cursor: e-resize;
+    left: 50%;
+    transform: translateX(-50%);
+    cursor: n-resize;
   }
 
   #colorMenu ul li,
@@ -149,6 +150,7 @@ $(function () {
   var workingCanvas = "";
   var minScale = 0.5; // Minimum scale factor
   var maxScale = 3.0; // Maximum scale factor
+  var isDraggingHandle = false; // Track if the drag handle is active
 
   // load default canvas from local storage if it exists. create a new canvas if it doesn't.
   if (localStorage.getItem("shapes")) {
@@ -204,10 +206,12 @@ $(function () {
   function setSelected() {
     $(".canvas-shape").removeClass("selected");
     $(this).addClass("selected");
-    // if rectangle, add drag handle
-    if ($(this).attr("data-shape") === "rectangle") {
+    // Add drag handle for rectangle, triangle, and diamond
+    if ($(this).attr("data-shape") === "rectangle" || $(this).attr("data-shape") === "triangle" || $(this).attr("data-shape") === "diamond") {
       $(this).append('<div class="drag-handle"></div>');
     }
+    // remove drag handle from other shapes
+    $(".canvas-shape").not(this).find(".drag-handle").remove();
     $(this).css("z-index", z++);
   }
 
@@ -307,10 +311,11 @@ $(function () {
 
 
   $("#canvas").on("mousedown touchstart", ".canvas-shape", setSelected);
-  // Remove .selected only when clicking on the canvas outside any shapes.
+  // Remove .selected and drag handle only when clicking on the canvas outside any shapes.
   $("#canvas").on("mousedown", function (event) {
     if (event.target.id === "canvas") {
       $(".canvas-shape").removeClass("selected");
+      $(".drag-handle").remove();
     }
   });
 
@@ -363,6 +368,13 @@ $(function () {
       left: e.center.x - clone.width() / 2,
       top: e.center.y - clone.height() / 2
     });
+
+    // Add drag handle for rectangle, triangle, and diamond
+    if (clone.attr("data-shape") === "rectangle" || clone.attr("data-shape") === "triangle" || clone.attr("data-shape") === "diamond") {
+      clone.append('<div class="drag-handle"></div>');
+    }
+    // remove drag handle from other shapes
+    $(".canvas-shape").not(clone).find(".drag-handle").remove();
   });
 
   shapeMenu.on('panmove', function (e) {
@@ -389,20 +401,30 @@ $(function () {
   // Drag handle functionality
   $(document).on("mousedown touchstart", ".drag-handle", function (e) {
     isDraggingHandle = true;
-    var item = $(this).closest("#rectangle");
+    var item = $(this).closest(".canvas-shape");
     var svg = item.find('svg');
-    var rect = svg.find('rect');
+    var shape = svg.find('rect, polygon');
+    var startHeight = item.height();
     var startWidth = item.width();
+    
+    var startY = e.type === "mousedown" ? e.pageY : e.originalEvent.touches[0].pageY;
     var startX = e.type === "mousedown" ? e.pageX : e.originalEvent.touches[0].pageX;
 
     $(document).on("mousemove touchmove", function (e) {
-      var currentX = e.type === "mousemove" ? e.pageX : e.originalEvent.touches[0].pageX;
-      var newWidth = startWidth + (currentX - startX);
+      var currentY = e.type === "mousemove" ? e.pageY : e.originalEvent.touches[0].pageY;
+      var newHeight = startHeight + (currentY - startY);
       item.css({
-        width: `${newWidth}px`,
+        width: `${startWidth}px`,
+        height: `${newHeight}px`
       });
-      svg.attr('viewBox', `0 0 ${newWidth} 60`);
-      rect.attr('width', newWidth);
+      svg.attr('viewBox', `0 0 100 ${newHeight}`);
+      shape.attr('height', newHeight);
+
+      if (item.attr("data-shape") === "triangle") {
+        shape.attr('points', `50,0 100,${newHeight} 0,${newHeight}`); // For triangle
+      } else if (item.attr("data-shape") === "diamond") {
+        shape.attr('points', `50,0 100,${newHeight / 2} 50,${newHeight} 0,${newHeight / 2}`); // For diamond
+      }
     });
 
     $(document).on("mouseup touchend", function () {
