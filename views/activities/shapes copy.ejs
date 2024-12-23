@@ -9,7 +9,6 @@
   .selected {
     filter: drop-shadow(0 0 0.5rem #0f0);
     border: solid 1px red;
-    transform-origin: center;
   }
 
   .drag-handle {
@@ -422,12 +421,12 @@ $(function () {
     var item = $(this).closest(".canvas-shape");
     var svg = item.find('svg');
     var shape = svg.find('rect, polygon');
+    var startTop = item.offset().top;
+    var startLeft = item.offset().left;
     var startY = e.type === "mousedown" ? e.pageY : e.originalEvent.touches[0].pageY;
     var startX = e.type === "mousedown" ? e.pageX : e.originalEvent.touches[0].pageX;
     var startWidth = item.width();
     var startHeight = item.height();
-    var startTop = item.offset().top - startHeight / 2;
-    var startLeft = item.offset().left - startWidth / 2;
     var rotationAngle = getRotationAngle(item);
     var scale = getScale(item);
 
@@ -481,14 +480,20 @@ $(function () {
       // Calculate the Euclidean distance from the center of the shape to the current touch point
       var deltaX = currentX - centerX;
       var deltaY = currentY - centerY;
-      var newHeight = Math.sqrt(deltaX * deltaX + deltaY * deltaY) * 2;
+      var newHeight = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
       // Calculate the angle between the center of the shape and the current touch point
       var angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI) - 90;
+      
+      // Adjust the position of the shape so that the center remains the same
+      var newCenterX = currentX - startWidth / 2 * scale;
+      var newCenterY = currentY - newHeight / 2 * scale;
 
       item.css({
         height: `${newHeight}px`,
         transform: `rotate(${angle}deg)`,
+        left: `${newCenterX}px`,
+        top: `${newCenterY}px`,
       });
 
 
