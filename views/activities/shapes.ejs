@@ -4,6 +4,13 @@
   .shape {
     height: 14%;
     position: relative;
+    transform-origin: top center;
+  }
+
+  .canvas-shape {
+    position: absolute;
+    transform-origin: top center;
+    cursor: move;
   }
 
   .selected {
@@ -223,6 +230,10 @@ $(function () {
     return degrees;
   }
 
+  function degreesToTouch(degrees) {
+    return (degrees + 180) % 360;
+  }
+
 
   function getRotationAngle(element) {
     var matrix = element.css('transform');
@@ -422,74 +433,63 @@ $(function () {
     var item = $(this).closest(".canvas-shape");
     var svg = item.find('svg');
     var shape = svg.find('rect, polygon');
-    var startY = e.type === "mousedown" ? e.pageY : e.originalEvent.touches[0].pageY;
-    var startX = e.type === "mousedown" ? e.pageX : e.originalEvent.touches[0].pageX;
     var startWidth = item.width();
-    var startHeight = item.height();
-    var startTop = item.offset().top - startHeight / 2;
-    var startLeft = item.offset().left - startWidth / 2;
-    var rotationAngle = getRotationAngle(item);
+    var startTop = item.offset().top;
+    var startLeft = item.offset().left + startWidth / 2;
     var scale = getScale(item);
-
-    // Calculate the center of the shape taking into account the rotation and scale
-
-    var centerX = startLeft + startWidth / 2 * scale;
-    var centerY = startTop + startHeight / 2 * scale;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    var rotation = getRotationAngle(item);
 
 
 
     $(document).on("mousemove touchmove", function (e) {
-      var currentY = e.type === "mousemove" ? e.pageY : e.originalEvent.touches[0].pageY;
-      var currentX = e.type === "mousemove" ? e.pageX : e.originalEvent.touches[0].pageX;
+      if (!isDraggingHandle) return;
+      var newY = e.type === "mousemove" ? e.pageY : e.originalEvent.touches[0].pageY;
+      var newX = e.type === "mousemove" ? e.pageX : e.originalEvent.touches[0].pageX;
 
-      // Calculate the Euclidean distance from the center of the shape to the current touch point
-      var deltaX = currentX - centerX;
-      var deltaY = currentY - centerY;
-      var newHeight = Math.sqrt(deltaX * deltaX + deltaY * deltaY) * 2;
+      var deltaY = newY - startTop;
+      var deltaX = newX - startLeft;
+      var newHeight = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
-      // Calculate the angle between the center of the shape and the current touch point
-      var angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI) - 90;
+      var currentAngle = Math.atan2(deltaY, deltaX) * 180 / Math.PI - 90 + rotation;
 
+      console.log(startLeft, startTop);
+      console.log(newX, newY);
+      console.log(deltaX, deltaY);
+      console.log(rotation, currentAngle);
+      console.log('');
+      
       item.css({
-        height: `${newHeight}px`,
-        transform: `rotate(${angle}deg)`,
+        height: newHeight,
+        transform: `rotate(${currentAngle}deg) scale(${scale})`,
+        transformOrigin: "top center"
       });
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
       svg.attr('viewBox', `0 0 ${startWidth} ${newHeight}`);
@@ -505,61 +505,16 @@ $(function () {
       }
     });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     $(document).on("mouseup touchend", function () {
       isDraggingHandle = false;
       $(document).off("mousemove touchmove");
       $(document).off("mouseup touchend");
     });
+  });
+
+
+  document.addEventListener('contextmenu', function (e) {
+    e.preventDefault();
   });
 
 });
