@@ -18,8 +18,10 @@
 
   .drag-handle {
     position: absolute;
-    width: 10px;
-    height: 10px;
+    width: 30px;
+    height: 20px;
+    border: 1px solid black;
+    border-radius: 50%;
     background-color: #0f0;
     left: 50%;
     bottom: 0px;
@@ -289,7 +291,7 @@ $(function () {
       if (isDraggingHandle) return; // Disable Hammer.js events if the drag handle is active
 
       // If the shape is dragged off the canvas, remove it
-      if (parseInt(item.css("left")) < 0 || parseInt(item.css("top")) < 0 || parseInt(item.css("left")) > $("#canvas").width() || parseInt(item.css("top")) > $("#canvas").height()) {
+      if (parseInt(item.css("left")) <= 0  || parseInt(item.css("left")) > $("#canvas").width()) {
         item.remove();
         if (workingCanvas === "default") {
           canvases.default = $("#canvas").html();
@@ -421,33 +423,48 @@ $(function () {
 
   var isDraggingHandle = false;
   // Drag handle functionality
-  $(document).on("mousedown touchstart", ".drag-handle", startDrag);
+  $(document).on("mousedown touchstart", ".drag-handle", function (e) {
+    let shape = $(this).closest('.canvas-shape');
+    let currentAngle = shape.css('transform') === 'none' ? 0 : getRotationAngle(shape);
+    let currentHeight = shape.height();
+    let startWidth = shape.width();
+    startDrag(e, currentAngle, currentHeight, startWidth);
+  });
 
-
-  let currentAngle = 0;
-  let currentHeight = 0;
-
-  function startDrag(e) {
+  function startDrag(e, currentAngle, currentHeight, startWidth) {
     e.preventDefault();
     isDraggingHandle = true;
     const shape = e.target.closest('.canvas-shape');
-    const startWidth = shape.clientWidth;
-    document.addEventListener('mousemove', drag);
-    document.addEventListener('mouseup', stopDrag);
+    $(document).on('mousemove touchmove', drag);
+    $(document).on('mouseup touchend', stopDrag);
 
     const shapeBounds = shape.getBoundingClientRect();
     const shapeCenter = {
       x: shapeBounds.left + shapeBounds.width / 2,
       y: shapeBounds.top + shapeBounds.height / 2
     };
-    const initialAngle = Math.atan2(e.clientX - shapeCenter.x, -(e.clientY - shapeCenter.y)) * (180 / Math.PI);
+
+    // Calculate initial angle of rotation for mouse or touch
+    var initialAngle;
+    if (e.type === 'mousedown') {
+      initialAngle = Math.atan2(e.clientX - shapeCenter.x, -(e.clientY - shapeCenter.y)) * (180 / Math.PI);
+    } else {
+      initialAngle = Math.atan2(e.touches[0].clientX - shapeCenter.x, -(e.touches[0].clientY - shapeCenter.y)) * (180 / Math.PI);
+    }
 
     function drag(e) {
-      const angle = Math.atan2(e.clientX - shapeCenter.x, -(e.clientY - shapeCenter.y)) * (180 / Math.PI);
+      
+      // calculate deltas for mouse or touch
+      let deltaX, deltaY;
+      if (e.type === 'mousemove') {
+        deltaX = e.clientX - shapeCenter.x;
+        deltaY = e.clientY - shapeCenter.y;
+      } else {
+        deltaX = e.touches[0].clientX - shapeCenter.x;
+        deltaY = e.touches[0].clientY - shapeCenter.y;
+      }
+      const angle = Math.atan2(deltaX, -(deltaY)) * (180 / Math.PI);
       const newRotation = angle - initialAngle;
-
-      const deltaX = e.clientX - shapeCenter.x;
-      const deltaY = e.clientY - shapeCenter.y;
       currentHeight = 2 * Math.sqrt(deltaX * deltaX + deltaY * deltaY); // Twice the distance between the point of rotation and the cursor
 
       // Reset transform origin and apply new rotation and height
@@ -458,6 +475,7 @@ $(function () {
 
       const svg = shape.querySelector('svg');
       const polygon = svg.querySelector('polygon');
+      const rect = svg.querySelector('rect');
 
       svg.setAttribute('viewBox', `0 0 ${startWidth} ${currentHeight}`);
       shape.setAttribute('height', currentHeight);
@@ -467,7 +485,8 @@ $(function () {
       } else if (shape.getAttribute("data-shape") === "diamond") {
         polygon.setAttribute('points', `${startWidth / 2},0 ${startWidth},${currentHeight / 2} ${startWidth / 2},${currentHeight} 0,${currentHeight / 2}`); // For diamond
       } else {
-        polygon.setAttribute('points', `0,0 ${startWidth},0 ${startWidth},${currentHeight} 0,${currentHeight}`);
+        rect.setAttribute('height', currentHeight);
+        rect.setAttribute('width', startWidth);
       }
 
       // Adjust shape position
@@ -479,8 +498,8 @@ $(function () {
       currentAngle += touchToDegrees(0, currentAngle);
       currentHeight = 0;
 
-      document.removeEventListener('mousemove', drag);
-      document.removeEventListener('mouseup', stopDrag);
+      $(document).off('mousemove touchmove', drag);
+      $(document).off('mouseup touchend', stopDrag);
       
       // Update current angle
       const matrix = new DOMMatrix(getComputedStyle(shape).transform);
