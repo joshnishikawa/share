@@ -15,14 +15,6 @@
     border: 1px solid red;
   }
 
-  .transform-origin-dot {
-    position: absolute;
-    width: 5px;
-    height: 5px;
-    background-color: red;
-    border-radius: 50%;
-    pointer-events: none;
-  }
 </style>
 
 <div id="canvas" class="bg-med" style="height: 100vh;position:relative;">
@@ -40,22 +32,15 @@
 
 <script>
 $(function () {
-  function matrixToDegrees(matrixString) {
-    if (matrixString === 'none') return 0;
-    const values = matrixString.match(/matrix\(([^)]+)\)/)[1].split(', ');
-    const a = parseFloat(values[0]); // Corresponds to cos(θ)
-    const b = parseFloat(values[1]); // Corresponds to sin(θ)
-    const radians = Math.atan2(b, a); // Extract the angle in radians
-    const degrees = radians * (180 / Math.PI); // Convert to degrees
-    return degrees;
-  }
 
   let currentAngle = 0;
+  let currentHeight = 0;
   const shape = document.querySelector('.shape');
   const handle = document.querySelector('.drag-handle');
 
   handle.addEventListener('mousedown', startDrag);
 
+  
   function startDrag(e) {
     e.preventDefault();
     document.addEventListener('mousemove', drag);
@@ -66,32 +51,42 @@ $(function () {
       x: shapeBounds.left + shapeBounds.width / 2,
       y: shapeBounds.top + shapeBounds.height / 2
     };
-
     const initialAngle = Math.atan2(e.clientX - shapeCenter.x, -(e.clientY - shapeCenter.y)) * (180 / Math.PI);
 
     function drag(e) {
+      const startWidth = shape.clientWidth;
+
       const angle = Math.atan2(e.clientX - shapeCenter.x, -(e.clientY - shapeCenter.y)) * (180 / Math.PI);
       const newRotation = angle - initialAngle;
 
       const deltaX = e.clientX - shapeCenter.x;
       const deltaY = e.clientY - shapeCenter.y;
-      const newHeight = 2 * Math.sqrt(deltaX * deltaX + deltaY * deltaY); // Twice the distance between the point of rotation and the cursor
+      currentHeight = 2 * Math.sqrt(deltaX * deltaX + deltaY * deltaY); // Twice the distance between the point of rotation and the cursor
 
       // Reset transform origin and apply new rotation and height
       shape.style.transformOrigin = 'center center';
       shape.style.transform = `rotate(${currentAngle + newRotation}deg)`;
-      shape.style.height = `${newHeight}px`;
+      shape.style.height = `${currentHeight}px`;
 
       const svg = shape.querySelector('svg');
       const polygon = svg.querySelector('polygon');
-      svg.setAttribute('viewBox', `0 0 ${shapeBounds.width} ${newHeight}`);
-      polygon.setAttribute('points', `${shapeBounds.width / 2},0 ${shapeBounds.width},${newHeight} 0,${newHeight}`);
+
+      svg.setAttribute('viewBox', `0 0 ${startWidth} ${currentHeight}`);
+      shape.setAttribute('height', currentHeight);
+
+      if (shape.getAttribute("data-shape") === "triangle") {
+        polygon.setAttribute('points', `${startWidth / 2},0 ${startWidth},${currentHeight} 0,${currentHeight}`); // For triangle
+      } else if (shape.getAttribute("data-shape") === "diamond") {
+        polygon.setAttribute('points', `${startWidth / 2},0 ${startWidth},${currentHeight / 2} ${startWidth / 2},${currentHeight} 0,${currentHeight / 2}`); // For diamond
+      } else {
+        polygon.setAttribute('points', `0,0 ${startWidth},0 ${startWidth},${currentHeight} 0,${currentHeight}`);
+      }
 
       // Update drag handle position
       handle.style.bottom = `0px`;
 
       // Adjust shape position
-      const newTop = shapeCenter.y - newHeight / 2;
+      const newTop = shapeCenter.y - currentHeight / 2;
       shape.style.top = `${newTop}px`;
     }
 

@@ -4,7 +4,6 @@
   .shape {
     height: 14%;
     position: relative;
-    transform-origin: top center;
   }
 
   .canvas-shape {
@@ -15,19 +14,16 @@
 
   .selected {
     filter: drop-shadow(0 0 0.5rem #0f0);
-    border: solid 1px red;
-    transform-origin: center;
   }
 
   .drag-handle {
     position: absolute;
-    width: 30px;
-    height: 15px;
+    width: 10px;
+    height: 10px;
     background-color: #0f0;
-    bottom: 0px;
     left: 50%;
-    transform: translateX(-50%);
-    cursor: n-resize;
+    bottom: 0px;
+    cursor: e-resize;
   }
 
   #colorMenu ul li,
@@ -291,13 +287,14 @@ $(function () {
 
     mc.on("panend", function () {
       if (isDraggingHandle) return; // Disable Hammer.js events if the drag handle is active
+
       // If the shape is dragged off the canvas, remove it
-      if (parseInt(item.css("left")) < 0) {
+      if (parseInt(item.css("left")) < 0 || parseInt(item.css("top")) < 0 || parseInt(item.css("left")) > $("#canvas").width() || parseInt(item.css("top")) > $("#canvas").height()) {
         item.remove();
-      }
-      if (workingCanvas === "default") {
-        canvases.default = $("#canvas").html();
-        localStorage.setItem("shapes", JSON.stringify(canvases));
+        if (workingCanvas === "default") {
+          canvases.default = $("#canvas").html();
+          localStorage.setItem("shapes", JSON.stringify(canvases));
+        }
       }
     });
 
@@ -422,95 +419,75 @@ $(function () {
   });
 
 
-
-
-
-
   var isDraggingHandle = false;
   // Drag handle functionality
-  $(document).on("mousedown touchstart", ".drag-handle", function (e) {
+  $(document).on("mousedown touchstart", ".drag-handle", startDrag);
+
+
+  let currentAngle = 0;
+  let currentHeight = 0;
+
+  function startDrag(e) {
+    e.preventDefault();
     isDraggingHandle = true;
-    var item = $(this).closest(".canvas-shape");
-    var svg = item.find('svg');
-    var shape = svg.find('rect, polygon');
-    var startWidth = item.width();
-    var startTop = item.offset().top;
-    var startLeft = item.offset().left + startWidth / 2;
-    var scale = getScale(item);
-    var rotation = getRotationAngle(item);
+    const shape = e.target.closest('.canvas-shape');
+    const startWidth = shape.clientWidth;
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', stopDrag);
 
+    const shapeBounds = shape.getBoundingClientRect();
+    const shapeCenter = {
+      x: shapeBounds.left + shapeBounds.width / 2,
+      y: shapeBounds.top + shapeBounds.height / 2
+    };
+    const initialAngle = Math.atan2(e.clientX - shapeCenter.x, -(e.clientY - shapeCenter.y)) * (180 / Math.PI);
 
+    function drag(e) {
+      const angle = Math.atan2(e.clientX - shapeCenter.x, -(e.clientY - shapeCenter.y)) * (180 / Math.PI);
+      const newRotation = angle - initialAngle;
 
-    $(document).on("mousemove touchmove", function (e) {
-      if (!isDraggingHandle) return;
-      var newY = e.type === "mousemove" ? e.pageY : e.originalEvent.touches[0].pageY;
-      var newX = e.type === "mousemove" ? e.pageX : e.originalEvent.touches[0].pageX;
+      const deltaX = e.clientX - shapeCenter.x;
+      const deltaY = e.clientY - shapeCenter.y;
+      currentHeight = 2 * Math.sqrt(deltaX * deltaX + deltaY * deltaY); // Twice the distance between the point of rotation and the cursor
 
-      var deltaY = newY - startTop;
-      var deltaX = newX - startLeft;
-      var newHeight = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+      // Reset transform origin and apply new rotation and height
+      shape.style.transformOrigin = 'center center';
+      shape.style.transform = `rotate(${currentAngle + newRotation}deg)`;
+      shape.style.height = `${currentHeight}px`;
+      shape.style.width = `${startWidth}px`; // Keep width constant
 
-      var currentAngle = Math.atan2(deltaY, deltaX) * 180 / Math.PI - 90 + rotation;
+      const svg = shape.querySelector('svg');
+      const polygon = svg.querySelector('polygon');
 
-      console.log(startLeft, startTop);
-      console.log(newX, newY);
-      console.log(deltaX, deltaY);
-      console.log(rotation, currentAngle);
-      console.log('');
-      
-      item.css({
-        height: newHeight,
-        transform: `rotate(${currentAngle}deg) scale(${scale})`,
-        transformOrigin: "top center"
-      });
-      
+      svg.setAttribute('viewBox', `0 0 ${startWidth} ${currentHeight}`);
+      shape.setAttribute('height', currentHeight);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      svg.attr('viewBox', `0 0 ${startWidth} ${newHeight}`);
-      shape.attr('height', newHeight);
-
-      if (item.attr("data-shape") === "triangle") {
-        shape.attr('points', `${startWidth / 2},0 ${startWidth},${newHeight} 0,${newHeight}`); // For triangle
-      } else if (item.attr("data-shape") === "diamond") {
-        shape.attr('points', `${startWidth / 2},0 ${startWidth},${newHeight / 2} ${startWidth / 2},${newHeight} 0,${newHeight / 2}`); // For diamond
+      if (shape.getAttribute("data-shape") === "triangle") {
+        polygon.setAttribute('points', `${startWidth / 2},0 ${startWidth},${currentHeight} 0,${currentHeight}`); // For triangle
+      } else if (shape.getAttribute("data-shape") === "diamond") {
+        polygon.setAttribute('points', `${startWidth / 2},0 ${startWidth},${currentHeight / 2} ${startWidth / 2},${currentHeight} 0,${currentHeight / 2}`); // For diamond
       } else {
-        shape.attr('height', newHeight);
-        shape.attr('width', startWidth);
+        polygon.setAttribute('points', `0,0 ${startWidth},0 ${startWidth},${currentHeight} 0,${currentHeight}`);
       }
-    });
 
-    $(document).on("mouseup touchend", function () {
+      // Adjust shape position
+      const newTop = shapeCenter.y - currentHeight / 2;
+      shape.style.top = `${newTop}px`;
+    }
+
+    function stopDrag() {
+      currentAngle += touchToDegrees(0, currentAngle);
+      currentHeight = 0;
+
+      document.removeEventListener('mousemove', drag);
+      document.removeEventListener('mouseup', stopDrag);
+      
+      // Update current angle
+      const matrix = new DOMMatrix(getComputedStyle(shape).transform);
+      currentAngle = Math.atan2(matrix.b, matrix.a) * (180 / Math.PI);
       isDraggingHandle = false;
-      $(document).off("mousemove touchmove");
-      $(document).off("mouseup touchend");
-    });
-  });
+    }
+  }
 
 
   document.addEventListener('contextmenu', function (e) {
