@@ -14,11 +14,20 @@
   .shape {
     border: 1px solid red;
   }
+
+  .transform-origin-dot {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    background-color: red;
+    border-radius: 50%;
+    pointer-events: none;
+  }
 </style>
 
 <div id="canvas" class="bg-med" style="height: 100vh;position:relative;">
 
-  <div class="canvas-shape" data-shape="triangle" style="width:200px;position:absolute;top:50%;left:40%;border:solid cyan 1px;">
+  <div class="shape" data-shape="triangle" style="width:200px;position:absolute;top:50%;left:40%;border:solid cyan 1px;">
     <svg class="triangle-svg" width="100%" height="100%" viewBox="0 0 100 87" fill="none"
       xmlns="http://www.w3.org/2000/svg">
       <polygon points="50,0 100,86 0,86" fill="hotpink" stroke="black" stroke-width="1" />
@@ -41,57 +50,56 @@ $(function () {
     return degrees;
   }
 
-  function touchToDegrees(initial, current) {
-    let delta = current - initial;
-    let degrees = (delta + 180) % 360 - 180;   // Normalize to [-180, 180] range
-    return degrees;
-  }
+  let currentAngle = 0;
+  const shape = document.querySelector('.shape');
+  const handle = document.querySelector('.drag-handle');
 
+  handle.addEventListener('mousedown', startDrag);
 
-  $(document).on("mousedown touchstart", ".drag-handle", function (e) {
-    var item = $(this).closest(".canvas-shape");
-    var svg = item.find('svg');
-    var shape = svg.find('rect, polygon');
-    var startWidth = item.width();
-    var startTop = item.offset().top;
-    var startLeft = item.offset().left + startWidth / 2;
-    var rotation = matrixToDegrees( item.css('transform') );
+  function startDrag(e) {
+    e.preventDefault();
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', stopDrag);
 
-    $(document).on("mousemove touchmove", function (e) {
-      var newY = e.type === "mousemove" ? e.pageY : e.originalEvent.touches[0].pageY;
-      var newX = e.type === "mousemove" ? e.pageX : e.originalEvent.touches[0].pageX;
+    const shapeBounds = shape.getBoundingClientRect();
+    const shapeCenter = {
+      x: shapeBounds.left + shapeBounds.width / 2,
+      y: shapeBounds.top
+    };
 
-      var deltaY = newY - startTop;
-      var deltaX = newX - startLeft;
-      var newHeight = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    const initialAngle = Math.atan2(e.clientX - shapeCenter.x, -(e.clientY - shapeCenter.y)) * (180 / Math.PI);
 
-      var currentAngle = Math.atan2(deltaY, deltaX) * 180 / Math.PI - 90 + rotation;
+    function drag(e) {
+      const angle = Math.atan2(e.clientX - shapeCenter.x, -(e.clientY - shapeCenter.y)) * (180 / Math.PI);
+      const newRotation = angle - initialAngle;
 
-      item.css({
-        height: newHeight,
-        transform: `rotate(${currentAngle}deg) scale(1)`,
-        transformOrigin: "top center"
-      });
+      const deltaX = e.clientX - shapeCenter.x;
+      const deltaY = e.clientY - shapeCenter.y;
+      const newHeight = Math.sqrt(deltaX * deltaX + deltaY * deltaY); // Distance between the point of rotation and the cursor
+
+      // Reset transform origin and apply new rotation and height
+      shape.style.transformOrigin = 'top center';
+      shape.style.transform = `rotate(${currentAngle + newRotation}deg)`;
+      shape.style.height = `${newHeight}px`;
+
+      const svg = shape.querySelector('svg');
+      const polygon = svg.querySelector('polygon');
+      svg.setAttribute('viewBox', `0 0 ${shapeBounds.width} ${newHeight}`);
+      polygon.setAttribute('points', `${shapeBounds.width / 2},0 ${shapeBounds.width},${newHeight} 0,${newHeight}`);
+
+      // Update drag handle position
+      handle.style.bottom = `0px`;
+    }
+
+    function stopDrag() {
+      document.removeEventListener('mousemove', drag);
+      document.removeEventListener('mouseup', stopDrag);
       
-      svg.attr('viewBox', `0 0 ${startWidth} ${newHeight}`);
-      shape.attr('height', newHeight);
-
-      if (item.attr("data-shape") === "triangle") {
-        shape.attr('points', `${startWidth / 2},0 ${startWidth},${newHeight} 0,${newHeight}`); // For triangle
-      } else if (item.attr("data-shape") === "diamond") {
-        shape.attr('points', `${startWidth / 2},0 ${startWidth},${newHeight / 2} ${startWidth / 2},${newHeight} 0,${newHeight / 2}`); // For diamond
-      } else {
-        shape.attr('height', newHeight);
-        shape.attr('width', startWidth);
-      }
-    });
-
-    $(document).on("mouseup touchend", function () {
-      $(document).off("mousemove touchmove");
-      $(document).off("mouseup touchend");
-    });
-  });
-
+      // Update current angle
+      const matrix = new DOMMatrix(getComputedStyle(shape).transform);
+      currentAngle = Math.atan2(matrix.b, matrix.a) * (180 / Math.PI);
+    }
+  }
 
   document.addEventListener('contextmenu', function (e) {
     e.preventDefault();
