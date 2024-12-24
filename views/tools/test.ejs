@@ -64,7 +64,7 @@ $(function () {
     const shapeBounds = shape.getBoundingClientRect();
     const shapeCenter = {
       x: shapeBounds.left + shapeBounds.width / 2,
-      y: shapeBounds.top
+      y: shapeBounds.top + shapeBounds.height / 2
     };
 
     const initialAngle = Math.atan2(e.clientX - shapeCenter.x, -(e.clientY - shapeCenter.y)) * (180 / Math.PI);
@@ -75,10 +75,10 @@ $(function () {
 
       const deltaX = e.clientX - shapeCenter.x;
       const deltaY = e.clientY - shapeCenter.y;
-      const newHeight = Math.sqrt(deltaX * deltaX + deltaY * deltaY); // Distance between the point of rotation and the cursor
+      const newHeight = 2 * Math.sqrt(deltaX * deltaX + deltaY * deltaY); // Twice the distance between the point of rotation and the cursor
 
       // Reset transform origin and apply new rotation and height
-      shape.style.transformOrigin = 'top center';
+      shape.style.transformOrigin = 'center center';
       shape.style.transform = `rotate(${currentAngle + newRotation}deg)`;
       shape.style.height = `${newHeight}px`;
 
@@ -89,6 +89,10 @@ $(function () {
 
       // Update drag handle position
       handle.style.bottom = `0px`;
+
+      // Adjust shape position
+      const newTop = shapeCenter.y - newHeight / 2;
+      shape.style.top = `${newTop}px`;
     }
 
     function stopDrag() {
