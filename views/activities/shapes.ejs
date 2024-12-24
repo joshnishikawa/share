@@ -17,15 +17,17 @@
   }
 
   .drag-handle {
+    /* use image/transfrom.svg */
+    background-image: url('/image/transform.svg');
+    background-size: 100%;
+    background-repeat: no-repeat;
     position: absolute;
+    text-shadow: 0 0 0.5rem #000;
     width: 30px;
-    height: 20px;
-    border: 1px solid black;
-    border-radius: 50%;
-    background-color: #0f0;
-    left: 50%;
-    bottom: 0px;
-    cursor: e-resize;
+    height: 30px;
+    left: calc(50% - 15px);
+    bottom: -40px;
+    cursor: pointer;
   }
 
   #colorMenu ul li,
