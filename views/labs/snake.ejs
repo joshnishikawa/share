@@ -3,6 +3,27 @@
   <canvas id="gameCanvas" width="600" height="450" class="alert-success mx-auto"></canvas>
 </div>
 
+<!-- modal for the 'listen' button -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Snake Game Voice Commands</h5>
+      </div>
+      <div class="modal-body">
+        <ul>
+          <li>Turn left</li>
+          <li>Turn right</li>
+          <li>Go straight</li>
+          <li>Restart</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button id="listen" type="button" class="btn btn-success">Start</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
   var canvas = document.getElementById('gameCanvas');
@@ -20,8 +41,104 @@
   var direction = '';
   var previousDirection = '';
 
+  // COPY/PASTE & edit vocab anywhere you need speech recognition. ///////////////
+  const vocab = ["turn left", "turn right", "go straight", "go straight two blocks", "go straight three blocks", "restart"];
+  const grammar = `#JSGF V1.0; grammar commands; public <commands> = ${vocab.join(" | ")};`;
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+  const SpeechGrammarList =
+    window.SpeechGrammarList || window.webkitSpeechGrammarList;
+  const SpeechRecognitionEvent =
+    window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
+  const recognition = new SpeechRecognition();
+  const speechRecognitionList = new SpeechGrammarList();
+  speechRecognitionList.addFromString(grammar, 1);
+  recognition.grammars = speechRecognitionList;
+  recognition.continuous = true;
+  recognition.lang = "en-US";
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+////////////////////////////////////////////////////////////////////////////////
+$(function () {
+  $("#listen").on('click', () => {
+    // dismiss modal
+    $("#myModal").modal('hide');
+    recognition.start();
+    reset();
+    gameLoop();
+  });
+
+  // show modal and focus on start button
+  $("#myModal").modal('show').on('shown.bs.modal', () => {
+    $("#listen").focus();
+  });
+
+  $(document).off('keydown').on('keydown', function(event) {
+    if (event.key === 'q') {
+      reset();
+      return;
+    }
+    else if (    (event.key === 'ArrowUp' && previousDirection != 'down')
+              || (event.key === 'ArrowDown' && previousDirection != 'up')   
+              || (event.key === 'ArrowLeft' && previousDirection != 'right')
+              || (event.key === 'ArrowRight' && previousDirection != 'left') ) {
+      direction = event.key.replace('Arrow', '').toLowerCase();
+      gameLoop(direction);
+    }
+    else return;
+  });
+});
+
+
+  recognition.onresult = (event) => {
+    let command = event.results[event.results.length - 1][0].transcript.trim();
+
+    if (!vocab.includes(command)) return;
+    else {
+      console.log(`Command received: ${command}`);
+      switch (command) {
+        case "turn left":
+          turnLeft();
+          break;
+        case "turn right":
+          turnRight();
+          break;
+        case "go straight":
+          goStraight(direction);
+          break;
+        case "go straight two blocks":
+          goStraight(direction);
+          goStraight(direction);
+          break;
+        case "go straight three blocks":
+          goStraight(direction);
+          goStraight(direction);
+          goStraight(direction);
+          break;
+        case "restart":
+          reset();
+          break;
+        default:
+          break;
+      }
+    }
+  };
+
+  recognition.onspeechend = () => {
+  };
+
+  recognition.onnomatch = (event) => {
+    console.log("I didn't recognise that command.");
+  };
+
+  recognition.onerror = (event) => {
+    console.log(`Error occurred in recognition: ${event.error}`);
+  };
+
+
   function getFoodPosition(s) {
-    let index = snake.indexOf(s);
+    let index = positions.indexOf(s);
+
     let foodPositions = [];
     switch (index) {
       case 0:
@@ -77,7 +194,6 @@
     return position;
   }
 
-
   function drawModule() {
     return {
       bodySnake: function(part) { // TODO: x and y should indicate direction when passed to this function and other values should be adjusted accordingly 
@@ -88,16 +204,16 @@
         context.fillRect(x+10, y+10, gridSize-20, gridSize-20);
         switch (d) {
           case 'up':
-            context.fillRect(x+10, y+gridSize-10, gridSize-20, 20);
-            break;
-          case 'down':
             context.fillRect(x+10, y-10, gridSize-20, 20);
             break;
-          case 'left':
-            context.fillRect(x+gridSize-10, y+10, 20, gridSize-20);
+            case 'down':
+            context.fillRect(x+10, y+gridSize-10, gridSize-20, 20);
             break;
-          case 'right':
+          case 'left':
             context.fillRect(x-10, y+10, 20, gridSize-20);
+            break;
+            case 'right':
+            context.fillRect(x+gridSize-10, y+10, 20, gridSize-20);
             break;
           default:
             break;
@@ -110,7 +226,6 @@
         context.fillStyle = 'red';
         switch (d) {
           case 'down':
-            context.clearRect(x+10, y+gridSize-10, gridSize-20, 20);
             context.beginPath();
             context.moveTo(x+10, y+gridSize-10);
             context.lineTo(x+(gridSize/2), y+gridSize+1);
@@ -118,7 +233,6 @@
             context.fill();
             break;
           case 'up':
-            context.clearRect(x+10, y-10, gridSize-20, 20);
             context.beginPath();
             context.moveTo(x+10, y+10);
             context.lineTo(x+(gridSize/2), y-1);
@@ -126,7 +240,6 @@
             context.fill();
             break;
           case 'right':
-            context.clearRect(x+gridSize-10, y+10, 20, gridSize-20);
             context.beginPath();
             context.moveTo(x+gridSize-10, y+10);
             context.lineTo(x+gridSize+1, y+(gridSize/2));
@@ -134,7 +247,6 @@
             context.fill();
             break;
           case 'left':
-            context.clearRect(x-10, y+10, 20, gridSize-20);
             context.beginPath();
             context.moveTo(x+10, y+10);
             context.lineTo(x-1, y+(gridSize/2));
@@ -192,95 +304,111 @@
       pizza: function(x, y) {
         context.fillStyle = 'red';
         context.fillRect(x+20, y+20, gridSize-40, gridSize-40);
-      },
-      init: function() {
-        $(document).off('keydown').on('keydown', function(event) {
-          // if (event.key === 'ArrowUp' && previousDirection === 'down'
-          //     || event.key === 'ArrowDown' && previousDirection === 'up'
-          //     || event.key === 'ArrowLeft' && previousDirection === 'right'
-          //     || event.key === 'ArrowRight' && previousDirection === 'left') return;
-
-          previousDirection = direction;
-          if (event.key === 'ArrowUp') direction = 'up';
-          if (event.key === 'ArrowDown') direction = 'down';
-          if (event.key === 'ArrowLeft') direction = 'left';
-          if (event.key === 'ArrowRight') direction = 'right';
-          if (event.key === 'q') reset();
-          gameLoop();
-        });
-        // setInterval(gameLoop, 1000 / 10); // to auto-move the snake
       }
     };
   }
 
-
-  function reset() {
-    direction = '';
-    snake = [ positions[Math.floor(Math.random() * positions.length)] ];
-    food = getFoodPosition();
+  function turnLeft() {
+    if (previousDirection === 'up') direction = 'left';
+    else if (previousDirection === 'down') direction = 'right';
+    else if (previousDirection === 'left') direction = 'down';
+    else if (previousDirection === 'right') direction = 'up';
+    else direction = 'left';
     gameLoop();
   }
 
+  function turnRight() {
+    if (previousDirection === 'up') direction = 'right';
+    else if (previousDirection === 'down') direction = 'left';
+    else if (previousDirection === 'left') direction = 'up';
+    else if (previousDirection === 'right') direction = 'down';
+    else direction = 'right';
+    gameLoop();
+  }
 
-  function gameLoop() {
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    let hitself = false;
+  function goStraight() {
+    previousDirection = direction;
+    gameLoop(direction);
+  }
+
+  function reset() {
+    direction = '';
+    previousDirection = '';
+    snake = [ positions[Math.floor(Math.random() * positions.length)] ];
+    food = getFoodPosition(snake[0]);
+    gameLoop();
+  }
+
+  function gameLoop(move) {
+    context.clearRect(0, 0, canvas.width, canvas.height); //clear canvas
+    let bitself = false;
     let message = '';
 
-    let head = { x: snake[0].x, y: snake[0].y, dir: direction };
-    if (direction === 'up') head.y = snake[0].y - gridSize;
-    if (direction === 'down') head.y = snake[0].y + gridSize;
-    if (direction === 'left') head.x = snake[0].x - gridSize;
-    if (direction === 'right') head.x = snake[0].x + gridSize;
+    let head = { x: snake[0].x, y: snake[0].y, dir: direction};
 
-    snake.unshift(head);
-    let tail = snake.pop(); // after adding the head, remove the tail. Put it back if the snake
+    if (move) {
+      previousDirection = direction;
+      snake[0].dir = direction; // update direction of segment following head
+      if (direction === 'up') head.y = snake[0].y - gridSize;
+      if (direction === 'down') head.y = snake[0].y + gridSize;
+      if (direction === 'left') head.x = snake[0].x - gridSize;
+      if (direction === 'right') head.x = snake[0].x + gridSize;
+      snake.unshift(head);
+      let tail = snake.pop(); //after add head, remove tail. Put back if eating.
 
-    for (let i = 1; i < snake.length; i++) {
-      if (head.x === snake[i].x && head.y === snake[i].y) {
-        hitself = true;
-        message = 'You bit yourself!';
-        break;
+      for (let i = 1; i < snake.length; i++) {
+        if (head.x === snake[i].x && head.y === snake[i].y) {
+          bitself = true;
+          message = 'You bit yourself!';
+          break;
+        }
       }
-    }
-
-    if (   head.x < 0 
-        || head.x >= canvas.width 
-        || head.y < 0 
-        || head.y >= canvas.height){ // snake hits wall = dead
-      message = 'You died!';
-    }
-    else if (head.x === food.x && head.y === food.y ){ // snake eats = yummy
-      snake.push(tail);
-      food = getRandomGridPosition();
-      if (!food){
-        snake.unshift(head);
-        message = 'You won!';
+      
+      if (   head.x < 0 
+          || head.x >= canvas.width 
+          || head.y < 0 
+          || head.y >= canvas.height){ // snake hits wall = dead
+        message = 'You died!';
       }
-    }
-    else if (hitself){ // snake hits self = ignore its stupidity
-      snake.shift();
-      snake.push(tail);
+      else if (head.x === food.x && head.y === food.y ){ // snake eats = yummy
+        
+        snake.push(tail);
+        food = getRandomGridPosition();
+        if (!food){
+          snake.unshift(head);
+          message = 'You won!';
+        }
+      }
+      else if (bitself){ // snake bit self = ignore its stupidity
+        snake.shift();
+        snake.push(tail);
+      }
+
+      for (var i = 1; i <= snake.length-1; i++) { // draw the moving snake
+        drawModule().bodySnake(snake[i]);
+      }
+      drawModule().headSnake(snake[0]);
+      drawModule().tailSnake(snake[snake.length-1]);
+
+    } else { // draw the snake only turning
+      snake[0].dir = direction;
+      for (var i = 1; i <= snake.length-1; i++) {
+        drawModule().bodySnake(snake[i]);
+      }
+      drawModule().headSnake(snake[0]);
+      drawModule().tailSnake(snake[snake.length-1]);
     }
 
     if (food) drawModule().pizza(food.x, food.y);
-    for (var i = 0; i < snake.length; i++) {
-      drawModule().bodySnake(snake[i]);
-    }
-    drawModule().tailSnake(snake[snake.length-1]); // make tail pointy
-    drawModule().headSnake(snake[0]);              // make head black
 
     if (message) {
-      setTimeout(function() { // delay the alert so that the snake is drawn before the alert pops up
+      setTimeout(function() { //delay alert so snake is drawn before alert shows
           alert(message);
           reset();
       }, 100);
     }
-
   }
 
-  drawModule().init();
-  reset();
 
 </script>
 <%- include('../foot.ejs') %>
