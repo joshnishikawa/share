@@ -387,96 +387,67 @@ $(function () {
         let d = part.dir;
         context.fillStyle = 'green';
 
-        if (d === 'up' && nextD === 'right' || d === 'left' && nextD === 'down') {
-          // draw a square with a rounded bottom right corner
-          context.beginPath();
-          context.moveTo(x+10, y+gridSize-10);
-          context.lineTo(x+10, y+10);
-          context.lineTo(x+gridSize-10, y+10);
-          context.arcTo(x+gridSize-10, y+gridSize-10, x+10, y+gridSize-10, 50);
-          context.fill();
-        } else if (d === 'up' && nextD === 'left' || d === 'right' && nextD === 'down') {
-          // draw a square with a rounded bottom left corner
-          context.beginPath();
-          context.moveTo(x+10, y+10);
-          context.lineTo(x+gridSize-10, y+10);
-          context.lineTo(x+gridSize-10, y+gridSize-10);
-          context.arcTo(x+10, y+gridSize-10, x+10, y+10, 50);
-          context.fill();
-        } else if (d === 'down' && nextD === 'right' || d === 'left' && nextD === 'up') {
-          // draw a square with a rounded top right corner
-          context.beginPath();
-          context.moveTo(x+10, y+10);
-          context.lineTo(x+10, y+gridSize-10);
-          context.lineTo(x+gridSize-10, y+gridSize-10);
-          context.arcTo(x+gridSize-10, y+10, x+10, y+10, 50);
-          context.fill();
-        } else if (d === 'down' && nextD === 'left' || d === 'right' && nextD === 'up') {
-          // draw a square with a rounded top left corner
-          context.beginPath();
-          context.moveTo(x+10, y+gridSize-10);
-          context.lineTo(x+gridSize-10, y+gridSize-10);
-          context.lineTo(x+gridSize-10, y+10);
-          context.arcTo(x+10, y+10, x+10, y+gridSize-10, 50);
-          context.fill();
-        }
-        else {
-          context.fillRect(x+10, y+10, gridSize-20, gridSize-20);
+        context.save(); // Save the current canvas state
+
+        // Rotate the path to match the direction
+        if (d === 'down') {
+          context.translate(x + gridSize / 2, y + gridSize / 2);
+          context.rotate(Math.PI);
+          context.translate(-x - gridSize / 2, -y - gridSize / 2);
+        } else if (d === 'right') {
+          context.translate(x + gridSize / 2, y + gridSize / 2);
+          context.rotate(Math.PI / 2);
+          context.translate(-x - gridSize / 2, -y - gridSize / 2);
+        } else if (d === 'left') {
+          context.translate(x + gridSize / 2, y + gridSize / 2);
+          context.rotate(-Math.PI / 2);
+          context.translate(-x - gridSize / 2, -y - gridSize / 2);
         }
 
-        switch (d) {
-          case 'up':
-            context.fillRect(x+10, y-10, gridSize-20, 20);
-            break;
-            case 'down':
-            context.fillRect(x+10, y+gridSize-10, gridSize-20, 20);
-            break;
-          case 'left':
-            context.fillRect(x-10, y+10, 20, gridSize-20);
-            break;
-            case 'right':
-            context.fillRect(x+gridSize-10, y+10, 20, gridSize-20);
-            break;
-          default:
-            break;
+        if (d === nextD) {
+          // draw a straight tail
+          context.beginPath();
+          context.moveTo(x + 10, y-10); // Top left corner
+          context.arcTo(x + 10, y + (gridSize / 2), x + (gridSize / 2), y + gridSize, gridSize/2); // Bottom left corner
+          context.lineTo(x + (gridSize / 2), y + gridSize); // Bottom side
+          context.arcTo(x + gridSize - 10, y + (gridSize / 2), x + gridSize - 10, y - 10, gridSize/2); // Bottom side
+          context.lineTo(x + gridSize - 10, y - 10); // Top side
+          context.lineTo(x + 10, y - 10); // Right side
+          context.closePath();
+          context.fill();
+
+        }
+        else if (    (d === 'up' && nextD === 'left')
+                  || (d === 'left' && nextD === 'down') 
+                  || (d === 'down' && nextD === 'right')
+                  || (d === 'right' && nextD === 'up') ){
+          // draw a tail curving to the right
+          context.beginPath();
+          context.moveTo(x + 10, y-10); // Top left corner
+          context.arcTo(x + 10, y + gridSize, x + gridSize, y + gridSize, gridSize/2); // Bottom left corner
+          context.lineTo(x + gridSize, y + gridSize)
+          context.bezierCurveTo(x + (gridSize / 2), y + (gridSize / 2), x + gridSize - 10, y + gridSize/3, x + gridSize - 10, y - 10)
+          context.lineTo(x + 10, y-10); // Top side
+          context.closePath();
+          context.fill();
+        }
+        else if (    (d === 'up' && nextD === 'right')
+                  || (d === 'right' && nextD === 'down')
+                  || (d === 'down' && nextD === 'left')
+                  || (d === 'left' && nextD === 'up') ){
+          // draw a tail curving to the left
+          context.beginPath();
+          context.moveTo(x + gridSize - 10, y - 10); // Top right corner
+          context.arcTo(x + gridSize - 10, y + gridSize, x + 10, y + gridSize, gridSize/2); // Bottom right corner
+          context.lineTo(x + 10, y + gridSize)
+          context.bezierCurveTo(x + (gridSize / 2), y + (gridSize / 2), x + 10, y + gridSize/3, x + 10, y - 10)
+          context.lineTo(x + gridSize - 10, y - 10); // Top side
+          context.closePath();
+          context.fill();
         }
 
-        switch (nextD) {
-          case 'up':
-            context.clearRect(x+10, y+gridSize-10, gridSize-20, 20);
-            context.beginPath();
-            context.moveTo(x+10, y+gridSize-10);
-            context.lineTo(x+(gridSize/2), y+gridSize);
-            context.lineTo(x+gridSize-10, y+gridSize-10);
-            context.fill();
-            break;
-          case 'down':
-            context.clearRect(x+10, y-10, gridSize-20, 20);
-            context.beginPath();
-            context.moveTo(x+10, y+10);
-            context.lineTo(x+(gridSize/2), y);
-            context.lineTo(x+gridSize-10, y+10);
-            context.fill();
-            break;
-          case 'left':
-            context.clearRect(x+gridSize-10, y+10, 20, gridSize-20);
-            context.beginPath();
-            context.moveTo(x+gridSize-10, y+10);
-            context.lineTo(x+gridSize, y+(gridSize/2));
-            context.lineTo(x+gridSize-10, y+gridSize-10);
-            context.fill();
-            break;
-          case 'right':
-            context.clearRect(x-10, y+10, 20, gridSize-20);
-            context.beginPath();
-            context.moveTo(x+10, y+10);
-            context.lineTo(x, y+(gridSize/2));
-            context.lineTo(x+10, y+gridSize-10);
-            context.fill();
-            break;
-          default:
-            break;
-        }
+        context.restore(); // Restore the canvas state
+
       },
       pizza: function(x, y) {
         // Draw pizza crust
