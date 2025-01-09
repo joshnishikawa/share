@@ -121,6 +121,16 @@ router.get('/slots', (req, res)=>{
   }
 });
 
+router.get('/snake', (req, res)=>{
+  try{
+    res.render('activities/snake');
+  }
+  catch(err
+  ){
+    res.send(err);
+    console.error(err);
+  }
+});
 
 router.get('/richtext', (req, res)=>{ 
   try{

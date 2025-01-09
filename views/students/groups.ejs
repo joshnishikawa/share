@@ -29,7 +29,9 @@
           </div>
         </div>
 
-<!-- players will be added dynamically here -->
+        <div id="otherPlayers">
+          <!-- players will be added dynamically here -->
+        </div>
 
       </div> <!-- end of myGroup -->
 
@@ -48,14 +50,18 @@
 
           </div>
         </div>
-<!-- players will be added dynamically here -->
-      </div>
-<!-- end of friend's group -->
 
-    </div>
+<!-- players will be added dynamically here -->
+
+      </div> <!-- end of friend's group -->
+
+    </div> 
     
-    <div class="col-sm-8 border border-primary rounded-3 mb-3">
+    <div class="col-sm-8 border border-primary mb-3">
       <!-- <div id="choose" class="activity btn btn-lg btn-success display-1">Choose</div> -->
+       <p>TODO: Users need to be able to leave / close rooms.</p>
+       <p>Player IDs should be listed before user hits 'join' button.</p>
+       <p></p>
     </div>
 
   </div>
@@ -66,6 +72,34 @@
 <script src="https://cdn.socket.io/4.0.1/socket.io.js"></script>
 
 <script>
+$(function(){
+  $(`#groups-tab`).addClass("active");
+
+// VARIABLES ////////////////////////////////////////////////////////////////////
+  var socket = io();
+  var room = {};
+  var player = {id: null, color: "#cccccc", number: 1};
+
+// FUNCTIONS ////////////////////////////////////////////////////////////////////
+  function updatePlayerList(data){
+    $(`#otherPlayers`).empty();
+        for (let p of data) {
+          if (p.id == player.id) continue;
+
+          $(`#otherPlayers`).append(`
+            <div class="row bg-light border border-primary rounded-3">
+              <div class="col-2">
+                <div id="pawn${p.number}" class="mx-2 my-1"></div>
+              </div>
+              <div class="col-10">
+                <div id="name${p.number}" class="fs-4" style="color: ${p.color};text-shadow:0px 0px 2px #555;">${p.id}</div>
+              </div>
+            </div>
+          `);
+          setColor(p.number, p.color);
+        }
+  }
+
 
   function getPawn(color) {
     let shadow = reduceBrightness(color, 20);
@@ -97,6 +131,7 @@
   </svg>`;
   }
 
+
   function reduceBrightness(hex, percent) {
     var num = parseInt(hex.replace("#", ""), 16),
         amt = Math.round(2.55 * percent),
@@ -108,107 +143,125 @@
   }
 
 
-$(function(){
-  $(`#groups-tab`).addClass("active");
+  function getName(socket) {
+    return new Promise((resolve, reject) => {
+      socket.emit('getName', { room, player });
 
-  var socket = io();
-  var room = {};
-  var player = {username: null, color: "#cccccc", number: 1, last_socket: null};
-
-  function setMyColor(color) {
-    player.color = color;
-    localStorage.setItem('player', JSON.stringify(player));
-    $("#color").val(color);
-    $("#myPawn").html(getPawn(color));
-    $("#myName").css('color', color);
+      socket.on('setName', function(data) {
+        if (data.id) {
+          player.id = data.id;
+          resolve(data.id);
+        } else {
+          reject('Failed to get name from server');
+        }
+      });
+    });
   }
 
-  function setPlayerColor(number, color) {
-    $(`#pawn${number}`).html(getPawn(color));
-    $(`#name${number}`).css('color', color);
+
+  function setColor(number, color) {
+    if (number == player.number){
+      player.color = color;
+      localStorage.setItem('player', JSON.stringify(player));
+      $(`#myPawn`).html(getPawn(color));
+      $(`#myName`).css('color', color);
+      $("#color").val(color);
+    }
+    else {
+      $(`#pawn${number}`).html(getPawn(color));
+      $(`#name${number}`).css('color', color);
+    }
     // add other things to change color or make #pawn & #name into classes?
   }
 
+
+// EVENTS //////////////////////////////////////////////////////////////////////
   $("#roomSearch").on('input', ()=>{
     socket.emit('roomSearch', $("#roomSearch").val());
-  });
-
-  $("#join").on('click', ()=>{
-    let data = {room: $("#roomSearch").val(), type: 'private', player: player};
-    socket.emit('join', data);
   });
 
   $("#roomSearchForm").on('submit', (e)=>{
     e.preventDefault();
     // if #join is disabled, then the room does not exist
     if ($("#join").prop('disabled')) return;
-    let data = {room: $("#roomSearch").val(), type: 'private', player: player};
-    socket.emit('join', $("#roomSearch").val());
+    let data = { room: {roomname: $("#roomSearch").val(), type: 'private'}, player};
+    socket.emit('join', data);
   });
 
   $("#getName").on('click', ()=>{
-    socket.emit('getName');
+    socket.emit('getName', {room, player});
   });
 
   $("#color").on('change', ()=>{
-    setMyColor($("#color").val());
-    socket.emit('setPlayer', player);
+    let color = $("#color").val();
+    player.color = color;
+    setColor(player.number, color);
+    socket.emit('setColor', {room, player});
   });
 
 
-
-  socket.on('connect', ()=>{
+// SOCKET EVENTS ///////////////////////////////////////////////////////////////
+  socket.on('connect', async()=>{
+    // localStorage.setItem('player', JSON.stringify({id: "Daring Seafarer", color: "#b20a0a", number: 1}))
     let stored_player = JSON.parse(localStorage.getItem('player'));
     let stored_room = JSON.parse(localStorage.getItem('room'));
 
-
     if (stored_player){
       player = stored_player;
-      $("#myName").text(player.username);
-      setMyColor(player.color);
-      socket.emit('setPlayer', player);
+      $("#myName").text(player.id);
+      setColor(player.number, player.color);
     }
     else {
       $("#myPawn").html(getPawn(player.color));
-      socket.emit('getName');
-
+      await getName(socket);
+      await setColor(player.number, player.color);
     }
 
 
     if (stored_room) {
-      room = stored_room;
       let now = new Date();
-      if (now - new Date(room.date) > 1000*60*60*12) {
+      if (now - new Date(stored_room.date) > 1000*60*60*12) { // 12 hours old, delete
         localStorage.removeItem('room');
-        socket.emit('join', null);
+        socket.emit('join', {player});
       }
       else {
-        socket.emit('join', room);
+        room = stored_room;
+        socket.emit('join', {room, player});
       }
     }
     else {
-      socket.emit('join', null, ()=>{});
+      socket.emit('join', {player});
     }
   });
 
 
   socket.on('joined', (data)=>{
-    if (data) {
+    if (data.room) {
       room = data.room;
-      localStorage.setItem('room', JSON.stringify(data));
-      $(`#room`).text(room);
+      player.number = data.playerNum;
+      localStorage.setItem('room', JSON.stringify(data.room));
+      localStorage.setItem('player', JSON.stringify(player));
+      $(`#room`).text(room.roomname);
+      updatePlayerList(data.room.players);
     }
     else {
       localStorage.removeItem('room');
-      socket.emit('join', null);
+      socket.emit('join', {player});
     }
   });
 
+
   socket.on('setName', (data)=>{
-    $("#player").text(data);
-    player.username = data;
-    localStorage.setItem('player', JSON.stringify(player));
+    if (data.number == player.number) {
+      player.id = data.id;
+      localStorage.setItem('player', JSON.stringify(player));
+      $(`#myName`).text(data.id);
+    }
+    else {
+      $(`#name${data.number}`).text(data.id);
+    }
   });
+
 
   socket.on('roomSearch', (data)=>{
     if (data) {
@@ -220,28 +273,16 @@ $(function(){
   });
 
 
-// OTHER PLAYERS ///////////////////////////////////////////////////////////////
+  // other players' events /////////////////////////////////////////////////////
   socket.on('playerJoined', (data)=>{
-    $(`#myGroup`).append(`
-      <div class="row bg-light border border-primary rounded-3">
-        <div class="col-2">
-          <div id="pawn${data.number} class="mx-2 my-1">${setPlayerColor(data.number, data.color)}</div>
-        </div>
-        <div class="col-10">
-          <div id="name${data.number} class="fs-4" style="color: ${data.color};text-shadow:0px 0px 2px #555;">${data.username}</div>
-        </div>
-      </div>
-    `);
+    console.log('what the absolute fuck?');
+    console.log(data);
+    updatePlayerList(data.players);
   });
 
-  socket.on('setPlayer', (data)=>{
-    if (data.number == player.number) {
-      player = data;
-      localStorage.setItem('player', JSON.stringify(player));
-    }
-    else {
-      setPlayerColor(data.number, data.color);
-    }
+
+  socket.on('setColor', (data)=>{
+    setColor(data.number, data.color);
   });
 });
 

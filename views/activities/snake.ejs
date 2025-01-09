@@ -36,6 +36,7 @@
       </div>
       <div class="modal-footer">
         <button id="playAgain" type="button" class="btn btn-primary" data-dismiss="modal">Play Again!</button>
+        <button id="dismiss" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
@@ -81,6 +82,10 @@ $(function () {
     $("#myModal").modal('hide');
     recognition.start();
     reset();
+  });
+
+  $("#dismiss").on('click', () => {
+    $("#messageModal").modal('hide');
   });
 
   // show modal and focus on start button
