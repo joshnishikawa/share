@@ -83,18 +83,18 @@ function convertOBJtoSRT(subs){
 
 
 // LABS ////////////////////////////////////////////////////////////////////////
-const download = (url, newfilepath) => new Promise((resolve, reject) => {
-  const file = fs.createWriteStream(newfilepath);
-  https.get(url, (response) => {
-    response.pipe(file);
-    file.on('finish', () => {
-      file.close(resolve);
-    });
-  }).on('error', (err) => {
-    fs.unlink(newfilepath);
-    reject(err.message);
-  });
-});
+// const download = (url, newfilepath) => new Promise((resolve, reject) => {
+//   const file = fs.createWriteStream(newfilepath);
+//   https.get(url, (response) => {
+//     response.pipe(file);
+//     file.on('finish', () => {
+//       file.close(resolve);
+//     });
+//   }).on('error', (err) => {
+//     fs.unlink(newfilepath);
+//     reject(err.message);
+//   });
+// });
 
 
 router.get('/:activity', (req, res)=>{

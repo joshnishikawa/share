@@ -57,11 +57,12 @@
 
     </div> 
     
-    <div class="col-sm-8 border border-primary mb-3">
+    <div id="activity" class="col-sm-8 border border-primary mb-3">
       <!-- <div id="choose" class="activity btn btn-lg btn-success display-1">Choose</div> -->
        <p>TODO: Users need to be able to leave / close rooms.</p>
        <p>Player IDs should be listed before user hits 'join' button.</p>
        <p></p>
+       <div id="choose" class="activity btn btn-lg btn-success display-1">Choose</div>
     </div>
 
   </div>
@@ -74,6 +75,29 @@
 <script>
 $(function(){
   $(`#groups-tab`).addClass("active");
+
+  $(".activity").on('click', function(){
+    loadActivity( $(this).attr('id') );
+  });
+
+  function loadActivity(activity) {
+    // fetch(`/pages/groups/${activity}.html`)
+    //   .then(response => response.text())
+    //   .then(html => {
+    //     $("#activity").html(html);
+    //   })
+    //   .catch(error => console.error('Error loading activity:', error));
+    $.ajax({
+      url: `/pages/groups/${activity}.html`,
+      method: 'GET',
+      success: function(response) {
+        $('#activity').html(response);
+      },
+      error: function(xhr, status, error) {
+        console.error('Error loading content:', error);
+      }
+    });
+  }
 
 // VARIABLES ////////////////////////////////////////////////////////////////////
   var socket = io();
@@ -198,6 +222,8 @@ $(function(){
     setColor(player.number, color);
     socket.emit('setColor', {room, player});
   });
+
+
 
 
 // SOCKET EVENTS ///////////////////////////////////////////////////////////////
