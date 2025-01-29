@@ -4,10 +4,10 @@
     <i class="material-icons" style="line-height:1rem;vertical-align:middle;">info</i>
   </button> -->
   
-  <li class="nav-item"><a id="datetime" href="#" class="item nav-link" data-toggle="tab">What's the date?</a></li>
-  <li class="nav-item"><a id="thisis" href="#" class="item nav-link" data-toggle="tab">Who is this?</a></li>
-  <li class="nav-item"><a id="countries" href="#" class="item nav-link" data-toggle="tab">Where do you want to go?</a></li>
-  <li class="nav-item"><a id="weekend" href="#" class="item nav-link" data-toggle="tab">How was your weekend?</a></li>
+  <li class="nav-item"><a id="datetime" href="slots?page=datetime" class="item nav-link" data-toggle="tab">What's the date?</a></li>
+  <li class="nav-item"><a id="thisis" href="slots?page=thisis" class="item nav-link" data-toggle="tab">Who is this?</a></li>
+  <li class="nav-item"><a id="countries" href="slots?page=countries" class="item nav-link" data-toggle="tab">Where do you want to go?</a></li>
+  <li class="nav-item"><a id="weekend" href="slots?page=weekend" class="item nav-link" data-toggle="tab">How was your weekend?</a></li>
 </ul>
 
 <div id="content" class="pt-3" style="height:100vh"></div>
@@ -15,16 +15,19 @@
 
 <script>
 $(function(){
-  $('.item').click(function(){
-    $('#content').load(`/public/pages/slots/${$(this).attr('id')}.html`);
-  });
+  // load page from query string
+  let page = new URLSearchParams(window.location.search).get('page');
+  if (page){
+    $('#content').load(`/public/pages/slots/${page}.html`);
+  }
   
-  spinit = (slot, val)=>{
+  spinit = (slot, id)=>{
+    console.log(slot, id);
     let slotElement = $(`#${slot}`);
     let slotChildren = slotElement.children();
     let slotChildHeight = $(slotChildren[0]).height();
     let slotChildCount = slotChildren.length;
-    let slotChildIndex = slotChildren.index($(`#${val.replace(/ /g, '')}`));
+    let slotChildIndex = slotChildren.index($(`#${id}`));
     let slotChildOffset = slotChildHeight * slotChildIndex;
     let slotHeight = slotElement.height();
     let slotOffset = slotChildOffset - slotHeight / 2 + slotChildHeight / 2;

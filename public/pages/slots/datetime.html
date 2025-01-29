@@ -67,6 +67,16 @@
   <div class="row">
     <div class="col-1">
       <div id="SPIN" class="btn btn-lg btn-success">SPIN</div>
+
+      <div class="form-check my-5">
+        <input id="showDate" class="form-check-input" type="checkbox" name="dateCol" checked></input>
+        <label class="form-check-label" for="dateCol">Date</label>
+      </div>
+      <div class="form-check mb-3">
+        <input id="showTime" class="form-check-input" type="checkbox" name="timeCol" checked></input>
+        <label class="form-check-label" for="timeCol">Time</label>
+      </div>
+
       <form id="intervalForm" class="form w-100">
         <!-- radio buttons for 1 hour, 30 minute, 15 minute and 5 minute intervals -->
         <div class="form-check">
@@ -88,7 +98,7 @@
       </form>
 
     </div>
-    <div class="col-5">
+    <div id="dateCol" class="col-5">
       <div class="container YM fs-1">
 
         <div class="row mb-2">
@@ -106,14 +116,15 @@
       </div>
     </div>
     
-    <div class="col-6 d-flex justify-content-center">
-      <div id="clock" style="position:relative;">
-        <div id="ampm" class="YM" style="position:absolute;top:0;right:0;"></div>
-        <img src="image/clock_face.png" id="clock_back">
-        <img src="image/clock_long_hand.png" id="clock_minute" style="transform: rotate(720deg);">
-        <img src="image/clock_short_hand.png" id="clock_hour" style="transform: rotate(60deg);">
+    <div id="timeCol" class="col">
+      <div class="w-100 d-flex justify-content-center">
+        <div id="clock" style="position:relative;">
+          <div id="ampm" class="YM" style="position:absolute;top:0;right:0;"></div>
+          <img src="image/clock_face.png" id="clock_back">
+          <img src="image/clock_long_hand.png" id="clock_minute" style="transform: rotate(720deg);">
+          <img src="image/clock_short_hand.png" id="clock_hour" style="transform: rotate(60deg);">
+        </div>
       </div>
-
     </div>
   </div>
 </div>
@@ -125,8 +136,50 @@
 $(function(){
   $(".item").removeClass("active disabled");
   $("#datetime").addClass("active disabled");
+
+  // update checkbox states
+  let url = new URL(window.location.href);
+  let params = new URLSearchParams(url.search);
+  if (params.has("showDate")){
+    $("#showDate").prop("checked", true);
+    $("#dateCol").show();
+  }
+  if (params.has("showTime")){
+    $("#showTime").prop("checked", true);
+    $("#timeCol").show();
+    $("#intervalForm").show();
+  }
+
+
+
   $("#SPIN").on('click', function(){
     runit();
+  });
+
+  $("#showDate").change(function(){
+    $("#dateCol").toggle();
+    // update query string
+    let url = new URL(window.location.href);
+    let params = new URLSearchParams(url.search);
+    if (params.has("showDate")){
+      params.delete("showDate");
+    } else {
+      params.append("showDate", "true");
+    }
+  });
+
+  $("#showTime").change(function(){
+    $("#timeCol").toggle();
+    $("#intervalForm").toggle();
+    // update query string
+    let url = new URL(window.location.href);
+    let params = new URLSearchParams(url.search);
+    if (params.has("showTime")){
+      params.delete("showTime");
+    } else {
+      params.append("showTime", "true");
+    }
+    
   });
 
   var hour = 0;

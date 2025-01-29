@@ -152,7 +152,10 @@ $(function(){
 
       let input = $(this).val();
       if (input == ""){return;}
-      let matches = deck.filter((v)=>{return v.word.startsWith(input);});
+      let matches = deck.filter((v)=>{
+        let spaceMatch = v.word.includes(' ') && input.includes(' ') || !v.word.includes(' ') && !input.includes(' ');
+        return v.word.startsWith(input) && spaceMatch;
+      });
       for (let i of matches){
         let id = i.word.replace(/[ ()']/g, '_');
         $(`#${id} > .flip`).addClass('border');

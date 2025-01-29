@@ -1,9 +1,5 @@
-text to speech for spelling activity
+Add a map to 'slots' where you can click on any country you want.
 audio samples for all static vocab
-
-////////// BUGS ////////////////////////////////////////////////////////////////
-RECALL 'rice ball' persists after 'rice' is entered
-
 
 ////////// IDEAS FOR STUDENT ACTIVITIES ////////////////////////////////////////
 Get the spoken picture dictionary working
@@ -65,7 +61,6 @@ socket.io page for giving directions
   Type the missing word(s)
 
   Read an English sentence. Type the sentence with the indicated change.
-
   Read a question and type the (indicated) answer.
 
   Listen to a sentence and look at a picture. Correct the sentence with a spoken response.
