@@ -1,0 +1,102 @@
+<%- include('../head') %>
+
+<div class="btn btn-primary btn-lg" id="next">Next</div>
+<div id="output" class="container text-center display-1"></div>
+
+
+<script>
+$(function(){
+
+/*
+There should be as many cards as there are items.
+Each item should appear on as many cards as there are items on each card.
+Items are grouped; 1st group is # of items on card. Others are that same # -1.
+Perfect set sizes are i*i+i+1 where 'i' is any integer 
+  (eg. 3, 7, 13, 21, 31, 43, 57, 73, 91, 111...)
+Extra items MUST BE IGNORED.
+                  ___
+A   |E  |H  |K       \
+A   | F | I | L       \
+A   |  G|  J|  M       \
+ B  |E  | I |  M        \___All but the cards that contain the
+ B  | F |  J|K          /   the last item of the first group
+ B  |  G|H  | L        /    are handled in the first loop. 
+  C |E  |  J| L       /
+  C | F |H  |  M     /
+  C |  G| I |K   ___/
+   D|EFG|   |        \______2nd loop handles last item of 1st group
+   D|   |HIJ|        /      with ALL items of EACH of the other groups.
+   D|   |   |KLM ___/
+ABCD|   |   |    ___________Last card has all items in the 1st group.
+*/
+
+function getDobbleDeck(itemList, itemsOnEachCard){
+  let deck = [];
+  let card = [];
+  let groupSize = itemsOnEachCard - 1;
+  for (let i = 0; i < groupSize; i++){
+    for (let j = 0; j < groupSize; j++){
+      card = [itemList[i]];
+      for (let k = 0; k < groupSize; k++){
+        let increment = (j + (k*i) ) % groupSize; // the magic formula
+        card.push(itemList[itemsOnEachCard + (groupSize*k) + increment]);
+      }
+      deck.push(card);
+    }
+  }
+
+  for (let i = 0; i < groupSize; i++){
+    card = [itemList[groupSize]]; // the last item of the first group
+    for (let j = 0; j < groupSize; j++){
+      card.push(itemList[itemsOnEachCard + (groupSize*i) + j]);
+    }
+    deck.push(card);
+  }
+
+  card = [];
+  for (let i = 0; i <= groupSize; i++){
+    card.push(itemList[i]);
+  }
+  deck.push(card);
+
+  return deck;
+}
+
+
+function numOfItemsOnEachCard(arrayLength) {
+  let floorSqrt = Math.floor(Math.sqrt(arrayLength));
+  return floorSqrt**2 + floorSqrt + 1 <= arrayLength ? floorSqrt + 1: floorSqrt;
+}
+
+
+let set = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234".split("");
+let deck = [];
+let itemsOnEachCard = numOfItemsOnEachCard(set.length);
+let deckSize = (itemsOnEachCard-1)**2 + itemsOnEachCard;
+let itemsList = set.slice(0, deckSize);
+deck = getDobbleDeck(itemsList, itemsOnEachCard);
+FYshuffle(deck);
+
+
+$('#next').on('click', function(){
+  let card = FYshuffle(deck.pop());
+  let output = '';
+  for (let i = 0; i < card.length; i++){
+    output += card[i] + ' ';
+  }
+  output += '<br>';
+  card = FYshuffle(deck.pop());
+  for (let i = 0; i < card.length; i++){
+    output += card[i] + ' ';
+  }
+  if (deck.length < 2 ){
+    deck = getDobbleDeck(itemsList, itemsOnEachCard);
+    FYshuffle(deck);
+  }
+  $('#output').html(output);
+});
+
+});
+</script>
+
+<%- include('../foot') %>
