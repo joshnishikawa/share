@@ -14,51 +14,47 @@ Items are grouped; 1st group is # of items on card. Others are that same # -1.
 Perfect set sizes are i*i+i+1 where 'i' is any integer 
   (eg. 3, 7, 13, 21, 31, 43, 57, 73, 91, 111...)
 Extra items MUST BE IGNORED.
-                  ___
-A   |E  |H  |K       \
-A   | F | I | L       \
-A   |  G|  J|  M       \
- B  |E  | I |  M        \___All but the cards that contain the
- B  | F |  J|K          /   the last item of the first group
- B  |  G|H  | L        /    are handled in the first loop. 
-  C |E  |  J| L       /
-  C | F |H  |  M     /
-  C |  G| I |K   ___/
-   D|EFG|   |        \______2nd loop handles last item of 1st group
-   D|   |HIJ|        /      with ALL items of EACH of the other groups.
-   D|   |   |KLM ___/
-ABCD|   |   |    ___________Last card has all items in the 1st group.
+                 ____
+ABCD|   |   |        \
+A   |EFG|   |         \_____1st loop handles cards that have
+A   |   |HIJ|         /     the 1st item of the 1st group
+A   |   |   |KLM ____/      with ALL items of ONE group.
+ B  |E  |H  |K       \
+ B  | F | I | L       \
+ B  |  G|  J|  M       \
+  C |E  | I |  M        \___All other cards are handled 
+  C | F |  J|K          /   in the 2nd (main) loop.
+  C |  G|H  | L        / 
+   D|E  |  J| L       /
+   D| F |H  |  M     /
+   D|  G| I |K   ___/
+
 */
 
 function getDobbleDeck(itemList, itemsOnEachCard){
-  let deck = [];
+  let deck = [];//[itemlist.slice(0, itemsOnEachCard)]; // first card
   let card = [];
-  let groupSize = itemsOnEachCard - 1;
-  for (let i = 0; i < groupSize; i++){
-    for (let j = 0; j < groupSize; j++){
-      card = [itemList[i]];
-      for (let k = 0; k < groupSize; k++){
-        let increment = (j + (k*i) ) % groupSize; // the magic formula
-        card.push(itemList[itemsOnEachCard + (groupSize*k) + increment]);
-      }
-      deck.push(card);
-    }
-  }
+  let grp = itemsOnEachCard - 1;
 
-  for (let i = 0; i < groupSize; i++){
-    card = [itemList[groupSize]]; // the last item of the first group
-    for (let j = 0; j < groupSize; j++){
-      card.push(itemList[itemsOnEachCard + (groupSize*i) + j]);
+  for (let i = 0; i < itemsOnEachCard; i++){ // FIXME: There should difinitely be a way to combine these two loops.
+    card = [itemList[0]];
+    for (let j = 1; j < itemsOnEachCard; j++){
+      card.push(itemList[j + (grp*i)]);
     }
     deck.push(card);
   }
 
-  card = [];
-  for (let i = 0; i <= groupSize; i++){
-    card.push(itemList[i]);
+  for (let i = 0; i < grp; i++){ // FIXME: This breaks when ...%grp is any facror of grp (ie. when group is non-prime).
+    for (let j = 0; j < grp; j++){
+      card = [itemList[i+1]];
+      for (let k = 0; k < grp; k++){
+        let increment = i==0||k==0?j:i+k<=grp?(i+j+k-1)%grp:(i+j+k)%grp;//voodoo
+        card.push(itemList[itemsOnEachCard + (grp*k) + increment]);
+      }
+      deck.push(card);
+    }
   }
-  deck.push(card);
-
+  console.log(deck);
   return deck;
 }
 
@@ -69,13 +65,13 @@ function numOfItemsOnEachCard(arrayLength) {
 }
 
 
-let set = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234".split("");
+let set = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopq";//rstuvwxyz01234".split("");
 let deck = [];
 let itemsOnEachCard = numOfItemsOnEachCard(set.length);
 let deckSize = (itemsOnEachCard-1)**2 + itemsOnEachCard;
 let itemsList = set.slice(0, deckSize);
 deck = getDobbleDeck(itemsList, itemsOnEachCard);
-FYshuffle(deck);
+// FYshuffle(deck);
 
 
 $('#next').on('click', function(){
@@ -90,6 +86,7 @@ $('#next').on('click', function(){
     output += card[i] + ' ';
   }
   if (deck.length < 2 ){
+    alert('Deck is empty. Generating a new one.');
     deck = getDobbleDeck(itemsList, itemsOnEachCard);
     FYshuffle(deck);
   }
