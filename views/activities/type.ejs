@@ -54,7 +54,7 @@
   <div id="content" class="container" style="display:none;">
   
     <div class="row g-0">
-      <div id="remaining"  class="col-1 text-primary UD"></div>
+      <div id="remaining" class="col-1 text-primary display-5 UD"></div>
 
       <div class="col-10 text-center UD">
         <div id="display" class="text-center mb-3"></div>
@@ -152,7 +152,8 @@ $(function(){
 
     item = deck.pop();
     if (item){
-      $("#remaining").html(`<span class="display-3">${deck.length}</span><br/>words left`);
+      let done = originalDeck.length - deck.length;
+      $("#remaining").html(`${done}/${originalDeck.length}`);
 
       if (deckType != 'text'){
         $("#image").html(

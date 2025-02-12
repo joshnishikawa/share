@@ -1,98 +1,43 @@
 <%- include('../head') %>
 
 <div class="btn btn-primary btn-lg" id="next">Next</div>
-<div id="output" class="container text-center display-1"></div>
+
+<div class="container text-center display-1">
+  <div id="card1" class="row d-flex"></div>
+  <div id="card2" class="row d-flex"></div>
+</div>
 
 
 <script>
 $(function(){
+const SET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+let numOfItems = 8; // make user selectable
 
-/*
-There should be as many cards as there are items.
-Each item should appear on as many cards as there are items on each card.
-Items are grouped; 1st group is # of items on card. Others are that same # -1.
-Perfect set sizes are i*i+i+1 where 'i' is any integer 
-  (eg. 3, 7, 13, 21, 31, 43, 57, 73, 91, 111...)
-Extra items MUST BE IGNORED.
-                 ____
-ABCD|   |   |        \
-A   |EFG|   |         \_____1st loop handles cards that have
-A   |   |HIJ|         /     the 1st item of the 1st group
-A   |   |   |KLM ____/      with ALL items of ONE group.
- B  |E  |H  |K       \
- B  | F | I | L       \
- B  |  G|  J|  M       \
-  C |E  | I |  M        \___All other cards are handled 
-  C | F |  J|K          /   in the 2nd (main) loop.
-  C |  G|H  | L        / 
-   D|E  |  J| L       /
-   D| F |H  |  M     /
-   D|  G| I |K   ___/
+$('#next').on('click', load2Cards);
 
-*/
-
-function getDobbleDeck(itemList, itemsOnEachCard){
-  let deck = [];//[itemlist.slice(0, itemsOnEachCard)]; // first card
-  let card = [];
-  let grp = itemsOnEachCard - 1;
-
-  for (let i = 0; i < itemsOnEachCard; i++){ // FIXME: There should difinitely be a way to combine these two loops.
-    card = [itemList[0]];
-    for (let j = 1; j < itemsOnEachCard; j++){
-      card.push(itemList[j + (grp*i)]);
-    }
-    deck.push(card);
+function load2Cards(){
+  if (gameSet.length < numOfItems*2-1) gameSet = FYshuffle( SET );
+  let card1 = [gameSet.pop()];
+  let card2 = card1.slice();
+  let roundSet = gameSet.slice(); // copy remaining set after selecting item
+  
+  for (let i = 0; i < numOfItems-1; i++) {
+    card1.push(roundSet.pop());
+    card2.push(roundSet.pop());
   }
+  card1 = FYshuffle(card1);
+  card2 = FYshuffle(card2);
 
-  for (let i = 0; i < grp; i++){ // FIXME: This breaks when ...%grp is any facror of grp (ie. when group is non-prime).
-    for (let j = 0; j < grp; j++){
-      card = [itemList[i+1]];
-      for (let k = 0; k < grp; k++){
-        let increment = i==0||k==0?j:i+k<=grp?(i+j+k-1)%grp:(i+j+k)%grp;//voodoo
-        card.push(itemList[itemsOnEachCard + (grp*k) + increment]);
-      }
-      deck.push(card);
-    }
+  $("#card1").html("");
+  $("#card2").html("");
+
+  for (let i = 0; i < numOfItems; i++) {
+    $("#card1").append(`<div class="col-1">${card1[i]}</div>`);
+    $("#card2").append(`<div class="col-1">${card2[i]}</div>`);
   }
-  console.log(deck);
-  return deck;
 }
 
-
-function numOfItemsOnEachCard(arrayLength) {
-  let floorSqrt = Math.floor(Math.sqrt(arrayLength));
-  return floorSqrt**2 + floorSqrt + 1 <= arrayLength ? floorSqrt + 1: floorSqrt;
-}
-
-
-let set = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopq";//rstuvwxyz01234".split("");
-let deck = [];
-let itemsOnEachCard = numOfItemsOnEachCard(set.length);
-let deckSize = (itemsOnEachCard-1)**2 + itemsOnEachCard;
-let itemsList = set.slice(0, deckSize);
-deck = getDobbleDeck(itemsList, itemsOnEachCard);
-// FYshuffle(deck);
-
-
-$('#next').on('click', function(){
-  let card = FYshuffle(deck.pop());
-  let output = '';
-  for (let i = 0; i < card.length; i++){
-    output += card[i] + ' ';
-  }
-  output += '<br>';
-  card = FYshuffle(deck.pop());
-  for (let i = 0; i < card.length; i++){
-    output += card[i] + ' ';
-  }
-  if (deck.length < 2 ){
-    alert('Deck is empty. Generating a new one.');
-    deck = getDobbleDeck(itemsList, itemsOnEachCard);
-    FYshuffle(deck);
-  }
-  $('#output').html(output);
-});
-
+let gameSet = FYshuffle( SET.slice() );
 });
 </script>
 

@@ -42,10 +42,12 @@
 
 
   <div id="content" class="container g-0" style="display:none;">
+    
     <div class="row g-0">
-
+      <div id="remaining" class="col-1 text-primary display-5 UD">42</div>
+      
       <!-- answer -->
-      <div class="col UD">
+      <div class="col-11 UD">
         <div id="guess" class="d-flex flex-wrap justify-content-center my-3"></div>
         <div class="d-flex justify-content-center my-3">
           <div id="answer" class="d-flex flex-wrap justify-content-center">
@@ -60,12 +62,12 @@
     </div>
     <div class="row g-0">
       <!-- image -->
-      <div class="col-4 text-center">
+      <div class="col-6 text-center">
         <div id="image" class="p-4"></div>
       </div>
 
-      <div class="col-8 d-flex justify-content-end flex-column">
-        <div id="keyboard" class="container g-0">
+      <div class="col-6 d-flex flex-column justify-content-center">
+        <div id="keyboard" class="container p-1 rounded-3 border text-center d-flex flex-column justify-content-center g-0" style="width:400px;">
           <div id="keyrow1" class="row g-0 justify-content-center"></div>
           <div id="keyrow2" class="row g-0 justify-content-center"></div>
           <div id="keyrow3" class="row g-0 justify-content-center"></div>
@@ -98,9 +100,9 @@ $(function(){
   var correct = true;
   var firstTry = true;
 
-  const letters = ["q","w","e","r","t","y","u","i","o","p",
-                  "a","s","d","f","g","h","j","k","l",
-                  "z","x","c","v","b","n","m","-","'",".",
+  const letters = ["q","w","e","r","t","y","u","i","o","p","-",
+                  "a","s","d","f","g","h","j","k","l","'",
+                  "z","x","c","v","b","n","m",".",
                   " ",
                   "Q","W","E","R","T","Y","U","I","O","P",
                   "A","S","D","F","G","H","J","K","L",
@@ -249,6 +251,9 @@ $(function(){
 
     item = deck.pop();
     if (item){
+      let done = originalDeck.length - deck.length;
+      $("#remaining").html(`${done}/${originalDeck.length}`);
+
       $("#image").html(
         item.image ? `<img src="${item.image}" 
                         class="img-fluid"
@@ -317,47 +322,34 @@ $(function(){
 
 
 // KEYBOARD ////////////////////////////////////////////////////////////////////
-  for ( let key of letters.slice( 0, 10)){
+  for ( let key of letters.slice( 0, 11)){
     $("#keyrow1").append(
-      `<div data-value="${key}" class="letter btn btn-sm border shadow-sm me-1 mb-1" 
-                                style="width:50px;">${key}</div>`);
+      `<div data-value="${key}" class="letter rounded-3 text-center border shadow-sm me-1 mb-1" 
+                                style="width:30px;cursor:default;">${key}</div>`);
   }
-  for ( let key of letters.slice( 10, 19)){
+  for ( let key of letters.slice( 11, 21)){
     $("#keyrow2").append(
-      `<div data-value="${key}" class="letter btn btn-sm border shadow-sm me-1 mb-1" 
-                                style="width:50px;">${key}</div>`);
+      `<div data-value="${key}" class="letter rounded-3 text-center border shadow-sm me-1 mb-1" 
+                                style="width:30px;cursor:default;">${key}</div>`);
   }
-  for ( let key of letters.slice( 19, 29 )){
+  for ( let key of letters.slice( 21, 29 )){
     $("#keyrow3").append(
-      `<div data-value="${key == '.' ? 'period' : key}" class="letter btn btn-sm border shadow-sm me-1 mb-1" 
-                                style="width:50px;">${key}</div>`);
+      `<div data-value="${key == '.' ? 'period' : key}" class="letter rounded-3 text-center border shadow-sm me-1 mb-1" 
+                                style="width:30px;cursor:default;">${key}</div>`);
   }
 
-  $("#keyrow4").html(`<div data-value="_" class="letter btn btn-sm border shadow-sm me-1 mb-1" 
-                                style="width:360px;">&nbsp;</div>`)
+  $("#keyrow4").html(`<div data-value="_" class="letter rounded-3 text-center border shadow-sm me-1 mb-1" 
+                                style="width:160px;cursor:default;">&nbsp;</div>`)
 
-  $("#keyrow1").append(
-    `<div id="backspace" class="btn btn-sm shadow-sm border me-1 mb-1" style="width:50px;">
-        <i class="material-icons-outlined" style="font-size:1rem;">backspace</i>
-      </div>`);
+  // $("#keyrow1").append(
+  //   `<div id="backspace" class="btn btn-sm shadow-sm border me-1 mb-1" style="width:50px;">
+  //       <i class="material-icons-outlined" style="font-size:1rem;">backspace</i>
+  //     </div>`);
 
-  $("#keyrow2").append(
-    `<button id="enter" class="btn btn-sm shadow-sm border me-1 mb-1" style="width:50px;" disabled>
-        <i class="material-icons-outlined" style="font-size:1rem;">keyboard_return</i>
-      </button>`);
-
-  $(".letter").on('click', function(){
-    inputLetter( $(this).attr('data-value') );
-  });
-
-  $("#backspace").on('click', function(){
-    backspace();
-  });
-
-  $("#enter").on('click', ()=>{
-    submitAnswer();
-  });
-
+  // $("#keyrow2").append(
+  //   `<button id="enter" class="btn btn-sm shadow-sm border me-1 mb-1" style="width:50px;" disabled>
+  //       <i class="material-icons-outlined" style="font-size:1rem;">keyboard_return</i>
+  //     </button>`);
 });
 </script>
 

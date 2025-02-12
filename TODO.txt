@@ -1,3 +1,5 @@
+FIXME: activities don't load words in the order selected
+
 Add a map to 'slots' where you can click on any country you want.
 audio samples for all static vocab
 
