@@ -319,6 +319,8 @@ router.get('/:activity/:id', async (req, res)=>{
       deck = await rows.map( row => {
         return {id: row.id, word: row.word, meaning: row.meaning, image: row.image};
       });
+      // put deck in the right order
+      deck = deck.sort( (a, b) => ids.indexOf(a.id) - ids.indexOf(b.id));
     }
 
     res.render(`activities/${req.params.activity}`, {deckType, deck, params});

@@ -46,7 +46,41 @@
         <i class="material-icons">print</i>
       </button>
 
-      <button id="clear" class="btn btn-sm btn-outline-danger" style="display:none;">CLEAR</button>
+      <button class="btn btn-sm btn-outline-secondary py-0" onclick="document.execCommand('insertUnorderedList', false, null);">
+        <i class="material-icons">format_list_bulleted</i>
+      </button>
+      <button class="btn btn-sm btn-outline-secondary py-0" onclick="document.execCommand('insertOrderedList', false, null);">
+        <i class="material-icons">format_list_numbered</i>
+      </button>
+      <button class="btn btn-sm btn-outline-secondary py-0" onclick="document.execCommand('justifyLeft', false, null);">
+        <i class="material-icons">format_align_left</i>
+      </button>
+      <button class="btn btn-sm btn-outline-secondary py-0" onclick="document.execCommand('justifyCenter', false, null);">
+        <i class="material-icons">format_align_center</i>
+      </button>
+
+      <!-- dropdown list for font size and color picker -->
+
+      <div class="dropdown">
+        <button class="btn btn-sm btn-outline-secondary py-0 dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="material-icons">format_size</i>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+          <li><button class="dropdown-item" onclick="document.execCommand('fontSize', false, '1')">1</button></li>
+          <li><button class="dropdown-item" onclick="document.execCommand('fontSize', false, '2')">2</button></li>
+          <li><button class="dropdown-item" onclick="document.execCommand('fontSize', false, '3')">3</button></li>
+          <li><button class="dropdown-item" onclick="document.execCommand('fontSize', false, '4')">4</button></li>
+          <li><button class="dropdown-item" onclick="document.execCommand('fontSize', false, '5')">5</button></li>
+          <li><button class="dropdown-item" onclick="document.execCommand('fontSize', false, '6')">6</button></li>
+          <li><button class="dropdown-item" onclick="document.execCommand('fontSize', false, '7')">7</button></li>
+        </ul>
+      </div>
+
+      <input type="color" class="btn btn-sm btn-outline-secondary" 
+             onchange="document.execCommand('foreColor', false, this.value)">
+      </input>
+
+      <button id="clear" class="btn btn-sm btn-outline-danger ms-3" style="display:none;">CLEAR</button>
 
     </div>
   </div>
