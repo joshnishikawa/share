@@ -196,9 +196,10 @@
 
       window.deck.push(w);
       window.local.push(w);
+      let id = w.word.replace(/[ '-.]/g, '_');
       $("#list").append( // in menu/lists.ejs
       `<div class="alert-primary rounded-3 m-1 ps-1 d-flex justify-content-between">
-          <div id="${w.word.split(' ').join('_')}">${w.word} - ${w.meaning}</div>
+          <div id="${id}">${w.word} - ${w.meaning}</div>
           <div data-value="${w.word.split(' ').join('_')}" class="list btn btn-close" style="font-size:10px;"></div>
         </div>`);
 

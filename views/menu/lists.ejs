@@ -86,15 +86,16 @@ $(window).on('pageshow', function(){
   }
 
   addWords = (list) => {
-    for (let l of list) {
+    for (let i of list) {
       // add word if the id doesn't exist in window.deck
-      if (!window.deck.includes(l.id)) {
-        window.deckType == 'nolink' ? window.deck.push(l) : window.deck.push(l.id);
-        window.local.push(l);
+      if (!window.deck.includes(i.id)) {
+        window.deckType == 'nolink' ? window.deck.push(i) : window.deck.push(i.id);
+        window.local.push(i);
+        let id = i.word.replace(/[ '-.]/g, '_');
         $("#list").append(`
           <div class="alert-primary rounded-3 m-1 ps-1 d-flex justify-content-between">
-            <div id="${l.word.split(' ').join('_')}">${l.word}${l.meaning ? ' - ' + l.meaning : ''}</div>
-            <div data-value="${l.id}" class="list btn btn-close" style="font-size:10px;"></div>
+            <div id="${id}">${i.word}${i.meaning ? ' - ' + i.meaning : ''}</div>
+            <div data-value="${i.id}" class="list btn btn-close" style="font-size:10px;"></div>
           </div>`);
       }
     }
@@ -115,8 +116,9 @@ $(window).on('pageshow', function(){
     for (let i of list) {
       window.deck = window.deck.filter(d => d !== i && d !== i.id && d !== i.word);
       window.local = window.local.filter(l => l.id !== i.id && l.id !== i.word);
+      let id = i.word.replace(/[ '-.]/g, '_');
 
-      $(`#${i.word.split(' ').join('_')}`).parent().remove();
+      $(`#${id}`).parent().remove();
     }
     $("#numOfItems").html(`&nbsp;(${window.deck.length})`);
   }

@@ -12,6 +12,7 @@
 
   [contenteditable="true"] {
     cursor:pointer;
+    color: black;
   }
 
   [contenteditable="true"].single-line {
@@ -36,17 +37,17 @@
 
 
 <body>
-  <div id="menucontainer"><!-- to hide the entire menu when printing -->
-    <div id="menu" class="d-flex">
-      <button class="btn btn-sm btn-outline-secondary p-0 me-3" data-bs-toggle="modal" data-bs-target="#lp_modal">
+  <div id="menucontainer" class="bg-light" style="position:fixed;top:0;"><!-- to hide the entire menu when printing -->
+    <div id="menu" class="d-flex flex-column">
+      <button class="btn btn-sm btn-outline-secondary p-0" data-bs-toggle="modal" data-bs-target="#lp_modal">
         <i class="material-icons">info</i>
       </button>
 
-      <button id="print" class="btn btn-sm btn-outline-success py-0 me-3">
+      <button id="print" class="btn btn-sm btn-outline-success py-0 mt-4">
         <i class="material-icons">print</i>
       </button>
 
-      <button class="btn btn-sm btn-outline-secondary py-0" onclick="document.execCommand('insertUnorderedList', false, null);">
+      <button class="btn btn-sm btn-outline-secondary py-0 mt-4" onclick="document.execCommand('insertUnorderedList', false, null);">
         <i class="material-icons">format_list_bulleted</i>
       </button>
       <button class="btn btn-sm btn-outline-secondary py-0" onclick="document.execCommand('insertOrderedList', false, null);">
@@ -62,9 +63,8 @@
       <!-- dropdown list for font size and color picker -->
 
       <div class="dropdown">
-        <button class="btn btn-sm btn-outline-secondary py-0 dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-          <i class="material-icons">format_size</i>
-        </button>
+        <button class="btn btn-sm btn-outline-secondary py-0 px-3 dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="material-icons">format_size</i></button>
         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
           <li><button class="dropdown-item" onclick="document.execCommand('fontSize', false, '1')">1</button></li>
           <li><button class="dropdown-item" onclick="document.execCommand('fontSize', false, '2')">2</button></li>
@@ -76,18 +76,29 @@
         </ul>
       </div>
 
-      <input type="color" class="btn btn-sm btn-outline-secondary" 
-             onchange="document.execCommand('foreColor', false, this.value)">
-      </input>
+      <!-- button group -->
+      <button data-value="black" class="textcolor btn btn-sm btn-outline-secondary text-body py-0 px-3">
+        <i class="material-icons">format_color_text</i>
+      </button>
 
-      <button id="clear" class="btn btn-sm btn-outline-danger ms-3" style="display:none;">CLEAR</button>
+      <div class="btn-group" role="group">
+        <button data-value="red" class="textcolor btn btn-sm btn-outline-secondary text-danger py-0 px-1">
+          <i class="material-icons">format_color_text</i>
+        </button>
+  
+        <button data-value="blue" class="textcolor btn btn-sm btn-outline-secondary text-primary py-0 px-1">
+          <i class="material-icons">format_color_text</i>
+        </button>
+      </div>
+      
+      <button id="clear" class="btn btn-sm btn-outline-danger mt-4" style="display:none;">CLEAR</button>
 
     </div>
   </div>
 
 
 <!-- ####################################################################### -->
-  <div id="sheet" class="container-fluid UD bg-white text-muted border border-white rounded-3">
+  <div id="sheet" class="container-fluid UD bg-white text-muted border border-white rounded-3 my-3">
     <div class="row" style="height:5%;">
 
       <div class="col-2 border rounded-3">
@@ -191,11 +202,18 @@ $(function(){
   let lp = localStorage.getItem('lp');
   if (lp) {
     $('#sheet').html(lp);
+    setTitle();
     $('#clear').show();
   }
 
   $("#print").on('click', ()=>{
     window.print();
+  });
+
+  $(".textcolor").on('mousedown', function(e){
+    e.preventDefault();
+    let color = $(this).attr('data-value');
+    document.execCommand('foreColor', false, color);
   });
 
   $("#clear").on('click', function(){
@@ -204,7 +222,8 @@ $(function(){
     $(this).hide();
   });
 
-  $(".editor").on('blur', function(){
+  $(".editor, .single-line").on('blur', function(){
+    setTitle();
     localStorage.setItem('lp', $('#sheet').html());
   });
 
@@ -229,6 +248,17 @@ $(function(){
       document.execCommand('justifyLeft', false, null);
     }
   });
+
+  // call setTitle when date or grade is changed
+  $(".single-line").on('blur', function(){
+    setTitle();
+  });
+
+  function setTitle(){
+    let date = $(".single-line").eq(0).text().replace(/[^a-zA-Z0-9]/g, '-');
+    let grade = $(".single-line").eq(1).text().replace(/[^a-zA-Z0-9]/g, '-');
+    document.title = `LP_${grade}_${date}`;
+  }
 
 });
 </script>
