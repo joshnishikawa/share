@@ -1,3 +1,4 @@
+Go through everything using a Japanese browser and update the i18n.
 Add a map to 'slots' where you can click on any country you want.
 audio samples for all static vocab
 

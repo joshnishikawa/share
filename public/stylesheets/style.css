@@ -45,8 +45,7 @@ body {
   mix-blend-mode: multiply;
 }
 
-.UD{font-family: 'Yusei Magic', sans-serif;} /* TODO: change all instances of .UD to .YM . Then delete this. */
-
+.YM{font-family: 'Yusei Magic', sans-serif;}
 
 .flip {
   background-color: transparent;

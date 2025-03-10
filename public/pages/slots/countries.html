@@ -1,8 +1,7 @@
 <style>
   #country, #adj, #see, #eat, #enjoy, #buy{
-    height:4rem;
+    height:3rem;
     overflow: hidden;
-    font-size: 1rem;
   }
   .inshade{
     box-shadow: 
@@ -16,40 +15,45 @@
     <div class="col-1">
       <div id="SPIN" class="btn btn-lg btn-success">SPIN</div>
     </div>
-    <div class="col-11">
-      <div class="container YM fs-1">
+    <div class="col-5">
+      <!-- <img src="https://upload.wikimedia.org/wikipedia/commons/a/ad/World_map_1942_%28SVG%29.svg" class="img-fluid" alt="World Map"> -->
+      <!-- Put a map in here --></div>
+    <div class="col-6">
+      <div class="container YM" style="font-size:2rem;">
 
         <div class="row mb-2">
-          <div class="col-4" style="text-align: right;">I want to go to</div>
-          <div id="country" class="col-6 text-center inshade border rounded-3 bg-light"></div>
-          <div class="col-2">.</div>
+          <div class="col-6" style="text-align: right;">I want to go to</div>
+          <div class="col-6 d-flex">
+            <div id="country" class="text-center inshade border rounded-3 bg-light"></div>.
+          </div>
         </div>
-      
+
         <div class="row mb-2">
-          <div id="its" class="col-4" style="text-align: right;"></div>
-          <div id="adj" class="col-6 text-center inshade border rounded-3 bg-light"></div>
-          <div class="col-2">country.</div>
+          <div class="col-6" style="text-align: right;">I want to see</div>
+          <div class="col-6 d-flex">
+            <div id="see" class="text-center inshade border rounded-3 bg-light flex-fill"></div>.
+          </div>
         </div>
-      
+
         <div class="row mb-2">
-          <div class="col-4" style="text-align: right;">I want to see</div>
-          <div id="see" class="col-6 text-center inshade border rounded-3 bg-light"></div>
-          <div class="col-2">.</div>
+          <div class="col-6" style="text-align: right;">I want to eat</div>
+          <div class="col-6 d-flex">
+            <div id="eat" class="text-center inshade border rounded-3 bg-light flex-fill"></div>.
+          </div>
         </div>
+
         <div class="row mb-2">
-          <div class="col-4" style="text-align: right;">I want to eat</div>
-          <div id="eat" class="col-6 text-center inshade border rounded-3 bg-light"></div>
-          <div class="col-2">.</div>
+          <div class="col-6" style="text-align: right;">I want to enjoy</div>
+          <div class="col-6 d-flex">
+            <div id="enjoy" class="text-center inshade border rounded-3 bg-light flex-fill"></div>.
+          </div>
         </div>
+
         <div class="row mb-2">
-          <div class="col-4" style="text-align: right;">I want to enjoy</div>
-          <div id="enjoy" class="col-6 text-center inshade border rounded-3 bg-light"></div>
-          <div class="col-2">.</div>
-        </div>
-        <div class="row mb-2">
-          <div class="col-4" style="text-align: right;">I want to buy</div>
-          <div id="buy" class="col-6 text-center inshade border rounded-3 bg-light"></div>
-          <div class="col-2">.</div>
+          <div class="col-6" style="text-align: right;">I want to buy</div>
+          <div class="col-6 d-flex">
+            <div id="buy" class="col-6 text-center inshade border rounded-3 bg-light flex-fill"></div>.
+          </div>
         </div>
       
       </div>
@@ -68,18 +72,6 @@ $(function(){
   $("#SPIN").on('click', function(){
     runit();
   });
-
-  const ADJ = [
-    "nice",
-    "amazing",
-    "fantastic",
-    "wonderful",
-    "beautiful",
-    "interesting",
-    "exciting",
-    "fun"
-  ];
-  var adj = ADJ.slice();
 
   const COUNTRIES = {
     "The U.K.": {
@@ -261,24 +253,20 @@ $(function(){
   var countries = {...COUNTRIES};
 
   for (let country in COUNTRIES){
-    $("#country").append(`<div id="${country.replace(/[ .'-]/g, '_')}" class="fs-1">${country}</div>`);
-  }
-  for (let adj of ADJ){
-    $("#adj").append(`<div id="${adj}" class="fs-1">${adj}</div>`);
+    $("#country").append(`<div id="${country.replace(/[ .'-]/g, '_')}">${country}</div>`);
   }
 
 
   runit = ()=>{
     let country = getCountry();
     fillit(country);
-    getAdj();
   }
 
   fillit = (country)=>{
     for (let s of ["see", "eat", "enjoy", "buy"]){
       for (let i of COUNTRIES[country][s]){
         let id = i.replace(/[ .'-]/g, '_');
-        $(`#${s}`).append(`<div id="${id}" class="fs-1">${i}</div>`);
+        $(`#${s}`).append(`<div id="${id}">${i}</div>`);
       }
       let i = COUNTRIES[country][s][Math.floor(Math.random() * COUNTRIES[country][s].length)];
       let id = i.replace(/[ .'-]/g, '_');
@@ -296,17 +284,6 @@ $(function(){
     return country;
   }
 
-  function getAdj(){
-    if (adj.length == 0){
-      adj = ADJ.slice();
-    }
-    let a = adj[Math.floor(Math.random() * adj.length)];
-    // if the first letter is a vowel, use "an" instead of "a"
-    let a_an = ['a', 'e', 'i', 'o', 'u'].includes(a[0].toLowerCase()) ? "an" : "a";
-    $("#its").text(`It's ${a_an}`);
-    adj.splice(adj.indexOf(a), 1);
-    spinit("adj", a);
-  }
   runit();
 
 });

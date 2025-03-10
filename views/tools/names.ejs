@@ -1,9 +1,12 @@
 <%- include('../head'); -%>
 <style>
+  * {
+    box-sizing: border-box;
+  }
   /* set page margin */
   @page {
     size: A4;
-    margin: 50px 50px;
+    /* margin: 50px 50px; */
   }
 
   @media print {
@@ -19,8 +22,8 @@
 
     #sheet {
       visibility: visible !important;
-      font-size: 270px;
-      line-height: 240px;
+      font-size: 240px;
+      line-height: 200px;
       margin-left: auto;
       margin-right: auto;
     }
@@ -50,7 +53,7 @@
     <textarea class="form-control p-5 alert-secondary" rows="10" placeholder="Add comma-separated names here."></textarea>
   </div>
 
-  <div id="sheet" class="sheet d-flex flex-wrap UD text-center" style="visibility:hidden;"></div>
+  <div id="sheet" class="d-flex flex-wrap YM text-center" style="visibility:hidden;"></div>
 
   <%- include ("../modals/modal_names.ejs") %>
 
@@ -65,7 +68,7 @@ $(function(){
     for (let i in names) {
       names[i] = names[i].trim();
       $("#sheet").append(`
-        <div class="tag w-50 border" style="min-height:20%">
+        <div class="tag w-50 border" style="height:20%">
           <div class="name"><span>${names[i]}</span></div>
         </div>
       `);
