@@ -1,17 +1,19 @@
 <style>
-  ::-webkit-input-placeholder { text-align:right; }
+  ::placeholder { text-align:right; }
   input:-moz-placeholder { text-align:right; }
+  ::-ms-input-placeholder { text-align:right; }
 </style>
 
 
-<div class="container-fluid pt-3" style="height:100vh;">
+<div class="container-fluid" style="height:350px;">
 
   <div class="row">
 <!-- SELECT VOCAB FORMS ------------------------------------------------------->
     <div class="col-md-4">
-      <div class="border border-white rounded-3 alert-secondary p-3 mb-3">
+      <div class="border border-white rounded-3 alert-secondary px-3">
+        <span class="text-primary display-6 YM">Dictionary</span>
         <input id="searchInput" name="word" type="text"
-               class="form-control mb-3" placeholder="<%- __('text') %>"
+               class="form-control my-2" placeholder="<%- __('text') %>"
                autofocus>
 
         <!-- <div class="d-flex justify-content-end">
@@ -41,51 +43,74 @@ $(function(){
   const typingDelay = 500; // Delay in milliseconds
 
   var words = {};
-  $.get('/vocablist', (data) => {
-    words = data;
-  });
+  $.get('/vocablist')
+    .done((data) => {
+      words = data;
+    })
+    .fail((xhr, status, error) => {
+      console.error("Failed to load vocabulary:", error);
+      $("#output").html('<div class="alert alert-danger">Failed to load vocabulary. Please try refreshing the page.</div>');
+    });
 
 
 // TEXT INPUT //////////////////////////////////////////////////////////////////
   $('#searchInput').on('input', async function(){
     clearTimeout(typingTimer);
     typingTimer = setTimeout(async () => {
+      $("#output").html('<div class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>');
       let word = $(this).val();
 
       let EnglishWord = '';
       let JapaneseWord = '';
-      let image = '';
-      let audio = '';
       let isJapanese = word.match(/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/);
 
       if (word && isJapanese) {
         JapaneseWord = word;
-        EnglishWord = await translate(word, { from: "ja", to: "en" });
+        try{
+          EnglishWord = await translate(word, { from: "ja", to: "en" });
+        } catch (error) {
+          console.error("Translation error:", error);
+          EnglishWord = "Translation failed";
+        }
       } else if (word) {
         EnglishWord = word;
-        JapaneseWord = await translate(word, { from: "en", to: "ja" });
+        try {
+          JapaneseWord = await translate(word, { from: "en", to: "ja" });
+        } catch (error) {
+          console.error("Translation error:", error);
+          JapaneseWord = "Translation failed";
+        }
       } else {
         $("#output").html('');
         return;
       }
 
-      if (Object.keys(words).includes(EnglishWord)) {
-        image = `<img src="${words[EnglishWord].image}" class="img-fluid" style="max-height:300px;">`;
-        audio = words[EnglishWord].audio;
-        if (JapaneseWord != words[EnglishWord].meaning) {
-          JapaneseWord += `, ${words[EnglishWord].meaning}`;
-        }
-      } else {
-        let lc = EnglishWord.toLowerCase();
-        if (Object.keys(words).includes(lc)) {
-          EnglishWord = lc;
+      function processWord(EnglishWord, JapaneseWord) {
+        let image = '';
+        let audio = '';
+        
+        if (Object.keys(words).includes(EnglishWord)) {
           image = `<img src="${words[EnglishWord].image}" class="img-fluid" style="max-height:300px;">`;
-          audio = words[lc].audio;
-          if (JapaneseWord != words[lc].meaning) {
-            JapaneseWord += `, ${words[lc].meaning}`;
+          audio = words[EnglishWord].audio;
+          if (JapaneseWord != words[EnglishWord].meaning) {
+            JapaneseWord += `, ${words[EnglishWord].meaning}`;
+          }
+        } else {
+          let lc = EnglishWord.toLowerCase();
+          if (Object.keys(words).includes(lc)) {
+            EnglishWord = lc;
+            image = `<img src="${words[EnglishWord].image}" class="img-fluid" style="max-height:300px;">`;
+            audio = words[lc].audio;
+            if (JapaneseWord != words[lc].meaning) {
+              JapaneseWord += `, ${words[lc].meaning}`;
+            }
           }
         }
+        
+        return { EnglishWord, JapaneseWord, image, audio };
       }
+
+      const { EnglishWord: processedEnglish, JapaneseWord: processedJapanese, image, audio } = processWord(EnglishWord, JapaneseWord);
       showWord({word: EnglishWord, meaning: JapaneseWord, image, audio});
     }, typingDelay);
   });
@@ -158,13 +183,13 @@ $(function(){
 
 
   function showWord(w) {
-    window.deck.push(w);
-    window.local.push(w);
     let id = w.word.replace(/[ '-.]/g, '_');
-    $("#output").html( // in menu/lists.ejs
-     `<div class="bg-light shadow border rounded-3 p-3 YM">
-        <span class="text-primary display-1">${w.word} </span> <br />
-        <span class="display-5">${w.meaning}</span>
+     $("#output").html(
+     `<div class="bg-light shadow border rounded-3 p-3 YM d-flex">
+        <div>
+          <span class="text-primary display-1">${w.word} </span> <br />
+          <span class="display-5">${w.meaning}</span>
+        </div>
         <div class="w-100 text-center">${w.image}</div>
       </div>`);
   }

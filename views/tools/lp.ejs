@@ -39,15 +39,20 @@
 <body>
   <div id="menucontainer" class="bg-light" style="position:fixed;top:0;"><!-- to hide the entire menu when printing -->
     <div id="menu" class="d-flex flex-column">
-      <button class="btn btn-sm btn-outline-secondary p-0" data-bs-toggle="modal" data-bs-target="#lp_modal">
+      <button class="btn btn-sm btn-outline-secondary p-0 mb-4" data-bs-toggle="modal" data-bs-target="#lp_modal">
         <i class="material-icons">info</i>
       </button>
 
-      <button id="print" class="btn btn-sm btn-outline-success py-0 mt-4">
+      <select id="lp_select" class="form-select form-select border border-success small" aria-label="Default select example"></select>
+      <button id="add_lp_modal" class="btn btn-sm btn-outline-success">
+        <i class="material-icons">note_add</i>
+      </button>
+
+      <button id="print" class="btn btn-sm btn-outline-success mb-4" onclick="window.print();">
         <i class="material-icons">print</i>
       </button>
 
-      <button class="btn btn-sm btn-outline-secondary py-0 mt-4" onclick="document.execCommand('insertUnorderedList', false, null);">
+      <button class="btn btn-sm btn-outline-secondary py-0" onclick="document.execCommand('insertUnorderedList', false, null);">
         <i class="material-icons">format_list_bulleted</i>
       </button>
       <button class="btn btn-sm btn-outline-secondary py-0" onclick="document.execCommand('insertOrderedList', false, null);">
@@ -64,8 +69,9 @@
 
       <div class="dropdown">
         <button class="btn btn-sm btn-outline-secondary py-0 px-3 dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-          <i class="material-icons">format_size</i></button>
-        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+          <i class="material-icons">format_size</i>
+        </button>
+        <ul class="dropdown-menu w-100 m-0" aria-labelledby="dropdownMenuButton1">
           <li><button class="dropdown-item" onclick="document.execCommand('fontSize', false, '1')">1</button></li>
           <li><button class="dropdown-item" onclick="document.execCommand('fontSize', false, '2')">2</button></li>
           <li><button class="dropdown-item" onclick="document.execCommand('fontSize', false, '3')">3</button></li>
@@ -91,8 +97,13 @@
         </button>
       </div>
       
-      <button id="clear" class="btn btn-sm btn-outline-danger mt-4" style="display:none;">CLEAR</button>
-
+      <button id="clear" class="btn btn-sm btn-outline-danger mt-4" style="display:none;">
+        <i class="material-icons">clear</i>
+        <span class="align-top small">dblclick</span>
+      </button>
+      <button id="delete_LP_modal" class="btn btn-sm btn-outline-danger" style="display:none;">
+        <i class="material-icons">delete</i>
+      </button>
     </div>
   </div>
 
@@ -194,21 +205,76 @@
 
   </div>
 
+  <!-- modal to add new list -->
+<div id="addModal" class="modal fade" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addModalLabel">Add New Lesson Plan</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="addModalBody">
+        Please choose a name.
+        <form id="add_lp_form" class="form d-flex">
+          <input id="lp_name" type="text" class="form-control mx-3" name="lp_name" 
+          placeholder="<%- __('lp_name') %>" required>
+          <input type="hidden" name="lp" value="getLP()">
+          <button id="list_submit" type="submit" class="btn btn-success w-50" disabled>
+            <i class="material-icons">note_add</i>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- modal to confirm delete -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Delete Lesson Plan</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="deleteModalBody">
+        Are you sure you want to delete this lesson plan?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-danger" id="deleteLP">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <%- include('../modals/modal_lp'); -%>
 
 
 <script>
-$(function(){
-  let lp = localStorage.getItem('lp');
-  if (lp) {
-    $('#sheet').html(lp);
-    setTitle();
-    $('#clear').show();
+$(window).on('pageshow', function(){
+  var lps = {};
+
+  $("#lp_select").html('<option value="default"></option>');
+  // populate lp_select from local storage
+  lps = JSON.parse(localStorage.getItem('lps'));
+
+  if (lps) {
+    for (let l of Object.keys(lps) ) {
+      if (l == 'default' && lps[l]) {
+        $('#sheet').html(lps[l]);
+        setTitle();
+        $('#clear').show();
+      }
+      else {
+        $("#lp_select").append(`<option value="${l}">${l}</option>`);
+      }
+    }
+  }
+  else {
+    lps = {"default": ""};
+    localStorage.setItem('lps', JSON.stringify(lps));
   }
 
-  $("#print").on('click', ()=>{
-    window.print();
-  });
 
   $(".textcolor").on('mousedown', function(e){
     e.preventDefault();
@@ -216,16 +282,18 @@ $(function(){
     document.execCommand('foreColor', false, color);
   });
 
-  $("#clear").on('click', function(){
+
+  $("#clear").on('dblclick', function(){
     $(".single-line").empty();
     $(".editor").empty();
     $(this).hide();
   });
 
-  $(".editor, .single-line").on('blur', function(){
-    setTitle();
-    localStorage.setItem('lp', $('#sheet').html());
+
+  $(".editor, .single-line").off('blur').on('blur', () => {
+    updateLP();
   });
+
 
   $('.editor').on('keydown', function(e) {
     if (e.key === 'Tab') {
@@ -249,15 +317,103 @@ $(function(){
     }
   });
 
-  // call setTitle when date or grade is changed
-  $(".single-line").on('blur', function(){
+
+  $("#lp_select").on('change', function(){
+    let lp = $(this).val();
+    $('#sheet').html(lps[lp]);
+    $(".editor, .single-line").off('blur').on('blur', () => {
+      updateLP();
+    });
     setTitle();
+    $('#clear').show();
+    $('#delete_LP_modal').show();
   });
+
+
+  $("#add_lp_form").on('submit', function(e){
+    e.preventDefault();
+    let lpname = $("#lp_name").val();
+    let lp = $("#sheet").html();
+    lps[lpname] = lp;
+    localStorage.setItem('lps', JSON.stringify(lps));
+    $("#lp_select").append(`<option value="${lpname}">${lpname}</option>`);
+    $("#lp_select").val(lpname);
+    $("#list_submit").prop('disabled', true);
+    $("#addModal").modal('hide');
+  });
+
+
+  // add new list
+  $("#add_lp_modal").on('click', () => {
+    $("#addModal").modal('show');
+  });
+
+
+  $('#addModal').on('shown.bs.modal', function () {
+    $('#lp_name').trigger('focus');
+  });
+
+
+  $("#lp_name").on('input', () => {
+    let lpname = $("#lp_name").val();
+    if (!lpname) {
+      $("#list_submit").prop('disabled', true);
+    } else {
+      $("#list_submit").prop('disabled', false);
+      if (Object.keys(lps).includes(lpname)) {
+        $("#list_submit").html('<i class="material-icons">edit_note</i>Update');
+      }
+      else {
+        $("#list_submit").html('<i class="material-icons">note_add</i>Add');
+      }
+    }
+  });
+
+
+  function getLP(){
+    return $('#sheet').html();
+  }
+
+
+  function updateLP(){
+    setTitle();
+    let lp = $("#lp_select").val();
+    console.log(lp);
+    lps[lp] = $('#sheet').html();
+    localStorage.setItem('lps', JSON.stringify(lps));
+  }
 
   function setTitle(){
     let date = $(".single-line").eq(0).text().replace(/[^a-zA-Z0-9]/g, '-');
     let grade = $(".single-line").eq(1).text().replace(/[^a-zA-Z0-9]/g, '-');
     document.title = `LP_${grade}_${date}`;
+  }
+
+
+
+
+
+  $("#delete_LP_modal").on('click', () => {
+    $("#deleteModal").modal('show');
+  });
+
+  $("#deleteLP").on('click', ()=>{
+    deleteLP();
+    $("#deleteModal").modal('hide');
+  });
+
+
+  function deleteLP(){
+    let lp = $("#lp_select").val();
+    delete lps[lp];
+    localStorage.setItem('lps', JSON.stringify(lps));
+    $(".single-line").empty();
+    $(".editor").empty();
+    $("#lp_select option[value='"+lp+"']").remove();
+    setTitle();
+    $('#clear').hide();
+    $('#delete_LP_modal').hide();
+    $("#lp_select").val('default');
   }
 
 });
