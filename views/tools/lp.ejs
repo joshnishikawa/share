@@ -52,23 +52,33 @@
         <i class="material-icons">print</i>
       </button>
 
-      <button class="btn btn-sm btn-outline-secondary py-0" onclick="document.execCommand('insertUnorderedList', false, null);">
-        <i class="material-icons">format_list_bulleted</i>
+      <button id="save" class="btn btn-sm btn-outline-primary mb-4">
+        <i class="material-icons">save</i>
+        <span class="align-top small">Save</span>
       </button>
-      <button class="btn btn-sm btn-outline-secondary py-0" onclick="document.execCommand('insertOrderedList', false, null);">
-        <i class="material-icons">format_list_numbered</i>
-      </button>
-      <button class="btn btn-sm btn-outline-secondary py-0" onclick="document.execCommand('justifyLeft', false, null);">
-        <i class="material-icons">format_align_left</i>
-      </button>
-      <button class="btn btn-sm btn-outline-secondary py-0" onclick="document.execCommand('justifyCenter', false, null);">
-        <i class="material-icons">format_align_center</i>
-      </button>
+
+      <div class="btn-group" role="group">
+        <button class="btn btn-sm btn-outline-secondary py-0" onclick="document.execCommand('insertUnorderedList', false, null);">
+          <i class="material-icons">format_list_bulleted</i>
+        </button>
+        <button class="btn btn-sm btn-outline-secondary py-0" onclick="document.execCommand('insertOrderedList', false, null);">
+          <i class="material-icons">format_list_numbered</i>
+        </button>
+      </div>
+
+      <div class="btn-group" role="group">
+        <button class="btn btn-sm btn-outline-secondary py-0" onclick="document.execCommand('justifyLeft', false, null);">
+          <i class="material-icons">format_align_left</i>
+        </button>
+        <button class="btn btn-sm btn-outline-secondary py-0" onclick="document.execCommand('justifyCenter', false, null);">
+          <i class="material-icons">format_align_center</i>
+        </button>
+      </div>
 
       <!-- dropdown list for font size and color picker -->
 
       <div class="dropdown">
-        <button class="btn btn-sm btn-outline-secondary py-0 px-3 dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+        <button class="btn btn-sm btn-outline-secondary py-0 px-3 dropdown-toggle w-100" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
           <i class="material-icons">format_size</i>
         </button>
         <ul class="dropdown-menu w-100 m-0" aria-labelledby="dropdownMenuButton1">
@@ -83,16 +93,16 @@
       </div>
 
       <!-- button group -->
-      <button data-value="black" class="textcolor btn btn-sm btn-outline-secondary text-body py-0 px-3">
-        <i class="material-icons">format_color_text</i>
-      </button>
-
       <div class="btn-group" role="group">
-        <button data-value="red" class="textcolor btn btn-sm btn-outline-secondary text-danger py-0 px-1">
+        <button data-value="black" class="textcolor btn btn-sm btn-outline-secondary text-body p-0">
+          <i class="material-icons">format_color_text</i>
+        </button>
+
+        <button data-value="red" class="textcolor btn btn-sm btn-outline-secondary text-danger p-0">
           <i class="material-icons">format_color_text</i>
         </button>
   
-        <button data-value="blue" class="textcolor btn btn-sm btn-outline-secondary text-primary py-0 px-1">
+        <button data-value="blue" class="textcolor btn btn-sm btn-outline-secondary text-primary p-0">
           <i class="material-icons">format_color_text</i>
         </button>
       </div>
@@ -249,7 +259,7 @@
 
 <%- include('../modals/modal_lp'); -%>
 
-
+<script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js" defer></script>
 <script>
 $(window).on('pageshow', function(){
   var lps = {};
@@ -415,6 +425,15 @@ $(window).on('pageshow', function(){
     $('#delete_LP_modal').hide();
     $("#lp_select").val('default');
   }
+
+
+  $('#save').click(function(){
+    // save this page without the menu or script
+    var title = Date.now();
+    var html = document.documentElement.outerHTML;
+    var blob = new Blob([html], {type: "text/html"});
+    saveAs(blob, title + ".html");
+  });
 
 });
 </script>

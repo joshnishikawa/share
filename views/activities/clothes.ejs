@@ -1,0 +1,477 @@
+<%- include('../head'); -%>
+
+<style>
+  .shape {
+    height: 14%;
+    position: relative;
+  }
+
+  .canvas-shape {
+    position: absolute;
+    cursor: move;
+  }
+
+  .selected {
+    filter: drop-shadow(0 0 0.5rem #0f0);
+  }
+
+</style>
+
+
+<div class="container-fluid g-0">
+  <div class="row g-0 h-100">
+    <div id="shapeMenu" class="col bg-light p-2" style="height:100%;max-width:100px;border:10px solid rgba(0,0,0,0);">
+      <div class="shape" data-shape="circle">
+        <svg class="circle-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="49" fill="purple" stroke="black" stroke-width="1" />
+        </svg>
+      </div>
+      <div class="shape" data-shape="square">
+        <svg class="square-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="0" width="100" height="100" fill="green" stroke="black" stroke-width="1" />
+        </svg>
+      </div>
+      <div class="shape" data-shape="triangle">
+        <svg class="triangle-svg" width="100%" height="100%" viewBox="0 0 100 87" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <polygon points="50,0 100,86 0,86" fill="hotpink" stroke="black" stroke-width="1" />
+        </svg>
+      </div>
+      <div class="shape" data-shape="rectangle">
+        <svg class="rectangle-svg" width="100%" height="100%" viewBox="0 0 100 60" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="0" width="100" height="60" fill="orange" stroke="black" stroke-width="1" />
+        </svg>
+      </div>
+      <div class="shape" data-shape="diamond">
+        <svg class="diamond-svg" width="100%" height="100%" viewBox="0 0 100 80" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <polygon points="50,0 100,40 50,80 0,40" fill="blue" stroke="black" stroke-width="1" />
+        </svg>
+      </div>
+      <div class="shape" data-shape="star">
+        <svg class="star-svg" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 85"
+          fill="none">
+          <polygon points="45,0 56,30 90,30 63,52 73,85 45,65 17,85 27,52 0,30 34,30" fill="yellow" stroke="black"
+            stroke-width="1" />
+        </svg>
+      </div>
+      <div class="shape" data-shape="heart">
+        <svg class="heart-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="m 29.703568,1.0010808 a 28.70313,31.396622 0 0 0 -20.2964316,9.1950552 28.70313,31.396622 0 0 0 -1e-7,44.401932 L 49.999999,99 90.592864,54.598068 a 28.70313,31.396622 0 0 0 0,-44.401932 28.70313,31.396622 0 0 0 -40.592864,0 28.70313,31.396622 0 0 0 -20.296432,-9.1950552 z"
+            fill="red" stroke="black" stroke-width="1" />
+        </svg>
+      </div>
+
+      <div style="position:absolute;bottom:5px;">
+        <!-- selecting will replace the canvas with the selected canvas -->
+        <select id="loadCanvas" class="form-control border-primary mb-1">
+        </select>
+        <!-- this button will open a modal for entering a name to save as -->
+        <button id="saveCanvas" class="btn btn-sm btn-success">
+          <i class="material-icons">save_alt</i>
+        </button>
+        <!-- this button will open a modal to confirm clearing the canvas -->
+        <button id="clearCanvas" class="btn btn-sm btn-danger">
+          <i class="material-icons">delete</i>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Canvas area for dragging and dropping shapes -->
+    <div class="col" style="max-height:100vh;overflow:hidden;">
+      <div id="canvas" class="border bg-med" style="height: 100%;overflow:hidden;"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="clearCanvasModal" tabindex="-1" aria-labelledby="clearCanvasModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="clearCanvasModalLabel"><%- __("shapesDelete") %></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Keep</button>
+        <button type="button" class="btn btn-danger" id="clearCanvasConfirm">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+
+<script>
+$(function () {
+  var canvases = {};
+  var workingCanvas = "";
+  var minScale = 0.5; // Minimum scale factor
+  var maxScale = 3.0; // Maximum scale factor
+  var isDraggingHandle = false; // Track if the drag handle is active
+
+  // load default canvas from local storage if it exists. create a new canvas if it doesn't.
+  if (localStorage.getItem("shapes")) {
+    canvases = JSON.parse(localStorage.getItem("shapes"));
+    // load the default canvas
+    if (canvases.default) {
+      workingCanvas = "default";
+      $("#canvas").html(canvases.default);
+      $("#canvas .canvas-shape").each(function () {
+        makeTouchable($(this));
+      });
+    }
+    else {
+      $("#canvas").html("");
+    }
+  } else {
+    canvases.default = "";
+    workingCanvas = "default";
+    localStorage.setItem("shapes", JSON.stringify(canvases));
+  }
+
+
+  // populate the load canvas dropdown
+  for (let canvas in canvases) {
+    $("#loadCanvas").append(`<option value="${canvas}">${canvas}</option>`);
+  }
+
+  // load canvas from local storage
+  $("#loadCanvas").on("change", function () {
+    workingCanvas = $(this).val();
+    $("#canvas").html(canvases[workingCanvas]);
+    $("#canvas .canvas-shape").each(function () {
+      makeTouchable($(this));
+    });
+  });
+
+  // save canvas to local storage
+  $("#saveCanvas").on("click", function () {
+    let name = prompt("<%- __("shapesName") %>");
+    if (name) {
+      workingCanvas = name;
+      canvases["default"] = "";
+      canvases[workingCanvas] = $("#canvas").html();
+      localStorage.setItem("shapes", JSON.stringify(canvases));
+      $("#loadCanvas").append(`<option value="${name}">${name}</option>`);
+      $("#loadCanvas").val(name);
+    }
+  });
+
+
+  let z = 1; // makes sure the last selected item is on top
+
+  function setSelected() {
+    $(".canvas-shape").removeClass("selected");
+    $(this).addClass("selected");
+    // Add drag handle for rectangle, triangle, and diamond
+    if ($(this).attr("data-shape") === "rectangle" || $(this).attr("data-shape") === "triangle" || $(this).attr("data-shape") === "diamond") {
+      $(this).append('<div class="drag-handle"></div>');
+    }
+    // remove drag handle from other shapes
+    $(".canvas-shape").not(this).find(".drag-handle").remove();
+    $(this).css("z-index", z++);
+  }
+
+
+  function touchToDegrees(initial, current) {
+    let delta = current - initial;
+    let degrees = (delta + 180) % 360 - 180;   // Normalize to [-180, 180] range
+    return degrees;
+  }
+
+  function degreesToTouch(degrees) {
+    return (degrees + 180) % 360;
+  }
+
+
+  function getRotationAngle(element) {
+    var matrix = element.css('transform');
+    if (matrix !== 'none') {
+      var values = matrix.split('(')[1].split(')')[0].split(',');
+      var a = values[0];
+      var b = values[1];
+      var angle = Math.round(Math.atan2(b, a) * (180 / Math.PI));
+      return angle;
+    }
+    return 0;
+  }
+
+
+  function getScale(element) {
+    var matrix = element.css('transform');
+    if (matrix !== 'none') {
+      var values = matrix.split('(')[1].split(')')[0].split(',');
+      var a = values[0];
+      var b = values[1];
+      var scale = Math.sqrt(a * a + b * b);
+      return scale;
+    }
+    return 1;
+  }
+
+
+  function makeTouchable(item) {
+    const mc = new Hammer(item[0]);
+    var scale = 1;                 // current scale of the shape
+    var lastScale = 1;             // current scale of the shape
+    var itemRotation = 0;          // current rotation of the shape
+    var startingTouchRotation = 0; // reference for how much rotation to add
+    var initialLeft = 0;           // initial left position of the shape
+    var initialTop = 0;            // initial top position of the shape
+
+    mc.get('pinch').set({ enable: true });
+    mc.get('rotate').set({ enable: false });
+
+    mc.on("panstart", function (e) {
+      if (isDraggingHandle) return; // Disable Hammer.js events if the drag handle is active
+      initialLeft = parseInt(item.css("left"), 10) || 0;
+      initialTop = parseInt(item.css("top"), 10) || 0;
+    });
+
+    mc.on("panmove", function (e) {
+      if (isDraggingHandle) return; // Disable Hammer.js events if the drag handle is active
+      let dx = e.deltaX;
+      let dy = e.deltaY;
+      item.css({
+        left: `${initialLeft + dx}px`,
+        top: `${initialTop + dy}px`,
+      });
+    });
+
+    mc.on("panend", function () {
+      if (isDraggingHandle) return; // Disable Hammer.js events if the drag handle is active
+
+      // If the shape is dragged off the canvas, remove it
+      if (parseInt(item.css("left")) <= 0  || parseInt(item.css("left")) > $("#canvas").width()) {
+        item.remove();
+        if (workingCanvas === "default") {
+          canvases.default = $("#canvas").html();
+          localStorage.setItem("shapes", JSON.stringify(canvases));
+        }
+      }
+    });
+
+    mc.on("pinchstart", function (ev) {
+      startingTouchRotation = ev.rotation;
+      itemRotation = getRotationAngle(item);
+    });
+
+    mc.on("pinchmove", function (ev) {
+      let scale = Math.max(minScale, Math.min(lastScale * ev.scale, maxScale));
+      let newItemRotation = touchToDegrees(startingTouchRotation, ev.rotation) + itemRotation;
+      newItemRotation = parseInt(newItemRotation);
+      item.css({
+        transform: `scale(${scale}) rotate(${newItemRotation}deg)`,
+      });
+    });
+
+    mc.on("pinchend", function (ev) {
+      lastScale *= ev.scale;
+      if (workingCanvas === "default") {
+        canvases.default = $("#canvas").html();
+        localStorage.setItem("shapes", JSON.stringify(canvases));
+      }
+    });
+
+  }
+
+
+  // set all shapes to selected color
+  $('#colorMenu .nav-item').on('click', function () {
+    let color = $(this).text().toLowerCase();
+    color = color === "pink" ? "hotpink" : color;
+    $('#shapeMenu').addClass("rounded-3").css('border', `10px solid ${color}`);
+    $('#shapeMenu .shape svg').each(function () {
+      $(this).find('path, circle, rect, polygon').attr('fill', color);
+    });
+  });
+
+
+  $("#canvas").on("mousedown touchstart", ".canvas-shape", setSelected);
+  // Remove .selected and drag handle only when clicking on the canvas outside any shapes.
+  $("#canvas").on("mousedown", function (event) {
+    if (event.target.id === "canvas") {
+      $(".canvas-shape").removeClass("selected");
+      $(".drag-handle").remove();
+    }
+  });
+
+
+  $(document).on("keydown", function (event) {
+    if (event.key === "Delete") {
+      $(".selected").remove();
+      if (workingCanvas === "default") {
+        canvases.default = $("#canvas").html();
+        localStorage.setItem("shapes", JSON.stringify(canvases));
+      }
+    }
+  });
+
+
+  $("#clearCanvas").on("click", function () {
+    $("#clearCanvasModal").modal("show");
+  });
+
+
+  $("#clearCanvasConfirm").on("click", function () {
+    if (workingCanvas === "default") {
+      canvases.default = "";
+    } else {
+      delete canvases[workingCanvas];
+      $(`#loadCanvas option[value="${workingCanvas}"]`).remove();
+      workingCanvas = "default";
+      $("#loadCanvas").val("default");
+    }
+
+    $("#canvas").empty();
+    localStorage.setItem("shapes", JSON.stringify(canvases));
+    z = 1;
+    $("#clearCanvasModal").modal("hide");
+  });
+
+
+  // Handle dragging shapes from the shape menu to the canvas ////////////////////
+  var shapeMenu = new Hammer(document.getElementById('shapeMenu'));
+
+  shapeMenu.on('panstart', function (e) {
+    $(".canvas-shape").removeClass("selected");
+    var shape = $(e.target).closest('.shape');
+    var clone = shape.clone().removeClass('shape').addClass('canvas-shape selected');
+    $('#canvas').append(clone);
+    makeTouchable(clone);
+
+    clone.css({
+      position: 'absolute',
+      left: e.center.x - clone.width() / 2,
+      top: e.center.y - clone.height() / 2
+    });
+
+    // Add drag handle for rectangle, triangle, and diamond
+    if (clone.attr("data-shape") === "rectangle" || clone.attr("data-shape") === "triangle" || clone.attr("data-shape") === "diamond") {
+      clone.append('<div class="drag-handle"></div>');
+    }
+    // remove drag handle from other shapes
+    $(".canvas-shape").not(clone).find(".drag-handle").remove();
+  });
+
+  shapeMenu.on('panmove', function (e) {
+    var clone = $('#canvas .canvas-shape.selected');
+
+    clone.css({
+      left: e.center.x - clone.width() / 2,
+      top: e.center.y - clone.height() / 2,
+      transform: `scale(1) rotate(0deg)`
+    });
+  });
+
+  shapeMenu.on('panend', function () {
+    if (workingCanvas === "default") {
+      canvases.default = $("#canvas").html();
+      localStorage.setItem("shapes", JSON.stringify(canvases));
+    }
+  });
+
+
+  var isDraggingHandle = false;
+  // Drag handle functionality
+  $(document).on("mousedown touchstart", ".drag-handle", function (e) {
+    let shape = $(this).closest('.canvas-shape');
+    let currentAngle = shape.css('transform') === 'none' ? 0 : getRotationAngle(shape);
+    let currentHeight = shape.height();
+    let startWidth = shape.width();
+    startDrag(e, currentAngle, currentHeight, startWidth);
+  });
+
+  function startDrag(e, currentAngle, currentHeight, startWidth) {
+    e.preventDefault();
+    isDraggingHandle = true;
+    const shape = e.target.closest('.canvas-shape');
+    $(document).on('mousemove touchmove', drag);
+    $(document).on('mouseup touchend', stopDrag);
+
+    const shapeBounds = shape.getBoundingClientRect();
+    const shapeCenter = {
+      x: shapeBounds.left + shapeBounds.width / 2,
+      y: shapeBounds.top + shapeBounds.height / 2
+    };
+
+    // Calculate initial angle of rotation for mouse or touch
+    var initialAngle;
+    if (e.type === 'mousedown') {
+      initialAngle = Math.atan2(e.clientX - shapeCenter.x, -(e.clientY - shapeCenter.y)) * (180 / Math.PI);
+    } else {
+      initialAngle = Math.atan2(e.touches[0].clientX - shapeCenter.x, -(e.touches[0].clientY - shapeCenter.y)) * (180 / Math.PI);
+    }
+
+    function drag(e) {
+      
+      // calculate deltas for mouse or touch
+      let deltaX, deltaY;
+      if (e.type === 'mousemove') {
+        deltaX = e.clientX - shapeCenter.x;
+        deltaY = e.clientY - shapeCenter.y;
+      } else {
+        deltaX = e.touches[0].clientX - shapeCenter.x;
+        deltaY = e.touches[0].clientY - shapeCenter.y;
+      }
+      const angle = Math.atan2(deltaX, -(deltaY)) * (180 / Math.PI);
+      const newRotation = angle - initialAngle;
+      currentHeight = 2 * Math.sqrt(deltaX * deltaX + deltaY * deltaY); // Twice the distance between the point of rotation and the cursor
+
+      // Reset transform origin and apply new rotation and height
+      shape.style.transformOrigin = 'center center';
+      shape.style.transform = `rotate(${currentAngle + newRotation}deg)`;
+      shape.style.height = `${currentHeight}px`;
+      shape.style.width = `${startWidth}px`; // Keep width constant
+
+      const svg = shape.querySelector('svg');
+      const polygon = svg.querySelector('polygon');
+      const rect = svg.querySelector('rect');
+
+      svg.setAttribute('viewBox', `0 0 ${startWidth} ${currentHeight}`);
+      shape.setAttribute('height', currentHeight);
+
+      if (shape.getAttribute("data-shape") === "triangle") {
+        polygon.setAttribute('points', `${startWidth / 2},0 ${startWidth},${currentHeight} 0,${currentHeight}`); // For triangle
+      } else if (shape.getAttribute("data-shape") === "diamond") {
+        polygon.setAttribute('points', `${startWidth / 2},0 ${startWidth},${currentHeight / 2} ${startWidth / 2},${currentHeight} 0,${currentHeight / 2}`); // For diamond
+      } else {
+        rect.setAttribute('height', currentHeight);
+        rect.setAttribute('width', startWidth);
+      }
+
+      // Adjust shape position
+      const newTop = shapeCenter.y - currentHeight / 2;
+      shape.style.top = `${newTop}px`;
+    }
+
+    function stopDrag() {
+      currentAngle += touchToDegrees(0, currentAngle);
+      currentHeight = 0;
+
+      $(document).off('mousemove touchmove', drag);
+      $(document).off('mouseup touchend', stopDrag);
+      
+      // Update current angle
+      const matrix = new DOMMatrix(getComputedStyle(shape).transform);
+      currentAngle = Math.atan2(matrix.b, matrix.a) * (180 / Math.PI);
+      isDraggingHandle = false;
+    }
+  }
+
+
+  document.addEventListener('contextmenu', function (e) {
+    e.preventDefault();
+  });
+
+});
+</script>
+
+<%- include('../foot'); -%>

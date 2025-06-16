@@ -200,6 +200,16 @@ router.get('/shapes', (req, res)=>{
   }
 });
 
+router.get('/clothes', (req, res)=>{
+  try{
+    res.render('activities/clothes');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
 router.get('/speech', (req, res)=>{
   try{
     res.render('activities/speech');

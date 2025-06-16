@@ -4,6 +4,9 @@
     #menucontainer {
       display: none;
     }
+    .ql-toolbar {
+      display: none;
+    }
     body{
       background-image: none !important;
     }
@@ -42,6 +45,10 @@
         <label for="showtext" class="form-check-label">Text</label>
       </div>
 
+      <div class="form-check mx-3">
+        <input type="checkbox" id="header" class="form-check-input">
+        <label for="header" class="form-check-label">Header</label>
+      </div>
 
       <button id="print" class="btn btn-sm btn-outline-success py-0 mx-3">
         <i class="material-icons">print</i>
@@ -50,9 +57,15 @@
     </div>
   </div>
 
+  <div id="editorWrapper" style="display:none;">
+    <div id="editor" class="bg-white w-100 border-0" autofocus></div>
+  </div>
   <div id="grid" class="d-flex flex-wrap justify-content-center"></div>
 
 <%- include ("../modals/modal_grid.ejs") %>
+
+<link href="https://cdn.quilljs.com/1.0.0/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.quilljs.com/1.0.0/quill.js" defer></script>
 
 <script>
 $(function(){
@@ -105,11 +118,7 @@ $(function(){
                style="max-height:75%;max-width:75%;"
                onerror="altOnly(this)">
 
-          <div class="txt text-center YM w-100 position-absolute bottom-0 mb-1" 
-              style="text-stroke: 1px white;-webkit-text-stroke: 1px white;display:none;">
-            ${workingdeck[i].word}
-          </div>
-          <div class="txt text-center YM w-100 position-absolute bottom-0 mb-1" style="display:none;">
+          <div class="txt text-center YM w-100 position-absolute bottom-0 mb-1" style="display:none;" contenteditable="true">
             ${workingdeck[i].word}
           </div>
 
@@ -131,6 +140,11 @@ $(function(){
     else $('.txt').hide();
   });
 
+  $("#header").on('change', ()=>{
+    let header = $("#header").prop('checked');
+    if (header) $('#editorWrapper').show();
+    else $('#editorWrapper').hide();
+  });
 
   $("#print").on('click', ()=>{
     window.print();
@@ -141,6 +155,33 @@ $(function(){
   });
 
   setGrid();
+
+  var editor = new Quill('#editor', {
+    modules: {
+      toolbar: {
+        container: [
+          {'font': [] }, 
+      // {'size': ['small', false, 'large', 'huge'] }, 
+          {'header': [1, 2, 3, 4, 5, 6, false] }, 
+          'bold', 
+          'italic', 
+          'underline', 
+          {'color': [] }, 
+          {'background': [] }, 
+          'strike', 
+          {'script': 'sub'}, 
+          {'script': 'super' }, 
+          {'align': [] }, 
+          {'indent': '+1' }, 
+          {'indent': '-1'}, 
+          {'list': 'ordered'}, 
+          {'list': 'bullet' }, 
+          'clean']
+      }
+    },
+    theme: 'snow'
+  });
+
 });
 
 </script>
