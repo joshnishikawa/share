@@ -239,6 +239,13 @@
   });
 
 
+// set height of the font to the size of the card
+  $(".flip-front").each(function(){
+    let height = $(this).parent().height() * 0.8;
+    $(this).css('font-size', `${height}px`);
+  });
+
+
   $(".flip").on('click', function(){
     $(this).toggleClass('flipped').promise().done(function(){
       if ($('.flip.flipped').length == 2){
