@@ -19,6 +19,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Yusei+Magic&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="/stylesheets/style.css">
+  <link rel="stylesheet" href="/stylesheets/universal.css">
   <link rel="stylesheet" href="/stylesheets/progress.css">
 </head>
 
@@ -35,8 +36,8 @@
 
 
 <body>
-<div id="sheet" class="container-fluid YM" 
-     style="min-height:100%;font-size: 3rem;line-height: 4.5rem;">
+<div id="sheet" class="container-fluid YM g-0" 
+     style="min-height:100%;font-size: 2rem;line-height: 4.5rem;">
 </div>
 
 
@@ -99,18 +100,11 @@ $(function(){
         <div class="col-3">
           <div>${prefectures[p]}</div>
         </div>
-        <div class="col" style="position: relative;">
-          <div style="position: absolute; top: 28%; left: 10px; right: 10px;" class="border-bottom"></div>
-          <div style="position: absolute; top: 43%; left: 10px; right: 10px;" class="border-bottom"></div>
-          <div style="position: absolute; top: 78%; left: 10px; right: 10px;" class="border-bottom border-secondary"></div>
-          <div style="position: absolute; top: 93%; left: 10px; right: 10px;" class="border-bottom"></div>
-          <div style="position:absolute;top: 0;color: lightgray;">${p}</div>
+        <div class="col NHdot">
+          |${p}|
         </div>
-        <div class="col" style="position: relative;">
-          <div style="position: absolute; top: 28%; left: 10px; right: 10px;" class="border-bottom"></div>
-          <div style="position: absolute; top: 43%; left: 10px; right: 10px;" class="border-bottom"></div>
-          <div style="position: absolute; top: 78%; left: 10px; right: 10px;" class="border-bottom border-secondary"></div>
-          <div style="position: absolute; top: 93%; left: 10px; right: 10px;" class="border-bottom"></div>
+        <div class="col NHline" style="overflow: hidden;">
+          ||||||||||||||||||||||||||||||||||||||||||||||||||
         </div>
       </div>
     `;

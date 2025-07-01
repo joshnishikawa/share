@@ -80,19 +80,19 @@ $(function(){
 
 
   getNextLetter = async (k)=>{
-    if (deck.length == 0){
-      finished = true;
-      return;
-    }
-    else {
-      if (k == l){
-        await $(`#${l}`).text(l).removeClass('text-danger'); // show the letter again
+    if (k == l){
+      await $(`#${l}`).text(l).removeClass('text-danger'); // show the letter again
+      if (deck.length == 0){
+        finished = true;
+        return;
+      }
+      else {
         l = deck.pop();
         underscore();
       }
-      else {
-        $(`#${l}`).text(l).addClass('text-danger');
-      }
+    }
+    else {
+      $(`#${l}`).text(l).addClass('text-danger');
     }
   }
 

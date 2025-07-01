@@ -40,6 +40,11 @@
         </div>
       </div>
 
+      <button id="shuffle" class="btn btn-sm btn-outline-primary py-0 me-3 d-flex align-items-center">
+        <i class="material-icons me-1">shuffle</i>
+        <span>Shuffle</span>
+      </button>
+
       <div class="form-check mx-3">
         <input type="checkbox" id="showtext" class="form-check-input">
         <label for="showtext" class="form-check-label">Text</label>
@@ -133,6 +138,11 @@ $(function(){
     // set height of all each .space to be the same as its width
     if (text) $('.txt').show();
   }
+
+  $("#shuffle").on('click', ()=>{
+    deck = FYshuffle(deck);
+    setGrid();
+  });
 
   $("#showtext").on('change', ()=>{
     text = $("#showtext").prop('checked');
