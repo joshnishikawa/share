@@ -6,42 +6,50 @@
     <div class="col-sm-4 mb-3">
 
 <!-- MY GROUP -->
-      <div id="myGroup" class="container alert-primary text-center border border-primary rounded-3 pb-3 mb-3">
+      <div id="myGroup" class="container alert-primary border border-primary rounded-3 pb-3 mb-3">
         <div class="row">
-          <div class="col-4">
-            My Group:
+
+          <div class="col-3">
+            Group:
           </div>
-          <div class="col-8 fs-1">
-            <div id="room"></div>
+
+          <div class="col-9 fs-1">
+            <div id="roomname"></div>
           </div>
         </div>
 
-        <div class="row bg-light border border-primary rounded-3 px-1">
-          <div class="col-2 g-0">
-            <div id="myPawn" class="my-1" style="margin:auto;width:32px;"></div>
+        <div class="row bg-light border border-primary rounded-3">
+          <div class="col-2">
+            <div id="myPawn" class="my-1 text-center" style="margin:auto;width:32px;"></div>
           </div>
           <div class="col-10">
             <div id="myName" class="fs-3" style="text-shadow:0px 0px 2px #555"></div>
-            <div class="d-flex mb-1 justify-content-center">
+
+            <div class="d-flex justify-content-between mb-1">
               <button id="getName" class="btn btn-sm btn-outline-primary px-1 py-0">Change Name</button>
-              <input id="color" type="color">
+              <input id="color" class="form-control form-control-sm p-0 mx-1" type="color">
+
             </div>
           </div>
         </div>
 
         <div id="otherPlayers">
-          <!-- players will be added dynamically here -->
+          <!-- rows for other players will be added dynamically here -->
+        </div>
+
+        <div class="mx-0" id="leaveGroup" style="display: none;">
+          <img src="/image/exit.svg" alt="leave group" class="img-fluid point" style="width: 64px; height: 64px;" title="Leave Group">
         </div>
 
       </div> <!-- end of myGroup -->
 
 
 <!-- FRIEND'S GROUP -->
-      <div id="group" class="container alert-success text-center border border-success rounded-3 py-3">
+      <div id="group" class="container alert-success text-center border border-success rounded-3 py-3" style="display: none;">
         <div class="row">
           <div class="col-12 g-0">
 
-            <form id="roomSearchForm" class="form d-flex">
+            <form id="roomSearchForm" class="form d-flex mb-3">
               <button id="join" class="btn btn-success" disabled>
                 <i class="material-icons fs-1">groups</i>
               </button>
@@ -49,20 +57,17 @@
             </form>
 
           </div>
+          <div id="foundplayers" class="text-success">
+            <!-- player names only will be added dynamically here -->
+          </div>
         </div>
-
-<!-- players will be added dynamically here -->
 
       </div> <!-- end of friend's group -->
 
     </div> 
     
     <div id="activity" class="col-sm-8 border border-primary mb-3">
-      <!-- <div id="choose" class="activity btn btn-lg btn-success display-1">Choose</div> -->
-       <p>TODO: Users need to be able to leave / close rooms.</p>
-       <p>Player IDs should be listed before user hits 'join' button.</p>
-       <p></p>
-       <div id="choose" class="activity btn btn-lg btn-success display-1">Choose</div>
+      <div id="choose" class="activity btn btn-lg btn-success display-1">Choose</div>
     </div>
 
   </div>
@@ -73,13 +78,22 @@
 <script src="https://cdn.socket.io/4.0.1/socket.io.js"></script>
 
 <script>
+// VARIABLES ////////////////////////////////////////////////////////////////////
+  var room = {};
+  var player = {id: null, color: "#cccccc", roomname: null, roomtype: "private", closed: false, number: 1};
+  var socket = io();
+
 $(function(){
+  
+  // localStorage.removeItem('player'); // DEBUG: so I don't have to clear my iPhone cache
   $(`#groups-tab`).addClass("active");
 
   $(".activity").on('click', function(){
     loadActivity( $(this).attr('id') );
   });
 
+
+// FUNCTIONS ////////////////////////////////////////////////////////////////////
   function loadActivity(activity) {
     $.ajax({
       url: `/pages/groups/${activity}.html`,
@@ -93,29 +107,41 @@ $(function(){
     });
   }
 
-// VARIABLES ////////////////////////////////////////////////////////////////////
-  var socket = io();
-  var room = {};
-  var player = {id: null, color: "#cccccc", number: 1};
 
-// FUNCTIONS ////////////////////////////////////////////////////////////////////
   function updatePlayerList(data){
-    $(`#otherPlayers`).empty();
-        for (let p of data) {
-          if (p.id == player.id) continue;
+    if (data.length != 1) {
+      $("#group").removeClass("d-flex").addClass("d-none");
+      $("#leaveGroup").show();
+    }
+    else {
+      $("#group").removeClass("d-none").addClass("d-flex");
+      $("#leaveGroup").hide();
+    }
 
-          $(`#otherPlayers`).append(`
-            <div class="row bg-light border border-primary rounded-3">
-              <div class="col-2">
-                <div id="pawn${p.number}" class="mx-2 my-1"></div>
-              </div>
-              <div class="col-10">
-                <div id="name${p.number}" class="fs-4" style="color: ${p.color};text-shadow:0px 0px 2px #555;">${p.id}</div>
-              </div>
-            </div>
-          `);
-          setColor(p.number, p.color);
-        }
+    //console.log(data); // DEBUG
+    $(`#otherPlayers`).empty();
+    for (let p of data) {
+      if (p.id == player.id){
+        $(`#myName`).text(p.id);
+        $(`#myName`).css('color', player.color);
+        $(`#color`).val(player.color);
+        $(`#myPawn`).html(getPawn(player.color));
+        localStorage.setItem('player', JSON.stringify(player));
+      }
+      else {
+      $(`#otherPlayers`).append(`
+        <div class="row bg-light border border-primary rounded-3">
+          <div class="col-2">
+            <div id="pawn${p.number}" class="text-center my-1" style="margin:auto;width:24px;"></div>
+          </div>
+          <div class="col-10">
+            <div id="name${p.number}" class="fs-4" style="color: ${p.color};text-shadow:0px 0px 2px #555;">${p.id}</div>
+          </div>
+        </div>
+      `);
+        setColor(p.number, p.color); // Only set color for other players
+      }
+    }
   }
 
 
@@ -161,14 +187,14 @@ $(function(){
   }
 
 
-  function getName(socket) {
+  function getName() {
     return new Promise((resolve, reject) => {
-      socket.emit('getName', { room, player });
+      socket.emit('getName', player);
 
       socket.on('setName', function(data) {
         if (data.id) {
           player.id = data.id;
-          resolve(data.id);
+          resolve();
         } else {
           reject('Failed to get name from server');
         }
@@ -189,7 +215,7 @@ $(function(){
       $(`#pawn${number}`).html(getPawn(color));
       $(`#name${number}`).css('color', color);
     }
-    // add other things to change color or make #pawn & #name into classes?
+    socket.emit('setColor', player);
   }
 
 
@@ -202,72 +228,47 @@ $(function(){
     e.preventDefault();
     // if #join is disabled, then the room does not exist
     if ($("#join").prop('disabled')) return;
-    let data = { room: {roomname: $("#roomSearch").val(), type: 'private'}, player};
-    socket.emit('join', data);
+    let newRoom = $("#roomSearch").val();
+    socket.emit('join', {newRoom, player});
+    $("#roomSearch").val(''); // clear the search input
+    $("#foundplayers").empty(); // clear the found players list
+    $("#join").prop('disabled', true); // disable the join button again
   });
 
-  $("#getName").on('click', ()=>{
-    socket.emit('getName', {room, player});
-  });
+  $("#getName").on('click', getName);
 
   $("#color").on('change', ()=>{
     let color = $("#color").val();
-    player.color = color;
     setColor(player.number, color);
-    socket.emit('setColor', {room, player});
   });
 
+  $("#leaveGroup").on('click', ()=>{
+    $(`#roomSearch`).val(player.roomname);
+    $("#roomSearch").trigger('input');
+    socket.emit('leave', player);
+  });
 
-
+  $(".activity").on('click', function(){
+    loadActivity( $(this).attr('id') );
+  });
 
 // SOCKET EVENTS ///////////////////////////////////////////////////////////////
   socket.on('connect', async()=>{
-    // localStorage.setItem('player', JSON.stringify({id: "Daring Seafarer", color: "#b20a0a", number: 1}))
-    let stored_player = JSON.parse(localStorage.getItem('player'));
-    let stored_room = JSON.parse(localStorage.getItem('room'));
-
-    if (stored_player){
-      player = stored_player;
-      $("#myName").text(player.id);
-      setColor(player.number, player.color);
-    }
-    else {
-      $("#myPawn").html(getPawn(player.color));
-      await getName(socket);
-      await setColor(player.number, player.color);
-    }
-
-
-    if (stored_room) {
-      let now = new Date();
-      if (now - new Date(stored_room.date) > 1000*60*60*12) { // 12 hours old, delete
-        localStorage.removeItem('room');
-        socket.emit('join', {player});
-      }
-      else {
-        room = stored_room;
-        socket.emit('join', {room, player});
-      }
-    }
-    else {
-      socket.emit('join', {player});
-    }
+    let stored_player = await JSON.parse(localStorage.getItem('player'));
+    if (!stored_player) await getName();
+    else player = stored_player;
+    socket.emit('join', player);
   });
 
 
   socket.on('joined', (data)=>{
-    if (data.room) {
-      room = data.room;
-      player.number = data.playerNum;
-      localStorage.setItem('room', JSON.stringify(data.room));
-      localStorage.setItem('player', JSON.stringify(player));
-      $(`#room`).text(room.roomname);
-      updatePlayerList(data.room.players);
-    }
-    else {
-      localStorage.removeItem('room');
-      socket.emit('join', {player});
-    }
+    room = data.room;
+    player.number = data.playerNum;
+    player.roomname = room.roomname;
+    localStorage.setItem('player', JSON.stringify(player));
+    $(`#room`).text(player.roomname);
+    $(`#roomname`).text(player.roomname);
+    updatePlayerList(data.room.players);
   });
 
 
@@ -285,9 +286,13 @@ $(function(){
 
   socket.on('roomSearch', (data)=>{
     if (data) {
+      for (let p of data.players) {
+        $(`#foundplayers`).append(`<div style="color: ${p.color};text-shadow:0px 0px 2px #000;">${p.id}</div>`);
+      }
       $("#join").prop('disabled', false);
     }
     else {
+      $(`#foundplayers`).empty();
       $("#join").prop('disabled', true);
     }
   });
@@ -295,11 +300,20 @@ $(function(){
 
   // other players' events /////////////////////////////////////////////////////
   socket.on('playerJoined', (data)=>{
-    console.log('what the absolute fuck?');
-    console.log(data);
-    updatePlayerList(data.players);
+    updatePlayerList(data);
+  });
+  
+  socket.on('youLeft', (data)=>{
+    room = {};
+    player.roomname = null; // reset the roomname
+    player.roomtype = "private"; // reset the roomtype
+    player.number = 1; // reset the player number
+    socket.emit('join', player); // join a new private room
   });
 
+  socket.on('playerLeft', (data)=>{
+    updatePlayerList(data);
+  });
 
   socket.on('setColor', (data)=>{
     setColor(data.number, data.color);
@@ -309,4 +323,3 @@ $(function(){
 </script>
 
 <%- include('../foot.ejs') -%>
-  

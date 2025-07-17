@@ -1,4 +1,4 @@
-const { da, pl } = require('google-translate-api-jp/languages');
+const { da, pl, so } = require('google-translate-api-jp/languages');
 
 const adjectives = [
   "Agile", "Brave", "Cunning", "Daring", "Eager", "Fearless", "Gentle", "Happy", "Inventive", "Jolly", 
@@ -44,74 +44,71 @@ const nouns = [
 
 const groups = (io) => {
 const rooms = require('../rooms.json');
-var publicRooms = {}; // array of public rooms in use
-var privateRooms = {}; // array of private rooms in use
+var publicRooms = {};
+var privateRooms = {};
 
 
 function openPublicRoom(data){
+  console.log('Attempting to open public room.');
   let available = rooms.filter(x => !Object.keys(publicRooms).includes(x) 
                                  && !Object.keys(privateRooms).includes(x));
-  if (available.length === 0) return null; // no available rooms
+  if (available.length === 0) {
+    console.log('No available public rooms.');
+    return null; // no available rooms
+  }
   else {
     let roomname = available[Math.floor(Math.random() * available.length)];
     let date = Date.now(); // current unix timecode
-    data.player.number = 1; // set the player number to 1 if it's a new room
+    data.number = 1; // set the player number to 1 if it's a new room
     publicRooms[roomname] = {roomname, type: 'public',
-                             activity: data.room.activity, players: [data.player],
+                             activity: data.room.activity, players: [data],
                              date}; // add the word to the rooms object
+    console.log(`Public room "${roomname}" opened.`);
     return roomname;
   }
 }
 
 
 function openPrivateRoom(data){
+  console.log('Attempting to open private room.');
+  // check if there are any available rooms
   let available = rooms.filter(x => !Object.keys(publicRooms).includes(x) 
                                  && !Object.keys(privateRooms).includes(x));
-  if (available.length === 0) return null; // no available rooms
+  if (available.length === 0) {
+    console.log('No available private rooms.');
+    return null; // no available rooms
+  }
   else {
     let roomname = available[Math.floor(Math.random() * available.length)];
     let date = Date.now(); // current unix timecode
-    data.player.number = 1; // set the player number to 1 if it's a new room
+    data.number = 1; // set the player number to 1 if it's a new room
     privateRooms[roomname] = {roomname, type: 'private', open: true, 
-                              activity: null, players: [data.player],
+                              activity: null, players: [data],
                               date}; // add the room to the rooms object
+    console.log(`Private room "${roomname}" opened.`);
     return roomname;
   }
 }
 
 
 function closePublicRoom(roomname){
-  publicRooms = publicRooms.filter(x => x !== roomname);
+  delete publicRooms[roomname];
+  console.log(`Public room "${roomname}" closed.`);
 }
 
 
 function closePrivateRoom(roomname){
-  privateRooms = privateRooms.filter(x => x !== roomname);
-}
-
-
-function joinNewPrivateRoom(socket, data){
-  let roomname = openPrivateRoom(data);
-  if (roomname === null){
-    console.log('FIXME: NO AVAILABLE ROOMS, WE PROBABLY NEED TO FILTER EXPIRED ONES');
-    socket.emit('joined', {message: "No more available rooms."});
-    return;
-  }
-  else {
-    data['room'] = privateRooms[roomname];
-    data.player.number = 1;
-    joinPrivateRoom(socket, data);
-  }
+  delete privateRooms[roomname];
+  console.log(`Private room "${roomname}" closed.`);
 }
 
 
 function joinPrivateRoom(socket, data){
-  let roomname = Object.keys(privateRooms).includes(data.room.roomname) ?
-                 data.room.roomname : 
+  let roomname = Object.keys(privateRooms).includes(data.roomname) ?
+                 data.roomname : 
                  openPrivateRoom(data);
-
   if (roomname === null){
-    console.log('FIXME: NO AVAILABLE ROOMS, WE PROBABLY NEED TO FILTER EXPIRED ONES');
+    console.log('No available private rooms.'); // FIXME: we need to filter expired rooms
     socket.emit('joined', {message: "No more available rooms."});
     return;
   }
@@ -120,13 +117,13 @@ function joinPrivateRoom(socket, data){
     let playerFound = false;
     let playerNum;
     for (let player of room.players){
-      if (player.id === data.player.id){
+      if (player.id === data.id){
         playerFound = true;
         playerNum = player.number;
         break;
       }
     }
-    
+
     if (!playerFound){
       if (!room.open){
         socket.emit('joined', {message: "Sorry, this room is closed and your name is not on the list."});
@@ -138,13 +135,11 @@ function joinPrivateRoom(socket, data){
         let playerNum = 1;
         let playerNums = room.players.map(x => x.number);
         while (playerNums.includes(playerNum)) playerNum++;
-        data.player.number = playerNum;
-        room.players.push(data.player);
+        data.number = playerNum;
+        room.players.push(data);
         socket.emit('joined', {room, playerNum});
-        // log all the sockets in the room
-        console.log('sockets in room: ', io.sockets.adapter.rooms.get(roomname));
-        socket.broadcast.to(roomname).emit('playerJoined', room);
-        console.log(`${socket.id} joined the private room. "${roomname}" as player ${data.player.number}.`);
+        socket.broadcast.to(roomname).emit('playerJoined', room.players);
+        console.log(`${socket.id} joined the private room. "${roomname}" as player ${data.number}.`);
       }
       else {
         socket.emit('joined', {message: "Sorry, this room is full."});
@@ -153,7 +148,7 @@ function joinPrivateRoom(socket, data){
     else {
       socket.join(roomname);
       socket.emit('joined', {room, playerNum});
-      socket.broadcast.to(roomname).emit('playerJoined', room);
+      socket.broadcast.to(roomname).emit('playerJoined', room.players);
       console.log(`${socket.id} rejoined the private room "${roomname}" as player ${playerNum}.`);
     }
   }
@@ -175,7 +170,7 @@ function joinPublicRoom(socket, data){
     let playerFound = false;
     let playerNum;
     for (let player of room.players){
-      if (player.id === data.player.id){
+      if (player.id === data.id){
         playerFound = true;
         playerNum = player.number;
         break;
@@ -188,23 +183,23 @@ function joinPublicRoom(socket, data){
         let playerNums = room.players.map(x => x.number);
         let playerNum = 1;
         while (playerNums.includes(playerNum)) playerNum++;
-        data.player.number = playerNum;
-        room.players.push(data.player);
+        data.number = playerNum;
+        room.players.push(data);
         socket.join(roomname);
         socket.emit('joined', {room, playerNum});
         // broadcast to all sockets in the room except the sender
-        socket.broadcast.to(roomname).emit('playerJoined', room);
+        socket.broadcast.to(roomname).emit('playerJoined', room.players);
         console.log(`${socket.id} joined the public room. "${roomname}"`);
       }
       else socket.emit('joined', {message: "Sorry, this room filled up. You'll join a new one."});
     }
     else {
       for (let player of room.players){
-        if (player.id === data.player.id){
+        if (player.id === data.id){
           socket.join(roomname);
           socket.emit('joined', {room, playerNum});
           // broadcast to all sockets in the room except the sender
-          socket.broadcast.to(roomname).emit('playerJoined', room);
+          socket.broadcast.to(roomname).emit('playerJoined', room.players);
           console.log(`${socket.id} rejoined the public room. "${roomname}"`);
           return;
         }
@@ -214,32 +209,70 @@ function joinPublicRoom(socket, data){
 }
 
 
+function leaveRoom(socket, data){
+  let roomname = data.roomname;
+  let roomtype = data.roomtype;
+  let id = data.id;
+  let room;
+
+  socket.leave(data.roomname);
+
+  if (roomtype === 'public'){
+    if (publicRooms[roomname]){
+      room = publicRooms[roomname];
+      room.players = room.players.filter(player => player.id !== id);
+      if (room.players.length === 0){
+        closePublicRoom(roomname);
+        console.log(`Closing public room "${roomname}" as it has no players left.`);
+      }
+      else io.to(roomname).emit('playerLeft', room.players);
+    }
+  }
+  else if (roomtype === 'private'){
+    if (privateRooms[roomname]){
+      room = privateRooms[roomname];
+      room.players = room.players.filter(player => player.id !== id);
+      if (room.players.length === 0){
+        console.log(`Closing private room "${roomname}" as it has no players left.`);
+        closePrivateRoom(roomname);
+      }
+      else io.to(roomname).emit('playerLeft', room.players);
+    }
+  }
+  console.log(`${socket.id} left the room "${roomname}".`);
+}
+
+
 // SOCKET.IO EVENTS ////////////////////////////////////////////////////////////
 io.sockets.on('connection', socket =>{
-  console.log('socket connected: ', socket.id);
-
+  console.log('socket connected: ', socket.id);  
   socket.on('join', function(data){
-    if (data.room){
-      if (data.room.type === 'public'){
-        joinPublicRoom(socket, data);
+    if (data.newRoom) {
+      console.log(`${data.player.id} is joining a different room: ${data.newRoom}`);
+      leaveRoom(socket, data.player);
+      if (Object.keys(privateRooms).includes(data.newRoom)){
+        data.player.roomname = data.newRoom; // update the roomname
+        joinPrivateRoom(socket, data.player);
       }
-      else if (data.room.type === 'private'){
-        joinPrivateRoom(socket, data);
+      else if (Object.keys(publicRooms).includes(data.newRoom)){
+        joinPublicRoom(socket, data.player);
       }
-      else { // room doesn't exist any more, open a new one
-        joinNewPrivateRoom(socket, data);
+      else {
+        openPrivateRoom(socket, data.player);
       }
     }
-    else { // choose a random available room, add to privateRooms and return it
-      joinNewPrivateRoom(socket, data);
+    else if (!data.roomname || data.roomtype === 'private'){
+      joinPrivateRoom(socket, data);
+    }
+    else {
+      joinPublicRoom(socket, data);
     }
   });
 
 
   socket.on('roomSearch', function(data){
-    console.log('roomSearch: ', data);
     if (Object.keys(privateRooms).includes(data)){
-      socket.emit('roomSearch', true);
+      socket.emit('roomSearch', privateRooms[data]);
     }
     else {
       socket.emit('roomSearch', false);
@@ -247,80 +280,78 @@ io.sockets.on('connection', socket =>{
   });
 
 
-  socket.on('setColor', function(data){
-    let room;
-    if (data.room.type === 'public'){
-      room = publicRooms[data.room.roomname];
-    }
-    else if (data.room.type === 'private'){
-      room = privateRooms[data.room.roomname];
-    }
-
-    for (let player of room.players){
-      if (player.id === data.player.id){
-        player.color = data.player.color;
-        socket.broadcast.to(data.room.roomname).emit('setColor', {number: player.number, color: player.color});
-        break;
-      }
-    }
-  });
-  
-
   socket.on('getName', function(data){
+    let roomname = data.roomname;
     let room;
     let adj = adjectives[Math.floor(Math.random() * adjectives.length)];
     let noun = nouns[Math.floor(Math.random() * nouns.length)];
     let newName = `${adj} ${noun}`;
 
-    if (data.room.type){ // user is already in a room
-      if (data.room.type === 'public' && publicRooms[data.room.roomname]){ 
-        room = publicRooms[data.room.roomname];
+    if (roomname){ // user is already in a room
+      if (publicRooms[roomname]){ 
+        room = publicRooms[roomname];
         for (let player of room.players){
-          if (player.id === data.player.id){
+          if (player.id === data.id){
             player.id = newName;
-            // broadcast to all sockets in the room including sender
-            io.in(data.room.roomname).emit('setName', {number: data.player.number, id: newName});
-            break;
+            io.to(roomname).emit('setName', {number: player.number, id: player.id});
+            return;
           }
         }
       }
-      else if (data.room.type === 'private' && privateRooms[data.room.roomname]){
-        room = privateRooms[data.room.roomname];
+      else if (privateRooms[roomname]){
+        room = privateRooms[roomname];
         for (let player of room.players){
-          if (player.id === data.player.id){
+          if (player.id === data.id){
             player.id = newName;
-            // broadcast to all sockets in the room including sender
-            io.in(data.room.roomname).emit('setName', {number: data.player.number, id: newName});
-            break;
+            io.to(roomname).emit('setName', {number: player.number, id: player.id});
+
+            return;
           }
         }
       }
-      else { // room no longer exists, open a new one under the newName and return it
-        socket.emit('setName', {number: data.player.number, id: newName});
-      }
     }
-    else { // New users need a name before their room can be created
-      socket.emit('setName', {number: data.player.number, id: newName});
-    }
+    socket.emit('setName', {id: newName, number: 1});
   });
 
 
-  socket.on('leave', async function(data){ // data = {room: 'room1'}
-    socket.leave(data.room);
-    // emit to all sockets in the room including sender
-    io.in(data.room).emit('left', socketIds);
+  socket.on('setColor', function(data){
+    let room;
+    let roomname = data.roomname;
+    if (publicRooms[roomname]){
+      room = publicRooms[roomname];
+    }
+    else if (privateRooms[roomname]){
+      room = privateRooms[roomname];
+    }
+
+    if (room) {
+      for (let player of room.players){
+        if (player.id === data.id){
+          player.color = data.color;
+          socket.broadcast.to(roomname).emit('setColor', {number: player.number, color: player.color});
+          break;
+        }
+      }
+    }
+  });
+  
+
+  socket.on('leave', function(data){
+    leaveRoom(socket, data);
+    socket.emit('youLeft');
+    // console.log(privateRooms[data.roomname].players); // DEBUG: log private rooms
   });
 
 
   socket.on('selectimg', function(data){
     // emit to all sockets in the room except the sender
-    socket.broadcast.to(data.room).emit('selectedimg', data.word);
+    socket.broadcast.to(data.roomname).emit('selectedimg', data.word);
   });
 
 
   socket.on('selectword', async function(data){
     // emit to all sockets in the room except the sender
-    socket.broadcast.to(data.room).emit('selectedword', data.word);
+    socket.broadcast.to(data.roomname).emit('selectedword', data.word);
     console.log('selectedword: ', data.word);
   });
 
