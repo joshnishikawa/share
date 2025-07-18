@@ -30,7 +30,7 @@
               <input id="color" class="form-control form-control-sm p-0 mx-1" type="color">
 
             </div>
-          </div>
+      </div>
         </div>
 
         <div id="otherPlayers">
@@ -40,7 +40,7 @@
         <div class="mx-0" id="leaveGroup" style="display: none;">
           <img src="/image/exit.svg" alt="leave group" class="img-fluid point" style="width: 64px; height: 64px;" title="Leave Group">
         </div>
-
+ 
       </div> <!-- end of myGroup -->
 
 
@@ -49,16 +49,16 @@
         <div class="row">
           <div class="col-12 g-0">
 
-            <form id="roomSearchForm" class="form d-flex mb-3">
+            <div id="foundplayers" class="text-success mb-3">
+              <!-- player names only will be added dynamically here -->
+            </div>
+            <form id="roomSearchForm" class="form d-flex">
               <button id="join" class="btn btn-success" disabled>
                 <i class="material-icons fs-1">groups</i>
               </button>
               <input id="roomSearch" class="form-control fs-1 text-success text-center" placeholder="join">
             </form>
 
-          </div>
-          <div id="foundplayers" class="text-success">
-            <!-- player names only will be added dynamically here -->
           </div>
         </div>
 
@@ -67,7 +67,7 @@
     </div> 
     
     <div id="activity" class="col-sm-8 border border-primary mb-3">
-      <div id="choose" class="activity btn btn-lg btn-success display-1">Choose</div>
+      <%- include('../../public/pages/groups/menu.html') %>
     </div>
 
   </div>
@@ -80,11 +80,10 @@
 <script>
 // VARIABLES ////////////////////////////////////////////////////////////////////
   var room = {};
-  var player = {id: null, color: "#cccccc", roomname: null, roomtype: "private", closed: false, number: 1};
+  var player = {id: null, color: "#cccccc", roomname: null, roomtype: "private", closed: false, number: 1, activity: null};
   var socket = io();
 
 $(function(){
-  
   // localStorage.removeItem('player'); // DEBUG: so I don't have to clear my iPhone cache
   $(`#groups-tab`).addClass("active");
 
@@ -92,8 +91,6 @@ $(function(){
     loadActivity( $(this).attr('id') );
   });
 
-
-// FUNCTIONS ////////////////////////////////////////////////////////////////////
   function loadActivity(activity) {
     $.ajax({
       url: `/pages/groups/${activity}.html`,
@@ -107,7 +104,12 @@ $(function(){
     });
   }
 
+// VARIABLES ////////////////////////////////////////////////////////////////////
+  var socket = io();
+  var room = {};
+  var player = {id: null, color: "#cccccc", roomname: null, roomtype: "private", closed: false, number: 1};
 
+// FUNCTIONS ////////////////////////////////////////////////////////////////////
   function updatePlayerList(data){
     if (data.length != 1) {
       $("#group").removeClass("d-flex").addClass("d-none");
@@ -122,6 +124,7 @@ $(function(){
     $(`#otherPlayers`).empty();
     for (let p of data) {
       if (p.id == player.id){
+        $(`#myPawn`).html(getPawn(player.color));
         $(`#myName`).text(p.id);
         $(`#myName`).css('color', player.color);
         $(`#color`).val(player.color);

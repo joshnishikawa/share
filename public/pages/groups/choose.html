@@ -42,10 +42,10 @@ $(function(){
                     onerror="altOnly(this)">`;
 
     $("#images").append(img);
-    $(`#images img[alt="${set[i].word}"]`).on('click', function (){
-      socket.emit('selectimg', {word: set[i].word, room}); // word selected
-      $(`#words div:contains("${set[i].word}")`).remove(); // remove the word
-      $(this).off('click').removeClass('thumb').show();    // and the picture
+    $(`#images img`).on('click', function (){
+      socket.emit('selectimg', {word: set[i].word, player}); // word selected
+      $(`#words div:contains("${set[i].word}")`).remove();   // remove the word
+      $(this).off('click').removeClass('thumb').show();      // and the picture
     });
 
     let word = `<div class="col-4">${set[i].word}</div>`;
