@@ -1,23 +1,24 @@
-<div class="rounded-3 border p-1 shadow d-flex">
-  <i class="material-icons text-secondary" 
-    style="line-height:1.4rem;font-size:1.4rem;cursor:pointer;" 
+<div class="rounded-3 d-flex">
+  <div class="point d-flex me-3"
     data-bs-toggle="modal" data-bs-target="#flash_modal">
-    info
-  </i>
-  <strong class="text-primary h3">FLASH</strong>
+    <i class="material-icons text-secondary">
+      info
+    </i>
+    <strong class="text-primary fs-5">FLASH</strong>
+  </div>
 
-  <form id="flashForm" action="/flash" method="POST" class="d-flex justify-content-end w-100">
+  <form id="flashForm" action="/flash" method="POST" class="menuitem d-flex justify-content-end w-100">
 
     <div class="d-flex flex-wrap justify-content-end">
     <div class="form-check me-3">
-      <input class="form-check-input" type="checkbox" value="shuffle" name="order" id="order">
+      <input id="shuffle" class="form-check-input" type="checkbox" value="shuffle" name="order" id="order">
       <label class="form-check-label small" for="order">
         Shuffle
       </label>
     </div>
 
     <div class="form-check me-3">
-      <input class="form-check-input" type="checkbox" value="true" name="text" id="text">
+      <input id="showtext" class="form-check-input" type="checkbox" value="true" name="text" id="text">
       <label class="form-check-label small" for="text">
         Text
       </label>
@@ -26,26 +27,38 @@
 
     <input type="hidden" value="" name="deckType">
     <input type="hidden" value="" name="deck">
-    <button id="flashButton" type="submit" class="btn btn-primary" style="height:100%;">Start</button>
+    <button id="flashButton" type="submit" class="btn btn-sm btn-primary" style="height:100%;">Start</button>
   </form>
 
 </div>
 
-<%- include ("../modals/modal_flash.ejs") %>
 
-<script>
-$(function(){
-  $("#flashButton").on('click', (e)=>{
-    e.preventDefault();
-    if (!window.deck || window.deck.length == 0) {
-      alert("<%- __('pleaseSelect') %>");
-    }
-    else {
-      $("#flashForm input[name='deck']").val(JSON.stringify(window.deck));
-      $("#flashForm input[name='deckType']").val(window.deckType);
-      $("#flashForm").submit();
-    }
-  });
-});
+<div id="flash_modal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+    
+      <div class="modal-header">
+        <h3 class="modal-title">Flash Cards</h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <h5>
+          &rarr; = NEXT<br/>
+          &larr; = PREV<br/>
+          &uarr; = Save for Review<br/>
+          &darr; = Oops! remove that last one saved<br/>
+          <span class="ms-5 small">(if it matches the one on screen)</span>
+        </h5>
+        <hr/>
 
-</script>
+        <p>A <b>'Review'</b> button and the number of items saved for review will appear as soon as any are saved.
+        Hit the button or <kbd>Enter</kbd> to start the review deck.<br/></p>
+        
+        <p>When reviewing, the button will say <b>'Restart'</b>. 
+        Hit the button or <kbd>Enter</kbd> to return to the original deck.<br/></p>
+        
+        <p>You can also save cards for further review while reviewing.</p>
+      </div>
+    </div>
+  </div>
+</div>

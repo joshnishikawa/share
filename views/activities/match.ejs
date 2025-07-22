@@ -21,29 +21,33 @@
 </style>
 
 <body>
-<div class="d-flex">
+<div class="d-flex" style="position:relative;">
 
-  <button class="btn btn-sm btn-outline-secondary p-0 me-3" data-bs-toggle="modal" data-bs-target="#match_modal">
-    <i class="material-icons">info</i>
-  </button>
+  <%- include('../menu/item_match'); -%>
 
   <div class="form-check mx-3">
     <input type="checkbox" id="showtext" class="form-check-input">
     <label for="showtext" class="form-check-label">Match Image with Text</label>
   </div>
+
+  <button id="home" class="btn btn-sm btn-outline-secondary p-0" style="position:absolute;right:0;" onclick="location.href='/'">
+    <i class="material-icons">home</i>
+  </button>
+
 </div> 
 
 <div class="pt-3" style="min-height:100vh;user-select: none;">
   <div id="grid" class="d-flex flex-wrap"></div>
 </div>
 
-<%- include ("../modals/modal_match.ejs") %>
-
 
 <script>
-  const deckType = '<%- deckType %>';
+const deckType = '<%- deckType %>';
 
-  $(async function(){
+$(async function(){
+  $("form button[type=submit]").hide();
+  $("form select[name=backs]").hide();
+
   var text_decks;
   await fetch('/javascripts/text_decks.json')
         .then(response => response.json())

@@ -1,7 +1,9 @@
 <%- include('../head'); -%>
-<button class="btn btn-outline-secondary p-0" data-bs-toggle="modal" data-bs-target="#richtext_modal">
-  <i class="material-icons">info</i>
-</button>
+<div class="d-flex">
+  <%- include('../menu/item_richtext.ejs'); -%>
+  <div id="save" class="btn btn-sm btn-outline-primary">SAVE</div>
+  <div id="copy" class="btn btn-sm btn-outline-primary">COPY</div>
+</div>
 
 
 <link href="https://cdn.quilljs.com/1.0.0/quill.snow.css" rel="stylesheet">
@@ -11,11 +13,7 @@
 <style>.ql-code:after {font-size:0.7em;vertical-align:top;content:"kbd";}</style>
 
 <!-- THE editor DIV NEEDS A FIXED HEIGHT OR EMBEDS WILL BREAK -->
-<div id="save" class="btn btn-sm btn-outline-primary">SAVE</div>
-<div id="copy" class="btn btn-sm btn-outline-primary">COPY</div>
 <div id="editor" class="bg-white" style="height:100vh;font-size:1rem;padding:50px;z-index:1;" autofocus></div>
-
-<%- include ("../modals/modal_richtext.ejs") %>
 
 
 <script>
@@ -28,6 +26,8 @@
   }
 
 $(function(){
+  $("form button[type=submit]").hide();
+
   $('#save').click(function(){
     var title = $("#postRichText input[name=title]").val() || Date.now();
     var group = $("#postRichText select[name=group] option:selected").text() || "";

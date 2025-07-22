@@ -12,11 +12,9 @@
 
 <body>
   <div id="menucontainer" style="display:none;"><!-- to adios the entire menu when printing -->
-    <div id="menu" class="d-flex">
+    <div id="menu" class="d-flex" style="position:relative;">
 
-      <button class="btn btn-sm btn-outline-secondary p-0 me-3" data-bs-toggle="modal" data-bs-target="#cards_modal">
-        <i class="material-icons">info</i>
-      </button>
+      <%- include('../menu/item_cards'); -%>
 
       <div class="form-check mx-3">
         <input type="checkbox" id="showtext" class="form-check-input">
@@ -27,16 +25,19 @@
         <i class="material-icons">print</i>
       </button>
 
+    <button id="home" class="btn btn-sm btn-outline-secondary p-0" style="position:absolute;right:0;" onclick="location.href='/'">
+      <i class="material-icons">home</i>
+    </button>
+
     </div>
   </div>
 
   <div id="sheet" class=""></div>
 
-<%- include ("../modals/modal_cards.ejs") %>
-
 
 <script>
 $(function(){
+  $("#start").hide();
   document.title = `Print Cards`;
 
   // PREPARE THE DECK //////////////////////////////////////////////////////////

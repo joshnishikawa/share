@@ -1,16 +1,33 @@
-<div class="rounded-3 border p-1 shadow d-flex">
-  <i class="material-icons text-secondary" 
-    style="line-height:1.4rem;font-size:1.4rem;cursor:pointer;" 
-    data-bs-toggle="modal" data-bs-target="#richtext_modal">
-    info
-  </i>
-  <strong class="text-primary h3">RICH&nbsp;TEXT</strong>
-  
+<div class="rounded-3 d-flex">
+  <div class="point d-flex me-3" data-bs-toggle="modal" data-bs-target="#richtext_modal">
+    <i class="material-icons text-secondary">
+      info
+    </i>
+    <strong class="text-primary fs-5">RICH&nbsp;TEXT</strong>
+  </div>
+
   <form action="/richtext" method="GET" class="d-flex justify-content-end w-100">
-    <button type="submit" class="btn btn-primary" style="height:100%">
+    <button type="submit" class="btn btn-sm btn-primary" style="height:100%">
       Start
     </button>
   </form>
 </div>
 
-<%- include ("../modals/modal_richtext.ejs") %>
+
+<div id="richtext_modal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h3 class="modal-title">Rich Text</h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>This is a simple rich text editor. There are many rich-text editors
+          out there. This one just allows you to SAVE the text as an html file 
+          or COPY the html to the clipboard.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

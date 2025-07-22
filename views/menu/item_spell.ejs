@@ -1,38 +1,73 @@
-<div class="rounded-3 border p-1 shadow d-flex YM">
-  <i class="material-icons text-secondary" 
-    style="line-height:1.4rem;font-size:1.4rem;cursor:pointer;" 
-    data-bs-toggle="modal" data-bs-target="#spell_modal">
-    info
-  </i>
+<div class="rounded-3 d-flex YM">
+  <div class="d-flex point me-3" data-bs-toggle="modal" data-bs-target="#spell_modal">
+    <i class="material-icons text-secondary">
+      info
+    </i>
 
-  <div class="spell rounded-3 bg-secondary text-white text-center">s</div>
-  <div class="spell rounded-3 bg-primary text-white text-center">p</div>
-  <div class="spell rounded-3 bg-warning text-white text-center">e</div>
-  <div class="spell rounded-3 bg-primary text-white text-center">l</div>
-  <div class="spell rounded-3 bg-secondary text-white text-center">l</div>
+    <div class="rounded-3 bg-secondary text-white text-center fs-5" style="width:30px;height:30px;">s</div>
+    <div class="rounded-3 bg-primary text-white text-center fs-5" style="width:30px;height:30px;">p</div>
+    <div class="rounded-3 bg-warning text-white text-center fs-5" style="width:30px;height:30px;">e</div>
+    <div class="rounded-3 bg-primary text-white text-center fs-5" style="width:30px;height:30px;">l</div>
+    <div class="rounded-3 bg-secondary text-white text-center fs-5" style="width:30px;height:30px;">l</div>
+  </div>
 
-  <form id="spellForm" action="/spell" method="POST" class="d-flex justify-content-end w-100">
+  <form id="spellForm" action="/spell" method="POST" class="menuitem d-flex justify-content-end w-100">
     <input type="hidden" value="" name="deck">
     <input type="hidden" value="" name="deckType">
-    <button id="spellButton" type="submit" class="btn btn-primary ms-3" style="height:100%;">Start</button>
+    <button id="spellButton" type="submit" class="btn btn-sm btn-primary" style="height:100%;">Start</button>
   </form>
 </div>
 
-<%- include ("../modals/modal_spell.ejs") %>
 
-<script>
-$(function(){
-  $("#spellButton").on('click', (e)=>{
-    e.preventDefault();
-    if (!window.deck || window.deck.length == 0) {
-      alert("<%- __('pleaseSelect') %>");
-    }
-    else {
-      $("#spellForm input[name='deck']").val(JSON.stringify(window.deck));
-      $("#spellForm input[name='deckType']").val(window.deckType);
-      $("#spellForm").submit();
-    }
-  });
-});
+<div id="spell_modal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
 
-</script>
+      <div class="modal-header">
+        <div class="modal-title d-flex YM">
+          <div class="spell rounded-3 bg-secondary text-white text-center">s</div>
+          <div class="spell rounded-3 bg-primary text-white text-center">p</div>
+          <div class="spell rounded-3 bg-warning text-white text-center">e</div>
+          <div class="spell rounded-3 bg-primary text-white text-center">l</div>
+          <div class="spell rounded-3 bg-secondary text-white text-center">l</div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p><%- __('activity.spell.1') %></p>
+        <p><%- __('activity.spell.2') %></p>
+        <span class="btn btn-primary" style="width:80px;">Blue</span> <%- __('activity.spell.blue') %><br>
+        <span class="btn btn-warning" style="width:80px;">Yellow</span> <%- __('activity.spell.yellow') %><br>
+        <span class="btn btn-secondary" style="width:80px;">Gray</span> <%- __('activity.spell.gray') %>
+        <hr/>
+
+        <p><%- __('activity.spell.3') %></p>
+        <div class="d-flex YM">
+          <div class="spell rounded-3 bg-secondary text-white text-center">s</div>
+          <div class="spell rounded-3 bg-primary text-white text-center">p</div>
+          <div class="spell rounded-3 bg-warning text-white text-center">e</div>
+          <div class="spell rounded-3 bg-primary text-white text-center">l</div>
+          <div class="spell rounded-3 bg-secondary text-white text-center">l</div>
+        </div>
+        <div class="d-flex YM">
+          <div class="spell rounded-3 alert-primary text-center">a</div>
+          <div class="spell rounded-3 alert-primary text-center">p</div>
+          <div class="spell rounded-3 alert-primary text-center">p</div>
+          <div class="spell rounded-3 alert-primary text-center">l</div>
+          <div class="spell rounded-3 alert-primary text-center">e</div>
+        </div>
+
+        <div id="answer" class="d-flex flex-wrap mt-5 YM">
+          <div class="spell rounded-3 bg-primary text-white text-center p-3" style="font-size:3em;">apple</div>
+
+          <div class="spell rounded-3 bg-success text-white text-center p-3" style="font-size:3em;">
+            <i class="material-icons">arrow_forward</i>
+          </div>
+        </div>
+
+        <p><%- __('activity.spell.4') %></p>
+
+    </div>
+    </div>
+  </div>
+</div>

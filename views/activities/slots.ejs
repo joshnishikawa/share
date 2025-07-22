@@ -1,5 +1,5 @@
 <%- include('../head.ejs') %>
-<ul class="nav nav-tabs bg-white d-flex pt-1 mb-3">
+<ul class="nav nav-tabs bg-white d-flex pt-1 mb-3" style="position:relative;">
   <!-- <button class="btn btn-outline-secondary mx-1 mb-1 py-0" data-bs-toggle="modal" data-bs-target="#menu_modal">
     <i class="material-icons" style="line-height:1rem;vertical-align:middle;">info</i>
   </button> -->
@@ -8,6 +8,9 @@
   <li class="nav-item"><a id="thisis" href="slots?page=thisis" class="item nav-link" data-toggle="tab">Who is this?</a></li>
   <li class="nav-item"><a id="countries" href="slots?page=countries" class="item nav-link" data-toggle="tab">Where do you want to go?</a></li>
   <li class="nav-item"><a id="weekend" href="slots?page=weekend" class="item nav-link" data-toggle="tab">How was your weekend?</a></li>
+  <button id="home" class="btn btn-sm btn-outline-secondary m-1 p-0" style="position:absolute;right:0;" onclick="location.href='/'">
+    <i class="material-icons">home</i>
+  </button>
 </ul>
 
 <div id="content" class="pt-3" style="height:100vh"></div>

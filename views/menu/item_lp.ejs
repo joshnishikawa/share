@@ -1,16 +1,47 @@
-<div class="rounded-3 border p-1 shadow d-flex">
-  <i class="material-icons text-secondary" 
-    style="line-height:1.4rem;font-size:1.4rem;cursor:pointer;" 
-    data-bs-toggle="modal" data-bs-target="#lp_modal">
-    info
-  </i>
-  <strong class="text-primary h3">LESSON PLANNER</strong>
+<div class="rounded-3 d-flex">
+  <div class="point d-flex me-3" data-bs-toggle="modal" data-bs-target="#lp_modal">
+    <i class="material-icons text-secondary">
+      info
+    </i>
+    <strong class="text-primary fs-5">LESSON PLANNER</strong>
+  </div>
   
   <form action="/lp" method="GET" class="d-flex justify-content-end flex-grow-1">
-    <button type="submit" class="btn btn-primary" style="height:100%">
+    <button type="submit" class="btn btn-sm btn-primary" style="height:100%">
       Start
     </button>
   </form>
 </div>
 
-<%- include ("../modals/modal_lp.ejs") %>
+
+<div id="lp_modal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+    
+      <div class="modal-header">
+        <h3 class="modal-title">Lesson Planner</h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+<p>
+  This is a simple outline for a team-teaching lesson plan. It's meant to
+  privide a very basic structure for a lesson that is taught by two teachers so
+  that everyone knows, at a glance, what they are supposed to be doing at any
+  given time. The idea is to keep the lesson moving smoothly and to keep the
+  students engaged.
+
+  These 8 keyboard shortcuts will help you format your lesson plan.
+  <strong>Bold</strong>: <kbd>Ctrl + B</kbd><br/>
+  <i>Italic</i>: <kbd>Ctrl + I</kbd> <br/>
+  <u>Underline</u>: <kbd>Ctrl + U</kbd><br/>
+  &nbsp;&nbsp;&nbsp;&nbsp;&rarr;Increase indent: <kbd>Tab</kbd><br/>
+  &larr;Decrease indent: <kbd>Shift + Tab</kbd><br/>
+  Align left: <kbd>Ctrl + Shift + L</kbd><br/>
+  Align center: <kbd>Ctrl + Shift + E</kbd><br/>
+  Align right: <kbd>Ctrl + Shift + R</kbd><br/>
+  
+</p>
+      </div>
+    </div>
+  </div>
+</div>

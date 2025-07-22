@@ -1,14 +1,14 @@
-<div class="rounded-3 border p-1 shadow d-flex">  
-  <i class="material-icons text-secondary" 
-    style="line-height:1.4rem;font-size:1.4rem;cursor:pointer;" 
-    data-bs-toggle="modal" data-bs-target="#reveal_modal">
-    info
-  </i>
-  <strong class="text-primary h3">REVEAL</strong>
+<div class="rounded-3 d-flex">
+  <div class="point d-flex me-3" data-bs-toggle="modal" data-bs-target="#reveal_modal">
+    <i class="material-icons text-secondary">
+      info
+    </i>
+    <strong class="text-primary fs-5">REVEAL</strong>
+  </div>
 
-  <form id="reveal" action="/reveal" method="POST" class="d-flex justify-content-end w-100">
+  <form id="reveal" action="/reveal" method="POST" class="menuitem justify-content-end w-100">
     <div class="d-flex" style="height:100%;">
-      <select class="form-control" name="style" required>
+      <select id="style" class="form-control form-control-sm" name="style" required>
         <option value="" disabled selected>Style</option>
         <option value="spotlight">Spotlight</option>
         <option value="blur">Fog</option>
@@ -17,24 +17,48 @@
 
       <input type="hidden" value="" name="deck">
       <input type="hidden" value="" name="deckType">
-      <button type="submit" class="btn btn-primary">Start</button>
+      <button type="submit" class="btn btn-sm btn-primary">Start</button>
     </div>
   </form>
 </div>
 
-<%- include ("../modals/modal_reveal.ejs") %>
 
-<script>
-$(function(){
-  $("#reveal").on('submit', (e)=>{
-    if (!window.deck || window.deck.length == 0) {
-      e.preventDefault();
-      alert("<%- __('pleaseSelect') %>");
-    }
-    else {
-      $("#reveal input[name='deck']").val(JSON.stringify(window.deck));
-      $("#reveal input[name='deckType']").val(window.deckType);
-    }
-  });
-});
-</script>
+<div id="reveal_modal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h3 class="modal-title">Reveal</h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>Here are several ways you can slowly reveal an image. Choose a set of 
+          images and a style (Spotlight, Fog, Pixels). Then click START.
+        </p>
+        <hr/>
+        <p><strong>Spotlight:</strong> The screen is dark except for a small 
+          circle of light at the mouse pointer. The light will slowly get larger 
+          as you move the pointer. Try to avoid anything that will give the
+          image away too quickly.</p>
+        <p><strong>Fog:</strong> The image will not be visible at first. Press 
+          &rarr; and something will slowly appear out of the fog. You can tap 
+          the &rarr; key as slowly as you like or hold it down.</p>
+        <p><strong>Pixels:</strong> There will be only large pixels on the
+          screen. Press &rarr; and the pixels will get smaller and smaller
+          until the image is revealed.</p>
+          <hr/>
+          <p>When someone thinks they know what the image is, they say 'stop' 
+            and says the word or any piece of target language - 
+          <br/><strong>"I (don't) like <span class="text-primary">tomatoes</span>."</strong>
+          <br/><strong>"I study <span class="text-primary">English</span> on 
+          Wednesday."</strong>
+          <br/>
+          Get as many answers as possible even if it's the 
+          same answer (The more winners, the better!) If working in groups, have 
+          them tell the rest of their group members so they can say it together.
+          Reveal, rejoice and repeat by hitting <kbd>Enter</kbd> for the next image!
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

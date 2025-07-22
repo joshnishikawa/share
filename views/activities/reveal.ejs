@@ -51,28 +51,23 @@
 </style>
 
 
-<div class="d-flex">
+<div class="d-flex" style="position:relative;">
 
-  <button class="btn btn-sm btn-outline-secondary p-0 me-3" data-bs-toggle="modal" data-bs-target="#reveal_modal">
-    <i class="material-icons">info</i>
+  <%- include('../menu/item_reveal'); -%>
+
+  <button id="home" class="btn btn-sm btn-outline-secondary m-1 py-0" style="position:absolute;right:0;" onclick="location.href='/'">
+    <i class="material-icons">home</i>
   </button>
-
-  <select id="style" class="form-control form-control-sm" style="width:fit-content;" name="style">
-    <option value="" disabled selected>Style</option>
-    <option value="spotlight">Spotlight</option>
-    <option value="blur">Fog</option>
-    <option value="pixelate">Pixels</option>
-  </select>
 
 </div>
 
 <div id="blurme" class="text-center"></div>
 <div id="loadme" class="text-center" style="height:100vh;display:none;"></div>
 
-<%- include ("../modals/modal_reveal.ejs") %>
 
 <script>
 $(function(){
+  $("form button[type=submit]").hide();
 // PREPARE THE DECK ////////////////////////////////////////////////////////////
   const deckType = '<%- deckType %>';
 

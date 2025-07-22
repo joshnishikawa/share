@@ -11,10 +11,12 @@
 </style>
 
 <body>
-
-  <button class="btn btn-sm btn-outline-secondary p-0" data-bs-toggle="modal" data-bs-target="#type_modal">
-    <i class="material-icons">info</i>
+<div class="d-flex justify-content-between">
+  <%- include('../menu/item_type'); -%>
+  <button id="home" class="btn btn-sm btn-outline-secondary p-0" onclick="location.href='/'">
+    <i class="material-icons">home</i>
   </button>
+</div>
 
 
   <div id="info" class="container">
@@ -69,10 +71,11 @@
 
   </div>
 
-<%- include ("../modals/modal_type.ejs") %>
 
 <script>
 $(function(){
+  $("form button[type=submit]").hide();
+
   const deckType = '<%- deckType %>';
   document.title = `Type ${deckType}`;
 

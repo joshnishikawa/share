@@ -1,40 +1,47 @@
-<div class="rounded-3 border p-1 shadow d-flex">
-  <i class="material-icons text-secondary" 
-    style="line-height:1.4rem;font-size:1.4rem;cursor:pointer;" 
-    data-bs-toggle="modal" data-bs-target="#bingo_modal">
-    info
-  </i>
-
-  <strong class="text-primary h3">BINGO</strong>
+<div class="rounded-3 d-flex">
+  <div class="flex-grow-1 d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#bingo_modal">
+    <i class="material-icons text-secondary">
+      info
+    </i>
+    <strong class="text-primary fs-5">BINGO</strong>
+  </div>
 
   <div class="d-flex justify-content-end w-100">
 
-    <a href="/image/bingo.jpg" download="2BingoCards.jpg" class="btn btn-outline-secondary me-1">
+    <a href="/image/bingo.jpg" download="2BingoCards.jpg" class="btn btn-sm btn-outline-secondary me-1">
       <i class="material-icons" style="line-height:1rem;vertical-align:middle;">download</i>
     </a>
 
-    <form id="bingoForm" action="/bingo" method="POST">
+    <form id="bingoForm" action="/bingo" method="POST" class="menuitem d-flex align-items-center">
       <input type="hidden" value="" name="deck">
       <input type="hidden" value="" name="deckType">
-      <button id="bingoButton" type="submit" class="btn btn-primary" style="height:100%;">Start</button>
+      <button type="submit" class="btn btn-sm btn-primary" style="height:100%;">Start</button>
     </form>
   </div>
 </div>
 
-<%- include ("../modals/modal_bingo.ejs") %>
-
-<script>
-$(function(){
-  $("#bingoButton").on('click', (e)=>{
-    e.preventDefault();
-    if (!window.deck || window.deck.length == 0) {
-      alert("<%- __('pleaseSelect') %>");
-    }
-    else {
-      $("#bingoForm input[name='deck']").val(JSON.stringify(window.deck));
-      $("#bingoForm input[name='deckType']").val(window.deckType);
-      $("#bingoForm").submit();
-    }
-  });
-});
-</script>
+<div id="bingo_modal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+    
+      <div class="modal-header">
+        <h3 class="modal-title">BINGO</h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>Have the students choose a random selection of words on the screen 
+          and write them on a sheet of paper in a grid. Have them use a...
+          <ul>
+            <li>5x5 grid if there are at least 25 words</li>
+            <li>4x4 grid if there are at least 16 words</li>
+            <li>3x3 grid if there are at least 9 words</li>
+          </ul>
+          Then click start. The words will appear in random order. Use the
+          navigation buttons or &larr; &rarr; to navigate through the 
+          words/images. The students find and circle the ones they chose. The 
+          first student to cross off all the words in a row wins.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,46 +1,62 @@
-<div class="rounded-3 border p-1 shadow d-flex">
-  <i class="material-icons text-secondary" 
-    style="line-height:1.4rem;font-size:1.4rem;cursor:pointer;" 
-    data-bs-toggle="modal" data-bs-target="#grid_modal">
-    info
-  </i>
-  <strong class="text-primary h3">GRID</strong>
+<div class="rounded-3 d-flex">
+  <div class="point d-flex me-3" data-bs-toggle="modal" data-bs-target="#grid_modal">
+    <i class="material-icons text-secondary point">
+      info
+    </i>
+    <strong class="text-primary fs-5">GRID</strong>
+  </div>
 
 
-  <form id="gridForm" action="/grid" method="POST" class="d-flex justify-content-end w-100">
+  <form id="gridForm" action="/grid" method="POST" class="menuitem d-flex justify-content-end w-100">
 
     <div class="d-flex" style="height:100%;">
       <input type="hidden" value="" name="deck">
       <input type="hidden" value="" name="deckType">
 
       <div class="form-check me-3">
-        <input type="checkbox" value="true" name="text" class="form-check-input">
+        <input id="showtext" type="checkbox" value="true" name="text" class="form-check-input">
         <label class="form-check-label small text-center" for="text">Text</label>
       </div>
 
-      <input type="number" min="4" value="25" name="spaces" class="form-control" style="width:4.5rem;">
+      <div id="numselect" class="form-group mx-3">
+        <div class="d-flex rounded-3 border border-secondary">
+          <label for="numCards" class="form-label px-1 mt-1 mb-0">Spaces</label>
+          <input id="numCards" type="number" name="spaces" class="form-control form-control-sm border-0" 
+                min="4" style="width:4.5rem;" aria-label="number of squares">
+        </div>
+      </div>
 
-      <button id="gridButton" type="submit" class="btn btn-primary" style="height:100%;">Start</button>
+      <button id="gridButton" type="submit" class="btn btn-sm btn-primary" style="height:100%;">Start</button>
     </div>
   </form>
 
 </div>
 
-<%- include ("../modals/modal_grid.ejs") %>
+<div id="grid_modal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+    
+      <div class="modal-header">
+        <h3 class="modal-title">GRID</h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>This can be used to generate a grid of selected images/text. 
+          <ul>
+            <li>You can create a 3x3 grid to play a brief Tic-Tac-Toe activity 
+                for review. 
+            </li>
+            <li>You can large grid for a group of students to use as a game 
+              board for Connect four.
+            </li>
+            <li>
+              You can create a 5x5 grid for Bingo cards.
+            </li>
+          </ul>
 
-<script>
-$(function(){
-  $("#gridButton").on('click', (e)=>{
-    e.preventDefault();
-    if (!window.deck || window.deck.length == 0) {
-      alert("<%- __('pleaseSelect') %>");
-    }
-    else {
-      $("#gridForm input[name='deck']").val(JSON.stringify(window.deck));
-      $("#gridForm input[name='deckType']").val(window.deckType);
-      $("#gridForm").submit();
-    }
-  });
-});
-
-</script>
+          Tap the Shuffle button for a different arrangement.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

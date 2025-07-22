@@ -4,11 +4,10 @@
 </style>
 
 <body>
-<div class="d-flex">
 
-  <button class="btn btn-sm btn-outline-secondary p-0 me-3" data-bs-toggle="modal" data-bs-target="#bingo_modal">
-    <i class="material-icons">info</i>
-  </button>
+  
+<div class="d-flex" style="position:relative;">
+  <%- include('../menu/item_bingo'); -%>
 
   <button id="start" class="btn btn-sm btn-outline-success py-0 mx-3">
     <i class="material-icons">play_arrow</i>
@@ -16,6 +15,22 @@
   <button id="check" class="btn btn-sm btn-outline-success py-0 mx-3" style="display:none;">
     <i class="material-icons">check_circle</i>
   </button>
+
+  <form id="gotogrid" action="/grid" method="POST">
+    <input type="hidden" value="" name="deck">
+    <input type="hidden" value="nolink" name="deckType">
+    <input type="hidden" value="" name="spaces">
+    <input type="hidden" value="true" name="text">
+    <button type="submit" class="btn btn-sm btn-outline-primary d-flex align-items-center">
+      <i class="material-icons">grid_on</i>
+      <span>Make Cards</span>
+    </button>
+  </form>
+
+  <button id="home" class="btn btn-sm btn-outline-secondary p-0" style="position:absolute;right:0;" onclick="location.href='/'">
+    <i class="material-icons">home</i>
+  </button>
+
 </div>
 
   <div class="container-fluid" style="min-height:100vh;">
@@ -43,10 +58,11 @@
 
   </div>
 
-<%- include ("../modals/modal_bingo.ejs") %>
 
 <script>
 $(function(){
+  $("form button[type=submit]").hide();
+  
 // PREPARE THE DECK ////////////////////////////////////////////////////////////
   const deckType = '<%- deckType %>';
   document.title = `Bingo ${deckType}`;
@@ -116,6 +132,18 @@ $(function(){
     if (e.key == "ArrowLeft") $("#prev").click();
     if (e.key == "ArrowRight") $("#next").click();
   });
+
+  $("#gotogrid").on('submit', (e)=>{
+    e.preventDefault();
+      $(e.target).find("input[name='deck']").val(JSON.stringify(deck));
+      $(e.target).find("input[name='spaces']").val(deck.length);
+
+      console.log($(e.target).serializeArray().map(i => `${i.name}: ${i.value}`).join(', '));
+
+      $(e.target).off('submit').submit();
+  });
+
+
 });
 
 </script>

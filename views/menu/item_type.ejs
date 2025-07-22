@@ -1,37 +1,55 @@
-<div class="rounded-3 border p-1 shadow d-flex YM">
-  <i class="material-icons text-secondary" 
-    style="line-height:1.4rem;font-size:1.4rem;cursor:pointer;" 
-    data-bs-toggle="modal" data-bs-target="#type_modal">
-    info
-  </i>
+<div class="rounded-3 d-flex YM">
+  <div class="point d-flex me-3" data-bs-toggle="modal" data-bs-target="#type_modal">
+    <i class="material-icons text-secondary">
+      info
+    </i>
 
-  <div class="spell rounded-3 alert-primary text-center">t</div>
-  <div class="spell rounded-3 alert-primary text-center">y</div>
-  <div class="spell rounded-3 alert-primary text-center">p</div>
-  <div class="spell rounded-3 alert-primary text-center">_</div>
+    <div class="rounded-3 alert-primary text-center fs-5" style="width:30px;height:30px;">t</div>
+    <div class="rounded-3 alert-primary text-center fs-5" style="width:30px;height:30px;">y</div>
+    <div class="rounded-3 alert-primary text-center fs-5" style="width:30px;height:30px;">p</div>
+    <div class="rounded-3 alert-primary text-center fs-5" style="width:30px;height:30px;">_</div>
+  </div>
 
-  <form id="typeForm" action="/type" method="POST" class="d-flex justify-content-end w-100">
+  <form id="typeForm" action="/type" method="POST" class="menuitem d-flex justify-content-end w-100">
     <input type="hidden" value="" name="deck">
     <input type="hidden" value="" name="deckType">
-    <button id="typeButton" type="submit" class="btn btn-primary" style="height:100%;">Start</button>
+    <button id="typeButton" type='submit' class="btn btn-sm btn-primary" style="height:100%;">Start</button>
   </form>
 </div>
 
-<%- include ("../modals/modal_type.ejs") %>
 
-<script>
-$(function(){
-  $("#typeButton").on('click', (e)=>{
-    e.preventDefault();
-    if (!window.deck || window.deck.length == 0) {
-      alert("<%- __('pleaseSelect') %>");
-    }
-    else {
-      $("#typeForm input[name='deck']").val(JSON.stringify(window.deck));
-      $("#typeForm input[name='deckType']").val(window.deckType);
-      $("#typeForm").submit();
-    }
-  });
-});
+<div id="type_modal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
 
-</script>
+      <div class="modal-header">
+        <div class="modal-title d-flex YM">
+          <div class="spell rounded-3 alert-primary text-center">t</div>
+          <div class="spell rounded-3 alert-primary text-center">y</div>
+          <div class="spell rounded-3 alert-primary text-center">p</div>
+          <div class="spell rounded-3 alert-primary text-center">_</div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p><%- __('activity.type.1') %></p>
+          <hr>
+        <p><%- __('activity.type.2') %></p>
+          <div class="d-flex YM">
+            <div class="spell rounded-3 alert-primary text-center">t</div>
+            <div class="spell rounded-3 alert-primary text-center">y</div>
+            <div class="spell rounded-3 alert-danger text-center">q</div>
+            <div class="spell rounded-3 alert-primary text-center">_</div>
+          </div>
+          <hr/>
+        <p><%- __('activity.type.3') %></p>
+        <ul>
+          <li><%- __('activity.type.typed') %> </li>
+          <li><%- __('activity.type.mistakes') %></li>
+          <li><%- __('activity.type.accuracy') %></li>
+          <li><%- __('activity.type.speed') %></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

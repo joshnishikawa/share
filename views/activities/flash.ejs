@@ -50,21 +50,14 @@
 
 <body>
 <div id="menucontainer">
-  <div class="d-flex">
+  <div class="d-flex" style="position:relative;">
 
-    <button class="btn btn-sm btn-outline-secondary p-0 me-3" data-bs-toggle="modal" data-bs-target="#flash_modal">
-      <i class="material-icons">info</i>
+    <%- include('../menu/item_flash'); -%>
+
+    <button id="home" class="btn btn-sm btn-outline-secondary p-0" style="position:absolute;right:0;" onclick="location.href='/'">
+      <i class="material-icons">home</i>
     </button>
 
-    <div class="form-check mx-3">
-      <input type="checkbox" id="shuffle" class="form-check-input">
-      <label for="shuffle" class="form-check-label">Shuffle</label>
-    </div>
-
-    <div class="form-check mx-3">
-      <input type="checkbox" id="showtext" class="form-check-input">
-      <label for="showtext" class="form-check-label">Text</label>
-    </div>
   </div>
 </div>
 
@@ -78,10 +71,10 @@
 
 </div> 
 
-<%- include ("../modals/modal_flash.ejs") %>
 
 <script>
 $(function(){
+  $("form button[type=submit]").hide(); // Hide the submit button in the form
   const deckType = '<%- deckType %>';
   document.title = `Flash ${deckType}`;
 

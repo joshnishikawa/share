@@ -1,10 +1,13 @@
-<ul id="navbar" class="nav nav-tabs bg-white d-flex pt-1 mb-3 YM">
+<ul id="navbar" class="nav nav-tabs bg-white d-flex pt-1 mb-3 YM" style="position:relative;">
   <button class="btn btn-outline-secondary m-1 py-0" data-bs-toggle="modal" data-bs-target="#menu_modal">
     <i class="material-icons" style="line-height:1rem;vertical-align:middle;">info</i>
   </button>
   <li class="nav-item"><a id="abc-tab" href="abc" class="nav-link" data-toggle="tab">Basics</a></li>
   <li class="nav-item"><a id="NH-tab" href="NH" class="nav-link" data-toggle="tab">New Horizon</a></li>
   <!-- <li class="nav-item"><a id="groups-tab" href="groups" class="nav-link" data-toggle="tab">Groups</a></li> -->
+  <button id="home" class="btn btn-sm btn-outline-secondary m-1 py-0" style="position:absolute;right:0;" onclick="location.href='/teachers'">
+    <i class="material-icons">school</i>
+  </button>
 </ul>
 
 
@@ -24,8 +27,3 @@
     </div>
   </div>
 </div>
-
-
-<script>
-  window.access = "/";
-</script>

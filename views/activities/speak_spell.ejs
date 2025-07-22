@@ -13,6 +13,12 @@
   }
 </style>
 
+<div class="d-flex justify-content-between">
+  <div></div>
+  <button id="home" class="btn btn-sm btn-outline-secondary p-0" onclick="location.href='/'">
+    <i class="material-icons">home</i>
+  </button>
+</div>
 
 <div class="container-fluid pt-3">
 
@@ -61,6 +67,7 @@
   window.deckType = 'nolink'; // define before reading local storage
 
   $(function(){
+
     window.deck = [];
     window.local = [];
     var words = {};
@@ -213,6 +220,19 @@
 
       $("#numOfItems").html(`&nbsp;(${window.deck.length})`);
     }
+
+
+    $(".menuitem").on('submit', (e)=>{
+      e.preventDefault();
+      if (!window.deck || window.deck.length == 0) {
+        alert("<%- __('pleaseSelect') %>");
+      }
+      else {
+        $(e.target).find("input[name='deck']").val(JSON.stringify(window.deck));
+        $(e.target).find("input[name='deckType']").val(window.deckType);
+        $(e.target).off('submit').submit();
+      }
+    });
 
   });
   </script>

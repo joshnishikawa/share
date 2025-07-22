@@ -1,7 +1,15 @@
 <%- include('../head'); -%>
 <body>
-  
-<div id="target" style="background-color:black;color:white;height:100vh;">
+
+  <div class="d-flex justify-content-between">
+    <div></div>
+    <button id="home" class="btn btn-sm btn-outline-secondary p-0" onclick="location.href='/'">
+      <i class="material-icons">home</i>
+    </button>
+  </div>
+
+  </div>
+<div id="target" class="bg-light">
   <div class="text-center pt-3">
     <button id="listen" class="btn btn-lg btn-success"><i class="material-icons">record_voice_over</i></button>
     <button id="stop" class="btn btn-lg btn-danger"><i class="material-icons">stop</i></button>
@@ -38,9 +46,9 @@ $(function(){
 ////////////////////////////////////////////////////////////////////////////////
   vocab.forEach((color, i) => {
     if (["black", "gray", "purple", "brown", "green", "blue"].includes(color)) {
-      $("#hints").append(`<span class="p-3" style="background-color:${color};"> ${color} </span>`);
+      $("#hints").append(`<span class="p-3" style="color:white;background-color:${color};"> ${color} </span>`);
     } else {
-      $("#hints").append(`<span class="p-3" style="color:black;background-color:${color};"> ${color} </span>`);
+      $("#hints").append(`<span class="p-3" style="background-color:${color};"> ${color} </span>`);
     }
   });
 

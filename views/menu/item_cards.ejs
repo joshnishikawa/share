@@ -1,10 +1,11 @@
-<div class="rounded-3 border p-1 shadow d-flex">
-  <i class="material-icons text-secondary" 
-    style="line-height:1.4rem;font-size:1.4rem;cursor:pointer;" 
+<div class="rounded-3 d-flex">
+  <div class="point d-flex me-3"
     data-bs-toggle="modal" data-bs-target="#cards_modal">
-    info
-  </i>
-  <strong class="text-primary h3">CARDS</strong>
+    <i class="material-icons text-secondary point">
+      info
+    </i>
+    <strong class="text-primary fs-5">CARDS</strong>
+  </div>
 
 
   <form id="cardsForm" action="/printcards" method="POST" class="d-flex justify-content-end w-100">
@@ -18,13 +19,27 @@
         <label class="form-check-label small text-center" for="text">Text</label>
       </div>
 
-      <button id="cardsButton" type="submit" class="btn btn-primary" style="height:100%;">Start</button>
+      <button id="cardsButton" type="submit" class="btn btn-sm btn-primary" style="height:100%;">Start</button>
     </div>
   </form>
 
 </div>
 
-<%- include ("../modals/modal_cards.ejs") %>
+<div id="cards_modal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+    
+      <div class="modal-header">
+        <h3 class="modal-title">CARDS</h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>This can be used to print flashcards</p>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <script>
 $(function(){

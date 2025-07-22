@@ -54,41 +54,41 @@
     <div class="col">
       <div class="row pb-3">
 
-        <div class="col">
+        <div class="col border">
           <%- include('../menu/item_flash.ejs') -%>
         </div>
       
-        <div class="col">
+        <div class="col border">
           <%- include('../menu/item_match.ejs') -%>
         </div>
       
-        <div class="col">
+        <div class="col border">
           <%- include('../menu/item_recall.ejs') -%>
         </div>
       
       </div>
       <div class="row pb-3">
   
-        <div class="col">
+        <div class="col border">
           <%- include('../menu/item_bingo.ejs') -%>
         </div>
       
-        <div class="col">
+        <div class="col border">
           <%- include('../menu/item_reveal.ejs') -%>
         </div>
       
-        <div class="col">
+        <div class="col border">
           <%- include('../menu/item_grid.ejs') -%>
         </div>
       
       </div>
       <div class="row">
 
-        <div class="col">
+        <div class="col border">
           <%- include('../menu/item_type.ejs') -%>
         </div>
 
-        <div class="col">
+        <div class="col border">
           <%- include('../menu/item_spell.ejs') -%>
         </div>
         <div class="col">
@@ -233,6 +233,19 @@ $(function(){
     for (let i in words) {
       words[i] = words[i].trim().replace(/\s/g, '_');
       window.deck.push({word: words[i], image: `/image/svg/${words[i]}.svg`});
+    }
+  });
+
+
+  $(".menuitem").on('submit', (e)=>{
+    e.preventDefault();
+    if (!window.deck || window.deck.length == 0) {
+      alert("<%- __('pleaseSelect') %>");
+    }
+    else {
+      $(e.target).find("input[name='deck']").val(JSON.stringify(window.deck));
+      $(e.target).find("input[name='deckType']").val(window.deckType);
+      $(e.target).off('submit').submit();
     }
   });
 

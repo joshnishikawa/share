@@ -215,6 +215,39 @@
 
   </div>
 
+
+<div id="lp_modal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+    
+      <div class="modal-header">
+        <h3 class="modal-title">Lesson Planner</h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+<p>
+  This is a simple outline for a team-teaching lesson plan. It's meant to
+  privide a very basic structure for a lesson that is taught by two teachers so
+  that everyone knows, at a glance, what they are supposed to be doing at any
+  given time. The idea is to keep the lesson moving smoothly and to keep the
+  students engaged.
+
+  These 8 keyboard shortcuts will help you format your lesson plan.
+  <strong>Bold</strong>: <kbd>Ctrl + B</kbd><br/>
+  <i>Italic</i>: <kbd>Ctrl + I</kbd> <br/>
+  <u>Underline</u>: <kbd>Ctrl + U</kbd><br/>
+  &nbsp;&nbsp;&nbsp;&nbsp;&rarr;Increase indent: <kbd>Tab</kbd><br/>
+  &larr;Decrease indent: <kbd>Shift + Tab</kbd><br/>
+  Align left: <kbd>Ctrl + Shift + L</kbd><br/>
+  Align center: <kbd>Ctrl + Shift + E</kbd><br/>
+  Align right: <kbd>Ctrl + Shift + R</kbd><br/>
+  
+</p>
+      </div>
+    </div>
+  </div>
+</div>
+
   <!-- modal to add new list -->
 <div id="addModal" class="modal fade" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -257,11 +290,12 @@
   </div>
 </div>
 
-<%- include('../modals/modal_lp'); -%>
 
 <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js" defer></script>
 <script>
 $(window).on('pageshow', function(){
+  $("form button[type=submit]").hide();
+
   var lps = {};
 
   $("#lp_select").html('<option value="default"></option>');

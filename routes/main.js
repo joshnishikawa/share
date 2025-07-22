@@ -263,7 +263,6 @@ router.get('/vocablist', async (req, res)=>{
 router.post('/:activity', async(req, res)=>{
   try{
     if ( !valid(req.params.activity, req.body) ) throw '404';
-
     let activity = req.params.activity;
     let params = req.body;
     let deck = params.deck;
@@ -274,7 +273,6 @@ router.post('/:activity', async(req, res)=>{
     
     if (deckType == "nolink"){ // expect deck to be an array of objects
       deck = JSON.parse(deck);
-      console.log(deck);
       res.render(`activities/${activity}`, {deckType, deck, params: JSON.stringify(params)});
       return;
     }

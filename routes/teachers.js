@@ -10,7 +10,7 @@ const text_decks = require('../public/javascripts/text_decks.json');
 
 router.get('/', (req, res)=>{
   try{
-    res.redirect('/teachers/images');
+    res.redirect('/teachers/NH');
   }
   catch(err){
     res.send(err);

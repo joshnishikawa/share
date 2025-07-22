@@ -16,11 +16,9 @@
 </style>
 
 <body>
-  <div class="d-flex">
+  <div class="d-flex w-100" style="position:relative;">
 
-    <button class="btn btn-sm btn-outline-secondary p-0 me-3" data-bs-toggle="modal" data-bs-target="#recall_modal">
-      <i class="material-icons">info</i>
-    </button>
+    <%- include('../menu/item_recall'); -%>
 
     <div id="numselect" class="form-group mx-3">
 
@@ -41,6 +39,11 @@
     <div class="d-inline-block mx-3">
       <input id="searchInput" class="form-control form-control-sm" type="text" placeholder="Search" aria-label="Search" style="display:none;">
     </div>
+
+    <button id="home" class="btn btn-sm btn-outline-secondary p-0" style="position:absolute;right:0;" onclick="location.href='/'">
+      <i class="material-icons">home</i>
+    </button>
+
   </div>
 
 
@@ -51,11 +54,10 @@
     </div>
   </div>
 
-<%- include ("../modals/modal_recall.ejs") %>
-
 
 <script>
 $(function(){
+  $("form button[type=submit]").hide(); // Hide the submit button in the form
   const deckType = '<%- deckType %>';
   document.title = `Recall ${deckType}`;
 

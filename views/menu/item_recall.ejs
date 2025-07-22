@@ -1,32 +1,62 @@
-<div class="rounded-3 border p-1 shadow d-flex">
-  <i class="material-icons text-secondary" 
-    style="line-height:1.4rem;font-size:1.4rem;cursor:pointer;" 
-    data-bs-toggle="modal" data-bs-target="#recall_modal">
-    info
-  </i>
-  <strong class="text-primary h3">RECALL</strong>
+<div class="rounded-3 d-flex">
+  <div class="point d-flex me-3" data-bs-toggle="modal" data-bs-target="#recall_modal">
+    <i class="material-icons text-secondary">info</i>
+    <strong class="text-primary fs-5">RECALL</strong>
+  </div>
 
-  <form id="recallForm" action="/recall" method="POST" class="d-flex justify-content-end w-100">
+  <form id="recallForm" action="/recall" method="POST" class="menuitem d-flex justify-content-end w-100">
     <input type="hidden" value="" name="deck">
     <input type="hidden" value="" name="deckType">
-    <button id="recallButton" type="submit" class="btn btn-primary" style="height:100%;">Start</button>
+    <button id="recallButton" type="submit" class="btn btn-sm btn-primary" style="height:100%;">Start</button>
   </form>
 </div>
 
-<%- include ("../modals/modal_recall.ejs") %>
 
-<script>
-$(function(){
-  $("#recallButton").on('click', (e)=>{
-    e.preventDefault();
-    if (!window.deck || window.deck.length == 0) {
-      alert("<%- __('pleaseSelect') %>");
-    }
-    else {
-      $("#recallForm input[name='deck']").val(JSON.stringify(window.deck));
-      $("#recallForm input[name='deckType']").val(window.deckType);
-      $("#recallForm").submit();
-    }
-  });
-});
-</script>
+<div id="recall_modal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+    
+      <div class="modal-header">
+        <h3 class="modal-title">RECALL</h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>Choose a number of cards to hide.</p>
+          <ul>
+            <li>You could choose only a few to hide and ask "What's missing?"</li>
+            <li>You could hide them all to see how many the class can remember.</li>
+          </ul>
+        <p>Click <strong>START</strong>. A search bar and the images (flipped or 
+          not) will appear in a grid. Students will call out words and you type
+          them into the search bar. As you type, all words that match the input
+          will be highlighted. Hit <kbd>Enter</kbd> at any time to flip
+          highlighted cards. </p>
+          <ul>
+            <li>You could have students call out one letter and flip all cards
+              that begin with that letter.</li>
+            <li>You could have students give you words, type them in and flip them one at a time.</li>
+            <li>You could have students spell out the word at least until only 
+              one is highlighted.</li>
+            <li>You could have students spell out the whole word themselves and,
+              if it's still highlighted when they finish, it's correct. Flip it!</li>
+          </ul>
+        <hr/>
+        <p>
+          <strong>NOTE:</strong> If the students need a hint you can either...
+          <ul>
+            <li>Click on an individual image to flip it until you release the 
+              mouese button.</li>
+            <li>Press the <kbd>?/</kbd> button to peek at all highlighted cards 
+              (if any) or to peek at all unflipped cards (if none are 
+              highlighted). Cards will remain visible until you release the button.
+            </li>
+          </ul>
+        </p>
+        <hr/>
+        <p class="small">I'm not sure how to handle words that start with other 
+          words yet. For example, If someone says "rice", both 'rice' and 
+          'rice ball' will be highlighted since they both begin with 'rice'.</p>
+      </div>
+    </div>
+  </div>
+</div>

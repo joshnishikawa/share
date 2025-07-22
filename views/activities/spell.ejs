@@ -11,10 +11,12 @@
 </style>
 
 <body>
-
-  <button class="btn btn-sm btn-outline-secondary p-0" data-bs-toggle="modal" data-bs-target="#spell_modal">
-    <i class="material-icons">info</i>
-  </button>
+  <div class="d-flex justify-content-between">
+    <%- include('../menu/item_spell'); -%>
+    <button id="home" class="btn btn-sm btn-outline-secondary p-0" onclick="location.href='/'">
+      <i class="material-icons">home</i>
+    </button>
+  </div>
 
   <div id="info" class="container">
     <div class="row pb-5">
@@ -77,10 +79,11 @@
     </div>
   </div>
 
-<%- include ("../modals/modal_spell.ejs") %>
 
 <script>
 $(function(){
+  $("form button[type=submit]").hide();
+  
   const deckType = '<%- deckType %>';
   document.title = `Spell ${deckType}`;
 
@@ -170,6 +173,7 @@ $(function(){
 
   submitAnswer = ()=>{
     $("#enter").prop('disabled', true);
+    console.log(guess, item.word);
     if (guess === item.word){
       for (let i = 0; i < item.word.length; i++){
         $(`[data-value=${item.word[i] == '.' ? 'period': item.word[i] == ' ' ? '_' : item.word[i]}]`)
@@ -250,6 +254,7 @@ $(function(){
     $("#answer").html(`<div class="word d-flex"></div>`);
 
     item = deck.pop();
+    item.word = item.word.replace(/_/g, ' '); // replace underscores with spaces
     if (item){
       let done = originalDeck.length - deck.length;
       $("#remaining").html(`${done}/${originalDeck.length}`);
