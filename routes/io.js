@@ -161,7 +161,6 @@ function joinPrivateRoom(socket, data){
 
 
 function joinPublicRoom(socket, data){
-  data.roomtype = 'public'; // Ensure roomtype is set to public
   let roomname = data.roomname && Object.keys(publicRooms).includes(data.roomname) ?
                  data.roomname : 
                  openPublicRoom(data);
@@ -202,6 +201,7 @@ function joinPublicRoom(socket, data){
       else socket.emit('joined', {message: "Sorry, this room filled up. You'll join a new one."});
     }
     else {
+      console.log(publicRooms[roomname]);
       for (let player of room.players){
         if (player.id === data.id){
           socket.join(roomname);
@@ -253,7 +253,7 @@ function leaveRoom(socket, data){
 
 // SOCKET.IO EVENTS ////////////////////////////////////////////////////////////
 io.sockets.on('connection', socket =>{
-  console.log('socket connected: ', socket.id);  
+  console.log('socket connected: ', socket.id);
   socket.on('join', function(data){
     if (data.newRoom) {
       console.log(`${data.player.id} is joining a different room: ${data.newRoom}`);
@@ -288,7 +288,7 @@ io.sockets.on('connection', socket =>{
       socket.emit('roomSearch', publicRooms[data]);
     }
     else {
-      socket.emit('roomSearch', false);
+      socket.emit('roomSearch', null);
     }
   });
 
@@ -353,37 +353,95 @@ io.sockets.on('connection', socket =>{
     socket.emit('youLeft');
   });
 
-
-
+  
   socket.on('chooseActivity', function(data){
     let roomname = data.roomname;
-    if (privateRooms[roomname] && privateRooms[roomname].players.length === 1){ // alone in your room
-      closePrivateRoom(roomname);
-      for (let room of Object.values(publicRooms)){
-        if (room.activity === data.activity && room.players.length < 4){
-          data.roomname = room.roomname; // update the player's roomname
-          joinPublicRoom(socket, data);
-          io.to(room.roomname).emit('loadActivity', data.activity);
-          return;
+      // Find the player in the room and update their activity
+    let room = privateRooms[roomname] || publicRooms[roomname];
+    if (room) {
+      let player = room.players.find(p => p.id === data.id);
+      if (player) {
+        player.activity = data.activity; // Update the player's activity
+      }
+    }
+
+    if (privateRooms[roomname]){
+      if (privateRooms[roomname].players.length === 1){ // alone in your room
+        publicRooms[roomname] = privateRooms[roomname]; // move the room to public
+        delete privateRooms[roomname];
+        socket.emit('roomOpened', publicRooms[roomname].players);
+      }
+      else if (privateRooms[roomname].players.length === 4){ // in a full private room
+        let allSame = privateRooms[roomname].players.every(player => player.activity === data.activity);
+        if (allSame){
+          privateRooms[roomname].activity = data.activity;
+          io.to(roomname).emit('loadActivity', data.activity);
+        }
+        else {
+          io.to(roomname).emit('activityChosen', privateRooms[roomname].players);
         }
       }
-      // no public room found, create a new one
-      let newRoom = openPublicRoom(data);
-      socket.emit('activityChosen', publicRooms[newRoom].players);
-      socket.emit('waitingForPlayers', data.activity);
-    }
-    else if (privateRooms[roomname] && privateRooms[roomname].players.length > 1){ // in a private room with others
-      let allSame = privateRooms[roomname].players.every(player => player.activity === data.activity);
-      io.to(roomname).emit('activityChosen', privateRooms[roomname].players);
-      if (allSame){
-        privateRooms[roomname].activity = data.activity;
-        io.to(roomname).emit('loadActivity', data.activity);
+      else{
+        io.to(roomname).emit('activityChosen', privateRooms[roomname].players);
       }
     }
-    else {
-      socket.emit('joined', {message: "Error: choosing activity in mystery room."});
+    else if (publicRooms[roomname]){
+      if (publicRooms[roomname].players.length === 1){ // alone in public room
+        publicRooms[roomname].activity = data.activity;
+        io.to(roomname).emit('activityChosen', publicRooms[roomname].players);
+      }
+      else {
+        let allSame = publicRooms[roomname].players.every(player => player.activity === data.activity);
+        if (allSame){
+          publicRooms[roomname].activity = data.activity;
+          io.to(roomname).emit('loadActivity', data.activity);
+        }
+        else {
+          io.to(roomname).emit('activityChosen', publicRooms[roomname].players);
+        }
+      }
     }
   });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   socket.on('selectimg', function(data){

@@ -1,5 +1,14 @@
 <%- include('../head.ejs') -%>
 <%- include('navbar.ejs') -%>
+<style>
+  .activity .pawn {
+    width: 32px;
+    height: 16px;
+    display: inline-block;
+  }
+
+</style>
+
 
 <div class="container-fluid">
   <div class="row">
@@ -16,29 +25,30 @@
           <div class="col-9 fs-1">
             <div id="roomname"></div>
           </div>
-        </div>
 
+        </div>
         <div class="row bg-light border border-primary rounded-3">
+
           <div class="col-2">
             <div id="myPawn" class="my-1 text-center" style="margin:auto;width:32px;"></div>
           </div>
+
           <div class="col-10">
             <div id="myName" class="fs-3" style="text-shadow:0px 0px 2px #555"></div>
-
             <div class="d-flex justify-content-between mb-1">
               <button id="getName" class="btn btn-sm btn-outline-primary px-1 py-0">Change Name</button>
               <input id="color" class="form-control form-control-sm p-0 mx-1" type="color">
-
             </div>
-      </div>
-        </div>
+          </div>
 
-        <div id="otherPlayers">
-          <!-- rows for other players will be added dynamically here -->
         </div>
+        <div id="otherPlayers"></div><!-- rows for other players will be added dynamically here -->
 
-        <div class="mx-0" id="leaveGroup" style="display: none;">
-          <img src="/image/exit.svg" alt="leave group" class="img-fluid point" style="width: 64px; height: 64px;" title="Leave Group">
+        <div class="row" id="leaveGroup" style="display: none;">
+          <div class="col d-flex px-0">
+            <img src="/image/exit.svg" alt="leave group" class="img-fluid point" style="width: 64px; height: 64px;" title="Leave Group">
+            <div id="info" class="ms-2 align-self-center"></div>
+          </div>
         </div>
  
       </div> <!-- end of myGroup -->
@@ -47,8 +57,8 @@
 <!-- FRIEND'S GROUP -->
       <div id="group" class="container alert-success text-center border border-success rounded-3 py-3" style="display: none;">
         <div class="row">
-          <div class="col-12 g-0">
 
+          <div class="col-12 g-0">
             <div id="foundplayers" class="text-success mb-3">
               <!-- player names only will be added dynamically here -->
             </div>
@@ -58,18 +68,17 @@
               </button>
               <input id="roomSearch" class="form-control fs-1 text-success text-center" placeholder="join">
             </form>
-
           </div>
-        </div>
 
+        </div>
       </div> <!-- end of friend's group -->
 
     </div> 
-    
-    <div id="activity" class="col-sm-8 border border-primary mb-3">
-      <%- include('../../public/pages/groups/menu.html') %>
+    <div class="col-sm-8 mb-3">
+      <div id="activity" class="col-sm-8 border border-primary mb-3">
+        <%- include('../../public/pages/groups/menu.html') %>
+      </div>
     </div>
-
   </div>
 </div>
 
@@ -82,36 +91,15 @@
   var room = {};
   var player = {id: null, color: "#cccccc", roomname: null, roomtype: "private", closed: false, number: 1, activity: null};
   var socket = io();
+  var timer;
 
 $(function(){
   // localStorage.removeItem('player'); // DEBUG: so I don't have to clear my iPhone cache
   $(`#groups-tab`).addClass("active");
 
-  $(".activity").on('click', function(){
-    loadActivity( $(this).attr('id') );
-  });
-
-  function loadActivity(activity) {
-    $.ajax({
-      url: `/pages/groups/${activity}.html`,
-      method: 'GET',
-      success: function(response) {
-        $('#activity').html(response);
-      },
-      error: function(xhr, status, error) {
-        console.error('Error loading content:', error);
-      }
-    });
-  }
-
-// VARIABLES ////////////////////////////////////////////////////////////////////
-  var socket = io();
-  var room = {};
-  var player = {id: null, color: "#cccccc", roomname: null, roomtype: "private", closed: false, number: 1};
-
 // FUNCTIONS ////////////////////////////////////////////////////////////////////
   function updatePlayerList(data){
-    if (data.length != 1) {
+    if (data.length != 1 || player.roomtype == "public") {
       $("#group").removeClass("d-flex").addClass("d-none");
       $("#leaveGroup").show();
     }
@@ -120,8 +108,9 @@ $(function(){
       $("#leaveGroup").hide();
     }
 
-    //console.log(data); // DEBUG
     $(`#otherPlayers`).empty();
+    $(".activity").find(".pawn").remove(); // remove old pawns
+
     for (let p of data) {
       if (p.id == player.id){
         $(`#myPawn`).html(getPawn(player.color));
@@ -144,6 +133,7 @@ $(function(){
       `);
         setColor(p.number, p.color); // Only set color for other players
       }
+      $(`#${p.activity}`).append(getPawn(p.color));
     }
   }
 
@@ -152,7 +142,7 @@ $(function(){
     let shadow = reduceBrightness(color, 20);
     let def = shadow.replace("#", "");
     return `
-<svg class="img-fluid" width="64" height="128" viewBox="0 0 64 128" xmlns="http://www.w3.org/2000/svg">
+<svg class="img-fluid pawn" width="64" height="128" viewBox="0 0 64 128" xmlns="http://www.w3.org/2000/svg">
     <!-- Body of the pawn -->
     <path transform="matrix(0.78482373,0,0,0.3410327,-40.6,58)" d="m 54.796244,189.05536 c -12.062025,-20.89204 13.56978,-65.28763 37.693831,-65.28763 24.124055,0 49.755855,44.39559 37.693825,65.28763 -12.06202,20.89204 -63.325631,20.89204 -75.387656,0 z" fill="${color}" />
     <path transform="matrix(0.78482373,0,0,0.3410327,-40.6,58)" d="m 54.796244,189.05536 c -12.062025,-20.89204 13.56978,-65.28763 37.693831,-65.28763 24.124055,0 49.755855,44.39559 37.693825,65.28763 -12.06202,20.89204 -63.325631,20.89204 -75.387656,0 z" fill="url(#${def}1)" />
@@ -222,6 +212,11 @@ $(function(){
   }
 
 
+  function loadActivity(activity) {
+    alert(`Activity triggered: ${activity}`);
+  }
+
+
 // EVENTS //////////////////////////////////////////////////////////////////////
   $("#roomSearch").on('input', ()=>{
     socket.emit('roomSearch', $("#roomSearch").val());
@@ -229,13 +224,12 @@ $(function(){
 
   $("#roomSearchForm").on('submit', (e)=>{
     e.preventDefault();
-    // if #join is disabled, then the room does not exist
-    if ($("#join").prop('disabled')) return;
+    if ($("#join").prop('disabled')) return; // if #join disabled, room !exists
     let newRoom = $("#roomSearch").val();
     socket.emit('join', {newRoom, player});
-    $("#roomSearch").val(''); // clear the search input
-    $("#foundplayers").empty(); // clear the found players list
-    $("#join").prop('disabled', true); // disable the join button again
+    $("#roomSearch").val('');
+    $("#foundplayers").empty();
+    $("#join").prop('disabled', true);
   });
 
   $("#getName").on('click', getName);
@@ -246,14 +240,17 @@ $(function(){
   });
 
   $("#leaveGroup").on('click', ()=>{
-    $(`#roomSearch`).val(player.roomname);
-    $("#roomSearch").trigger('input');
+    $("#roomSearch").val(player.roomname);
     socket.emit('leave', player);
+    $("#roomSearch").trigger('input'); // must be after player leaves
   });
 
-  $(".activity").on('click', function(){
-    loadActivity( $(this).attr('id') );
+  $(".activity").on("click", function () {
+    let activity = $(this).attr("id");
+    player.activity = activity;
+    socket.emit("chooseActivity", player);
   });
+
 
 // SOCKET EVENTS ///////////////////////////////////////////////////////////////
   socket.on('connect', async()=>{
@@ -271,7 +268,7 @@ $(function(){
     localStorage.setItem('player', JSON.stringify(player));
     $(`#room`).text(player.roomname);
     $(`#roomname`).text(player.roomname);
-    updatePlayerList(data.room.players);
+    updatePlayerList(room.players);
   });
 
 
@@ -288,7 +285,7 @@ $(function(){
 
 
   socket.on('roomSearch', (data)=>{
-    if (data) {
+    if (data && data.roomname != player.roomname) {
       for (let p of data.players) {
         $(`#foundplayers`).append(`<div style="color: ${p.color};text-shadow:0px 0px 2px #000;">${p.id}</div>`);
       }
@@ -321,8 +318,19 @@ $(function(){
   socket.on('setColor', (data)=>{
     setColor(data.number, data.color);
   });
-});
 
+  socket.on('roomOpened', (data)=>{
+    $("#leaveGroup").show();
+    player.roomtype = "public";
+    localStorage.setItem('player', JSON.stringify(player));
+    updatePlayerList(data);
+  });
+
+  socket.on('activityChosen', (data)=>{
+    updatePlayerList(data);
+  });
+
+});
 </script>
 
 <%- include('../foot.ejs') -%>
