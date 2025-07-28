@@ -74,9 +74,14 @@
       </div> <!-- end of friend's group -->
 
     </div> 
-    <div class="col-sm-8 mb-3">
-      <div id="activity" class="col-sm-8 border border-primary mb-3">
-        <%- include('../../public/pages/groups/menu.html') %>
+
+    <div class="col-sm-4">
+      <%//- include('../menu/select_NH.ejs') %>
+    </div>
+
+    <div id="activity" class="col-sm-4 mb-3">
+      <div class="border">
+        <%- include('../menu/item_match.ejs') %>
       </div>
     </div>
   </div>
@@ -96,6 +101,12 @@
 $(function(){
   // localStorage.removeItem('player'); // DEBUG: so I don't have to clear my iPhone cache
   $(`#groups-tab`).addClass("active");
+
+  $(".menuitem").on('submit', (e)=>{
+    e.preventDefault();
+    console.log('Form submitted:', e.target);
+  });
+
 
 // FUNCTIONS ////////////////////////////////////////////////////////////////////
   function updatePlayerList(data){

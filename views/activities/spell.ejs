@@ -9,75 +9,76 @@
     max-height:50vh;
   }
 </style>
-
 <body>
-  <div class="d-flex justify-content-between">
-    <%- include('../menu/item_spell'); -%>
-    <button id="home" class="btn btn-sm btn-outline-secondary p-0" onclick="location.href='/'">
-      <i class="material-icons">home</i>
-    </button>
-  </div>
 
-  <div id="info" class="container">
-    <div class="row pb-5">
+<div class="d-flex justify-content-between">
+  <%- include('../menu/item_spell'); -%>
+  <button id="home" class="btn btn-sm btn-outline-secondary p-0" onclick="location.href='/'">
+    <i class="material-icons">home</i>
+  </button>
+</div>
 
-      <div class="col text-center">
-        <div class="display-1 YM">
-          <%- __('activity.spell.title') %>
-        </div>
-        <%- __('activity.spell.1') %>
+<div id="info" class="container">
+  <div class="row pb-5">
+
+    <div class="col text-center">
+      <div class="display-1 YM">
+        <%- __('activity.spell.title') %>
       </div>
-
+      <%- __('activity.spell.1') %>
     </div>
-    <div class="row text-center">
 
-      <div id="result" class="col" style="display:none;"></div>
-      <div id="controls" class="col d-flex justify-content-center">
-        <div class="d-flex align-items-center">
-          <button id="start" aria-label="next" class="btn btn-lg btn-success ms-3" autofocus>
-            START
-          </button>
-        </div>
+  </div>
+  <div class="row text-center">
+
+    <div id="result" class="col" style="display:none;"></div>
+    <div id="controls" class="col d-flex justify-content-center">
+      <div class="d-flex align-items-center">
+        <button id="start" aria-label="next" class="btn btn-lg btn-success ms-3" autofocus>
+          START
+        </button>
       </div>
     </div>
   </div>
+</div>
 
 
-  <div id="content" class="container g-0" style="display:none;">
+<div id="content" class="container g-0" style="display:none;">
+  
+  <div class="row g-0">
+    <div id="remaining" class="col-1 text-primary display-5 YM">42</div>
     
-    <div class="row g-0">
-      <div id="remaining" class="col-1 text-primary display-5 YM">42</div>
-      
-      <!-- answer -->
-      <div class="col-11 YM">
-        <div id="guess" class="d-flex flex-wrap justify-content-center my-3"></div>
-        <div class="d-flex justify-content-center my-3">
-          <div id="answer" class="d-flex flex-wrap justify-content-center">
-            <!-- populated dynamically by resetAnswer() -->
-          </div>
-          <button id="next" aria-label="next" class="btn btn-lg btn-success" style="display:none;">
-            <i class="material-icons">arrow_forward</i>
-          </button>
+    <!-- answer -->
+    <div class="col-11 YM">
+      <div id="guess" class="d-flex flex-wrap justify-content-center my-3"></div>
+      <div class="d-flex justify-content-center my-3">
+        <div id="answer" class="d-flex flex-wrap justify-content-center">
+          Hey yo WTF?
+          <!-- populated dynamically by resetAnswer() -->
         </div>
+        <button id="next" aria-label="next" class="btn btn-lg btn-success" style="display:none;">
+          <i class="material-icons">arrow_forward</i>
+        </button>
       </div>
-
     </div>
-    <div class="row g-0">
-      <!-- image -->
-      <div class="col-6 text-center">
-        <div id="image" class="p-4"></div>
-      </div>
 
-      <div class="col-6 d-flex flex-column justify-content-center">
-        <div id="keyboard" class="container p-1 rounded-3 border text-center d-flex flex-column justify-content-center g-0" style="width:400px;">
-          <div id="keyrow1" class="row g-0 justify-content-center"></div>
-          <div id="keyrow2" class="row g-0 justify-content-center"></div>
-          <div id="keyrow3" class="row g-0 justify-content-center"></div>
-          <div id="keyrow4" class="row g-0 justify-content-center"></div>
-        </div>
+  </div>
+  <div class="row g-0">
+    <!-- image -->
+    <div class="col-6 text-center">
+      <div id="image" class="p-4"></div>
+    </div>
+
+    <div class="col-6 d-flex flex-column justify-content-center">
+      <div id="keyboard" class="container p-1 rounded-3 border text-center d-flex flex-column justify-content-center g-0" style="width:400px;">
+        <div id="keyrow1" class="row g-0 justify-content-center"></div>
+        <div id="keyrow2" class="row g-0 justify-content-center"></div>
+        <div id="keyrow3" class="row g-0 justify-content-center"></div>
+        <div id="keyrow4" class="row g-0 justify-content-center"></div>
       </div>
     </div>
   </div>
+</div>
 
 
 <script>
@@ -89,8 +90,9 @@ $(function(){
 
   // PREPARE THE DECK ////////////////////////////////////////////////////////////
   const params = <%- params %> || {};
-  const originalDeck = <%- JSON.stringify(deck) %>;
+  const originalDeck = <%- JSON.stringify(deck) %> || [];
   var deck = originalDeck.slice();
+  console.log(deck);
   var item = {};
   var review = [];
   var place = 0;
@@ -265,10 +267,8 @@ $(function(){
                         alt="${item.word}" 
                         onerror="altOnly(this)">`
                    : `<div class="display-6 border border-primary rounded-3 text-primary">${item.meaning}</div>`);
-
-      for (let l = 0; l < item.word.length; l++){
+                   for (let l = 0; l < item.word.length; l++){
         let wordwrap = [' ', '-'].includes( item.word[l] ) ? true : false;
-
         $("#answer .word:last-child").append(`<div id="place${l}"
                                   class="place btn btn-lg alert-primary"
                                   style="font-size:2em;width:60px;">_</div>`);
@@ -276,10 +276,8 @@ $(function(){
         if (wordwrap) $("#answer").append(`<div class="word d-flex"></div>`);
       }
 
-      $("#answer").show();
-
-      $("#next").hide();
-      $(".letter").removeClass('bg-primary bg-warning bg-secondary text-white');
+      // $("#next").hide();
+      // $(".letter").removeClass('bg-primary bg-warning bg-secondary text-white');
     } 
     else {
       finished = true;
@@ -290,13 +288,9 @@ $(function(){
 
 
   // set or reset everything
-  $("#start").on('click', ()=>{
-    start();
-  });
+  $("#start").off('click').on('click', start);
 
-  $("#next").on('click', ()=>{
-    resetAnswer();
-  });
+  $("#next").on('click', resetAnswer);
 
   // input
 

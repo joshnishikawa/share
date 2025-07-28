@@ -39,18 +39,5 @@ $(function(){
     }
   });
 
-
-  $(".menuitem").on('submit', (e)=>{
-    e.preventDefault();
-    if (!window.deck || window.deck.length == 0) {
-      alert("<%- __('pleaseSelect') %>");
-    }
-    else {
-      $(e.target).find("input[name='deck']").val(JSON.stringify(window.deck));
-      $(e.target).find("input[name='deckType']").val(window.deckType);
-      $(e.target).off('submit').submit();
-    }
-  });
-
 });
 </script>

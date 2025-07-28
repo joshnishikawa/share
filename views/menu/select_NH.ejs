@@ -58,12 +58,12 @@
 $(function(){
   // But I only need that last div to be flex-grow-1 AND d-flex flex-wrap. So...
   // Set #growme to the width of #deletme. Then hide #deleteme. (also on resize)
-  $("#growme").width($("#deleteme").width() -20);
+  $("#growme").width($("#deleteme").width());
   $("#deleteme").hide();
 
   $(window).on('resize', function(){
     $("#deleteme").show();
-    $("#growme").width($("#deleteme").width() -20);
+    $("#growme").width($("#deleteme").width());
     $("#deleteme").hide();
   });
 
@@ -87,18 +87,6 @@ $(function(){
       addWords(list);
     } else {
       removeWords(list);
-    }
-  });
-
-  $(".menuitem").on('submit', (e)=>{
-    e.preventDefault();
-    if (!window.deck || window.deck.length == 0) {
-      alert("<%- __('pleaseSelect') %>");
-    }
-    else {
-      $(e.target).find("input[name='deck']").val(JSON.stringify(window.deck));
-      $(e.target).find("input[name='deckType']").val(window.deckType);
-      $(e.target).off('submit').submit();
     }
   });
 

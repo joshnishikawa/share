@@ -30,6 +30,18 @@
 $(function(){
   $(`#NH-tab`).addClass("active");
 
+  $(".menuitem").on('submit', (e)=>{
+    e.preventDefault();
+    if (!window.deck || window.deck.length == 0) {
+      alert("<%- __('pleaseSelect') %>");
+    }
+    else {
+      $(e.target).find("input[name='deck']").val(JSON.stringify(window.deck));
+      $(e.target).find("input[name='deckType']").val(window.deckType);
+      $(e.target).off('submit').submit();
+    }
+  });
+
   addWords = (list) => {
     for (let l of list) {
       if (!window.deck.includes(l.id)) {
