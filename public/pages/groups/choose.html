@@ -43,7 +43,7 @@ $(function(){
 
     $("#images").append(img);
     $(`#images img`).on('click', function (){
-      socket.emit('selectimg', {word: set[i].word, player}); // word selected
+      socket.emit('choose/selectimg', {word: set[i].word, player}); // word selected
       $(`#words div:contains("${set[i].word}")`).remove();   // remove the word
       $(this).off('click').removeClass('thumb').show();      // and the picture
     });
@@ -74,7 +74,6 @@ $(function(){
         $(this).addClass('text-danger');
       }
     });
-
   });
 
 });

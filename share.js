@@ -14,8 +14,6 @@ const path = require('path');
 const mainRouter = require('./routes/main');
 const TRouter = require('./routes/teachers');
 const mediaRouter = require('./routes/media');
-const groupRouter = require('./routes/groups');
-
 
 const { I18n } = require('i18n');
 const i18n = new I18n({
@@ -44,7 +42,6 @@ app.set('views', path.join(__dirname, 'views'));
 app.use( logger('dev') );
 app.use(  express.static( path.join(__dirname, 'public') )  );
 app.use( i18n.init );
-app.use('/groups', groupRouter);
 app.use('/teachers', TRouter);
 app.use('/media', mediaRouter);
 app.use('/', mainRouter);

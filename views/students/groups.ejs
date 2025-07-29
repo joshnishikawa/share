@@ -75,15 +75,25 @@
 
     </div> 
 
+    <div id="activity" class="col-sm-8">
+
+      <div class="btn btn-outline-primary activity d-flex justify-content-between w-100" id="choose">
+        Choose  
+      </div>  
+
+      <div class="btn btn-outline-primary activity d-flex justify-content-between w-100" id="race">
+        Race
+      </div>  
+
+      <div class="btn btn-outline-primary activity d-flex justify-content-between w-100" id="match">
+        Match
+      </div>
+    </div>
+
     <div class="col-sm-4">
       <%//- include('../menu/select_NH.ejs') %>
     </div>
 
-    <div id="activity" class="col-sm-4 mb-3">
-      <div class="border">
-        <%- include('../menu/item_match.ejs') %>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -97,6 +107,28 @@
   var player = {id: null, color: "#cccccc", roomname: null, roomtype: "private", closed: false, number: 1, activity: null};
   var socket = io();
   var timer;
+  
+  // Initialize global variables for NH vocabulary
+  window.deck = [];
+  window.local = [];
+  window.deckType = 'NH';
+
+  // Define global functions for NH vocabulary
+  addWords = (list) => {
+    for (let l of list) {
+      if (!window.deck.includes(l.id)) {
+        window.deck.push(l.id);
+        window.local.push(l);
+      }
+    }
+  }
+
+  removeWords = (list) => {
+    for (let i of list) {
+      window.deck = window.deck.filter(d => d !== i && d !== i.id && d !== i.word);
+      window.local = window.local.filter(l => l.id !== i.id && l.id !== i.word);
+    }
+  }
 
 $(function(){
   // localStorage.removeItem('player'); // DEBUG: so I don't have to clear my iPhone cache
@@ -104,23 +136,40 @@ $(function(){
 
   $(".menuitem").on('submit', (e)=>{
     e.preventDefault();
-    console.log('Form submitted:', e.target);
+        if (!window.deck || window.deck.length == 0) {
+      alert("<%- __('pleaseSelect') %>");
+    }
+    else {
+      $(e.target).find("input[name='deck']").val(JSON.stringify(window.deck));
+      $(e.target).find("input[name='deckType']").val(window.deckType);
+      $(e.target).off('submit').submit();
+    }
   });
 
 
 // FUNCTIONS ////////////////////////////////////////////////////////////////////
   function updatePlayerList(data){
+    // Cache DOM elements to avoid repeated queries
+    const $group = $("#group");
+    const $leaveGroup = $("#leaveGroup");
+    const $otherPlayers = $(`#otherPlayers`);
+    const $activities = $(".activity");
+    
     if (data.length != 1 || player.roomtype == "public") {
-      $("#group").removeClass("d-flex").addClass("d-none");
-      $("#leaveGroup").show();
+      $group.removeClass("d-flex").addClass("d-none");
+      $leaveGroup.show();
     }
     else {
-      $("#group").removeClass("d-none").addClass("d-flex");
-      $("#leaveGroup").hide();
+      $group.removeClass("d-none").addClass("d-flex");
+      $leaveGroup.hide();
     }
 
-    $(`#otherPlayers`).empty();
-    $(".activity").find(".pawn").remove(); // remove old pawns
+    // Clear old content once
+    $otherPlayers.empty();
+    $activities.find(".pawn").remove();
+
+    // Build HTML string instead of multiple DOM manipulations
+    let otherPlayersHTML = '';
 
     for (let p of data) {
       if (p.id == player.id){
@@ -128,23 +177,35 @@ $(function(){
         $(`#myName`).text(p.id);
         $(`#myName`).css('color', player.color);
         $(`#color`).val(player.color);
-        $(`#myPawn`).html(getPawn(player.color));
         localStorage.setItem('player', JSON.stringify(player));
       }
       else {
-      $(`#otherPlayers`).append(`
-        <div class="row bg-light border border-primary rounded-3">
-          <div class="col-2">
-            <div id="pawn${p.number}" class="text-center my-1" style="margin:auto;width:24px;"></div>
+        otherPlayersHTML += `
+          <div class="row bg-light border border-primary rounded-3">
+            <div class="col-2">
+              <div class="pawn${p.number} text-center my-1" style="margin:auto;width:24px;"></div>
+            </div>
+            <div class="col-10">
+              <div id="name${p.number}" class="fs-4" style="color: ${p.color};text-shadow:0px 0px 2px #555;">${p.id}</div>
+            </div>
           </div>
-          <div class="col-10">
-            <div id="name${p.number}" class="fs-4" style="color: ${p.color};text-shadow:0px 0px 2px #555;">${p.id}</div>
-          </div>
-        </div>
-      `);
-        setColor(p.number, p.color); // Only set color for other players
+        `;
       }
-      $(`#${p.activity}`).append(getPawn(p.color));
+    }
+    
+    // Single DOM update for other players
+    if (otherPlayersHTML) {
+      $otherPlayers.html(otherPlayersHTML);
+    }
+    
+    // Set colors and pawns after DOM is updated
+    for (let p of data) {
+      if (p.id != player.id) {
+        setColor(p.number, p.color);
+      }
+      if (p.activity) {
+        $(`#${p.activity}`).append(getPawn(p.color));
+      }
     }
   }
 
@@ -195,11 +256,16 @@ $(function(){
     return new Promise((resolve, reject) => {
       socket.emit('getName', player);
 
-      socket.on('setName', function(data) {
+      // Remove any existing listener to prevent memory leaks
+      socket.off('setName.getName');
+      
+      socket.on('setName.getName', function(data) {
         if (data.id) {
           player.id = data.id;
+          socket.off('setName.getName'); // Clean up immediately
           resolve();
         } else {
+          socket.off('setName.getName'); // Clean up on error too
           reject('Failed to get name from server');
         }
       });
@@ -214,23 +280,44 @@ $(function(){
       $(`#myPawn`).html(getPawn(color));
       $(`#myName`).css('color', color);
       $("#color").val(color);
+      
+      // Update activity pawn if player has selected an activity
+      if (player.activity) {
+        $(`.activity .pawn`).filter(function() {
+          return $(this).closest(`#${player.activity}`).length > 0;
+        }).html(getPawn(color));
+      }
+      
+      socket.emit('setColor', player);
     }
     else {
-      $(`#pawn${number}`).html(getPawn(color));
+      $(`.pawn${number}`).html(getPawn(color));
       $(`#name${number}`).css('color', color);
     }
-    socket.emit('setColor', player);
   }
 
 
   function loadActivity(activity) {
-    alert(`Activity triggered: ${activity}`);
+    // load from url
+    if (activity == "choose") {
+      $("#activity").load("/pages/groups/choose.html", function() {
+        // Initialize the game after loading the HTML
+        // if (typeof initChooseGame === 'function') {
+        //   initChooseGame();
+        // }
+      });
+    }
   }
 
 
 // EVENTS //////////////////////////////////////////////////////////////////////
+  let roomSearchTimeout;
   $("#roomSearch").on('input', ()=>{
-    socket.emit('roomSearch', $("#roomSearch").val());
+    // Debounce room search to avoid excessive server calls
+    clearTimeout(roomSearchTimeout);
+    roomSearchTimeout = setTimeout(() => {
+      socket.emit('roomSearch', $("#roomSearch").val());
+    }, 300); // Wait 300ms after user stops typing
   });
 
   $("#roomSearchForm").on('submit', (e)=>{
@@ -251,9 +338,8 @@ $(function(){
   });
 
   $("#leaveGroup").on('click', ()=>{
-    $("#roomSearch").val(player.roomname);
     socket.emit('leave', player);
-    $("#roomSearch").trigger('input'); // must be after player leaves
+    // Don't trigger room search here - let the server handle the rejoin
   });
 
   $(".activity").on("click", function () {
@@ -276,10 +362,15 @@ $(function(){
     room = data.room;
     player.number = data.playerNum;
     player.roomname = room.roomname;
+    player.roomtype = room.roomtype; // Make sure roomtype is updated
     localStorage.setItem('player', JSON.stringify(player));
     $(`#room`).text(player.roomname);
     $(`#roomname`).text(player.roomname);
     updatePlayerList(room.players);
+    if (room.activity) {
+      player.activity = room.activity;
+      loadActivity(room.activity);
+    }
   });
 
 
@@ -319,6 +410,17 @@ $(function(){
     player.roomname = null; // reset the roomname
     player.roomtype = "private"; // reset the roomtype
     player.number = 1; // reset the player number
+    player.activity = null; // reset the activity
+    
+    // Clear UI elements
+    $(`#otherPlayers`).empty();
+    $(".activity").find(".pawn").remove();
+    $("#foundplayers").empty();
+    $("#roomSearch").val('');
+    $("#join").prop('disabled', true);
+    
+    // Update localStorage and join new room
+    localStorage.setItem('player', JSON.stringify(player));
     socket.emit('join', player); // join a new private room
   });
 
@@ -327,7 +429,21 @@ $(function(){
   });
 
   socket.on('setColor', (data)=>{
+    // Update the player's color in the room data
+    if (room && room.players) {
+      const player = room.players.find(p => p.number === data.number);
+      if (player) {
+        player.color = data.color;
+      }
+    }
+    
+    // Update visual elements
     setColor(data.number, data.color);
+    
+    // If activity info is provided, specifically update that activity pawn
+    if (data.activity) {
+      $(`#${data.activity} .pawn`).html(getPawn(data.color));
+    }
   });
 
   socket.on('roomOpened', (data)=>{
@@ -339,6 +455,10 @@ $(function(){
 
   socket.on('activityChosen', (data)=>{
     updatePlayerList(data);
+  });
+
+  socket.on('loadActivity', (data)=>{
+    loadActivity(data);
   });
 
 });

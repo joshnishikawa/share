@@ -1,3 +1,4 @@
+const express = require('express');
 const { da, pl, so, co } = require('google-translate-api-jp/languages');
 
 const adjectives = [
@@ -41,20 +42,55 @@ const nouns = [
 
 ];
 
-
+const chooseEvents = require('./io/choose.js');
 const groups = (io) => {
 const rooms = require('../rooms.json');
 var publicRooms = {};
 var privateRooms = {};
 
+// Helper function to get available rooms efficiently
+function getAvailableRooms() {
+  const usedRooms = new Set([...Object.keys(publicRooms), ...Object.keys(privateRooms)]);
+  return rooms.filter(room => !usedRooms.has(room));
+}
+
+// Helper function to remove duplicate players by ID from a room
+function removeDuplicatePlayers(room) {
+  const seen = new Set();
+  room.players = room.players.filter(player => {
+    if (seen.has(player.id)) {
+      return false;
+    }
+    seen.add(player.id);
+    return true;
+  });
+}
+
+// Helper function to find player index by ID
+function findPlayerIndex(players, playerId) {
+  return players.findIndex(player => player.id === playerId);
+}
+
+// Periodic cleanup function to ensure no duplicates exist
+function cleanupDuplicatePlayers() {
+  // Clean up public rooms
+  Object.keys(publicRooms).forEach(roomname => {
+    removeDuplicatePlayers(publicRooms[roomname]);
+  });
+  
+  // Clean up private rooms
+  Object.keys(privateRooms).forEach(roomname => {
+    removeDuplicatePlayers(privateRooms[roomname]);
+  });
+}
+
+// Run cleanup every 5 minutes
+setInterval(cleanupDuplicatePlayers, 5 * 60 * 1000);
+
 
 function openPublicRoom(data){
-  console.log(data);
-  console.log('Attempting to open public room.');
-  let available = rooms.filter(x => !Object.keys(publicRooms).includes(x) 
-                                 && !Object.keys(privateRooms).includes(x));
+  let available = getAvailableRooms();
   if (available.length === 0) {
-    console.log('No available public rooms.');
     return null; // no available rooms
   }
   else {
@@ -63,20 +99,18 @@ function openPublicRoom(data){
     data.number = 1; // set the player number to 1 if it's a new room
     publicRooms[roomname] = {roomname, roomtype: 'public',
                              activity: data.activity, players: [data],
-                             date}; // add the word to the rooms object
-    console.log(`Public room "${roomname}" opened.`);
+                             open: true,
+                             turn: 1, // set the turn to player 1
+                             date};
     return roomname;
   }
 }
 
 
 function openPrivateRoom(data){
-  console.log('Attempting to open private room.');
   // check if there are any available rooms
-  let available = rooms.filter(x => !Object.keys(publicRooms).includes(x) 
-                                 && !Object.keys(privateRooms).includes(x));
+  let available = getAvailableRooms();
   if (available.length === 0) {
-    console.log('No available private rooms.');
     return null; // no available rooms
   }
   else {
@@ -85,8 +119,8 @@ function openPrivateRoom(data){
     data.number = 1; // set the player number to 1 if it's a new room
     privateRooms[roomname] = {roomname, roomtype: 'private', open: true, 
                               activity: null, players: [data],
-                              date}; // add the room to the rooms object
-    console.log(`Private room "${roomname}" opened.`);
+                              turn: 1,
+                              date};
     return roomname;
   }
 }
@@ -94,13 +128,11 @@ function openPrivateRoom(data){
 
 function closePublicRoom(roomname){
   delete publicRooms[roomname];
-  console.log(`Public room "${roomname}" closed.`);
 }
 
 
 function closePrivateRoom(roomname){
   delete privateRooms[roomname];
-  console.log(`Private room "${roomname}" closed.`);
 }
 
 
@@ -110,23 +142,19 @@ function joinPrivateRoom(socket, data){
                  data.roomname : 
                  openPrivateRoom(data);
   if (roomname === null){
-    console.log('No available private rooms.'); // FIXME: we need to filter expired rooms
     socket.emit('joined', {message: "No more available rooms."});
     return;
   }
   else {
     let room = privateRooms[roomname];
-    let playerFound = false;
+    
+    // Safety check: remove any duplicate players that might exist
+    removeDuplicatePlayers(room);
+    
+    let existingPlayerIndex = findPlayerIndex(room.players, data.id);
     let playerNum;
-    for (let player of room.players){
-      if (player.id === data.id){
-        playerFound = true;
-        playerNum = player.number;
-        break;
-      }
-    }
-
-    if (!playerFound){
+    
+    if (existingPlayerIndex === -1){ // Player not found, add new player
       if (!room.open){
         socket.emit('joined', {message: "Sorry, this room is closed and your name is not on the list."});
       }
@@ -142,18 +170,19 @@ function joinPrivateRoom(socket, data){
         room.players.push(data);
         socket.emit('joined', {room, playerNum});
         socket.broadcast.to(roomname).emit('playerJoined', room.players);
-        console.log(`${socket.id} joined the private room. "${roomname}" as player ${data.number}.`);
         return roomname; // return the roomname for further use
       }
       else {
         socket.emit('joined', {message: "Sorry, this room is full."});
       }
     }
-    else {
+    else { // Player found, update existing player data instead of adding duplicate
+      playerNum = room.players[existingPlayerIndex].number;
+      // Update the existing player's data with any new information
+      room.players[existingPlayerIndex] = {...room.players[existingPlayerIndex], ...data, number: playerNum};
       socket.join(roomname);
       socket.emit('joined', {room, playerNum});
       socket.broadcast.to(roomname).emit('playerJoined', room.players);
-      console.log(`${socket.id} rejoined the private room "${roomname}" as player ${playerNum}.`);
       return roomname; // return the roomname for further use
     }
   }
@@ -166,23 +195,41 @@ function joinPublicRoom(socket, data){
                  openPublicRoom(data);
 
   if (roomname === null){
-    console.log('FIXME: NO AVAILABLE ROOMS, WE PROBABLY NEED TO FILTER EXPIRED ONES');
     socket.emit('joined', {message: "No more available rooms."});
     return;
   }
   else {
     let room = publicRooms[roomname];
-    let playerFound = false;
+    
+    // Safety check: remove any duplicate players that might exist
+    removeDuplicatePlayers(room);
+    
+    let existingPlayerIndex = -1;
     let playerNum;
-    for (let player of room.players){
-      if (player.id === data.id){
-        playerFound = true;
-        playerNum = player.number;
-        break;
+
+    // Special case: if the room has only one player and it's the same ID, close room and create new private room
+    if (room.players.length === 1 && room.players[0].id === data.id){
+      leaveRoom(socket, data); // This will close the room since they're the only player
+      // Create a new private room for them
+      let newRoomname = openPrivateRoom(data);
+      if (newRoomname) {
+        socket.join(newRoomname);
+        socket.emit('joined', {room: privateRooms[newRoomname], playerNum: 1});
+        return newRoomname;
+      } else {
+        socket.emit('joined', {message: "No available rooms."});
+        return;
       }
     }
-    
-    if (!playerFound){
+    else{
+      // Check if player already exists in the room
+      existingPlayerIndex = findPlayerIndex(room.players, data.id);
+      if (existingPlayerIndex !== -1) {
+        playerNum = room.players[existingPlayerIndex].number;
+      }
+    }
+
+    if (existingPlayerIndex === -1){ // Player not found, add new player
       if (room.players.length < 4){
         // set the player number to the next available number
         let playerNums = room.players.map(x => x.number);
@@ -195,23 +242,18 @@ function joinPublicRoom(socket, data){
         socket.emit('joined', {room, playerNum});
         // broadcast to all sockets in the room except the sender
         socket.broadcast.to(roomname).emit('playerJoined', room.players);
-        console.log(`${socket.id} joined the public room. "${roomname}"`);
         return roomname; // return the roomname for further use
       }
       else socket.emit('joined', {message: "Sorry, this room filled up. You'll join a new one."});
     }
-    else {
-      console.log(publicRooms[roomname]);
-      for (let player of room.players){
-        if (player.id === data.id){
-          socket.join(roomname);
-          socket.emit('joined', {room, playerNum});
-          // broadcast to all sockets in the room except the sender
-          socket.broadcast.to(roomname).emit('playerJoined', room.players);
-          console.log(`${socket.id} rejoined the public room. "${roomname}"`);
-          return roomname; // return the roomname for further use
-        }
-      }
+    else { // Player found, update existing player data instead of adding duplicate
+      // Update the existing player's data with any new information
+      room.players[existingPlayerIndex] = {...room.players[existingPlayerIndex], ...data, number: playerNum};
+      socket.join(roomname);
+      socket.emit('joined', {room, playerNum});
+      // broadcast to all sockets in the room except the sender
+      socket.broadcast.to(roomname).emit('playerJoined', room.players);
+      return roomname; // return the roomname for further use
     }
   }
 }
@@ -231,7 +273,6 @@ function leaveRoom(socket, data){
       room.players = room.players.filter(player => player.id !== id);
       if (room.players.length === 0){
         closePublicRoom(roomname);
-        console.log(`Closing public room "${roomname}" as it has no players left.`);
       }
       else io.to(roomname).emit('playerLeft', room.players);
     }
@@ -241,22 +282,22 @@ function leaveRoom(socket, data){
       room = privateRooms[roomname];
       room.players = room.players.filter(player => player.id !== id);
       if (room.players.length === 0){
-        console.log(`Closing private room "${roomname}" as it has no players left.`);
         closePrivateRoom(roomname);
       }
       else io.to(roomname).emit('playerLeft', room.players);
     }
   }
-  console.log(`${socket.id} left the room "${roomname}".`);
 }
 
 
 // SOCKET.IO EVENTS ////////////////////////////////////////////////////////////
 io.sockets.on('connection', socket =>{
-  console.log('socket connected: ', socket.id);
+  
+  // Initialize modular event handlers for this socket
+  chooseEvents(io, socket);
+  
   socket.on('join', function(data){
     if (data.newRoom) {
-      console.log(`${data.player.id} is joining a different room: ${data.newRoom}`);
       leaveRoom(socket, data.player);
       if (Object.keys(privateRooms).includes(data.newRoom)){
         data.player.roomname = data.newRoom; // update the roomname
@@ -271,25 +312,22 @@ io.sockets.on('connection', socket =>{
         openPrivateRoom(socket, data.player);
       }
     }
-    else if (!data.roomname || data.roomtype === 'private'){
-      joinPrivateRoom(socket, data);
-    }
     else {
-      joinPublicRoom(socket, data);
+      if (data.roomtype === 'public'){
+        joinPublicRoom(socket, data);
+      }
+      else if (data.roomtype === 'private'){
+        joinPrivateRoom(socket, data);
+      }
+      else {
+        socket.emit('joined', {message: "Invalid room type specified."});
+      }
     }
   });
 
-
   socket.on('roomSearch', function(data){
-    if (Object.keys(privateRooms).includes(data)){
-      socket.emit('roomSearch', privateRooms[data]);
-    }
-    else if (Object.keys(publicRooms).includes(data)){
-      socket.emit('roomSearch', publicRooms[data]);
-    }
-    else {
-      socket.emit('roomSearch', null);
-    }
+    const room = privateRooms[data] || publicRooms[data] || null;
+    socket.emit('roomSearch', room);
   });
 
 
@@ -327,22 +365,18 @@ io.sockets.on('connection', socket =>{
 
 
   socket.on('setColor', function(data){
-    let room;
     let roomname = data.roomname;
-    if (publicRooms[roomname]){
-      room = publicRooms[roomname];
-    }
-    else if (privateRooms[roomname]){
-      room = privateRooms[roomname];
-    }
+    let room = publicRooms[roomname] || privateRooms[roomname];
 
     if (room) {
-      for (let player of room.players){
-        if (player.id === data.id){
-          player.color = data.color;
-          socket.broadcast.to(roomname).emit('setColor', {number: player.number, color: player.color});
-          break;
-        }
+      let player = room.players.find(p => p.id === data.id);
+      if (player) {
+        player.color = data.color;
+        socket.broadcast.to(roomname).emit('setColor', {
+          number: player.number, 
+          color: player.color,
+          activity: player.activity // Include activity so other players can update activity pawn
+        });
       }
     }
   });
@@ -366,40 +400,51 @@ io.sockets.on('connection', socket =>{
     }
 
     if (privateRooms[roomname]){
-      if (privateRooms[roomname].players.length === 1){ // alone in your room
-        publicRooms[roomname] = privateRooms[roomname]; // move the room to public
+      if (room.players.length === 1){ // alone in your room
+        publicRooms[roomname] = room; // move the room to public
         delete privateRooms[roomname];
-        socket.emit('roomOpened', publicRooms[roomname].players);
+        socket.emit('roomOpened', room.players);
       }
-      else if (privateRooms[roomname].players.length === 4){ // in a full private room
-        let allSame = privateRooms[roomname].players.every(player => player.activity === data.activity);
+      else if (room.length === 4){ // in a full private room
+        let allSame = room.players.every(player => player.activity === data.activity);
         if (allSame){
-          privateRooms[roomname].activity = data.activity;
+          room.activity = data.activity;
           io.to(roomname).emit('loadActivity', data.activity);
         }
         else {
-          io.to(roomname).emit('activityChosen', privateRooms[roomname].players);
+          io.to(roomname).emit('activityChosen', room.players);
         }
       }
       else{
-        io.to(roomname).emit('activityChosen', privateRooms[roomname].players);
-      }
-    }
-    else if (publicRooms[roomname]){
-      if (publicRooms[roomname].players.length === 1){ // alone in public room
-        publicRooms[roomname].activity = data.activity;
-        io.to(roomname).emit('activityChosen', publicRooms[roomname].players);
-      }
-      else {
-        let allSame = publicRooms[roomname].players.every(player => player.activity === data.activity);
+        // Check if all players chose the same activity
+        let allSame = room.players.every(player => player.activity === data.activity);
         if (allSame){
-          publicRooms[roomname].activity = data.activity;
+          room.activity = data.activity;
           io.to(roomname).emit('loadActivity', data.activity);
         }
         else {
-          io.to(roomname).emit('activityChosen', publicRooms[roomname].players);
+          io.to(roomname).emit('activityChosen', room.players);
         }
       }
+    }
+    else if (publicRooms[roomname]){
+      if (room.players.length === 1){ // alone in public room
+        room.activity = data.activity;
+        io.to(roomname).emit('activityChosen', room.players);
+      }
+      else {
+        let allSame = room.players.every(player => player.activity === data.activity);
+        if (allSame){
+          room.activity = data.activity;
+          io.to(roomname).emit('loadActivity', data.activity);
+        }
+        else {
+          io.to(roomname).emit('activityChosen', room.players);
+        }
+      }
+    }
+    else {
+      socket.emit('error', {message: "Room not found or closed."});
     }
   });
 
@@ -444,19 +489,8 @@ io.sockets.on('connection', socket =>{
 
 
 
-  socket.on('selectimg', function(data){
-    socket.broadcast.to(data.roomname).emit('selectedimg', data.word);
-  });
-
-
-  socket.on('selectword', async function(data){
-    socket.broadcast.to(data.roomname).emit('selectedword', data.word);
-    console.log('selectedword: ', data.word);
-  });
-
-
   socket.on('disconnect', function(){
-    console.log('socket disconnected: ', socket.id);
+    // Socket disconnected - cleanup handled by socket.io automatically
   });
 });
 
