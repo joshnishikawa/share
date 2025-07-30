@@ -42,7 +42,7 @@ $(function(){
   const typingDelay = 500; // Delay in milliseconds
 
   var words = {};
-  $.get('/vocablist')
+  $.get('/api/any-vocab')
     .done((data) => {
       words = data;
     })

@@ -1,0 +1,68 @@
+<%- include('../head'); -%>
+
+<body>
+<div class="d-flex" style="position:relative;">
+  <form id="visuals_form" action="visuals" method="GET" class="d-flex p-0">
+    <select id="page_select" class="form-control form-control-sm" name="page" required>
+<% for (let d of pages ) { %>
+      <option value="<%- d %>"><%- d %></option>
+<% } %>
+    </select>
+  </form>
+  <button id="home" class="btn btn-sm btn-outline-secondary m-1 py-0" style="position:absolute;right:0;" onclick="location.href='/'">
+    <i class="material-icons">home</i>
+  </button>
+
+</div>
+
+
+<div class="container-fluid" style="min-height:100vh;">
+  <div class="row">
+    <div id="img_container" class="col text-center">
+    </div>
+  </div>
+
+</div>
+
+
+<script>
+$(function(){
+  var url = window.location.href;
+  const searchParams = new URLSearchParams(url.substring(url.indexOf('?')));
+  const page = searchParams.get('page');
+
+  if (!page) {
+    // load the first page by default
+    $('#page_select').val($('#page_select option:first').val());
+    $('#visuals_form').submit();
+  }
+
+  $('#page_select').val(page);
+  if (page) $('#img_container').html(`<img src="/image/visuals/brainbox/${page}" alt="visuals" class="img-fluid" />`);
+  $('#img_container img').css('max-height', '100vh');
+  $('#page_select').on('change', function(){
+    $('#visuals_form').submit();
+  });
+
+
+  $(document).on('keydown', function(e){
+    if (e.key === 'ArrowRight') {
+      const next = $('#page_select option:selected').next();
+      if (next.length) {
+        $('#page_select').val(next.val());
+        $('#visuals_form').submit();
+      }
+    }
+    if (e.key === 'ArrowLeft') {
+      const prev = $('#page_select option:selected').prev();
+      if (prev.length) {
+        $('#page_select').val(prev.val());
+        $('#visuals_form').submit();
+      }
+    }
+  });
+});
+
+</script>
+
+<%- include('../foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->

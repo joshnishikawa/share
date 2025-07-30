@@ -23,6 +23,10 @@ $(function(){
   if (page){
     $('#content').load(`/public/pages/slots/${page}.html`);
   }
+  else {
+    // default to datetime
+    $('#content').load(`/public/pages/slots/datetime.html`);
+  }
   
   spinit = (slot, id)=>{
     let slotElement = $(`#${slot}`);

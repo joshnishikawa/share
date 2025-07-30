@@ -50,7 +50,7 @@ $(function(){
     }
     else {
       var words = {};
-      $.get('/vocablist', {deck: window.deck}, async (data) => {
+      $.get('/api/any-vocab', {deck: window.deck}, async (data) => {
         await $("#cardsForm input[name='deck']").val(JSON.stringify(data));
         $("#cardsForm").submit();
       });

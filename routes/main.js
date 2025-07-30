@@ -13,6 +13,44 @@ router.use(bodyParser.urlencoded({extended: true}));
 router.use('/abc', abc);
 router.use('/labs', labs);
 
+router.get('/', (req, res)=>{
+  try{
+    res.redirect('/abc');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
+
+router.get('/api/any-vocab', async (req, res)=>{
+  try{
+    // get array of words from vocabulary table
+    let words = {};
+    var rows, schema;
+    var deck = req.query.deck;
+
+    if (req.query.deck) { 
+      [rows, schema] = await db.query(`SELECT word, meaning, image, audio 
+                                 FROM vocabulary 
+                                 WHERE id IN (?)`, 
+                                 [deck]);
+    }
+    else { [rows, schema] = await db.query(`SELECT word, meaning, image, audio FROM vocabulary`);}
+
+    for (let row of rows){
+      words[row.word] = {meaning: row.meaning, image: row.image, audio: row.audio};
+    }
+    res.json(words);
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
+
 // API endpoint to get NH vocabulary and colors data
 router.get('/api/nh-vocab', async (req, res) => {
   try {
@@ -60,19 +98,10 @@ router.get('/api/nh-vocab', async (req, res) => {
   }
 });
 
+
 router.get('/test', (req, res)=>{
   try{
     res.render('tools/test');
-  }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
-
-router.get('/', (req, res)=>{
-  try{
-    res.redirect('/abc');
   }
   catch(err){
     res.send(err);
@@ -168,16 +197,6 @@ router.get('/slots', (req, res)=>{
   }
 });
 
-router.get('/snake', (req, res)=>{
-  try{
-    res.render('activities/snake');
-  }
-  catch(err
-  ){
-    res.send(err);
-    console.error(err);
-  }
-});
 
 router.get('/richtext', (req, res)=>{ 
   try{
@@ -212,14 +231,15 @@ router.get('/lp', (req, res)=>{
 });
 
 
-router.get('/books', (req, res)=>{
+router.get('/visuals', (req, res)=>{
   try{
     let book = req.query.book ?? 'brainbox';
     let page = req.query.page ?? 'airport.png';
 
-    fs.readdir( path.join(__dirname, `../public/image/books/${book}`), (err, pages)=>{
+    fs.readdir( path.join(__dirname, `../public/image/visuals/${book}`), (err, pages)=>{
       if (err) throw err;
-      res.render('tools/books', {book, pages, page});
+      console.log(book, pages, page);
+      res.render('tools/visuals', {book, pages, page});
     });
   }
   catch(err){ console.error(err); }
@@ -236,15 +256,6 @@ router.get('/shapes', (req, res)=>{
   }
 });
 
-router.get('/clothes', (req, res)=>{
-  try{
-    res.render('activities/clothes');
-  }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
 
 router.get('/speech', (req, res)=>{
   try{
@@ -263,33 +274,6 @@ router.get('/speak_spell', (req, res)=>{
   }
   catch
   (err){
-    res.send(err);
-    console.error(err);
-  }
-});
-
-
-router.get('/vocablist', async (req, res)=>{
-  try{
-    // get array of words from vocabulary table
-    let words = {};
-    var rows, schema;
-    var deck = req.query.deck;
-
-    if (req.query.deck) { 
-      [rows, schema] = await db.query(`SELECT word, meaning, image, audio 
-                                 FROM vocabulary 
-                                 WHERE id IN (?)`, 
-                                 [deck]);
-    }
-    else { [rows, schema] = await db.query(`SELECT word, meaning, image, audio FROM vocabulary`);}
-
-    for (let row of rows){
-      words[row.word] = {meaning: row.meaning, image: row.image, audio: row.audio};
-    }
-    res.json(words);
-  }
-  catch(err){
     res.send(err);
     console.error(err);
   }

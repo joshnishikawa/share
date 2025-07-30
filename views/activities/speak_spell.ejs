@@ -71,7 +71,7 @@
     window.deck = [];
     window.local = [];
     var words = {};
-    $.get('/vocablist', (data) => {
+    $.get('/api/any-vocab', (data) => {
       words = data;
     });
 
