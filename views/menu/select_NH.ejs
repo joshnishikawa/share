@@ -17,7 +17,27 @@
 
 
 <script>
-  // window.deckType, window.deck, and window.local are defined in parent page
+  // Initialize global variables
+  window.deck = [];
+  window.local = [];
+  window.deckType = 'NH';
+
+  // Define global functions
+  addWords = (list) => {
+    for (let l of list) {
+      if (!window.deck.includes(l.id)) {
+        window.deck.push(l.id);
+        window.local.push(l);
+      }
+    }
+  }
+
+  removeWords = (list) => {
+    for (let i of list) {
+      window.deck = window.deck.filter(d => d !== i && d !== i.id && d !== i.word);
+      window.local = window.local.filter(l => l.id !== i.id && l.id !== i.word);
+    }
+  }
   
 $(function(){
   let NH_vocab = {};

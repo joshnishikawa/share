@@ -16,11 +16,6 @@
 
       <%- include('../menu/item_cards'); -%>
 
-      <div class="form-check mx-3">
-        <input type="checkbox" id="showtext" class="form-check-input">
-        <label for="showtext" class="form-check-label">Text</label>
-      </div>
-
       <button id="print" class="btn btn-sm btn-outline-success py-0 mx-3">
         <i class="material-icons">print</i>
       </button>
@@ -37,7 +32,7 @@
 
 <script>
 $(function(){
-  $("#start").hide();
+  $("form button[type=submit]").hide();
   document.title = `Print Cards`;
 
   // PREPARE THE DECK //////////////////////////////////////////////////////////
@@ -54,7 +49,7 @@ $(function(){
               class="img-fluid" style="width:100%;" 
               onerror="altOnly(this)">
 
-        <div class="txt text-center YM w-100" style="font-size:5rem;display:none;">
+        <div class="txt text-center YM w-100" style="font-size:15rem;line-height:12rem;">
           ${i}
         </div>
 

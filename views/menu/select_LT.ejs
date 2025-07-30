@@ -16,10 +16,11 @@
 
 <script>
   window.deckType = 'LT'; // define before reading local storage
-$(function(){
-  let LT_vocab = <%- JSON.stringify(LT_vocab) %>;
   window.deck = [];
   window.local = [];
+
+$(function(){
+  let LT_vocab = <%- JSON.stringify(LT_vocab) %>;
 
 
   $("#themes input").on('change', function(){

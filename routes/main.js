@@ -158,17 +158,6 @@ router.get('/NH', async (req, res)=>{
 });
 
 
-// router.get('/dictionary', async (req, res)=>{
-//   try{
-//     res.render('activities/dictionary');
-//   }
-//   catch(err){
-//     res.send(err);
-//     console.error(err);
-//   }
-// });
-
-
 router.get('/slots', (req, res)=>{ 
   try{
     res.render('activities/slots');
