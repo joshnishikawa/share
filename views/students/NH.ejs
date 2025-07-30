@@ -30,15 +30,23 @@
 $(function(){
   $(`#NH-tab`).addClass("active");
 
-  $(".menuitem").on('submit', (e)=>{
+  // Use a more specific event handler to avoid conflicts
+  $(".menuitem").off('submit.nh').on('submit.nh', (e)=>{
     e.preventDefault();
+    
     if (!window.deck || window.deck.length == 0) {
       alert("<%- __('pleaseSelect') %>");
     }
     else {
-      $(e.target).find("input[name='deck']").val(JSON.stringify(window.deck));
-      $(e.target).find("input[name='deckType']").val(window.deckType);
-      $(e.target).off('submit').submit();
+      const $form = $(e.target);
+      $form.find("input[name='deck']").val(JSON.stringify(window.deck));
+      $form.find("input[name='deckType']").val(window.deckType);
+      
+      // Create a temporary form to submit without removing our event handler
+      const tempForm = $form.clone();
+      tempForm.hide().appendTo('body');
+      tempForm[0].submit();
+      tempForm.remove();
     }
   });
 

@@ -4,10 +4,16 @@
 <div class="container-fluid">
 
   <div class="row pb-3">
-    <div class="col border">
+    <div class="col">
       <div id="tags" class="d-flex flex-wrap"></div>
     </div>
   </div>
+
+  <div class="d-flex pt-3">
+    <div class="text-muted">VOCAB ACTIVITIES</div>
+    <div class="flex-grow-1"><hr/></div>
+  </div>
+
   <div class="row">
 
     <div class="col border">
@@ -62,18 +68,26 @@ $(function(){
   });
 
 
-  $(".menuitem").on('submit', (e)=>{
+  // Use a more specific event handler to avoid conflicts
+  $(".menuitem").off('submit.text').on('submit.text', (e)=>{
     e.preventDefault();
+    
     if (!window.deck || window.deck.length == 0) {
       alert("<%- __('pleaseSelect') %>");
     }
     else {
-      $(e.target).find("input[name='deck']").val(JSON.stringify(window.deck));
-      $(e.target).find("input[name='deckType']").val(window.deckType);
+      const $form = $(e.target);
+      $form.find("input[name='deck']").val(JSON.stringify(window.deck));
+      $form.find("input[name='deckType']").val(window.deckType);
       if (e.target.id == "match") {
         $("#match input[name='deckName']").val($("#tags input:checked").val());
       }
-      $(e.target).off('submit').submit();
+      
+      // Create a temporary form to submit without removing our event handler
+      const tempForm = $form.clone();
+      tempForm.hide().appendTo('body');
+      tempForm[0].submit();
+      tempForm.remove();
     }
   });
 

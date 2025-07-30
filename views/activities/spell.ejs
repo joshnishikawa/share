@@ -255,8 +255,8 @@ $(function(){
     $("#answer").html(`<div class="word d-flex"></div>`);
 
     item = deck.pop();
-    item.word = item.word.replace(/_/g, ' '); // replace underscores with spaces
     if (item){
+      item.word = item.word.replace(/_/g, ' '); // replace underscores with spaces
       let done = originalDeck.length - deck.length;
       $("#remaining").html(`${done}/${originalDeck.length}`);
 

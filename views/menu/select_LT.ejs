@@ -15,9 +15,37 @@
 
 
 <script>
-  window.deckType = 'LT'; // define before reading local storage
-  window.deck = [];
-  window.local = [];
+  // Initialize global variables only if they don't exist
+  if (typeof window.deck === 'undefined') window.deck = [];
+  if (typeof window.local === 'undefined') window.local = [];
+  
+  // Clear deck if switching from a different vocabulary type
+  if (window.deckType !== 'LT') {
+    window.deck = [];
+    window.local = [];
+  }
+  window.deckType = 'LT'; // Always set this for LT pages
+
+  // Define global functions only if they don't exist
+  if (typeof window.addWords === 'undefined') {
+    window.addWords = (list) => {
+      for (let l of list) {
+        if (!window.deck.includes(l.id)) {
+          window.deck.push(l.id);
+          window.local.push(l);
+        }
+      }
+    }
+  }
+
+  if (typeof window.removeWords === 'undefined') {
+    window.removeWords = (list) => {
+      for (let i of list) {
+        window.deck = window.deck.filter(d => d !== i && d !== i.id && d !== i.word);
+        window.local = window.local.filter(l => l.id !== i.id && l.id !== i.word);
+      }
+    }
+  }
 
 $(function(){
   let LT_vocab = <%- JSON.stringify(LT_vocab) %>;
@@ -34,9 +62,9 @@ $(function(){
     }
 
     if ($(this).is(':checked')) {
-      addWords(list);
+      window.addWords(list);
     } else {
-      removeWords(list);
+      window.removeWords(list);
     }
   });
 

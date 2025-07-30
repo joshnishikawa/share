@@ -17,25 +17,36 @@
 
 
 <script>
-  // Initialize global variables
-  window.deck = [];
-  window.local = [];
-  window.deckType = 'NH';
+  // Initialize global variables only if they don't exist
+  if (typeof window.deck === 'undefined') window.deck = [];
+  if (typeof window.local === 'undefined') window.local = [];
+  if (typeof window.deckType === 'undefined') window.deckType = 'NH';
 
-  // Define global functions
-  addWords = (list) => {
-    for (let l of list) {
-      if (!window.deck.includes(l.id)) {
-        window.deck.push(l.id);
-        window.local.push(l);
+  // Clear deck if switching from a different vocabulary type
+  if (window.deckType !== 'NH') {
+    window.deck = [];
+    window.local = [];
+    window.deckType = 'NH';
+  }
+
+  // Define global functions only if they don't exist
+  if (typeof window.addWords === 'undefined') {
+    window.addWords = (list) => {
+      for (let l of list) {
+        if (!window.deck.includes(l.id)) {
+          window.deck.push(l.id);
+          window.local.push(l);
+        }
       }
     }
   }
 
-  removeWords = (list) => {
-    for (let i of list) {
-      window.deck = window.deck.filter(d => d !== i && d !== i.id && d !== i.word);
-      window.local = window.local.filter(l => l.id !== i.id && l.id !== i.word);
+  if (typeof window.removeWords === 'undefined') {
+    window.removeWords = (list) => {
+      for (let i of list) {
+        window.deck = window.deck.filter(d => d !== i && d !== i.id && d !== i.word);
+        window.local = window.local.filter(l => l.id !== i.id && l.id !== i.word);
+      }
     }
   }
   
@@ -117,9 +128,9 @@ $(function(){
       }
 
       if ($(this).is(':checked')) {
-        addWords(list);
+        window.addWords(list);
       } else {
-        removeWords(list);
+        window.removeWords(list);
       }
     });
   }

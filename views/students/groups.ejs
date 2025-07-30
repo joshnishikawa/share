@@ -108,25 +108,29 @@
   var socket = io();
   var timer;
   
-  // Initialize global variables for NH vocabulary
-  window.deck = [];
-  window.local = [];
-  window.deckType = 'NH';
+  // Initialize global variables for NH vocabulary only if they don't exist
+  if (typeof window.deck === 'undefined') window.deck = [];
+  if (typeof window.local === 'undefined') window.local = [];
+  if (typeof window.deckType === 'undefined') window.deckType = 'NH';
 
-  // Define global functions for NH vocabulary
-  addWords = (list) => {
-    for (let l of list) {
-      if (!window.deck.includes(l.id)) {
-        window.deck.push(l.id);
-        window.local.push(l);
+  // Define global functions only if they don't exist
+  if (typeof window.addWords === 'undefined') {
+    window.addWords = (list) => {
+      for (let l of list) {
+        if (!window.deck.includes(l.id)) {
+          window.deck.push(l.id);
+          window.local.push(l);
+        }
       }
     }
   }
 
-  removeWords = (list) => {
-    for (let i of list) {
-      window.deck = window.deck.filter(d => d !== i && d !== i.id && d !== i.word);
-      window.local = window.local.filter(l => l.id !== i.id && l.id !== i.word);
+  if (typeof window.removeWords === 'undefined') {
+    window.removeWords = (list) => {
+      for (let i of list) {
+        window.deck = window.deck.filter(d => d !== i && d !== i.id && d !== i.word);
+        window.local = window.local.filter(l => l.id !== i.id && l.id !== i.word);
+      }
     }
   }
 
