@@ -309,5 +309,6 @@
 	"clothes+": "clothes+",
 	"town+": "town+",
 	"club activites+": "club activites+",
-	"lp_name": "lp_name"
+	"lp_name": "lp_name",
+	"typeNotSupported": "typeNotSupported"
 }

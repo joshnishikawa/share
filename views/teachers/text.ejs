@@ -79,6 +79,16 @@ $(function(){
       const $form = $(e.target);
       $form.find("input[name='deck']").val(JSON.stringify(window.deck));
       $form.find("input[name='deckType']").val(window.deckType);
+
+      if (e.target.id == "typeForm"){
+        // check if tags 'tens_teens' or 'ordinals' are selected
+        let tags = $("#tags input:checked").val();
+        console.log(tags);
+        if (tags === "tens_teens" || tags === "ordinals") {
+          alert("Sorry 'type' doesn't support 'tens_teens' or 'ordinals'.");
+          return;
+        }
+      }
       if (e.target.id == "match") {
         $("#match input[name='deckName']").val($("#tags input:checked").val());
       }
