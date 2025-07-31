@@ -10,14 +10,17 @@
   }
 </style>
 
+<div id="worldMap" style="z-index:-1;width:70%;position:absolute;">
+  Loading map...
+</div>
+
 <div class="container-fluid">
   <div class="row">
     <div class="col-1">
       <div id="SPIN" class="btn btn-lg btn-success">SPIN</div>
     </div>
-    <div class="col-5">
-      <!-- <img src="https://upload.wikimedia.org/wikipedia/commons/a/ad/World_map_1942_%28SVG%29.svg" class="img-fluid" alt="World Map"> -->
-      <!-- Put a map in here --></div>
+    <div id="map" class="col-5">
+    </div>
     <div class="col-6">
       <div class="container YM" style="font-size:2rem;">
 
@@ -72,6 +75,26 @@ $(function(){
   $("#SPIN").on('click', function(){
     runit();
   });
+
+  // Load the SVG file and inject it directly into the DOM
+  fetch('../image/World_Map_Simple.svg')
+    .then(response => response.text())
+    .then(svgText => {
+      document.getElementById('worldMap').innerHTML = svgText;
+      $('#worldMap svg').addClass('img-fluid');
+      console.log('SVG loaded successfully');
+      // Test the highlighting once SVG is loaded
+      setTimeout(() => {
+        const allPaths = document.querySelectorAll('#worldMap path, #worldMap polygon');
+        console.log('SVG paths found after load:', allPaths.length);
+        // Run the initial country selection and highlighting now that SVG is loaded
+        runit();
+      }, 100);
+    })
+    .catch(error => {
+      console.error('Error loading SVG:', error);
+      document.getElementById('worldMap').innerHTML = 'Error loading map';
+    });
 
   const COUNTRIES = {
     "The U.K.": {
@@ -134,12 +157,12 @@ $(function(){
       "enjoy": ["the festivals", "the yoga", "Bollywood movies"], 
       "buy": ["a sari", "a statue", "a henna tattoo"]
     },
-    "Germany": {
-      "see": ["the Brandenburg Gate", "the Black Forest", "the Rhine River"], 
-      "eat": ["bratwurst", "sauerkraut", "pretzels"], 
-      "enjoy": ["the castles", "the Christmas markets", "the autobahn"], 
-      "buy": ["a cuckoo clock", "chocolates", "a nutcracker"]
-    },
+    // "Germany": {
+    //   "see": ["the Brandenburg Gate", "the Black Forest", "the Rhine River"], 
+    //   "eat": ["bratwurst", "sauerkraut", "pretzels"], 
+    //   "enjoy": ["the castles", "the Christmas markets", "the autobahn"], 
+    //   "buy": ["a cuckoo clock", "chocolates", "a nutcracker"]
+    // },
     "Mexico": {
       "see": ["Chichen Itza", "the beaches", "the pyramids"], 
       "eat": ["tacos", "tamales", "churros"], 
@@ -170,24 +193,24 @@ $(function(){
       "enjoy": ["the adventure sports", "the Maori culture", "the scenery"], 
       "buy": ["a Maori carving", "a sheepskin rug", "Manuka honey"]
     },
-    "South Korea": {
-      "see": ["Seoul", "the palaces", "Jeju Island"], 
-      "eat": ["kimchi", "bulgogi", "bibimbap"], 
-      "enjoy": ["the K-pop", "the temples", "the shopping"], 
-      "buy": ["a hanbok", "a K-pop album", "celadon"]
-    },
-    "Vietnam": {
-      "see": ["Halong Bay", "Hanoi", "the Mekong Delta"], 
-      "eat": ["pho", "banh mi", "spring rolls"], 
-      "enjoy": ["the history", "the culture", "the beaches"], 
-      "buy": ["a conical hat", "a silk lantern", "a water puppet"]
-    },
-    "Singapore": {
-      "see": ["Marina Bay Sands", "Gardens by the Bay", "Sentosa"], 
-      "eat": ["chili crab", "chicken rice", "kaya toast"], 
-      "enjoy": ["the shopping", "the food", "the gardens"], 
-      "buy": ["a Merlion souvenir", "a piece of jade", "durian"]
-    },
+    // "South Korea": {
+    //   "see": ["Seoul", "the palaces", "Jeju Island"], 
+    //   "eat": ["kimchi", "bulgogi", "bibimbap"], 
+    //   "enjoy": ["the K-pop", "the temples", "the shopping"], 
+    //   "buy": ["a hanbok", "a K-pop album", "celadon"]
+    // },
+    // "Vietnam": {
+    //   "see": ["Halong Bay", "Hanoi", "the Mekong Delta"], 
+    //   "eat": ["pho", "banh mi", "spring rolls"], 
+    //   "enjoy": ["the history", "the culture", "the beaches"], 
+    //   "buy": ["a conical hat", "a silk lantern", "a water puppet"]
+    // },
+    // "Singapore": {
+    //   "see": ["Marina Bay Sands", "Gardens by the Bay", "Sentosa"], 
+    //   "eat": ["chili crab", "chicken rice", "kaya toast"], 
+    //   "enjoy": ["the shopping", "the food", "the gardens"], 
+    //   "buy": ["a Merlion souvenir", "a piece of jade", "durian"]
+    // },
     "Malaysia": {
       "see": ["Kuala Lumpur", "Penang", "Borneo"], 
       "eat": ["nasi lemak", "roti canai", "satay"], 
@@ -212,24 +235,24 @@ $(function(){
       "enjoy": ["the music", "the culture", "the festivals"], 
       "buy": ["a kente cloth", "a piece of adinkra", "a djembe drum"]
     },
-    "Taiwan": {
-      "see": ["Taipei", "Taroko Gorge", "Sun Moon Lake"], 
-      "eat": ["beef noodle soup", "bubble tea", "pineapple cake"], 
-      "enjoy": ["the night markets", "the hot springs", "the temples"], 
-      "buy": ["a piece of jade", "a tea set", "pottery"]
-    },
-    "Hong Kong": {
-      "see": ["Victoria Harbour", "Lantau Island", "the markets"], 
-      "eat": ["dim sum", "pineapple bun", "egg waffle"], 
-      "enjoy": ["the shopping", "the festivals", "the skyline"], 
-      "buy": ["a piece of jade", "a silk item", "electronics"]
-    },
-    "Hawaii": {
-      "see": ["Waikiki Beach", "Volcanoes National Park", "Pearl Harbor"], 
-      "eat": ["poke", "shave ice", "luau food"], 
-      "enjoy": ["the beaches", "the hula", "the volcanoes"], 
-      "buy": ["a lei", "Koa wood", "a hula doll"]
-    },
+    // "Taiwan": {
+    //   "see": ["Taipei", "Taroko Gorge", "Sun Moon Lake"], 
+    //   "eat": ["beef noodle soup", "bubble tea", "pineapple cake"], 
+    //   "enjoy": ["the night markets", "the hot springs", "the temples"], 
+    //   "buy": ["a piece of jade", "a tea set", "pottery"]
+    // },
+    // "Hong Kong": {
+    //   "see": ["Victoria Harbour", "Lantau Island", "the markets"], 
+    //   "eat": ["dim sum", "pineapple bun", "egg waffle"], 
+    //   "enjoy": ["the shopping", "the festivals", "the skyline"], 
+    //   "buy": ["a piece of jade", "a silk item", "electronics"]
+    // },
+    // "Hawaii": {
+    //   "see": ["Waikiki Beach", "Volcanoes National Park", "Pearl Harbor"], 
+    //   "eat": ["poke", "shave ice", "luau food"], 
+    //   "enjoy": ["the beaches", "the hula", "the volcanoes"], 
+    //   "buy": ["a lei", "Koa wood", "a hula doll"]
+    // },
     "Philippines": {
       "see": ["Manila", "Boracay", "the rice terraces"], 
       "eat": ["adobo", "sinigang", "halo-halo"],
@@ -257,17 +280,129 @@ $(function(){
   }
 
 
+  // Function to highlight a country on the map
+  highlightCountry = (countryName) => {    
+    // Reset all countries to default color (including groups and all child elements)
+    const allElements = document.querySelectorAll('#worldMap path, #worldMap polygon, #worldMap g');
+    
+    allElements.forEach(element => {
+      // Set fill attribute directly, which will override CSS classes
+      element.style.fill = '#e0e0e0';
+      
+      // Also reset any child elements
+      const children = element.querySelectorAll('path, polygon');
+      children.forEach(child => {
+        child.style.fill = '#e0e0e0';
+      });
+    });
+    
+    // Create mapping from COUNTRIES keys to inkscape:label values
+    const labelMapping = {
+      "The U.K.": "UK",
+      "The U.S.": "USA", 
+      "New Zealand": "NewZealand",
+      "United Arab Emirates": "UAE"
+    };
+    
+    // Get the label to search for
+    const searchLabel = labelMapping[countryName] || countryName;
+    console.log('Searching for label:', searchLabel);
+    
+    // Try multiple selector approaches in the main document
+    let countryElement = null;
+    
+    // Approach 1: Try with different namespace prefixes
+    const selectors = [
+      `#worldMap [inkscape\\:label="${searchLabel}"]`,
+      `#worldMap [*|label="${searchLabel}"]`,
+      `#worldMap g[inkscape\\:label="${searchLabel}"]`,
+      `#worldMap path[inkscape\\:label="${searchLabel}"]`
+    ];
+
+    for (const selector of selectors) {
+      try {
+        countryElement = document.querySelector(selector);
+        if (countryElement) {
+          console.log('Found country with selector:', selector);
+          break;
+        }
+      } catch (e) {
+        console.log('Selector failed:', selector, e);
+      }
+    }
+    
+    // Approach 2: If selectors fail, search manually through all elements
+    if (!countryElement) {
+      const allElements = document.querySelectorAll('#worldMap *');
+      for (const element of allElements) {
+        const label = element.getAttributeNS('http://www.inkscape.org/namespaces/inkscape', 'label');
+        if (label === searchLabel) {
+          countryElement = element;
+          break;
+        }
+      }
+    }
+    
+    // Approach 3: If still not found, try getAttribute directly
+    if (!countryElement) {
+      console.log('Manual search failed, trying getAttribute...');
+      const allElements = document.querySelectorAll('#worldMap *');
+      for (const element of allElements) {
+        const label = element.getAttribute('inkscape:label');
+        if (label === searchLabel) {
+          countryElement = element;
+          console.log('Found country with getAttribute:', label);
+          break;
+        }
+      }
+    }
+    
+    if (countryElement) {
+      // Use style.fill to override any CSS classes
+      countryElement.style.fill = '#ff6b6b'; // Red highlight color
+      
+      // If it's a group, also highlight its children
+      if (countryElement.tagName === 'g') {
+        const children = countryElement.querySelectorAll('path, polygon');
+        children.forEach(child => {
+          child.style.fill = '#ff6b6b';
+        });
+      }
+    } else {
+      console.log('Country not found:', searchLabel);
+      // List all available labels for debugging
+      const allElements = document.querySelectorAll('#worldMap *');
+      const availableLabels = [];
+      for (const element of allElements) {
+        const label1 = element.getAttributeNS('http://www.inkscape.org/namespaces/inkscape', 'label');
+        const label2 = element.getAttribute('inkscape:label');
+        if (label1) availableLabels.push(label1);
+        if (label2) availableLabels.push(label2);
+      }
+      console.log('Available labels:', [...new Set(availableLabels)]);
+    }
+  }
+
+
   runit = ()=>{
     let country = getCountry();
+    highlightCountry(country);
+    spinit("country", country.replace(/[ .]/g, '_'));
     fillit(country);
   }
 
   fillit = (country)=>{
     for (let s of ["see", "eat", "enjoy", "buy"]){
+      // Clear previous items first
+      $(`#${s}`).empty();
+      
+      // Add all items for this category (for the spinning animation)
       for (let i of COUNTRIES[country][s]){
         let id = i.replace(/[ .'-]/g, '_');
         $(`#${s}`).append(`<div id="${id}">${i}</div>`);
       }
+      
+      // Select one random item to show
       let i = COUNTRIES[country][s][Math.floor(Math.random() * COUNTRIES[country][s].length)];
       let id = i.replace(/[ .'-]/g, '_');
       spinit(s, id);
@@ -280,11 +415,8 @@ $(function(){
     }
     let country = Object.keys(countries)[Math.floor(Math.random() * Object.keys(countries).length)];
     delete countries[country];
-    spinit("country", country.replace(/[ .]/g, '_'));
     return country;
   }
-
-  runit();
 
 });
 </script>
