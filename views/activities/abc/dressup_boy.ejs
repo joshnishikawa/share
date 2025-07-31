@@ -1,0 +1,59 @@
+<%- include('../../head') %>
+<style>
+  #boyclothes img {
+    object-fit: contain;
+    object-position: center;
+    height: 200px;
+    border: 1px solid #ccc;
+  }
+</style>
+
+<div class="container-fluid text-center g-0">
+  <!-- BOY SECTION -->
+  <div class="row g-0 mb-4">
+    <div class="col-md-9" style="max-height:600px;">
+      <span class="display-3 NH">Put on your </span><span class="display-3 NHline">|||||||||||||||.</span>
+
+      <div id="boyclothes" class="d-flex flex-wrap mt-3">
+        <img src="/image/dressup/boy/boots.png" alt="boots">
+        <img src="/image/dressup/boy/cap.png" alt="cap">
+        <img src="/image/dressup/boy/cargo_shorts.png" alt="cargo_shorts">
+        <img src="/image/dressup/boy/coat.png" alt="coat">
+        <img src="/image/dressup/boy/dog_T-shirt.png" alt="dog_T-shirt">
+        <img src="/image/dressup/boy/dress_shirt.png" alt="dress_shirt">
+        <img src="/image/dressup/boy/hat.png" alt="hat">
+        <img src="/image/dressup/boy/jeans.png" alt="jeans">
+        <img src="/image/dressup/boy/knit_cap.png" alt="knit_cap">
+        <img src="/image/dressup/boy/long-sleeve_T-shirt.png" alt="long-sleeve_T-shirt">
+        <img src="/image/dressup/boy/other_pants.png" alt="other_pants">
+        <img src="/image/dressup/boy/pants.png" alt="pants">
+        <img src="/image/dressup/boy/pjs.png" alt="pjs">
+        <img src="/image/dressup/boy/shirt.png" alt="shirt">
+        <img src="/image/dressup/boy/shorts.png" alt="shorts">
+        <img src="/image/dressup/boy/sneakers.png" alt="sneakers">
+        <img src="/image/dressup/boy/snow_boots.png" alt="snow_boots">
+        <img src="/image/dressup/boy/sunglasses.png" alt="sunglasses">
+        <img src="/image/dressup/boy/sweater.png" alt="sweater">
+        <img src="/image/dressup/girl/sunglasses.png" alt="sunglasses">
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div id="boy" style="height:600px;position:relative;">
+        <img src="/image/dressup/boy/_boy.png" style="height:600px;position:absolute;left:0;" alt="Boy">
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/javascripts/dressup.js"></script>
+<script>
+$(function() {
+  // Initialize boy dressup with specific selectors
+  initializeDressup({
+    clothingSelector: '#boyclothes img',
+    characterSelector: 'img[alt="Boy"]',
+    clothingClass: 'clothing-on-boy'
+  });
+});
+</script>
+<%- include('../../foot') %>

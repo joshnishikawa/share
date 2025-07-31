@@ -39,62 +39,59 @@ function convertOBJtoSRT(subs){
   return subarr.join("\n\n");
 }
 
+const download = (url, newfilepath) => new Promise((resolve, reject) => {
+  const file = fs.createWriteStream(newfilepath);
+  https.get(url, (response) => {
+    response.pipe(file);
+    file.on('finish', () => {
+      file.close(resolve);
+    });
+  }).on('error', (err) => {
+    fs.unlink(newfilepath);
+    reject(err.message);
+  });
+});
 
-// router.get('/editsubs', (req, res)=>{
-//   try{
-//     const ENsubs = fs.readFileSync(path.join(__dirname, '../public/_EN.srt'));
-//     const ENsubobj = convertSRTtoOBJ(ENsubs.toString());
 
-//     const JAsubs = fs.readFileSync(path.join(__dirname, '../public/_JA.srt'));
-//     const JAsubobj = convertSRTtoOBJ(JAsubs.toString());
-//     res.render('labs/editsubs', {ENsubobj, JAsubobj});
-//   }
-//   catch(err){
-//     res.send(err);
-//     console.error(err);
-//   }
-// });
+router.get('/editsubs', (req, res)=>{
+  res.send('This route is disabled for now.'); return;// catch but don't execute
+  try{
+    const ENsubs = fs.readFileSync(path.join(__dirname, '../public/_EN.srt'));
+    const ENsubobj = convertSRTtoOBJ(ENsubs.toString());
 
-// router.post('/editsubs', (req, res)=>{
-//   try{
-//     const subs = JSON.parse(req.body.subs);
-//     console.log(subs);
+    const JAsubs = fs.readFileSync(path.join(__dirname, '../public/_JA.srt'));
+    const JAsubobj = convertSRTtoOBJ(JAsubs.toString());
+    res.render('labs/editsubs', {ENsubobj, JAsubobj});
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
 
-//     const JAsubs = fs.readFileSync(path.join(__dirname, '../public/_JA.srt'));
-//     var JAsubobj = convertSRTtoOBJ(JAsubs.toString());
 
-//     for (let key in subs){
-//       JAsubobj[key].text = subs[key];
-//     }
-//     const newJAsubs = convertOBJtoSRT(JAsubobj);
-//     fs.writeFileSync(path.join(__dirname, '../public/_JA.srt'), newJAsubs);
+router.post('/editsubs', (req, res)=>{
+  res.send('This route is disabled for now.'); return;// catch but don't execute
+  try{
+    const subs = JSON.parse(req.body.subs);
+    console.log(subs);
+
+    const JAsubs = fs.readFileSync(path.join(__dirname, '../public/_JA.srt'));
+    var JAsubobj = convertSRTtoOBJ(JAsubs.toString());
+
+    for (let key in subs){
+      JAsubobj[key].text = subs[key];
+    }
+    const newJAsubs = convertOBJtoSRT(JAsubobj);
+    fs.writeFileSync(path.join(__dirname, '../public/_JA.srt'), newJAsubs);
     
-//     res.send('Saved');
-//   }
-//   catch(err){
-//     res.send(err);
-//     console.error(err);
-//   }
-// });
-
-
-
-
-
-
-// LABS ////////////////////////////////////////////////////////////////////////
-// const download = (url, newfilepath) => new Promise((resolve, reject) => {
-//   const file = fs.createWriteStream(newfilepath);
-//   https.get(url, (response) => {
-//     response.pipe(file);
-//     file.on('finish', () => {
-//       file.close(resolve);
-//     });
-//   }).on('error', (err) => {
-//     fs.unlink(newfilepath);
-//     reject(err.message);
-//   });
-// });
+    res.send('Saved');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
 
 
 router.get('/:activity', (req, res)=>{

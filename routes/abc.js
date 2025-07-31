@@ -78,4 +78,16 @@ router.post('/SRS', (req, res)=>{
 });
 
 
+router.get('/dressup/:type', (req, res)=>{
+  try{
+
+    res.render(`activities/abc/dressup_${req.params.type}.ejs`);
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
+
 module.exports = router;

@@ -1,0 +1,68 @@
+<%- include('../../head') %>
+<style>
+  #girlclothes img {
+    object-fit: contain;
+    object-position: center;
+    height: 200px;
+    border: 1px solid #ccc;
+  }
+</style>
+
+<div class="container-fluid text-center g-0">
+  <!-- GIRL SECTION -->
+  <div class="row g-0">
+    <div class="col-md-9" style="max-height:600px;">
+      <span class="display-3 NH">Put on your </span><span class="display-3 NHline">|||||||||||||||.</span>
+
+      <div id="girlclothes" class="d-flex flex-wrap mt-3">
+        <img src="/image/dressup/girl/T-shirt.png" alt="T-shirt">
+        <img src="/image/dressup/girl/blouse.png" alt="blouse">
+        <img src="/image/dressup/girl/cap.png" alt="cap">
+        <img src="/image/dressup/girl/cargo_shorts.png" alt="cargo_shorts">
+        <img src="/image/dressup/girl/cargo_skirt.png" alt="cargo_skirt">
+        <img src="/image/dressup/girl/coat.png" alt="coat">
+        <img src="/image/dressup/girl/dress.png" alt="dress">
+        <img src="/image/dressup/girl/hiking_boots.png" alt="hiking_boots">
+        <img src="/image/dressup/girl/jeans.png" alt="jeans">
+        <img src="/image/dressup/girl/knit_cap.png" alt="knit_cap">
+        <img src="/image/dressup/girl/ong-sleeve_T-shirt.png" alt="ong-sleeve_T-shirt">
+        <img src="/image/dressup/girl/pants.png" alt="pants">
+        <img src="/image/dressup/girl/pjs.png" alt="pjs">
+        <img src="/image/dressup/girl/shirt.png" alt="shirt">
+        <img src="/image/dressup/girl/shoes.png" alt="shoes">
+        <img src="/image/dressup/girl/skirt.png" alt="skirt">
+        <img src="/image/dressup/girl/sneakers.png" alt="sneakers">
+        <img src="/image/dressup/girl/snow_boots.png" alt="snow_boots">
+        <img src="/image/dressup/girl/sunglasses.png" alt="sunglasses">
+        <img src="/image/dressup/girl/sweater.png" alt="sweater">
+        <img src="/image/dressup/girl/vest.png" alt="vest">
+
+        <img src="/image/dressup/boy/cap.png" alt="cap">
+        <img src="/image/dressup/boy/cargo_shorts.png" alt="cargo_shorts">
+        <img src="/image/dressup/boy/coat.png" alt="coat">
+        <img src="/image/dressup/boy/hat.png" alt="hat">
+        <img src="/image/dressup/boy/knit_cap.png" alt="knit_cap">
+        <img src="/image/dressup/boy/shorts.png" alt="shorts">
+
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div id="girl" style="height:600px;position:relative;">
+        <img src="/image/dressup/girl/_girl.png" style="height:600px;position:absolute;left:0;" alt="Girl">
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/javascripts/dressup.js"></script>
+<script>
+$(function() {
+  // Initialize girl dressup with specific selectors
+  initializeDressup({
+    clothingSelector: '#girlclothes img',
+    characterSelector: 'img[alt="Girl"]',
+    clothingClass: 'clothing-on-girl'
+  });
+});
+</script>
+<%- include('../../foot') %>
