@@ -93,3 +93,10 @@ body {
   -o-backface-visibility: hidden;
   transform: rotateY(180deg); /* because it starts face-down */
 }
+
+.menuitemwrapper {
+  border: 1px solid #0d6efd;
+  border-radius: 0.375rem;
+  margin: 0.25rem;
+  padding: 0.25rem;
+}
