@@ -1,8 +1,6 @@
 <%- include('../head.ejs') %>
 <ul class="nav nav-tabs bg-white d-flex pt-1 mb-3" style="position:relative;">
-  <!-- <button class="btn btn-outline-secondary mx-1 mb-1 py-0" data-bs-toggle="modal" data-bs-target="#menu_modal">
-    <i class="material-icons" style="line-height:1rem;vertical-align:middle;">info</i>
-  </button> -->
+  <%- include('../menu/item_slots'); -%>
   
   <li class="nav-item"><a id="datetime" href="slots?page=datetime" class="item nav-link" data-toggle="tab">What's the date?</a></li>
   <li class="nav-item"><a id="thisis" href="slots?page=thisis" class="item nav-link" data-toggle="tab">Who is this?</a></li>
@@ -18,6 +16,9 @@
 
 <script>
 $(function(){
+  document.title = `Slots`;
+  $("form button[type=submit]").hide();
+
   // load page from query string
   let page = new URLSearchParams(window.location.search).get('page');
   if (page){
@@ -29,6 +30,7 @@ $(function(){
   }
   
   spinit = (slot, id)=>{
+    id = id.replace(/ /g, '_'); // replace spaces with underscores
     let slotElement = $(`#${slot}`);
     let slotChildren = slotElement.children();
     let slotChildHeight = $(slotChildren[0]).height();

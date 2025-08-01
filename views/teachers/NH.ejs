@@ -99,21 +99,6 @@
       </div>
     </div>
   
-  <!-- SLOTS ----------------------------------------------------------------->
-  
-    <div class="col menuitemwrapper">
-      <div class="d-flex">
-        <i class="material-icons text-secondary" 
-          style="line-height:1.4rem;font-size:1.4rem;cursor:pointer;" 
-          data-bs-toggle="modal" data-bs-target="#slots_modal">
-          info
-        </i>
-        <a href="/slots" class="text-primary fs-5">
-          <strong>SLOTS</strong>
-        </a>
-      </div>
-    </div>
-  
   <!-- VISUALS ------------------------------------------------------------------>
     <div class="col menuitemwrapper">
       <div class="d-flex">
@@ -127,6 +112,13 @@
         </a>
       </div>
     </div>
+
+    <!-- SLOTS ----------------------------------------------------------------->
+  
+    <div class="col menuitemwrapper">
+      <%- include('../menu/item_slots.ejs') -%>
+    </div>
+  
 
   </div>
 

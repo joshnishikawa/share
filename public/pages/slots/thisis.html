@@ -12,40 +12,40 @@
 
 <div class="container-fluid">
   <div class="row">
-    <div class="col-1">
+    <div class="col-2">
       <div id="SPIN" class="btn btn-lg btn-success">SPIN</div>
     </div>
-    <div class="col-11">
-      <div class="container YM fs-1">
+    <div class="col-10">
+      <div class="container-fluid YM fs-1">
 
         <div class="row mb-2">
-          <div class="col-4" style="text-align: right;">This is</div>
-          <div id="names" class="col-4 text-center inshade border rounded-3 bg-light"></div>
-          <div class="col-4">.</div>
+          <div class="col-5" style="text-align: right;">This is</div>
+          <div id="names" class="col-5 text-center inshade border rounded-3 bg-light"></div>
+          <div class="col-2">.</div>
         </div>
       
         <div class="row mb-2">
-          <div class="col-4" style="text-align:right;">
+          <div class="col-5" style="text-align:right;">
             <span class="pron"></span> is my
           </div>
-          <div id="relationships" class="col-4 text-center inshade border rounded-3 bg-light"></div>
-          <div class="col-4">.</div>
+          <div id="relationships" class="col-5 text-center inshade border rounded-3 bg-light"></div>
+          <div class="col-2">.</div>
         </div>
       
         <div class="row mb-2">
-          <div class="col-4" style="text-align:right;">
+          <div class="col-5" style="text-align:right;">
             <span class="pron"></span> is
           </div>
-          <div id="personalities" class="col-4 text-center inshade border rounded-3 bg-light"></div>
-          <div class="col-4">.</div>
+          <div id="personalities" class="col-5 text-center inshade border rounded-3 bg-light"></div>
+          <div class="col-2">.</div>
         </div>
       
         <div class="row">
-          <div class="col-4" style="text-align:right;">
+          <div class="col-5" style="text-align:right;">
             <span class="pron"></span> can
           </div>
-          <div id="skills" class="col-4 text-center inshade border rounded-3 bg-light"></div>
-          <div class="col-4">well.</div>
+          <div id="skills" class="col-5 text-center inshade border rounded-3 bg-light"></div>
+          <div class="col-2">well.</div>
         </div>
       
       </div>
@@ -173,7 +173,8 @@ $(function(){
     $("#personalities").append(`<div id="${personality}" class="fs-1">${personality}</div>`);
   }
   for (let skill of SKILLS){
-    $("#skills").append(`<div id="${skill.replace(/ /g, '')}" class="fs-1">${skill}</div>`);
+    skillid = skill.replace(/ /g, '_'); // replace spaces with underscores
+    $("#skills").append(`<div id="${skillid}" class="fs-1">${skill}</div>`);
   }
 
 
@@ -226,7 +227,7 @@ $(function(){
 
 
   function getSkill(){
-    if (Object.keys(skills).length == 0){
+    if (skills.length == 0){
       skills = SKILLS.slice();
     }
     

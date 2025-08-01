@@ -1,0 +1,60 @@
+<style>
+  .slots {
+    overflow-y: hidden;
+    position: relative;
+    height: 2rem; /* Set a fixed height for the container */
+    min-width: 80px;
+    width: max-content;
+    box-shadow: 
+    rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;
+  }
+  
+  .slots::before {
+    content: "SLOTS";
+    position: absolute;
+    white-space: nowrap;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: scrollUp 3s linear infinite;
+  }
+  
+  @keyframes scrollUp {
+    0% {
+      transform: translateX(-50%) translateY(100%);
+    }
+    100% {
+      transform: translateX(-50%) translateY(-100%);
+    }
+  }
+</style>
+<div class="d-flex YM">
+  <div class="point d-flex me-3" data-bs-toggle="modal" data-bs-target="#slots_modal">
+    <i class="material-icons text-secondary">info</i>
+    <div class="text-center slots border border-secondary rounded-3 bg-light px-3 my-0 py-0"></div>
+  </div>
+
+  <form id="typeForm" action="/slots" method="GET" class="d-flex justify-content-end w-100">
+    <input type="hidden" value="" name="deck">
+    <input type="hidden" value="" name="deckType">
+    <button id="slotsButton" type='submit' class="btn btn-sm btn-primary" style="height:100%;">Start</button>
+  </form>
+</div>
+
+
+<div id="slots_modal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <div class="modal-title YM">
+          <div class="text-center slots border border-secondary rounded-3 bg-light"></div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p><%- __('activity.slots.1') %></p>
+        <p><%- __('activity.slots.2') %></p>
+      </div>
+    </div>
+  </div>
+</div>

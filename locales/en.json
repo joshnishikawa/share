@@ -84,6 +84,10 @@
 			"accuracy": "Your <strong>Accuracy</strong> is the percentage of letters you typed correctly.",
 			"speed": "Your <strong>Speed</strong> is given in WPM (words per minute).",
 			"title": "Type"
+		},
+		"slots": {
+			"1": "Choose the tab for what you want to practice.",
+      "2": "Click the 'SPIN' button for the next phrase." 
 		}
 	},
 	"navbar": {

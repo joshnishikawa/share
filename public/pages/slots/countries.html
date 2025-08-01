@@ -10,7 +10,7 @@
   }
 </style>
 
-<div id="worldMap" style="z-index:-1;width:70%;position:absolute;">
+<div id="worldMap" style="z-index:-1;width:60%;position:absolute;bottom:0;left:30px;">
   Loading map...
 </div>
 
@@ -27,7 +27,7 @@
         <div class="row mb-2">
           <div class="col-6" style="text-align: right;">I want to go to</div>
           <div class="col-6 d-flex">
-            <div id="country" class="text-center inshade border rounded-3 bg-light"></div>.
+            <div id="country" class="text-center inshade border rounded-3 bg-light flex-fill"></div>.
           </div>
         </div>
 
@@ -157,12 +157,12 @@ $(function(){
       "enjoy": ["the festivals", "the yoga", "Bollywood movies"], 
       "buy": ["a sari", "a statue", "a henna tattoo"]
     },
-    // "Germany": {
-    //   "see": ["the Brandenburg Gate", "the Black Forest", "the Rhine River"], 
-    //   "eat": ["bratwurst", "sauerkraut", "pretzels"], 
-    //   "enjoy": ["the castles", "the Christmas markets", "the autobahn"], 
-    //   "buy": ["a cuckoo clock", "chocolates", "a nutcracker"]
-    // },
+    "Germany": {
+      "see": ["the Brandenburg Gate", "the Black Forest", "the Rhine River"], 
+      "eat": ["bratwurst", "sauerkraut", "pretzels"], 
+      "enjoy": ["the castles", "the Christmas markets", "the autobahn"], 
+      "buy": ["a cuckoo clock", "chocolates", "a nutcracker"]
+    },
     "Mexico": {
       "see": ["Chichen Itza", "the beaches", "the pyramids"], 
       "eat": ["tacos", "tamales", "churros"], 
@@ -193,18 +193,18 @@ $(function(){
       "enjoy": ["the adventure sports", "the Maori culture", "the scenery"], 
       "buy": ["a Maori carving", "a sheepskin rug", "Manuka honey"]
     },
-    // "South Korea": {
-    //   "see": ["Seoul", "the palaces", "Jeju Island"], 
-    //   "eat": ["kimchi", "bulgogi", "bibimbap"], 
-    //   "enjoy": ["the K-pop", "the temples", "the shopping"], 
-    //   "buy": ["a hanbok", "a K-pop album", "celadon"]
-    // },
-    // "Vietnam": {
-    //   "see": ["Halong Bay", "Hanoi", "the Mekong Delta"], 
-    //   "eat": ["pho", "banh mi", "spring rolls"], 
-    //   "enjoy": ["the history", "the culture", "the beaches"], 
-    //   "buy": ["a conical hat", "a silk lantern", "a water puppet"]
-    // },
+    "South Korea": {
+      "see": ["Seoul", "the palaces", "Jeju Island"], 
+      "eat": ["kimchi", "bulgogi", "bibimbap"], 
+      "enjoy": ["the K-pop", "the temples", "the shopping"], 
+      "buy": ["a hanbok", "a K-pop album", "celadon"]
+    },
+    "Vietnam": {
+      "see": ["Halong Bay", "Hanoi", "the Mekong Delta"], 
+      "eat": ["pho", "banh mi", "spring rolls"], 
+      "enjoy": ["the history", "the culture", "the beaches"], 
+      "buy": ["a conical hat", "a silk lantern", "a water puppet"]
+    },
     // "Singapore": {
     //   "see": ["Marina Bay Sands", "Gardens by the Bay", "Sentosa"], 
     //   "eat": ["chili crab", "chicken rice", "kaya toast"], 
@@ -235,12 +235,12 @@ $(function(){
       "enjoy": ["the music", "the culture", "the festivals"], 
       "buy": ["a kente cloth", "a piece of adinkra", "a djembe drum"]
     },
-    // "Taiwan": {
-    //   "see": ["Taipei", "Taroko Gorge", "Sun Moon Lake"], 
-    //   "eat": ["beef noodle soup", "bubble tea", "pineapple cake"], 
-    //   "enjoy": ["the night markets", "the hot springs", "the temples"], 
-    //   "buy": ["a piece of jade", "a tea set", "pottery"]
-    // },
+    "Taiwan": {
+      "see": ["Taipei", "Taroko Gorge", "Sun Moon Lake"], 
+      "eat": ["beef noodle soup", "bubble tea", "pineapple cake"], 
+      "enjoy": ["the night markets", "the hot springs", "the temples"], 
+      "buy": ["a piece of jade", "a tea set", "pottery"]
+    },
     // "Hong Kong": {
     //   "see": ["Victoria Harbour", "Lantau Island", "the markets"], 
     //   "eat": ["dim sum", "pineapple bun", "egg waffle"], 
@@ -253,7 +253,7 @@ $(function(){
     //   "enjoy": ["the beaches", "the hula", "the volcanoes"], 
     //   "buy": ["a lei", "Koa wood", "a hula doll"]
     // },
-    "Philippines": {
+    "The Philippines": {
       "see": ["Manila", "Boracay", "the rice terraces"], 
       "eat": ["adobo", "sinigang", "halo-halo"],
       "enjoy": ["the beaches", "the festivals", "the culture"],
@@ -265,7 +265,7 @@ $(function(){
       "enjoy": ["the ballet", "the countryside", "the history"], 
       "buy": ["a matryoshka doll", "a fur hat", "a piece of amber"]
     },
-    "United Arab Emirates": {
+    "UAE": {
       "see": ["Dubai", "Abu Dhabi", "the desert"], 
       "eat": ["shawarma", "falafel", "kunafa"], 
       "enjoy": ["the shopping", "the luxury", "the architecture"], 
@@ -295,28 +295,14 @@ $(function(){
         child.style.fill = '#e0e0e0';
       });
     });
-    
-    // Create mapping from COUNTRIES keys to inkscape:label values
-    const labelMapping = {
-      "The U.K.": "UK",
-      "The U.S.": "USA", 
-      "New Zealand": "NewZealand",
-      "United Arab Emirates": "UAE"
-    };
-    
-    // Get the label to search for
-    const searchLabel = labelMapping[countryName] || countryName;
-    console.log('Searching for label:', searchLabel);
-    
-    // Try multiple selector approaches in the main document
     let countryElement = null;
     
     // Approach 1: Try with different namespace prefixes
     const selectors = [
-      `#worldMap [inkscape\\:label="${searchLabel}"]`,
-      `#worldMap [*|label="${searchLabel}"]`,
-      `#worldMap g[inkscape\\:label="${searchLabel}"]`,
-      `#worldMap path[inkscape\\:label="${searchLabel}"]`
+      `#worldMap [inkscape\\:label="${countryName}"]`,
+      `#worldMap [*|label="${countryName}"]`,
+      `#worldMap g[inkscape\\:label="${countryName}"]`,
+      `#worldMap path[inkscape\\:label="${countryName}"]`
     ];
 
     for (const selector of selectors) {
@@ -336,7 +322,7 @@ $(function(){
       const allElements = document.querySelectorAll('#worldMap *');
       for (const element of allElements) {
         const label = element.getAttributeNS('http://www.inkscape.org/namespaces/inkscape', 'label');
-        if (label === searchLabel) {
+        if (label === countryName) {
           countryElement = element;
           break;
         }
@@ -349,7 +335,7 @@ $(function(){
       const allElements = document.querySelectorAll('#worldMap *');
       for (const element of allElements) {
         const label = element.getAttribute('inkscape:label');
-        if (label === searchLabel) {
+        if (label === countryName) {
           countryElement = element;
           console.log('Found country with getAttribute:', label);
           break;
@@ -369,7 +355,7 @@ $(function(){
         });
       }
     } else {
-      console.log('Country not found:', searchLabel);
+      console.log('Country not found:', countryName);
       // List all available labels for debugging
       const allElements = document.querySelectorAll('#worldMap *');
       const availableLabels = [];

@@ -114,7 +114,11 @@
 			"accuracy": "<strong>正確さ</strong>は、正しく入力した文字の割合です。",
 			"speed": "<strong>速度</strong>は、WPM（分速単語数）で表示されます。",
 			"title": "Type"
-		}
+		},
+    "slots": {
+      "1": "練習したいタブを選んでください。",
+      "2": "「SPIN」ボタンをクリックして次のフレーズを表示してください。"
+    }
 	},
 	"navbar": {
 		"students": {
@@ -125,7 +129,7 @@
 		}
 	},
 	"NewHorizon": {
-		"vocab": "New Horizon - Vocabulary"
+		"vocab": "New Horizon - 語彙"
 	},
 	"list_select": "リストを選択してください",
 	"list_name": "デッキ名を入力してください",
