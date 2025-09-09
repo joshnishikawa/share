@@ -1,0 +1,56 @@
+<div class="rounded-3 d-flex">
+  <div class="d-flex me-3">
+    <i class="material-icons text-secondary point" data-bs-toggle="modal" data-bs-target="#write_modal">
+      info
+    </i>
+    <strong class="text-primary fs-5">WRITE</strong>
+  </div>
+
+  <form id="writeForm" action="/write" method="POST" class="menuitem d-flex justify-content-end w-100">
+
+    <div class="d-flex flex-wrap justify-content-end">
+    <div class="form-check me-3">
+      <input id="L1" class="form-check-input" type="checkbox" name="L1" checked>
+      <label class="form-check-label small" for="L1">
+        L1
+      </label>
+    </div>
+
+    <div class="form-check me-3">
+      <input id="trace" class="form-check-input" type="checkbox" name="trace" checked>
+      <label class="form-check-label small" for="trace">
+        Trace
+      </label>
+    </div>
+
+    <div class="form-check me-3">
+      <input id="write" class="form-check-input" type="checkbox" name="write" checked>
+      <label class="form-check-label small" for="write">
+        Write
+      </label>
+    </div>
+    </div>
+
+    <input type="hidden" value="" name="deckType">
+    <input type="hidden" value="" name="deck">
+    <button id="writeButton" type="submit" class="btn btn-sm btn-primary" style="height:100%;">Start</button>
+  </form>
+
+</div>
+
+
+<div id="write_modal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+    
+      <div class="modal-header">
+        <h3 class="modal-title">Writing Practice</h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>Practice writing characters by tracing them and/or writing them from memory.</p>
+        <p>Select whether you want to practice tracing, writing, or both.</p>
+      </div>
+    </div>
+  </div>
+</div>

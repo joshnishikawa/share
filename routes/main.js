@@ -292,6 +292,7 @@ router.post('/:activity', async(req, res)=>{
     if (deckType != 'text'){ delete params.deckName; }
     
     if (deckType == "nolink"){ // expect deck to be an array of objects
+      console.log('No link version');
       deck = JSON.parse(deck);
       res.render(`activities/${activity}`, {deckType, deck, params: JSON.stringify(params)});
       return;
@@ -373,7 +374,7 @@ router.get('/:activity/:id', async (req, res)=>{
 
 
 function valid(activity, params){
-  if ( !["bingo", "flash", "grid", "match", "recall", "reveal", "type", "spell", "printcards"].includes(activity)) return false;
+  if ( !["bingo", "flash", "grid", "match", "recall", "reveal", "type", "spell", "write", "printcards"].includes(activity)) return false;
   if ( !params.deck ) return false;
   try{
     JSON.parse(params.deck);

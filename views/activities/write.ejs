@@ -1,0 +1,88 @@
+<%- include('../head'); -%>
+<style>
+  @media print {
+    #menucontainer {
+      display: none;
+    }
+    body{
+      background-image: none !important;
+    }
+  }
+</style>
+
+<body>
+<div id="menucontainer">
+  <div class="d-flex" style="position:relative;">
+
+    <%- include('../menu/item_write'); -%>
+
+    <button id="home" class="btn btn-sm btn-outline-secondary p-0" style="position:absolute;right:0;" onclick="location.href='/'">
+      <i class="material-icons">home</i>
+    </button>
+
+  </div>
+</div>
+
+<div id="content" class="container-fluid fs-1">
+
+</div> 
+
+
+<script>
+$(function(){
+  $("form button[type=submit]").hide(); // Hide the submit button in the form
+  const deckType = '<%- deckType %>';
+  document.title = `Write`;
+
+  const deck = <%- JSON.stringify(deck) %>;
+  const paramsData = `<%- params %>`;
+  const params = JSON.parse(paramsData);
+  var L1 = (params.L1 == 'on' ? true : false);
+  var trace = (params.trace == 'on' ? true : false);
+  var write = (params.write == 'on' ? true : false);
+  $("#L1").prop('checked', L1);
+  $("#trace").prop('checked', trace);
+  $("#write").prop('checked', write);
+
+  for (let i of deck){
+    let row = 
+    `<div class="d-flex flex-wrap justify-content-between">
+      <div class="L1 NH" style="display:none;">${i.meaning}</div>
+      <div class="trace NHdot" style="display:none;">${i.word}</div>
+      <div class="write NHline" style="width:33%;display:none;overflow:hidden;">
+        ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||</div>
+    </div>`;
+
+    $("#content").append(row);
+  }
+
+  if (L1) $(".L1").show();
+  if (trace) $(".trace").show();
+  if (write)$(".write").show();
+
+  $("#L1").change(function(){
+    if(this.checked){
+      $(".L1").show();
+    } else {
+      $(".L1").hide();
+    }
+  });
+  $("#trace").change(function(){
+    if(this.checked){
+      $(".trace").show();
+    } else {
+      $(".trace").hide();
+    }
+  });
+  $("#write").change(function(){
+    if(this.checked){
+      $(".write").show();
+    } else {
+      $(".write").hide();
+    }
+  });
+});
+</script>
+
+
+<%- include('../foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->

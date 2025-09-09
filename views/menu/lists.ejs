@@ -100,9 +100,10 @@ $(window).on('pageshow', function(){
       }
     }
 
-    $(".list").on('click', function(){
+    $(".btn-close").off('click').on('click', function(){
       let val = $(this).data('value');
-      window.deck = window.deck.filter(e => e !== val);
+      console.log(val);
+      window.deck = window.deck.filter(d => d.word !== val);
       window.local = window.local.filter(e => e.id !== val);
       $(this).parent().remove();
       $("#numOfItems").html(`&nbsp;(${window.deck.length})`);

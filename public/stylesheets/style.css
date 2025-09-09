@@ -35,13 +35,13 @@ body {
   border-radius: 50%;
 }
 
-.write{
+.penmanship{
   background-image: url(../image/abc/lines.png);
   background-size: contain;
   font-family: 'Yusei Magic', sans-serif;
 }
 
-.write img{
+.penmanship img{
   mix-blend-mode: multiply;
 }
 

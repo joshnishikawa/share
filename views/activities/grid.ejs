@@ -128,7 +128,7 @@ $(function(){
     if (text) $('.txt').show();
   }
 
-  $("#shuffle").on('click', ()=>{
+  $("#shuffle").on('click', ()=>{ // BUG: edited content reverts on shuffle
     deck = FYshuffle(deck);
     setGrid();
   });

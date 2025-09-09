@@ -32,12 +32,12 @@ $(function(){
   };
 
   for(let i of letters){
-    $("#all").append(`<div class="write letter lc" style="cursor:pointer;font-size:80px;line-height:80px;width:100px;height:100px;">${i}</div>`);
+    $("#all").append(`<div class="penmanship letter lc" style="cursor:pointer;font-size:80px;line-height:80px;width:100px;height:100px;">${i}</div>`);
   }
 
   $(".lc").on("click", function(){
     let letter = $(this).text();
-    $("#penmanship").html(`<div class="write shadow">
+    $("#penmanship").html(`<div class="penmanship shadow">
                             <img src="/image/abc/${letter}.gif" 
                             class="img-fluid" 
                             alt="${letter}"
@@ -47,7 +47,7 @@ $(function(){
 
   $(document).on("keydown", function(e){
     if (letters.includes(e.key)){
-      $("#penmanship").html(`<div class="write shadow">
+      $("#penmanship").html(`<div class="penmanship shadow">
                               <img src="/image/abc/${e.key}.gif" 
                                    class="img-fluid" 
                                    alt="${e.key}"

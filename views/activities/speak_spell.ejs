@@ -21,7 +21,6 @@
 </div>
 
 <div class="container-fluid pt-3">
-
   <div class="row">
 <!-- SELECT VOCAB FORMS ------------------------------------------------------->
     <div class="col-md-4">
@@ -49,14 +48,18 @@
   
     </div>
 
-    <div class="col-md-4">
-      <%- include('../menu/item_type') %>
-    </div>
-    <div class="col-md-4">
-      <%- include('../menu/item_spell') %>
-    </div>
+    <div class="col-md-8">
+      <div class="menuitemwrapper">
+        <%- include('../menu/item_type') %>
+      </div>
+      <div class="menuitemwrapper">
+        <%- include('../menu/item_spell') %>
+      </div>
 
-
+      <div class="menuitemwrapper">
+        <%- include('../menu/item_write') %>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -212,9 +215,9 @@
 
       $(".btn-close").off('click').on('click', (event) => {
         let val = $(event.target).data('value');
-        $(event.target).parent().remove();
         window.deck = window.deck.filter(d => d.word != val);
         window.local = window.local.filter(e => e.id !== val);
+        $(event.target).parent().remove();
         $("#numOfItems").html(`&nbsp;(${window.deck.length})`);
       });
 

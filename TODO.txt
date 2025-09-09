@@ -1,5 +1,3 @@
-Go through everything using a Japanese browser and update the i18n.
-Add a map to 'slots' where you can click on any country you want.
 audio samples for all static vocab
 
 ////////// IDEAS FOR STUDENT ACTIVITIES ////////////////////////////////////////
@@ -19,6 +17,8 @@ Speaking Slots: Pull the lever to make a sentence with random parts. Say the sen
 ////////// IDEAS FOR TEACHER ACTIVITIES ////////////////////////////////////////
 Trash or Treasure (a la Bamboozle)
 
+Crack the code: Teacher adds a number and says it. Ss enter the same number to continue.
+
 Time Bomb: Pause for 3 seconds = die. Don't finish in 1 minute = die. Three strikes = die.
   choose a deck and number of teams
   display a picture in the first teams div
@@ -32,7 +32,7 @@ Time Bomb: Pause for 3 seconds = die. Don't finish in 1 minute = die. Three stri
   if they get to the end of the deck, bg-success!
 
 
-spot-it (for letters or pictures)
+Template for creating writing practice for a custom set of words.
 
 
 // LONG TERM GOALS /////////////////////////////////////////////////////////////
@@ -88,3 +88,17 @@ spot-it (for letters or pictures)
   3rd person (like - likes, wish - wishes, have - has)
   comparative (tall - taller, large - larger, early - earlier, beautiful - more beautiful, good - better)
   superlative "
+
+////////// IDEAS FOR VOCABULARY ACTIVITIES ////////////////////////////////////////
+accessiblity compliance
+code an activity format to practice dialogs
+free listening exercises: words / phrases / sentences, listen and write then check
+labelled diagrams for: clothes, body, school, kitchen, tools, maps, around town
+
+
+
+
+
+
+
+
