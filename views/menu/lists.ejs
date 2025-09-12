@@ -93,18 +93,30 @@ $(window).on('pageshow', function(){
         window.local.push(i);
         let id = i.word.replace(/[ '-.]/g, '_');
         $("#list").append(`
-          <div class="alert-primary rounded-3 m-1 ps-1 d-flex justify-content-between">
-            <div id="${id}">${i.word}${i.meaning ? ' - ' + i.meaning : ''}</div>
-            <div data-value="${i.id}" class="list btn btn-close" style="font-size:10px;"></div>
+          <div id="${id}" data-value="${i.id}" class="alert-primary rounded-3 m-1 ps-1 d-flex">
+            <div>${i.word}${i.meaning ? ' - ' + i.meaning : ''}</div>
+            <div class="list btn btn-close" style="font-size:10px;"></div>
           </div>`);
       }
     }
 
     $(".btn-close").off('click').on('click', function(){
-      let val = $(this).data('value');
-      console.log(val);
-      window.deck = window.deck.filter(d => d.word !== val);
-      window.local = window.local.filter(e => e.id !== val);
+      let val = $(this).parent().data('value');
+      let id = $(this).parent().attr('id');
+
+      if (['NH', 'LT'].includes(window.deckType)) {
+        // remove val from deck and local
+        window.deck = window.deck.filter(d => d !== val && d !== val.word);
+        window.local = window.local.filter(e => e.id !== val && e.id !== val.word);
+      }
+      else {
+        // find matching object in window.local
+        let obj = window.local.find(o => o.id === val || o.word === val);
+        // remove obj from deck and local
+        window.deck = window.deck.filter(d => d !== obj && d !== obj.id && d !== obj.word);
+        window.local = window.local.filter(e => e.id !== obj.id && e.id !== obj.word);
+      }
+
       $(this).parent().remove();
       $("#numOfItems").html(`&nbsp;(${window.deck.length})`);
     });
@@ -118,7 +130,6 @@ $(window).on('pageshow', function(){
       window.deck = window.deck.filter(d => d !== i && d !== i.id && d !== i.word);
       window.local = window.local.filter(l => l.id !== i.id && l.id !== i.word);
       let id = i.word.replace(/[ '-.]/g, '_');
-
       $(`#${id}`).parent().remove();
     }
     $("#numOfItems").html(`&nbsp;(${window.deck.length})`);

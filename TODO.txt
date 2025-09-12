@@ -15,8 +15,6 @@ Speaking Slots: Pull the lever to make a sentence with random parts. Say the sen
 
 
 ////////// IDEAS FOR TEACHER ACTIVITIES ////////////////////////////////////////
-Trash or Treasure (a la Bamboozle)
-
 Crack the code: Teacher adds a number and says it. Ss enter the same number to continue.
 
 Time Bomb: Pause for 3 seconds = die. Don't finish in 1 minute = die. Three strikes = die.
@@ -30,10 +28,6 @@ Time Bomb: Pause for 3 seconds = die. Don't finish in 1 minute = die. Three stri
 
   if bg-warning is displayed 3 times, bg-danger. press enter to review and try again.
   if they get to the end of the deck, bg-success!
-
-
-Template for creating writing practice for a custom set of words.
-
 
 // LONG TERM GOALS /////////////////////////////////////////////////////////////
   FUNCTIONS THAT CAN BE SELECTED FROM AN API FOR USE IN TEACHING GRAMMAR.
@@ -89,16 +83,7 @@ Template for creating writing practice for a custom set of words.
   comparative (tall - taller, large - larger, early - earlier, beautiful - more beautiful, good - better)
   superlative "
 
-////////// IDEAS FOR VOCABULARY ACTIVITIES ////////////////////////////////////////
-accessiblity compliance
+////////// IDEAS FOR VOCABULARY ACTIVITIES /////////////////////////////////////
 code an activity format to practice dialogs
 free listening exercises: words / phrases / sentences, listen and write then check
 labelled diagrams for: clothes, body, school, kitchen, tools, maps, around town
-
-
-
-
-
-
-
-
