@@ -88,10 +88,8 @@ $(function(){
   document.title = `Spell ${deckType}`;
 
   // PREPARE THE DECK ////////////////////////////////////////////////////////////
-  const params = <%- params %> || {};
   const originalDeck = <%- JSON.stringify(deck) %> || [];
   var deck = originalDeck.slice();
-  console.log(deck);
   var item = {};
   var review = [];
   var place = 0;
@@ -174,7 +172,6 @@ $(function(){
 
   submitAnswer = ()=>{
     $("#enter").prop('disabled', true);
-    console.log(guess, item.word);
     if (guess === item.word){
       for (let i = 0; i < item.word.length; i++){
         $(`[data-value=${item.word[i] == '.' ? 'period': item.word[i] == ' ' ? '_' : item.word[i]}]`)

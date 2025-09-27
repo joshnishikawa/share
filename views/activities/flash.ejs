@@ -79,12 +79,10 @@ $(function(){
   document.title = `Flash ${deckType}`;
 
   const originalDeck = <%- JSON.stringify(deck) %>;
-  const params = <%- params %>;
-  var order = params.order;
-  var isNum = originalDeck[0].word.match(/^\d+$/);
-  var text = (params.text == "true"); // convert string to boolean
-  $("#showtext").prop('checked', text);
-
+  const query = <%- JSON.stringify(query) %>;
+  var order = query.order;
+  var showtext = query.showtext === 'true' ? true : false;
+  var isNum = originalDeck[0].word.match(/^\d+$/); // for sorting numbers correctly
   var deck = originalDeck.slice();
   var deckLength = deck.length;
   var review = [];
@@ -93,11 +91,11 @@ $(function(){
 
   function setOrder(){
     if (order == "shuffle") {
-      $("#shuffle").prop('checked', true);
+      $("#order").prop('checked', true);
       deck = FYshuffle(deck);
     }
     else if (order == "alphabetical"){
-      $("#shuffle").prop('checked', false);
+      $("#order").prop('checked', false);
       if(isNum) deck.sort(function(a, b){
         return a.word - b.word}); // sort numerically
       else {
@@ -110,13 +108,14 @@ $(function(){
       }
     }
     else {
-      $("#shuffle").prop('checked', false);
+      $("#order").prop('checked', false);
     }
+    history.replaceState(null, '', `?order=${order}&showtext=${showtext}`);
   }
 
 
   function setText(){
-    if (text) {
+    if (showtext) {
       $("#showtext").prop('checked', true);
       $("#text").html( deck[card].word );
     }
@@ -124,6 +123,7 @@ $(function(){
       $("#showtext").prop('checked', false);
       $("#text").html("");
     }
+    history.replaceState(null, '', `?order=${order}&showtext=${showtext}`);
   }
 
 
@@ -156,8 +156,8 @@ $(function(){
   }
 
 
-  $("#shuffle").on('click', function(){
-    if ( $("#shuffle").prop('checked') ) order = "shuffle";
+  $("#order").on('click', function(){
+    if ( $("#order").prop('checked') ) order = "shuffle";
     else order = "alphabetical";
     setOrder();
     card = 0;
@@ -166,7 +166,7 @@ $(function(){
 
 
   $("#showtext").on('click', function(){
-    text = $("#showtext").prop('checked');
+    showtext = $("#showtext").prop('checked'); // do before setText()
     setText();
   });
 

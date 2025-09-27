@@ -284,45 +284,47 @@ router.post('/:activity', async(req, res)=>{
   try{
     if ( !valid(req.params.activity, req.body) ) throw '404';
     let activity = req.params.activity;
+
     let params = req.body;
     let deck = params.deck;
     delete params.deck;
     let deckType = params.deckType;
     delete params.deckType;
     if (deckType != 'text'){ delete params.deckName; }
-    
-    if (deckType == "nolink"){ // expect deck to be an array of objects
-      console.log('No link version');
-      deck = JSON.parse(deck);
-      res.render(`activities/${activity}`, {deckType, deck, params: JSON.stringify(params)});
-      return;
+
+    for (let p in params){ // use only last value of any repeated params
+      params[p] = Array.isArray(params[p]) ? params[p][params[p].length - 1] : params[p];
     }
 
+    let querystring = new URLSearchParams(params).toString();
+
+    if (deckType == "nolink"){ // expect deck to be an array of objects
+      deck = JSON.parse(deck);
+      res.render(`activities/${activity}`, {deckType, deck, query: params});
+      return;
+    }
 
     let link = '';
     let [rows, schema] = await db.query(`SELECT id FROM links 
                                          WHERE deckType=? 
                                          AND activity=? 
-                                         AND deck= BINARY ? 
-                                         AND params=?`, 
+                                         AND deck= BINARY ?`, 
                                         [deckType, 
                                          activity,
-                                         deck, 
-                                         JSON.stringify(params)]);
+                                         deck]);
     if (rows.length > 0) {
       link = rows[0].id;
     }
     else {
-      let newrow = await db.query(`INSERT INTO links (deckType, activity, deck, params) 
-                                   VALUES (?, ?, ?, ?)`, 
+      let newrow = await db.query(`INSERT INTO links (deckType, activity, deck) 
+                                   VALUES (?, ?, ?)`, 
                                   [deckType, 
                                    activity, 
-                                   deck,
-                                   JSON.stringify(params)]);
+                                   deck]);
       link = newrow[0].insertId;
     }
 
-    res.redirect(`${activity}/${link}`);
+    res.redirect(`${activity}/${link}?${querystring}`);
   }
   catch (err){
     if (err == '404') res.render('404');
@@ -336,6 +338,7 @@ router.get('/:activity/:id', async (req, res)=>{
   try{
     let activity = req.params.activity;
     let id = req.params.id;
+    let query = req.query;
     let deck = [];
 
     var [rows, schema] = await db.query(`SELECT * FROM links
@@ -343,13 +346,9 @@ router.get('/:activity/:id', async (req, res)=>{
                                          AND id = ?`, 
                                         [activity, id]);
     if (rows.length == 0) throw '404';
-    let params = rows[0].params;
     let deckType = rows[0].deckType;
 
-    if (deckType == "text"){
-      deck = JSON.parse(rows[0].deck);
-    }
-    else if (deckType == "images"){
+    if (["text", "images"].includes(deckType)){
       deck = JSON.parse(rows[0].deck);
     }
     else{
@@ -363,7 +362,8 @@ router.get('/:activity/:id', async (req, res)=>{
       deck = deck.sort( (a, b) => ids.indexOf(a.id) - ids.indexOf(b.id));
     }
 
-    res.render(`activities/${req.params.activity}`, {deckType, deck, params});
+    console.log('query:', query);
+    res.render(`activities/${req.params.activity}`, {deckType, deck, query});
   }
   catch(err ){
     if (err == '404') res.render('404');

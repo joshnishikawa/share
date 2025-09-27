@@ -66,12 +66,29 @@ $(function(){
   const deckType = '<%- deckType %>';
 
   var deck = <%- JSON.stringify(deck) %>;
-  const params = <%- params %>;
-  var spaces = params.spaces;
+  const query = <%- JSON.stringify(query) %>;
+  var spaces = query.spaces;
   $("#numCards").val(spaces);
   document.title = `Grid ${spaces} ${deckType}`;
-  var text = (params.text == "true"); // convert string to boolean
-  $("#showtext").prop('checked', text);
+  var showtext = query.showtext === 'true' ? true : false;
+  history.replaceState(null, '', `?spaces=${spaces}&showtext=${showtext}`);
+  
+  setText = ()=>{
+    if (showtext) {
+      $('.txt').show();
+      $('#showtext').prop('checked', true);      
+    }
+    else {
+      $('.txt').hide();
+      $('#showtext').prop('checked', false);
+    }
+    history.replaceState(null, '', `?spaces=${spaces}&showtext=${showtext}`);
+  };
+
+  $("#showtext").on('change', ()=>{
+    showtext = $("#showtext").prop('checked'); // do before setText()
+    setText();
+  });
 
 
   getCols = (deckLength)=>{
@@ -124,8 +141,8 @@ $(function(){
 
     $('#grid').html(html);
 
-    // set height of all each .space to be the same as its width
-    if (text) $('.txt').show();
+    setText();
+    history.replaceState(null, '', `?spaces=${spaces}&showtext=${showtext}`);
   }
 
   $("#shuffle").on('click', ()=>{ // BUG: edited content reverts on shuffle
@@ -134,9 +151,7 @@ $(function(){
   });
 
   $("#showtext").on('change', ()=>{
-    text = $("#showtext").prop('checked');
-    if (text) $('.txt').show();
-    else $('.txt').hide();
+    setText();
   });
 
   $("#header").on('change', ()=>{
@@ -154,6 +169,7 @@ $(function(){
   });
 
   setGrid();
+  setText();
 
   var editor = new Quill('#editor', {
     modules: {

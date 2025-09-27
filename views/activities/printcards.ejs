@@ -37,9 +37,30 @@ $(function(){
 
   // PREPARE THE DECK //////////////////////////////////////////////////////////
   var deck = <%- JSON.stringify(deck) %>;
-  const params = <%- params %> || {};
-  var text = (params.text == "true"); // convert string to boolean
-  $("#showtext").prop('checked', text);
+  const query = <%- JSON.stringify(query) %>;
+  console.log(query);
+  var showtext = query.showtext === 'true' ? true : false;
+  history.replaceState(null, '', `?showtext=${showtext}`);
+  
+  setText = ()=>{
+    if (showtext) {
+      $('.txt').show();
+      $('#showtext').prop('checked', true);
+    }
+    else {
+      $('.txt').hide();
+      $('#showtext').prop('checked', false);
+    }
+    history.replaceState(null, '', `?showtext=${showtext}`);
+  };
+
+
+  $("#showtext").on('change', ()=>{
+    showtext = $("#showtext").prop('checked'); // do before setText()
+    setText();
+  });
+
+
   $("#menucontainer").show();
 
   for (let i in deck){
@@ -56,16 +77,6 @@ $(function(){
       </div>`);
   }
 
-    
-  if (text) $('.txt').show();
-
-
-  $("#showtext").on('change', ()=>{
-    text = $("#showtext").prop('checked');
-    if (text) $('.txt').show();
-    else $('.txt').hide();
-  });
-
 
   $("#print").on('click', ()=>{
     window.print();
@@ -80,6 +91,8 @@ $(function(){
   window.onafterprint = function(){
     $("#menucontainer").show();
   };
+
+  setText();
 
 });
 

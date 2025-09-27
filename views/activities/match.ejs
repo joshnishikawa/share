@@ -56,13 +56,12 @@ $(async function(){
         });
 
   var deck = <%- JSON.stringify(deck) %>;
-  const params = <%- params %>;
-  var deckName = params.deckName;
-  var backs = params.backs;
+  const query = <%- JSON.stringify(query) %>;
+  var deckName = query.deckName;
+  var backs = query.backs;
 
   if (deckName == "lower_case_mix" && backs == "animals") deck = deck.slice(0, 10);
   else if (deckName == "lower_case_mix" && backs == "objects") deck = deck.slice(10, 20);
-  console.log(deck);
   document.title = `Match ${backs} ${deckType}`;
 
   let max_num_of_cards = {

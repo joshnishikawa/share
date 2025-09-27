@@ -80,7 +80,6 @@ $(function(){
   document.title = `Type ${deckType}`;
 
   // PREPARE THE DECK //////////////////////////////////////////////////////////
-  const params = <%- params %> || {};
   const originalDeck = <%- JSON.stringify(deck) %>;
   var deck = originalDeck.slice();
   let timeLimit = 0; // seconds

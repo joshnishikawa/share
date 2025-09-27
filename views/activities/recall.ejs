@@ -61,7 +61,6 @@ $(function(){
   const deckType = '<%- deckType %>';
   document.title = `Recall ${deckType}`;
 
-  const params = <%- params %>;
   var deck = <%- JSON.stringify(deck) %>;
   deck = FYshuffle(deck); // Shuffle first so that cards left out are random.
   let {length, colspan, rowheight} = getGrid({length: deck.length, even: false});

@@ -70,10 +70,10 @@ $(function(){
   $("form button[type=submit]").hide();
 // PREPARE THE DECK ////////////////////////////////////////////////////////////
   const deckType = '<%- deckType %>';
-
-  const params = <%- params %>;
   var deck = <%- JSON.stringify(deck) %>;
-  var style = params.style;
+
+  const query = <%- JSON.stringify(query) %>;
+  var style = query.style;
   document.title = `Reveal ${style} ${deckType}`;
 
   $("#style").val(style);
