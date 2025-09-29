@@ -130,7 +130,7 @@ $(window).on('pageshow', function(){
       window.deck = window.deck.filter(d => d !== i && d !== i.id && d !== i.word);
       window.local = window.local.filter(l => l.id !== i.id && l.id !== i.word);
       let id = i.word.replace(/[ '-.]/g, '_');
-      $(`#${id}`).parent().remove();
+      $(`#${id}`).remove();
     }
     $("#numOfItems").html(`&nbsp;(${window.deck.length})`);
   }
