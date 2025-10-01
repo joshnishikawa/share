@@ -57,8 +57,11 @@ $(async function(){
 
   var deck = <%- JSON.stringify(deck) %>;
   const query = <%- JSON.stringify(query) %>;
+  var showtext = query.showtext === 'true' ? true : false;
   var deckName = query.deckName;
   var backs = query.backs;
+  history.replaceState(null, '', `?deckName=${deckName}&backs=${backs}&showtext=${showtext}`);
+
 
   if (deckName == "lower_case_mix" && backs == "animals") deck = deck.slice(0, 10);
   else if (deckName == "lower_case_mix" && backs == "objects") deck = deck.slice(10, 20);
@@ -270,6 +273,8 @@ $(async function(){
 
 
   $("#showtext").on('change', function(){
+    showtext = this.checked;
+    history.replaceState(null, '', `?deckName=${deckName}&backs=${backs}&showtext=${showtext}`);
     if ($(this).is(':checked')){
       // hide all images inside divs with .text class
       $(".text img").hide();
@@ -280,6 +285,7 @@ $(async function(){
       $(".text img").show();
       $(".text div").hide();
     }
+
   });
 
 

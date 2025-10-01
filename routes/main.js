@@ -286,6 +286,7 @@ router.post('/:activity', async(req, res)=>{
     let activity = req.params.activity;
 
     let params = req.body;
+    console.log('params:', params);
     let deck = params.deck;
     delete params.deck;
     let deckType = params.deckType;

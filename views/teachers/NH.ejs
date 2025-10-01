@@ -261,7 +261,6 @@ $(function(){
     else {
       $(e.target).find("input[name='deck']").val(JSON.stringify(window.deck));
       $(e.target).find("input[name='deckType']").val(deckType);
-      const formDataArray = $(e.target).serializeArray();
       e.target.submit();
     }
   });

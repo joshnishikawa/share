@@ -69,35 +69,28 @@ $(function(){
 
 
   // Use a more specific event handler to avoid conflicts
-  $(".menuitem").off('submit.text').on('submit.text', (e)=>{
+  $(".menuitem").on('submit', (e)=>{
     e.preventDefault();
-    
+    let deckName = $("#tags input:checked").val();
+
     if (!window.deck || window.deck.length == 0) {
       alert("<%- __('pleaseSelect') %>");
     }
     else {
-      const $form = $(e.target);
-      $form.find("input[name='deck']").val(JSON.stringify(window.deck));
-      $form.find("input[name='deckType']").val(window.deckType);
-
       if (e.target.id == "typeForm"){
-        // check if tags 'tens_teens' or 'ordinals' are selected
         let tags = $("#tags input:checked").val();
-        console.log(tags);
         if (tags === "tens_teens" || tags === "ordinals") {
           alert("Sorry 'type' doesn't support 'tens_teens' or 'ordinals'.");
           return;
         }
       }
       if (e.target.id == "match") {
-        $("#match input[name='deckName']").val($("#tags input:checked").val());
+        $(e.target).find("input[name='deckName']").val(deckName);
       }
-      
-      // Create a temporary form to submit without removing our event handler
-      const tempForm = $form.clone();
-      tempForm.hide().appendTo('body');
-      tempForm[0].submit();
-      tempForm.remove();
+
+      $(e.target).find("input[name='deck']").val(JSON.stringify(window.deck));
+      $(e.target).find("input[name='deckType']").val(window.deckType);
+      e.target.submit();
     }
   });
 
