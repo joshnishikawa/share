@@ -29,6 +29,11 @@
 
 <script>
 $(function(){
+
+  document.addEventListener('contextmenu', function (event) {
+    event.preventDefault();
+  });
+
   // get times from local storage
   let times = JSON.parse(localStorage.getItem('haystack'));
   times = times ? times : {};

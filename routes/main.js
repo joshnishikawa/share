@@ -8,10 +8,46 @@ const labs = require('./labs.js');
 const creds = require('../../creds.js');
 const mysql = require('mysql2/promise');
 const db = mysql.createPool(creds);
+const vocabulary = require('../public/vocabulary.js');
+const NH_colors = {
+  "#ffa9a0" : ["page_8_9", "page_22_23"],   // red
+  "#ddefb7" : ["page_10_11", "page_24_25"], // green
+  "#cdaed2" : ["page_12_13", "page_34_35"], // purple
+  "#ffd3b5" : ["page_14_15", "page_26_27"], // orange
+  "#bfe0fa" : ["page_16_17", "page_28_29"], // blue
+  "#c4bd9a" : ["page_18_19", "page_30_31"], // olive
+  "#ffcbda" : ["page_20_21", "page_32_33"]  // pink
+}
 
 router.use(bodyParser.urlencoded({extended: true}));
 router.use('/abc', abc);
 router.use('/labs', labs);
+
+
+async function getNHVocab(){
+  let [rows, schema] = await db.query(`SELECT id, page, theme, word 
+                                        FROM vocabulary 
+                                        WHERE book='NH'`);
+  let NH_vocab = {};
+  for (let row of rows){
+    if ( !NH_vocab[row.page] ) NH_vocab[row.page] = {};
+    if ( !NH_vocab[row.page][row.theme] ) NH_vocab[row.page][row.theme] = {};
+    NH_vocab[row.page][row.theme][row.word] = row.id;
+  }
+
+  NH_vocab['+'] = {};
+  for (let p in NH_vocab){
+    for (let t in NH_vocab[p]){
+      if (t.indexOf('+') > -1){ // try 'include'
+        let plus = NH_vocab[p][t];
+        delete NH_vocab[p][t];
+        NH_vocab['+'][t] = plus;
+      }
+    }
+  }
+  return NH_vocab;
+}
+
 
 router.get('/', (req, res)=>{
   try{
@@ -54,43 +90,17 @@ router.get('/api/any-vocab', async (req, res)=>{
 // API endpoint to get NH vocabulary and colors data
 router.get('/api/nh-vocab', async (req, res) => {
   try {
-    var colors = {
-      "#ffa9a0" : ["page_8_9", "page_22_23"],   // red
-      "#ddefb7" : ["page_10_11", "page_24_25"], // green
-      "#cdaed2" : ["page_12_13", "page_34_35"], // purple
-      "#ffd3b5" : ["page_14_15", "page_26_27"], // orange
-      "#bfe0fa" : ["page_16_17", "page_28_29"], // blue
-      "#c4bd9a" : ["page_18_19", "page_30_31"], // olive
-      "#ffcbda" : ["page_20_21", "page_32_33"]  // pink
-    }
+    let NH_vocab = await getNHVocab();
 
-    let [rows, schema] = await db.query(`SELECT id, page, theme, word 
-                                         FROM vocabulary 
-                                         WHERE book='NH'`);
-
-    let NH_vocab = {};
     let translations = {};
-    for (let row of rows){
-      if ( !NH_vocab[row.page] ) NH_vocab[row.page] = {};
-      if ( !NH_vocab[row.page][row.theme] ) NH_vocab[row.page][row.theme] = {};
-      NH_vocab[row.page][row.theme][row.word] = row.id;
-      
-      // Store translation for this theme
-      translations[row.theme] = req.__(row.theme);
-    }
-
-    NH_vocab['+'] = {};
     for (let p in NH_vocab){
       for (let t in NH_vocab[p]){
-        if (t.indexOf('+') > -1){ // try 'include'
-          let plus = NH_vocab[p][t];
-          delete NH_vocab[p][t];
-          NH_vocab['+'][t] = plus;
-        }
+        let translatedTheme = req.__(t);
+        translations[t] = translatedTheme;
       }
     }
-
-    res.json({ NH_vocab, colors, translations });
+console.log('translations:', translations);
+    res.json({ NH_vocab, NH_colors, translations });
   }
   catch(err){
     res.status(500).json({ error: err.message });
@@ -121,17 +131,6 @@ router.get('/groups', (req, res)=>{
 });
 
 
-router.get('/LT', (req, res)=>{
-  try{
-    res.render('students/LT', {LT_vocab});
-  }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
-
-
 router.get('/New_Horizons', (req, res)=>{ // Because you borked it dude!
   try{
     res.redirect('/NH');
@@ -145,40 +144,8 @@ router.get('/New_Horizons', (req, res)=>{ // Because you borked it dude!
 
 router.get('/NH', async (req, res)=>{
   try{
-    var colors = {
-      "#ffa9a0" : ["page_8_9", "page_22_23"],   // red
-      "#ddefb7" : ["page_10_11", "page_24_25"], // green
-      "#cdaed2" : ["page_12_13", "page_34_35"], // purple
-      "#ffd3b5" : ["page_14_15", "page_26_27"], // orange
-      "#bfe0fa" : ["page_16_17", "page_28_29"], // blue
-      "#c4bd9a" : ["page_18_19", "page_30_31"], // olive
-      "#ffcbda" : ["page_20_21", "page_32_33"]  // pink
-    }
-
-    let [rows, schema] = await db.query(`SELECT id, page, theme, word 
-                                         FROM vocabulary 
-                                         WHERE book='NH'`);
-
-    let NH_vocab = {};
-    for (let row of rows){
-      if ( !NH_vocab[row.page] ) NH_vocab[row.page] = {};
-      if ( !NH_vocab[row.page][row.theme] ) NH_vocab[row.page][row.theme] = {};
-      NH_vocab[row.page][row.theme][row.word] = row.id;
-    }
-
-    NH_vocab['+'] = {};
-    for (let p in NH_vocab){
-      for (let t in NH_vocab[p]){
-        if (t.indexOf('+') > -1){ // try 'include'
-          let plus = NH_vocab[p][t];
-          delete NH_vocab[p][t];
-          NH_vocab['+'][t] = plus;
-        }
-      }
-    }
-
-
-    res.render('students/NH', {NH_vocab, colors, teacher: false});
+    let NH_vocab = await getNHVocab();
+    res.render('students/NH', {NH_vocab, NH_colors, teacher: false});
   }
   catch(err){
     res.send(err);

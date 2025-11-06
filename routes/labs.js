@@ -6,9 +6,6 @@ const router = express.Router();
 const fs = require('fs');
 const https = require('https');
 const path = require('path');
-const creds = require('../../creds.js');
-const mysql = require('mysql2/promise');
-const db = mysql.createPool(creds);
 
 const bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded({extended: true}));

@@ -130,7 +130,7 @@ $(function(){
   $.get('/api/nh-vocab')
     .done(function(data) {
       NH_vocab = data.NH_vocab;
-      colors = data.colors;
+      colors = data.NH_colors;
       
       // Populate the themes div
       $('#themes').html(createThemesHTML(NH_vocab, colors, data.translations));

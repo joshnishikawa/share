@@ -6,7 +6,6 @@
     height: 16px;
     display: inline-block;
   }
-
 </style>
 
 
@@ -37,7 +36,7 @@
             <div id="myName" class="fs-3" style="text-shadow:0px 0px 2px #555"></div>
             <div class="d-flex justify-content-between mb-1">
               <button id="getName" class="btn btn-sm btn-outline-primary px-1 py-0">Change Name</button>
-              <input id="color" class="form-control form-control-sm p-0 mx-1" type="color">
+              <input id="color" class="form-control form-control-sm p-0 mx-1" type="color" aria-label="Player color picker" title="Choose your player color">
             </div>
           </div>
 
@@ -63,10 +62,11 @@
               <!-- player names only will be added dynamically here -->
             </div>
             <form id="roomSearchForm" class="form d-flex">
-              <button id="join" class="btn btn-success" disabled>
+              <button id="join" class="btn btn-success" disabled title="Join group" aria-label="Join group">
                 <i class="material-icons fs-1">groups</i>
               </button>
-              <input id="roomSearch" class="form-control fs-1 text-success text-center" placeholder="join">
+              <input id="roomSearch" class="form-control fs-1 text-success text-center" placeholder="join" aria-label="Room search input" title="Enter room name to search">
+
             </form>
           </div>
 
@@ -77,17 +77,17 @@
 
     <div id="activity" class="col-sm-8">
 
-      <div class="btn btn-outline-primary activity d-flex justify-content-between w-100" id="choose">
+      <button class="btn btn-outline-primary activity d-flex justify-content-between w-100" id="choose" title="Choose activity" aria-label="Choose activity">
         Choose  
-      </div>  
+      </button>  
 
-      <div class="btn btn-outline-primary activity d-flex justify-content-between w-100" id="race">
+      <button class="btn btn-outline-primary activity d-flex justify-content-between w-100" id="race" title="Race activity" aria-label="Race activity">
         Race
-      </div>  
+      </button>  
 
-      <div class="btn btn-outline-primary activity d-flex justify-content-between w-100" id="match">
+      <button class="btn btn-outline-primary activity d-flex justify-content-between w-100" id="match" title="Match activity" aria-label="Match activity">
         Match
-      </div>
+      </button>
     </div>
 
     <div class="col-sm-4">
@@ -113,11 +113,12 @@
   if (typeof window.local === 'undefined') window.local = [];
   if (typeof window.deckType === 'undefined') window.deckType = 'NH';
 
-  // Define global functions only if they don't exist
+  // Define global functions only if they don't exist - Edge compatible
   if (typeof window.addWords === 'undefined') {
-    window.addWords = (list) => {
-      for (let l of list) {
-        if (!window.deck.includes(l.id)) {
+    window.addWords = function(list) {
+      for (var i = 0; i < list.length; i++) {
+        var l = list[i];
+        if (window.deck.indexOf(l.id) === -1) {
           window.deck.push(l.id);
           window.local.push(l);
         }
@@ -126,21 +127,26 @@
   }
 
   if (typeof window.removeWords === 'undefined') {
-    window.removeWords = (list) => {
-      for (let i of list) {
-        window.deck = window.deck.filter(d => d !== i && d !== i.id && d !== i.word);
-        window.local = window.local.filter(l => l.id !== i.id && l.id !== i.word);
+    window.removeWords = function(list) {
+      for (var i = 0; i < list.length; i++) {
+        var item = list[i];
+        window.deck = window.deck.filter(function(d) { 
+          return d !== item && d !== item.id && d !== item.word; 
+        });
+        window.local = window.local.filter(function(l) { 
+          return l.id !== item.id && l.id !== item.word; 
+        });
       }
     }
   }
 
 $(function(){
   // localStorage.removeItem('player'); // DEBUG: so I don't have to clear my iPhone cache
-  $(`#groups-tab`).addClass("active");
+  $("#groups-tab").addClass("active");
 
-  $(".menuitem").on('submit', (e)=>{
+  $(".menuitem").on('submit', function(e){
     e.preventDefault();
-        if (!window.deck || window.deck.length == 0) {
+    if (!window.deck || window.deck.length == 0) {
       alert("<%- __('pleaseSelect') %>");
     }
     else {
@@ -150,14 +156,13 @@ $(function(){
     }
   });
 
-
 // FUNCTIONS ////////////////////////////////////////////////////////////////////
   function updatePlayerList(data){
     // Cache DOM elements to avoid repeated queries
-    const $group = $("#group");
-    const $leaveGroup = $("#leaveGroup");
-    const $otherPlayers = $(`#otherPlayers`);
-    const $activities = $(".activity");
+    var $group = $("#group");
+    var $leaveGroup = $("#leaveGroup");
+    var $otherPlayers = $("#otherPlayers");
+    var $activities = $(".activity");
     
     if (data.length != 1 || player.roomtype == "public") {
       $group.removeClass("d-flex").addClass("d-none");
@@ -173,14 +178,15 @@ $(function(){
     $activities.find(".pawn").remove();
 
     // Build HTML string instead of multiple DOM manipulations
-    let otherPlayersHTML = '';
+    var otherPlayersHTML = '';
 
-    for (let p of data) {
+    for (var i = 0; i < data.length; i++) {
+      var p = data[i];
       if (p.id == player.id){
-        $(`#myPawn`).html(getPawn(player.color));
-        $(`#myName`).text(p.id);
-        $(`#myName`).css('color', player.color);
-        $(`#color`).val(player.color);
+        $("#myPawn").html(getPawn(player.color));
+        $("#myName").text(p.id);
+        $("#myName").css('color', player.color);
+        $("#color").val(player.color);
         localStorage.setItem('player', JSON.stringify(player));
       }
       else {
@@ -203,7 +209,8 @@ $(function(){
     }
     
     // Set colors and pawns after DOM is updated
-    for (let p of data) {
+    for (var i = 0; i < data.length; i++) {
+      var p = data[i];
       if (p.id != player.id) {
         setColor(p.number, p.color);
       }
@@ -213,37 +220,31 @@ $(function(){
     }
   }
 
-
   function getPawn(color) {
-    let shadow = reduceBrightness(color, 20);
-    let def = shadow.replace("#", "");
-    return `
-<svg class="img-fluid pawn" width="64" height="128" viewBox="0 0 64 128" xmlns="http://www.w3.org/2000/svg">
-    <!-- Body of the pawn -->
-    <path transform="matrix(0.78482373,0,0,0.3410327,-40.6,58)" d="m 54.796244,189.05536 c -12.062025,-20.89204 13.56978,-65.28763 37.693831,-65.28763 24.124055,0 49.755855,44.39559 37.693825,65.28763 -12.06202,20.89204 -63.325631,20.89204 -75.387656,0 z" fill="${color}" />
-    <path transform="matrix(0.78482373,0,0,0.3410327,-40.6,58)" d="m 54.796244,189.05536 c -12.062025,-20.89204 13.56978,-65.28763 37.693831,-65.28763 24.124055,0 49.755855,44.39559 37.693825,65.28763 -12.06202,20.89204 -63.325631,20.89204 -75.387656,0 z" fill="url(#${def}1)" />
-    <path transform="matrix(0.45050681,0,0,0.62867557,3.2,35)" d="m 105,121.60049 c -11.851854,8.65104 -69.62828,8.77896 -81.518324,0.1805 C 11.591632,113.18252 -6.3839294,58.273407 -1.8805296,44.308232 2.6228701,30.343057 49.289789,-3.7205685 63.963086,-3.7530573 78.636384,-3.785546 125.45369,30.071092 130.01888,44.016188 134.58408,57.961284 116.85185,112.94946 105,121.60049 Z" fill="${color}" />
-    <path transform="matrix(0.45050681,0,0,0.62867557,3.2,35)" d="m 105,121.60049 c -11.851854,8.65104 -69.62828,8.77896 -81.518324,0.1805 C 11.591632,113.18252 -6.3839294,58.273407 -1.8805296,44.308232 2.6228701,30.343057 49.289789,-3.7205685 63.963086,-3.7530573 78.636384,-3.785546 125.45369,30.071092 130.01888,44.016188 134.58408,57.961284 116.85185,112.94946 105,121.60049 Z" fill="url(#${def}1)" />
-
-    <!-- Head of the pawn -->
-    <circle cx="32" cy="22" r="22" fill="${color}" />
-    <circle cx="32" cy="22" r="22" fill="url(#${def}2)" />
-  
-    <!-- Shading gradients -->
-    <defs>
-      <radialGradient id="${def}1" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-        <stop offset="50%" style="stop-color:${shadow};stop-opacity:0" />
-        <stop offset="100%" style="stop-color:${shadow};stop-opacity:1" />
-      </radialGradient>
-
-      <radialGradient id="${def}2" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-        <stop offset="50%" style="stop-color:${shadow};stop-opacity:0" />
-        <stop offset="100%" style="stop-color:${shadow};stop-opacity:1" />
-      </radialGradient>
-    </defs>
-  </svg>`;
+    var shadow = reduceBrightness(color, 20);
+    var def = shadow.replace("#", "");
+    return '<svg class="img-fluid pawn" width="64" height="128" viewBox="0 0 64 128" xmlns="http://www.w3.org/2000/svg">' +
+      '<!-- Body of the pawn -->' +
+      '<path transform="matrix(0.78482373,0,0,0.3410327,-40.6,58)" d="m 54.796244,189.05536 c -12.062025,-20.89204 13.56978,-65.28763 37.693831,-65.28763 24.124055,0 49.755855,44.39559 37.693825,65.28763 -12.06202,20.89204 -63.325631,20.89204 -75.387656,0 z" fill="' + color + '" />' +
+      '<path transform="matrix(0.78482373,0,0,0.3410327,-40.6,58)" d="m 54.796244,189.05536 c -12.062025,-20.89204 13.56978,-65.28763 37.693831,-65.28763 24.124055,0 49.755855,44.39559 37.693825,65.28763 -12.06202,20.89204 -63.325631,20.89204 -75.387656,0 z" fill="url(#' + def + '1)" />' +
+      '<path transform="matrix(0.45050681,0,0,0.62867557,3.2,35)" d="m 105,121.60049 c -11.851854,8.65104 -69.62828,8.77896 -81.518324,0.1805 C 11.591632,113.18252 -6.3839294,58.273407 -1.8805296,44.308232 2.6228701,30.343057 49.289789,-3.7205685 63.963086,-3.7530573 78.636384,-3.785546 125.45369,30.071092 130.01888,44.016188 134.58408,57.961284 116.85185,112.94946 105,121.60049 Z" fill="' + color + '" />' +
+      '<path transform="matrix(0.45050681,0,0,0.62867557,3.2,35)" d="m 105,121.60049 c -11.851854,8.65104 -69.62828,8.77896 -81.518324,0.1805 C 11.591632,113.18252 -6.3839294,58.273407 -1.8805296,44.308232 2.6228701,30.343057 49.289789,-3.7205685 63.963086,-3.7530573 78.636384,-3.785546 125.45369,30.071092 130.01888,44.016188 134.58408,57.961284 116.85185,112.94946 105,121.60049 Z" fill="url(#' + def + '1)" />' +
+      '<!-- Head of the pawn -->' +
+      '<circle cx="32" cy="22" r="22" fill="' + color + '" />' +
+      '<circle cx="32" cy="22" r="22" fill="url(#' + def + '2)" />' +
+      '<!-- Shading gradients -->' +
+      '<defs>' +
+        '<radialGradient id="' + def + '1" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">' +
+          '<stop offset="50%" style="stop-color:' + shadow + ';stop-opacity:0" />' +
+          '<stop offset="100%" style="stop-color:' + shadow + ';stop-opacity:1" />' +
+        '</radialGradient>' +
+        '<radialGradient id="' + def + '2" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">' +
+          '<stop offset="50%" style="stop-color:' + shadow + ';stop-opacity:0" />' +
+          '<stop offset="100%" style="stop-color:' + shadow + ';stop-opacity:1" />' +
+        '</radialGradient>' +
+      '</defs>' +
+    '</svg>';
   }
-
 
   function reduceBrightness(hex, percent) {
     var num = parseInt(hex.replace("#", ""), 16),
@@ -251,13 +252,12 @@ $(function(){
         R = (num >> 16) - amt,
         G = (num >> 8 & 0x00FF) - amt,
         B = (num & 0x0000FF) - amt;
-    let returnme = "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 + (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 + (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+    var returnme = "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 + (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 + (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
     return returnme;
   }
 
-
   function getName() {
-    return new Promise((resolve, reject) => {
+    return new Promise(function(resolve, reject) {
       socket.emit('getName', player);
 
       // Remove any existing listener to prevent memory leaks
@@ -276,30 +276,28 @@ $(function(){
     });
   }
 
-
   function setColor(number, color) {
     if (number == player.number){
       player.color = color;
       localStorage.setItem('player', JSON.stringify(player));
-      $(`#myPawn`).html(getPawn(color));
-      $(`#myName`).css('color', color);
+      $("#myPawn").html(getPawn(color));
+      $("#myName").css('color', color);
       $("#color").val(color);
       
       // Update activity pawn if player has selected an activity
       if (player.activity) {
-        $(`.activity .pawn`).filter(function() {
-          return $(this).closest(`#${player.activity}`).length > 0;
+        $(".activity .pawn").filter(function() {
+          return $(this).closest("#" + player.activity).length > 0;
         }).html(getPawn(color));
       }
       
       socket.emit('setColor', player);
     }
     else {
-      $(`.pawn${number}`).html(getPawn(color));
-      $(`#name${number}`).css('color', color);
+      $(".pawn" + number).html(getPawn(color));
+      $("#name" + number).css('color', color);
     }
   }
-
 
   function loadActivity(activity) {
     // load from url
@@ -315,20 +313,20 @@ $(function(){
 
 
 // EVENTS //////////////////////////////////////////////////////////////////////
-  let roomSearchTimeout;
-  $("#roomSearch").on('input', ()=>{
+  var roomSearchTimeout;
+  $("#roomSearch").on('input', function(){
     // Debounce room search to avoid excessive server calls
     clearTimeout(roomSearchTimeout);
-    roomSearchTimeout = setTimeout(() => {
+    roomSearchTimeout = setTimeout(function() {
       socket.emit('roomSearch', $("#roomSearch").val());
     }, 300); // Wait 300ms after user stops typing
   });
 
-  $("#roomSearchForm").on('submit', (e)=>{
+  $("#roomSearchForm").on('submit', function(e){
     e.preventDefault();
     if ($("#join").prop('disabled')) return; // if #join disabled, room !exists
-    let newRoom = $("#roomSearch").val();
-    socket.emit('join', {newRoom, player});
+    var newRoom = $("#roomSearch").val();
+    socket.emit('join', {newRoom: newRoom, player: player});
     $("#roomSearch").val('');
     $("#foundplayers").empty();
     $("#join").prop('disabled', true);
@@ -336,40 +334,50 @@ $(function(){
 
   $("#getName").on('click', getName);
 
-  $("#color").on('change', ()=>{
-    let color = $("#color").val();
+  $("#color").on('change', function(){
+    var color = $("#color").val();
     setColor(player.number, color);
   });
 
-  $("#leaveGroup").on('click', ()=>{
+  $("#leaveGroup").on('click', function(){
     socket.emit('leave', player);
     // Don't trigger room search here - let the server handle the rejoin
   });
 
   $(".activity").on("click", function () {
-    let activity = $(this).attr("id");
+    var activity = $(this).attr("id");
     player.activity = activity;
     socket.emit("chooseActivity", player);
   });
 
-
 // SOCKET EVENTS ///////////////////////////////////////////////////////////////
-  socket.on('connect', async()=>{
-    let stored_player = await JSON.parse(localStorage.getItem('player'));
-    if (!stored_player) await getName();
-    else player = stored_player;
-    socket.emit('join', player);
+  socket.on('connect', function(){
+    var stored_player;
+    try {
+      stored_player = JSON.parse(localStorage.getItem('player'));
+    } catch (e) {
+      stored_player = null;
+    }
+    
+    if (!stored_player) {
+      getName().then(function() {
+        socket.emit('join', player);
+      });
+    } else {
+      player = stored_player;
+      socket.emit('join', player);
+    }
   });
 
 
-  socket.on('joined', (data)=>{
+  socket.on('joined', function(data){
     room = data.room;
     player.number = data.playerNum;
     player.roomname = room.roomname;
     player.roomtype = room.roomtype; // Make sure roomtype is updated
     localStorage.setItem('player', JSON.stringify(player));
-    $(`#room`).text(player.roomname);
-    $(`#roomname`).text(player.roomname);
+    $("#room").text(player.roomname);
+    $("#roomname").text(player.roomname);
     updatePlayerList(room.players);
     if (room.activity) {
       player.activity = room.activity;
@@ -378,38 +386,39 @@ $(function(){
   });
 
 
-  socket.on('setName', (data)=>{
+  socket.on('setName', function(data){
     if (data.number == player.number) {
       player.id = data.id;
       localStorage.setItem('player', JSON.stringify(player));
-      $(`#myName`).text(data.id);
+      $("#myName").text(data.id);
     }
     else {
-      $(`#name${data.number}`).text(data.id);
+      $("#name" + data.number).text(data.id);
     }
   });
 
 
-  socket.on('roomSearch', (data)=>{
+  socket.on('roomSearch', function(data){
     if (data && data.roomname != player.roomname) {
-      for (let p of data.players) {
-        $(`#foundplayers`).append(`<div style="color: ${p.color};text-shadow:0px 0px 2px #000;">${p.id}</div>`);
+      for (var i = 0; i < data.players.length; i++) {
+        var p = data.players[i];
+        $("#foundplayers").append('<div style="color: ' + p.color + ';text-shadow:0px 0px 2px #000;">' + p.id + '</div>');
       }
       $("#join").prop('disabled', false);
     }
     else {
-      $(`#foundplayers`).empty();
+      $("#foundplayers").empty();
       $("#join").prop('disabled', true);
     }
   });
 
 
   // other players' events /////////////////////////////////////////////////////
-  socket.on('playerJoined', (data)=>{
+  socket.on('playerJoined', function(data){
     updatePlayerList(data);
   });
   
-  socket.on('youLeft', (data)=>{
+  socket.on('youLeft', function(data){
     room = {};
     player.roomname = null; // reset the roomname
     player.roomtype = "private"; // reset the roomtype
@@ -417,7 +426,7 @@ $(function(){
     player.activity = null; // reset the activity
     
     // Clear UI elements
-    $(`#otherPlayers`).empty();
+    $("#otherPlayers").empty();
     $(".activity").find(".pawn").remove();
     $("#foundplayers").empty();
     $("#roomSearch").val('');
@@ -428,16 +437,22 @@ $(function(){
     socket.emit('join', player); // join a new private room
   });
 
-  socket.on('playerLeft', (data)=>{
+  socket.on('playerLeft', function(data){
     updatePlayerList(data);
   });
 
-  socket.on('setColor', (data)=>{
+  socket.on('setColor', function(data){
     // Update the player's color in the room data
     if (room && room.players) {
-      const player = room.players.find(p => p.number === data.number);
-      if (player) {
-        player.color = data.color;
+      var foundPlayer = null;
+      for (var i = 0; i < room.players.length; i++) {
+        if (room.players[i].number === data.number) {
+          foundPlayer = room.players[i];
+          break;
+        }
+      }
+      if (foundPlayer) {
+        foundPlayer.color = data.color;
       }
     }
     
@@ -450,18 +465,18 @@ $(function(){
     }
   });
 
-  socket.on('roomOpened', (data)=>{
+  socket.on('roomOpened', function(data){
     $("#leaveGroup").show();
     player.roomtype = "public";
     localStorage.setItem('player', JSON.stringify(player));
     updatePlayerList(data);
   });
 
-  socket.on('activityChosen', (data)=>{
+  socket.on('activityChosen', function(data){
     updatePlayerList(data);
   });
 
-  socket.on('loadActivity', (data)=>{
+  socket.on('loadActivity', function(data){
     loadActivity(data);
   });
 
