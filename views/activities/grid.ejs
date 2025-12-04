@@ -121,19 +121,32 @@ $(function(){
 
     let html = '<div class="border-top border-end d-flex flex-wrap justify-content-center">';
     for (let i = 0; i < workingdeck.length; i++){
-      html +=
-      `<div class="space border-start border-bottom text-center pt-3" 
-            style="position:relative;width:${colspan}vw;height:${colspan}vw;">
-          <img src="${workingdeck[i].image}" alt="${workingdeck[i].word}" 
-               class="img-fluid position-absolute top-50 translate-middle" 
-               style="max-height:75%;max-width:75%;"
-               onerror="altOnly(this)">
+      if ( !workingdeck[i].image ) {
+        let fs = 7 - workingdeck[i].word.length;
+        html += 
+        `<div class="space border-start border-bottom text-center pt-3" 
+              style="position:relative;width:${colspan}vw;height:${colspan}vw;">
 
-          <div class="txt text-center YM w-100 position-absolute bottom-0 mb-1" style="display:none;" contenteditable="true">
-            ${workingdeck[i].word}
-          </div>
+            <div class="text-center YM w-100" style="position:absolute;top:50%;transform:translateY(-50%);font-size:${fs}rem;" contenteditable="true">
+              ${workingdeck[i].word}
+            </div>
+          </div>`;
+      }
+      else {
+        html +=
+        `<div class="space border-start border-bottom text-center pt-3" 
+              style="position:relative;width:${colspan}vw;height:${colspan}vw;">
+            <img src="${workingdeck[i].image}" alt="${workingdeck[i].word}" 
+                class="img-fluid position-absolute top-50 translate-middle" 
+                style="max-height:75%;max-width:75%;"
+                onerror="altOnly(this)">
 
-        </div>`;
+            <div class="txt text-center YM w-100 position-absolute bottom-0 mb-1" style="display:none;" contenteditable="true">
+              ${workingdeck[i].word}
+            </div>
+
+          </div>`;
+      }
 
       if (i % cols == cols - 1) html += '</div><div class="border-end d-flex flex-wrap justify-content-center">';
     }

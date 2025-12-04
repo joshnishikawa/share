@@ -28,7 +28,7 @@
     width: 21cm;
     height: 29.7cm;
     text-align:top;
-    text-shadow: 30px 30px 50px #999;
+    text-shadow: 20px 20px 20px #999;
     -webkit-text-stroke: 1rem #000;
     font-size: 70em; line-height:64rem;
   }
@@ -37,29 +37,39 @@
     text-align:center;
     width:90%;
     margin: 0 auto;
-    background: linear-gradient(
-      180deg, 
-        rgba(0,0,0,0) 0px,
-        rgba(0,0,0,0) 14%, 
-        cornflowerblue 14%, 
-        cornflowerblue calc(14% + 5px), 
+    position: relative;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
 
-        rgba(0,0,0,0) calc(14% + 5px),
-        rgba(0,0,0,0) 40%, 
+  /* First cornflowerblue line at 14% */
+  #sheet span div::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background-color: cornflowerblue;
+    top: 14%;
+    z-index: -1;
+  }
 
-        magenta 40%, 
-        magenta calc(40% + 5px), 
-
-        rgba(0,0,0,0) calc(40% + 5px),
-        rgba(0,0,0,0) calc(99% - 15px), 
-
-        cornflowerblue calc(99% - 15px), 
-        cornflowerblue 99%,
-        rgba(0,0,0,0) 99%,
-        rgba(0,0,0,0) 10%
-
-    );
-
+  /* Magenta line at 40% */
+  #sheet span div::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background-color: magenta;
+    top: 40%;
+    z-index: -1;
+  }
+  
+  /* Bottom cornflowerblue line using border */
+  #sheet span div {
+    border-bottom: 15px solid cornflowerblue;
+    border-bottom-width: 15px;
   }
 
   @media print {

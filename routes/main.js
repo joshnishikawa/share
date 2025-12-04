@@ -5,7 +5,12 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const abc = require('./abc.js');
 const labs = require('./labs.js');
-const creds = require('../../creds.js');
+const creds = {
+  host: process.env.host,
+  user: process.env.user,
+  password: process.env.password,
+  database: process.env.database
+}
 const mysql = require('mysql2/promise');
 const db = mysql.createPool(creds);
 const vocabulary = require('../public/vocabulary.js');

@@ -2,7 +2,12 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
-const creds = require('../../creds.js');
+const creds = {
+  host: process.env.host,
+  user: process.env.user,
+  password: process.env.password,
+  database: process.env.database
+};
 const mysql = require('mysql2/promise');
 const db = mysql.createPool(creds);
 const text_decks = require('../public/javascripts/text_decks.json');

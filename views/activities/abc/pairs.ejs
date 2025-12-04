@@ -28,6 +28,10 @@
           <span class="display-1">abc</span><br/>
           <span class="small time"></span>
         </button>
+        <button data-value="both" class="col menu p-3 m-5 border rounded-3 alert-primary">
+          <span class="display-1">Both</span><br/>
+          <span class="small time"></span>
+        </button>
       </div>
     </div>
     <div id="gridContainer">
@@ -67,31 +71,44 @@ $(function(){
         deck = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
                 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
                 'U', 'V', 'W', 'X', 'Y', 'Z'];
+        FYshuffle(deck);
+        deck = deck.slice(0, 12);
+        deck = deck.concat(deck);
         break;
       
       case 'abc':
         deck = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
                 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
                 'u', 'v', 'w', 'x', 'y', 'z'];
+        FYshuffle(deck);
+        deck = deck.slice(0, 12);
+        deck = deck.concat(deck);
+
         break;
       
-      default : 
-        deck = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
-                'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
-                'U', 'V', 'W', 'X', 'Y', 'Z'];
+      case 'both':
+        deck = [['A', 'a'], [ 'B', 'b'], ['D', 'd'], ['E', 'e'],
+                ['F', 'f'], ['G', 'g'], ['H', 'h'], ['I', 'i'],
+                ['J', 'j'], ['K', 'k'], ['L', 'l'], ['M', 'm'],
+                ['N', 'n'], ['P', 'p'], ['Q', 'q'],
+                ['R', 'r'], ['T', 't'], ['U', 'u']];
+        FYshuffle(deck);
+        deck = deck.slice(0, 12);
+        deck = deck.flat();
+        break;
+
+      default :
+        console.log('Invalid deck name');
         break;
     }
 
-    FYshuffle(deck);
-    deck = deck.slice(0, 12);
-    deck = deck.concat(deck);
     FYshuffle(deck);
 
     // NOW BUILD THE GRID ////////////////////////////////////////////////////////
     for (let i = 0; i < deck.length; i++){
       $("#grid").append(
-      `<div class="col-2 vocab p-0" style="height:24vh;">
-          <div data-value="${deck[i]}" class="flip border-primary rounded-3 flipped m-3" style="height:80%;">
+       `<div class="col-2 vocab p-0" style="height:24vh;">
+          <div data-value="${deck[i]}" class="flip border-primary rounded-3 flipped m-3" style="user-select:none;height:80%;">
             <div class="flip-card shadow">
 
               <div class="flip-front bg-white rounded border display-1">
@@ -108,7 +125,7 @@ $(function(){
       $(this).toggleClass('border border-5');
 
       if ($('.flip.border-5').length == 2){
-        if ($('.flip.border-5').first().data('value') == $('.flip.border-5').last().data('value')){
+        if ($('.flip.border-5').first().data('value').toLowerCase() == $('.flip.border-5').last().data('value').toLowerCase()){
           $('.flip.border-5').removeClass('flip flipped border').off('click');
           if ($('.flip.flipped').length == 0){
 
