@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const fs = require('fs');
-const path = require('path');
+const vocabulary = require('../public/vocabulary.js');
 const creds = {
   host: process.env.host,
   user: process.env.user,
@@ -37,9 +36,7 @@ router.get('/images', (req, res)=>{
 
 router.get('/LT', async (req, res)=>{
   try{
-    let [rows, schema] = await db.query(`SELECT id, page, theme, word 
-                                         FROM vocabulary
-                                         WHERE book='LT'`);
+    let rows = vocabulary.filter(item => item.book === 'LT');
     let LT_vocab = {};
     for (let row of rows){
       if ( !LT_vocab[row.theme] ) LT_vocab[row.theme] = {};
@@ -67,9 +64,7 @@ router.get('/NH', async(req, res)=>{
       "#ffcbda" : ["page_20_21", "page_32_33"]  // pink
     }
 
-    let [rows, schema] = await db.query(`SELECT id, page, theme, word 
-                                         FROM vocabulary 
-                                         WHERE book='NH'`);
+    let rows = vocabulary.filter(item => item.book === 'NH');
     let NH_vocab = {};
     for (let row of rows){
       if ( !NH_vocab[row.page] ) NH_vocab[row.page] = {};

@@ -30,9 +30,7 @@ router.use('/labs', labs);
 
 
 async function getNHVocab(){
-  let [rows, schema] = await db.query(`SELECT id, page, theme, word 
-                                        FROM vocabulary 
-                                        WHERE book='NH'`);
+  let rows = vocabulary.filter(item => item.book === 'NH');
   let NH_vocab = {};
   for (let row of rows){
     if ( !NH_vocab[row.page] ) NH_vocab[row.page] = {};
@@ -69,16 +67,13 @@ router.get('/api/any-vocab', async (req, res)=>{
   try{
     // get array of words from vocabulary table
     let words = {};
-    var rows, schema;
+    var rows;
     var deck = req.query.deck;
 
-    if (req.query.deck) { 
-      [rows, schema] = await db.query(`SELECT word, meaning, image, audio 
-                                 FROM vocabulary 
-                                 WHERE id IN (?)`, 
-                                 [deck]);
+    if (req.query.deck) {
+      rows = vocabulary.filter(item => vocabulary.includes(item.word));
     }
-    else { [rows, schema] = await db.query(`SELECT word, meaning, image, audio FROM vocabulary`);}
+    else { rows = vocabulary;}
 
     for (let row of rows){
       words[row.word] = {meaning: row.meaning, image: row.image, audio: row.audio};
@@ -291,9 +286,7 @@ router.post('/:activity', async(req, res)=>{
     else {
       let newrow = await db.query(`INSERT INTO links (deckType, activity, deck) 
                                    VALUES (?, ?, ?)`, 
-                                  [deckType, 
-                                   activity, 
-                                   deck]);
+                                  [deckType, activity, deck]);
       link = newrow[0].insertId;
     }
 
@@ -326,7 +319,7 @@ router.get('/:activity/:id', async (req, res)=>{
     }
     else{
       let ids = JSON.parse(rows[0].deck);
-      [rows, schema] = await db.query(`SELECT * FROM vocabulary WHERE id IN (?)`, [ids]);
+      rows = vocabulary.filter(item => ids.includes(item.id));
       // convert to array of objects
       deck = await rows.map( row => {
         return {id: row.id, word: row.word, meaning: row.meaning, image: row.image};
