@@ -23,11 +23,12 @@ function CanvasBuilder(options) {
   };
 
   // Internal state
-  let canvases = {};
-  let workingCanvas = "";
+  let savedCanvases = []; // Array of saved canvas snapshots
+  let currentCanvasIndex = 0; // Index of currently active canvas
   let z = 1; // Z-index counter
   let isDraggingHandle = false;
   let tapHandlerActive = false;
+  const self = this; // Reference for passing to CanvasManager
 
   // Initialize
   this.init = function() {
@@ -36,51 +37,65 @@ function CanvasBuilder(options) {
     setupMenuDragging();
   };
 
+  // Migrate old object-based storage to new array format
+  function migrateOldStorage(data) {
+    // Check if data is an object (not array) with canvas properties
+    if (!Array.isArray(data) && typeof data === 'object' && data !== null) {
+      const migratedArray = [];
+      
+      // Convert each saved canvas from object to array format
+      for (const key in data) {
+        if (data.hasOwnProperty(key)) {
+          migratedArray.push({
+            html: data[key],
+            timestamp: Date.now() // Use current timestamp since old format didn't have it
+          });
+        }
+      }
+      
+      // Sort to ensure consistent order (alphabetically by original key name)
+      // This maintains some consistency with the old dropdown order
+      return migratedArray.length > 0 ? migratedArray : [{ html: "", timestamp: Date.now() }];
+    }
+    
+    // Already in array format or invalid data
+    return data;
+  }
+
   // Load canvases from localStorage
   function loadFromStorage() {
     if (localStorage.getItem(config.storageKey)) {
-      canvases = JSON.parse(localStorage.getItem(config.storageKey));
-      if (canvases.default) {
-        workingCanvas = "default";
-        $(`#${config.canvasId}`).html(canvases.default);
-        $(`#${config.canvasId} .${config.canvasItemClass}`).each(function () {
-          makeTouchable($(this));
-          // Ensure drag handles are properly scaled after loading
-          const handle = $(this).find('.drag-handle');
-          if (handle.length > 0) {
-            const currentScale = getScale($(this));
-            handle.css('transform', `scale(${1 / currentScale})`);
-          }
-        });
-      } else {
-        $(`#${config.canvasId}`).html("");
+      let data = JSON.parse(localStorage.getItem(config.storageKey));
+      
+      // Migrate old format if needed
+      data = migrateOldStorage(data);
+      
+      savedCanvases = Array.isArray(data) ? data : [];
+      
+      if (savedCanvases.length === 0) {
+        // Create first blank canvas
+        savedCanvases.push({ html: "", timestamp: Date.now() });
+        currentCanvasIndex = 0;
       }
+      
+      // Save migrated data back to storage
+      localStorage.setItem(config.storageKey, JSON.stringify(savedCanvases));
+      
+      // Load the current canvas
+      loadCanvas(currentCanvasIndex);
     } else {
-      canvases.default = "";
-      workingCanvas = "default";
-      localStorage.setItem(config.storageKey, JSON.stringify(canvases));
-    }
-
-    // Populate load canvas dropdown
-    for (let canvas in canvases) {
-      $("#loadCanvas").append(`<option value="${canvas}">${canvas}</option>`);
+      // Initialize with one blank canvas
+      savedCanvases = [{ html: "", timestamp: Date.now() }];
+      currentCanvasIndex = 0;
+      localStorage.setItem(config.storageKey, JSON.stringify(savedCanvases));
     }
   }
 
-  // Save current canvas to localStorage
-  function saveToStorage() {
-    if (workingCanvas === "default") {
-      canvases.default = $(`#${config.canvasId}`).html();
-      localStorage.setItem(config.storageKey, JSON.stringify(canvases));
-    }
-  }
-
-  // Setup event handlers
-  function setupEventHandlers() {
-    // Load canvas
-    $("#loadCanvas").on("change", function () {
-      workingCanvas = $(this).val();
-      $(`#${config.canvasId}`).html(canvases[workingCanvas]);
+  // Load a specific canvas by index
+  function loadCanvas(index) {
+    if (index >= 0 && index < savedCanvases.length) {
+      currentCanvasIndex = index;
+      $(`#${config.canvasId}`).html(savedCanvases[index].html);
       $(`#${config.canvasId} .${config.canvasItemClass}`).each(function () {
         makeTouchable($(this));
         // Ensure drag handles are properly scaled after loading
@@ -90,40 +105,22 @@ function CanvasBuilder(options) {
           handle.css('transform', `scale(${1 / currentScale})`);
         }
       });
-    });
+    }
+  }
 
-    // Save canvas
-    $("#saveCanvas").on("click", function () {
-      let name = prompt(config.savePromptText);
-      if (name) {
-        workingCanvas = name;
-        canvases["default"] = "";
-        canvases[workingCanvas] = $(`#${config.canvasId}`).html();
-        localStorage.setItem(config.storageKey, JSON.stringify(canvases));
-        $("#loadCanvas").append(`<option value="${name}">${name}</option>`);
-        $("#loadCanvas").val(name);
-      }
-    });
+  // Save current canvas to localStorage
+  function saveToStorage() {
+    savedCanvases[currentCanvasIndex].html = $(`#${config.canvasId}`).html();
+    savedCanvases[currentCanvasIndex].timestamp = Date.now();
+    localStorage.setItem(config.storageKey, JSON.stringify(savedCanvases));
+  }
 
-    // Clear canvas
-    $("#clearCanvas").on("click", function () {
-      $("#clearCanvasModal").modal("show");
-    });
-
-    $("#clearCanvasConfirm").on("click", function () {
-      if (workingCanvas === "default") {
-        canvases.default = "";
-      } else {
-        delete canvases[workingCanvas];
-        $(`#loadCanvas option[value="${workingCanvas}"]`).remove();
-        workingCanvas = "default";
-        $("#loadCanvas").val("default");
-      }
-
-      $(`#${config.canvasId}`).empty();
-      localStorage.setItem(config.storageKey, JSON.stringify(canvases));
-      z = 1;
-      $("#clearCanvasModal").modal("hide");
+  // Setup event handlers
+  function setupEventHandlers() {
+    // Open canvas manager modal
+    $("#manageCanvases").on("click", function () {
+      const manager = new CanvasManager(self);
+      manager.open();
     });
 
     // Delete key
@@ -419,7 +416,52 @@ function CanvasBuilder(options) {
     }
   }
 
-  // Public methods
+  // Public API methods for CanvasManager
+  this.getCanvases = function() {
+    return savedCanvases;
+  };
+
+  this.getCurrentIndex = function() {
+    return currentCanvasIndex;
+  };
+
+  this.switchToCanvas = function(index) {
+    saveToStorage(); // Save current before switching
+    loadCanvas(index);
+  };
+
+  this.addNewCanvas = function() {
+    saveToStorage();
+    savedCanvases.push({ html: "", timestamp: Date.now() });
+    currentCanvasIndex = savedCanvases.length - 1;
+    localStorage.setItem(config.storageKey, JSON.stringify(savedCanvases));
+    loadCanvas(currentCanvasIndex);
+  };
+
+  this.cloneCanvas = function(index) {
+    const clonedCanvas = { 
+      html: savedCanvases[index].html, 
+      timestamp: Date.now() 
+    };
+    savedCanvases.push(clonedCanvas);
+    localStorage.setItem(config.storageKey, JSON.stringify(savedCanvases));
+  };
+
+  this.deleteCanvas = function(index) {
+    if (savedCanvases.length > 1) {
+      savedCanvases.splice(index, 1);
+      if (currentCanvasIndex >= index && currentCanvasIndex > 0) {
+        currentCanvasIndex--;
+      }
+      if (currentCanvasIndex >= savedCanvases.length) {
+        currentCanvasIndex = savedCanvases.length - 1;
+      }
+      localStorage.setItem(config.storageKey, JSON.stringify(savedCanvases));
+      loadCanvas(currentCanvasIndex);
+    }
+  };
+
+  // Other public methods
   this.setColorableElements = function(color) {
     if (config.colorableSelector) {
       // Split the selector and scope each part to the menu
