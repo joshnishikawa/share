@@ -224,6 +224,17 @@ router.get('/shapes', (req, res)=>{
 });
 
 
+router.get('/objects', (req, res)=>{
+  try{
+    res.render('activities/objects');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
+
 router.get('/speech', (req, res)=>{
   try{
     res.render('activities/speech');

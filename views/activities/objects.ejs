@@ -1,0 +1,180 @@
+<%- include('../head'); -%>
+
+<style>
+  .object {
+    height: 12.5%;
+    position: relative;
+  }
+
+  #objectMenu .object img {
+    pointer-events: none;
+  }
+
+  .canvas-object img {
+    pointer-events: none;
+  }
+
+  .canvas-object {
+    position: absolute;
+    cursor: move;
+  }
+
+  .selected {
+    filter: drop-shadow(0 0 0.5rem #0f0);
+  }
+
+  #colorMenu ul li,
+  #tagMenuFiller {
+    font-weight: bold;
+    height: 9%;
+  }
+
+  #colorMenu ul li:hover {
+    cursor: pointer;
+  }
+</style>
+
+
+<div class="container-fluid g-0">
+  <div class="row g-0" style="height:100vh;">
+    <div id="colorMenu" class="col ps-1 pt-1 bg-light" style="max-width:100px;">
+      <ul class="nav vert-tabs d-flex flex-column" style="height:100%;">
+        <li class="nav-item rounded-start p-2" style="color:white;background-color:red;">RED</li>
+        <li class="nav-item rounded-start p-2" style="background-color: orange;">ORANGE</li>
+        <li class="nav-item rounded-start p-2" style="background-color: yellow;">YELLOW</li>
+        <li class="nav-item rounded-start p-2" style="color:white;background-color: green;">GREEN</li>
+        <li class="nav-item rounded-start p-2" style="color:white;background-color: blue;">BLUE</li>
+        <li class="nav-item rounded-start p-2" style="color:white;background-color: purple;">PURPLE</li>
+        <li class="nav-item rounded-start p-2" style="background-color: hotpink;">PINK</li>
+        <li class="nav-item rounded-start p-2 border border-end-0" style="background-color: white">WHITE</li>
+        <li class="nav-item rounded-start p-2" style="color:white;background-color: black;">BLACK</li>
+
+        <div id="tagMenuFiller" class="p-1" style="position:relative;flex: auto">
+          <div style="position:absolute;bottom:5px;">
+
+            <!-- selecting will replace the canvas with the selected canvas -->
+            <select id="loadCanvas" class="form-control border-primary mb-1">
+            </select>
+
+            <!-- this button will open a modal for entering a name to save as -->
+            <button id="saveCanvas" class="btn btn-sm btn-success">
+              <i class="material-icons">save_alt</i>
+            </button>
+
+            <!-- this button will open a modal to confirm clearing the canvas -->
+
+            <button id="clearCanvas" class="btn btn-sm btn-danger">
+              <i class="material-icons">delete</i>
+            </button>
+          </div>
+        </div>
+
+      </ul>
+    </div>
+    
+    <div id="objectMenu" class="col bg-light p-2" style="height:100%;max-width:100px;border:10px solid rgba(0,0,0,0);">
+      <div class="object" data-shape="cap">
+        <img src="/image/svg/cap.svg" alt="" style="width:100%;height:100%;object-fit:contain;">
+      </div>
+      
+      <div class="object" data-shape="Tshirt">
+        <img src="/image/svg/Tshirt.svg" alt="" style="width:100%;height:100%;object-fit:contain;">
+      </div>
+
+      <div class="object" data-shape="bag">
+        <img src="/image/svg/bag.svg" alt="" style="width:100%;height:100%;object-fit:contain;">
+      </div>
+
+      <div class="object" data-shape="book">
+        <img src="/image/svg/book.svg" alt="" style="width:100%;height:100%;object-fit:contain;">
+      </div>
+
+      <div class="object" data-shape="ball">
+        <img src="/image/svg/ball.svg" alt="" style="width:100%;height:100%;object-fit:contain;">
+      </div>
+
+      <div class="object" data-shape="basket">
+        <img src="/image/svg/basket.svg" alt="" style="width:100%;height:100%;object-fit:contain;">
+      </div>
+
+      <div class="object" data-shape="cat">
+        <img src="/image/svg/cat.svg" alt="" style="width:100%;height:100%;object-fit:contain;">
+      </div>
+
+      <div class="object" data-shape="box">
+        <img src="/image/svg/box.svg" alt="" style="width:100%;height:100%;object-fit:contain;">
+      </div>
+    </div>
+
+    <!-- Canvas area for dragging and dropping objects -->
+    <div class="col" style="max-height:100vh;overflow:hidden;">
+      <div id="canvas" class="border bg-med" style="height: 100%;overflow:hidden;"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="clearCanvasModal" tabindex="-1" aria-labelledby="clearCanvasModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="clearCanvasModalLabel">Delete Canvas?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Keep</button>
+        <button type="button" class="btn btn-danger" id="clearCanvasConfirm">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="clearCanvasModal" tabindex="-1" aria-labelledby="clearCanvasModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="clearCanvasModalLabel">Delete Canvas?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Keep</button>
+        <button type="button" class="btn btn-danger" id="clearCanvasConfirm">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+<script src="/javascripts/canvas_builder.js"></script>
+
+<script>
+$(function () {
+  // Initialize canvas builder for objects
+  const canvasBuilder = new CanvasBuilder({
+    storageKey: 'objects',
+    itemSelector: '.object',
+    menuContainerId: 'objectMenu',
+    canvasId: 'canvas',
+    canvasItemClass: 'canvas-object',
+    colorableSelector: null, // No color changing for objects
+    minScale: 0.3,
+    maxScale: 5.0,
+    savePromptText: "Enter a name for this canvas:",
+    enableScale: true,
+    enableRotate: true,
+    enableDragHandles: false
+  });
+
+  canvasBuilder.init();
+
+  // Color menu functionality
+  $('#colorMenu .nav-item').on('click', function () {
+    let color = $(this).text().toLowerCase();
+    color = color === "pink" ? "hotpink" : color;
+    $('#objectMenu').addClass("rounded-3").css('border', `10px solid ${color}`);
+  });
+});
+</script>
+
+<%- include('../foot'); -%>

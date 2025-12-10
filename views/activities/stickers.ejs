@@ -1,0 +1,117 @@
+<%- include('../head'); -%>
+
+<style>
+  .sticker {
+    height: 14%;
+    position: relative;
+  }
+
+  .canvas-sticker {
+    position: absolute;
+    cursor: move;
+  }
+
+  .selected {
+    filter: drop-shadow(0 0 0.5rem #0f0);
+  }
+
+  #stickerMenu ul li,
+  #tagMenuFiller {
+    font-weight: bold;
+    height: 9%;
+  }
+</style>
+
+
+<div class="container-fluid g-0">
+  <div class="row g-0" style="height:100vh;">
+    
+    <div id="stickerMenu" class="col bg-light p-2" style="height:100%;max-width:100px;">
+      <!-- Example stickers using SVG -->
+      <div class="sticker" data-shape="smile">
+        <svg width="100%" height="100%" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="45" fill="#FFD700" stroke="black" stroke-width="2"/>
+          <circle cx="35" cy="40" r="5" fill="black"/>
+          <circle cx="65" cy="40" r="5" fill="black"/>
+          <path d="M 30 60 Q 50 75 70 60" stroke="black" stroke-width="3" fill="none"/>
+        </svg>
+      </div>
+      
+      <div class="sticker" data-shape="star">
+        <svg width="100%" height="100%" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="50,10 61,40 95,40 68,60 78,90 50,70 22,90 32,60 5,40 39,40" 
+                   fill="#FF6B6B" stroke="black" stroke-width="2"/>
+        </svg>
+      </div>
+
+      <!-- Example using img tag -->
+      <!-- Uncomment and replace with actual image paths
+      <div class="sticker" data-shape="cat">
+        <img src="/image/stickers/cat.png" style="width:100%;height:100%;object-fit:contain;">
+      </div>
+      <div class="sticker" data-shape="dog">
+        <img src="/image/stickers/dog.png" style="width:100%;height:100%;object-fit:contain;">
+      </div>
+      -->
+    </div>
+
+    <!-- Canvas area for dragging and dropping stickers -->
+    <div class="col" style="max-height:100vh;overflow:hidden;">
+      <div id="canvas" class="border bg-med" style="height: 100%;overflow:hidden;position:relative;">
+        <div style="position:absolute;bottom:5px;right:5px;z-index:1000;">
+          <select id="loadCanvas" class="form-control border-primary mb-1" style="width:150px;">
+          </select>
+          <button id="saveCanvas" class="btn btn-sm btn-success me-1">
+            <i class="material-icons">save_alt</i>
+          </button>
+          <button id="clearCanvas" class="btn btn-sm btn-danger">
+            <i class="material-icons">delete</i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="clearCanvasModal" tabindex="-1" aria-labelledby="clearCanvasModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="clearCanvasModalLabel">Delete Canvas?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Keep</button>
+        <button type="button" class="btn btn-danger" id="clearCanvasConfirm">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+<script src="/javascripts/canvas_builder.js"></script>
+
+<script>
+$(function () {
+  // Initialize canvas builder for stickers
+  const canvasBuilder = new CanvasBuilder({
+    storageKey: 'stickers',
+    itemSelector: '.sticker',
+    menuContainerId: 'stickerMenu',
+    canvasId: 'canvas',
+    canvasItemClass: 'canvas-sticker',
+    colorableSelector: null, // No color changing for stickers
+    minScale: 0.3,
+    maxScale: 5.0,
+    savePromptText: "Enter a name for this canvas:",
+    enableScale: true,
+    enableRotate: true,
+    enableDragHandles: false
+  });
+
+  canvasBuilder.init();
+});
+</script>
+
+<%- include('../foot'); -%>

@@ -150,429 +150,85 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+<script src="/javascripts/canvas_builder.js"></script>
 
 <script>
 $(function () {
-  var canvases = {};
-  var workingCanvas = "";
-  var minScale = 0.5; // Minimum scale factor
-  var maxScale = 3.0; // Maximum scale factor
-  var isDraggingHandle = false; // Track if the drag handle is active
-
-  // load default canvas from local storage if it exists. create a new canvas if it doesn't.
-  if (localStorage.getItem("shapes")) {
-    canvases = JSON.parse(localStorage.getItem("shapes"));
-    // load the default canvas
-    if (canvases.default) {
-      workingCanvas = "default";
-      $("#canvas").html(canvases.default);
-      $("#canvas .canvas-shape").each(function () {
-        makeTouchable($(this));
-      });
-    }
-    else {
-      $("#canvas").html("");
-    }
-  } else {
-    canvases.default = "";
-    workingCanvas = "default";
-    localStorage.setItem("shapes", JSON.stringify(canvases));
-  }
-
-
-  // populate the load canvas dropdown
-  for (let canvas in canvases) {
-    $("#loadCanvas").append(`<option value="${canvas}">${canvas}</option>`);
-  }
-
-  // load canvas from local storage
-  $("#loadCanvas").on("change", function () {
-    workingCanvas = $(this).val();
-    $("#canvas").html(canvases[workingCanvas]);
-    $("#canvas .canvas-shape").each(function () {
-      makeTouchable($(this));
-    });
-  });
-
-  // save canvas to local storage
-  $("#saveCanvas").on("click", function () {
-    let name = prompt("<%- __("shapesName") %>");
-    if (name) {
-      workingCanvas = name;
-      canvases["default"] = "";
-      canvases[workingCanvas] = $("#canvas").html();
-      localStorage.setItem("shapes", JSON.stringify(canvases));
-      $("#loadCanvas").append(`<option value="${name}">${name}</option>`);
-      $("#loadCanvas").val(name);
+  // Initialize canvas builder
+  const canvasBuilder = new CanvasBuilder({
+    storageKey: 'shapes',
+    itemSelector: '.shape',
+    menuContainerId: 'shapeMenu',
+    canvasId: 'canvas',
+    canvasItemClass: 'canvas-shape',
+    colorableSelector: 'path, circle, rect, polygon',
+    minScale: 0.5,
+    maxScale: 3.0,
+    savePromptText: "<%- __('shapesName') %>",
+    enableScale: true,
+    enableRotate: true,
+    enableDragHandles: true,
+    dragHandleShapes: ['rectangle', 'triangle', 'diamond'],
+    onItemAdded: function(clone) {
+      // Add drag handle for rectangle, triangle, and diamond
+      if (clone.attr("data-shape") === "rectangle" || clone.attr("data-shape") === "triangle" || clone.attr("data-shape") === "diamond") {
+        clone.append('<div class="drag-handle"></div>');
+      }
     }
   });
 
+  canvasBuilder.init();
 
-  let z = 1; // makes sure the last selected item is on top
-
-  function setSelected(reorderZIndex) {
-    $(".canvas-shape").removeClass("selected");
-    $(this).addClass("selected");
-    // Add drag handle for rectangle, triangle, and diamond
-    if ($(this).attr("data-shape") === "rectangle" || $(this).attr("data-shape") === "triangle" || $(this).attr("data-shape") === "diamond") {
-      $(this).append('<div class="drag-handle"></div>');
-      
-      // Counter-scale the drag handle to keep it the same size as the shape
-      const currentScale = getScale($(this));
-      $(this).find('.drag-handle').css({
-        transform: `scale(${1 / currentScale})`
-      });
-    }
-    // remove drag handle from other shapes
-    $(".canvas-shape").not(this).find(".drag-handle").remove();
-    
-    // Only reorder z-index if this is a tap (not a drag/resize/reshape)
-    if (reorderZIndex) {
-      const currentZ = parseInt($(this).css("z-index")) || 0;
-      const maxZ = Math.max(...$('.canvas-shape').map(function() { 
-        return parseInt($(this).css("z-index")) || 0; 
-      }).get());
-      
-      if (currentZ === maxZ && maxZ > 1) {
-        // Already on top, move to bottom
-        $(this).css("z-index", 1);
-        // Shift all other shapes up by 1
-        $(".canvas-shape").not(this).each(function() {
-          const shapeZ = parseInt($(this).css("z-index")) || 0;
-          if (shapeZ > 0) {
-            $(this).css("z-index", shapeZ + 1);
-          }
-        });
-        z = maxZ + 1;
-      } else {
-        // Move to top
-        $(this).css("z-index", z++);
-      }
-    }
-  }
-
-
-  function touchToDegrees(initial, current) {
-    let delta = current - initial;
-    let degrees = (delta + 180) % 360 - 180;   // Normalize to [-180, 180] range
-    return degrees;
-  }
-
-  function degreesToTouch(degrees) {
-    return (degrees + 180) % 360;
-  }
-
-
-  function getRotationAngle(element) {
-    var matrix = element.css('transform');
-    if (matrix !== 'none') {
-      var values = matrix.split('(')[1].split(')')[0].split(',');
-      var a = values[0];
-      var b = values[1];
-      var angle = Math.round(Math.atan2(b, a) * (180 / Math.PI));
-      return angle;
-    }
-    return 0;
-  }
-
-
-  function getScale(element) {
-    var matrix = element.css('transform');
-    if (matrix !== 'none') {
-      var values = matrix.split('(')[1].split(')')[0].split(',');
-      var a = values[0];
-      var b = values[1];
-      var scale = Math.sqrt(a * a + b * b);
-      return scale;
-    }
-    return 1;
-  }
-
-
-  function makeTouchable(item) {
-    const mc = new Hammer(item[0]);
-    var scale = 1;                 // current scale of the shape
-    var lastScale = 1;             // current scale of the shape
-    var itemRotation = 0;          // current rotation of the shape
-    var startingTouchRotation = 0; // reference for how much rotation to add
-    var initialLeft = 0;           // initial left position of the shape
-    var initialTop = 0;            // initial top position of the shape
-
-    mc.get('pinch').set({ enable: true });
-    mc.get('rotate').set({ enable: false });
-
-    mc.on("panstart", function (e) {
-      if (isDraggingHandle) return; // Disable Hammer.js events if the drag handle is active
-      initialLeft = parseInt(item.css("left"), 10) || 0;
-      initialTop = parseInt(item.css("top"), 10) || 0;
-    });
-
-    mc.on("panmove", function (e) {
-      if (isDraggingHandle) return; // Disable Hammer.js events if the drag handle is active
-      let dx = e.deltaX;
-      let dy = e.deltaY;
-      item.css({
-        left: `${initialLeft + dx}px`,
-        top: `${initialTop + dy}px`,
-      });
-    });
-
-    mc.on("panend", function () {
-      if (isDraggingHandle) return; // Disable Hammer.js events if the drag handle is active
-
-      // If the shape is dragged off the canvas to the left, remove it
-      if (parseInt(item.css("left")) <= 0) {
-        item.remove();
-        if (workingCanvas === "default") {
-          canvases.default = $("#canvas").html();
-          localStorage.setItem("shapes", JSON.stringify(canvases));
-        }
-      }
-    });
-
-    mc.on("pinchstart", function (ev) {
-      startingTouchRotation = ev.rotation;
-      itemRotation = getRotationAngle(item);
-    });
-
-    mc.on("pinchmove", function (ev) {
-      let scale = Math.max(minScale, Math.min(lastScale * ev.scale, maxScale));
-      let newItemRotation = touchToDegrees(startingTouchRotation, ev.rotation) + itemRotation;
-      newItemRotation = parseInt(newItemRotation);
-      item.css({
-        transform: `scale(${scale}) rotate(${newItemRotation}deg)`,
-      });
-      
-      // Counter-scale the drag handle to keep it the same size
-      const dragHandle = item.find('.drag-handle');
-      if (dragHandle.length > 0) {
-        dragHandle.css({
-          transform: `scale(${1 / scale})`
-        });
-      }
-    });
-
-    mc.on("pinchend", function (ev) {
-      lastScale *= ev.scale;
-      if (workingCanvas === "default") {
-        canvases.default = $("#canvas").html();
-        localStorage.setItem("shapes", JSON.stringify(canvases));
-      }
-    });
-
-  }
-
-
-  // set all shapes to selected color
+  // Color menu functionality
   $('#colorMenu .nav-item').on('click', function () {
     let color = $(this).text().toLowerCase();
     color = color === "pink" ? "hotpink" : color;
     $('#shapeMenu').addClass("rounded-3").css('border', `10px solid ${color}`);
-    $('#shapeMenu .shape svg').each(function () {
-      $(this).find('path, circle, rect, polygon').attr('fill', color);
-    });
+    canvasBuilder.setColorableElements(color);
   });
 
-
-  // Handle tap vs drag for shape selection and z-index reordering
-  let tapHandlerActive = false;
-  
-  $("#canvas").on("mousedown touchstart", ".canvas-shape", function(e) {
-    // Prevent duplicate triggers (touchstart + mousedown on touch devices)
-    if (tapHandlerActive) return;
-    tapHandlerActive = true;
-    
-    const shape = $(this);
-    const startX = e.clientX || (e.originalEvent.touches && e.originalEvent.touches[0].clientX);
-    const startY = e.clientY || (e.originalEvent.touches && e.originalEvent.touches[0].clientY);
-    let hasMoved = false;
-    
-    const moveHandler = function(e) {
-      const currentX = e.clientX || (e.originalEvent.touches && e.originalEvent.touches[0].clientX);
-      const currentY = e.clientY || (e.originalEvent.touches && e.originalEvent.touches[0].clientY);
-      const distance = Math.sqrt(Math.pow(currentX - startX, 2) + Math.pow(currentY - startY, 2));
-      if (distance > 5) { // More than 5px = drag
-        hasMoved = true;
-      }
-    };
-    
-    const upHandler = function() {
-      $(document).off('mousemove touchmove', moveHandler);
-      $(document).off('mouseup touchend', upHandler);
-      
-      // Call setSelected with reorderZIndex only if it was a tap (not a drag)
-      setSelected.call(shape[0], !hasMoved);
-      
-      // Reset flag after a short delay to allow touch events to complete
-      setTimeout(function() {
-        tapHandlerActive = false;
-      }, 100);
-    };
-    
-    $(document).on('mousemove touchmove', moveHandler);
-    $(document).on('mouseup touchend', upHandler);
-  });
-  
-  // Remove .selected and drag handle only when clicking on the canvas outside any shapes.
-  $("#canvas").on("mousedown", function (event) {
-    if (event.target.id === "canvas" && !isDraggingHandle) {
-      $(".canvas-shape").removeClass("selected");
-      $(".drag-handle").remove();
-    }
-  });
-
-
-  $(document).on("keydown", function (event) {
-    if (event.key === "Delete") {
-      $(".selected").remove();
-      if (workingCanvas === "default") {
-        canvases.default = $("#canvas").html();
-        localStorage.setItem("shapes", JSON.stringify(canvases));
-      }
-    }
-  });
-
-
-  $("#clearCanvas").on("click", function () {
-    $("#clearCanvasModal").modal("show");
-  });
-
-
-  $("#clearCanvasConfirm").on("click", function () {
-    if (workingCanvas === "default") {
-      canvases.default = "";
-    } else {
-      delete canvases[workingCanvas];
-      $(`#loadCanvas option[value="${workingCanvas}"]`).remove();
-      workingCanvas = "default";
-      $("#loadCanvas").val("default");
-    }
-
-    $("#canvas").empty();
-    localStorage.setItem("shapes", JSON.stringify(canvases));
-    z = 1;
-    $("#clearCanvasModal").modal("hide");
-  });
-
-
-  // Handle dragging shapes from the shape menu to the canvas ////////////////////
-  var shapeMenu = new Hammer(document.getElementById('shapeMenu'));
-
-  shapeMenu.on('panstart', function (e) {
-    $(".canvas-shape").removeClass("selected");
-    var shape = $(e.target).closest('.shape');
-    var clone = shape.clone().removeClass('shape').addClass('canvas-shape selected');
-    $('#canvas').append(clone);
-    makeTouchable(clone);
-
-    // Get canvas offset to convert screen coordinates to canvas coordinates
-    var canvasOffset = $('#canvas').offset();
-    
-    // Use srcEvent for more accurate initial position
-    var clientX = e.srcEvent.clientX || e.center.x;
-    var clientY = e.srcEvent.clientY || e.center.y;
-    
-    // Get actual dimensions after appending to DOM
-    var shapeWidth = clone.outerWidth();
-    var shapeHeight = clone.outerHeight();
-    
-    clone.css({
-      position: 'absolute',
-      left: clientX - canvasOffset.left - shapeWidth / 2,
-      top: clientY - canvasOffset.top - shapeHeight / 2,
-      'z-index': z++
-    });
-
-    // Add drag handle for rectangle, triangle, and diamond
-    if (clone.attr("data-shape") === "rectangle" || clone.attr("data-shape") === "triangle" || clone.attr("data-shape") === "diamond") {
-      clone.append('<div class="drag-handle"></div>');
-    }
-    // remove drag handle from other shapes
-    $(".canvas-shape").not(clone).find(".drag-handle").remove();
-  });
-
-  shapeMenu.on('panmove', function (e) {
-    var clone = $('#canvas .canvas-shape.selected');
-    
-    // Get canvas offset to convert screen coordinates to canvas coordinates
-    var canvasOffset = $('#canvas').offset();
-    
-    // Use srcEvent for more accurate position
-    var clientX = e.srcEvent.clientX || e.center.x;
-    var clientY = e.srcEvent.clientY || e.center.y;
-    
-    var shapeWidth = clone.outerWidth();
-    var shapeHeight = clone.outerHeight();
-
-    clone.css({
-      left: clientX - canvasOffset.left - shapeWidth / 2,
-      top: clientY - canvasOffset.top - shapeHeight / 2,
-      transform: `scale(1) rotate(0deg)`
-    });
-  });
-
-  shapeMenu.on('panend', function () {
-    if (workingCanvas === "default") {
-      canvases.default = $("#canvas").html();
-      localStorage.setItem("shapes", JSON.stringify(canvases));
-    }
-  });
-
-
-  // Drag handle functionality
+  // Drag handle functionality (shapes-specific)
   $(document).on("mousedown touchstart", ".drag-handle", function (e) {
-    e.stopPropagation(); // Prevent triggering setSelected on the shape
-    let shape = $(this).closest('.canvas-shape');
-    let currentAngle = shape.css('transform') === 'none' ? 0 : getRotationAngle(shape);
-    let currentScale = shape.css('transform') === 'none' ? 1 : getScale(shape);
-    let currentHeight = shape.height();
-    let startWidth = shape.width();
+    e.stopPropagation();
+    const shape = $(this).closest('.canvas-shape');
+    const currentAngle = canvasBuilder.getRotationAngle(shape);
+    const currentScale = canvasBuilder.getScale(shape);
+    const currentHeight = shape.height();
+    const startWidth = shape.width();
     startDrag(e, currentAngle, currentScale, currentHeight, startWidth);
   });
 
   function startDrag(e, currentAngle, currentScale, currentHeight, startWidth) {
     e.preventDefault();
-    isDraggingHandle = true;
+    canvasBuilder.setIsDraggingHandle(true);
     const shape = e.target.closest('.canvas-shape');
     $(document).on('mousemove touchmove', drag);
     $(document).on('mouseup touchend', stopDrag);
 
     const shapeBounds = shape.getBoundingClientRect();
-    const shapeCenter = {
+    let shapeCenter = {
       x: shapeBounds.left + shapeBounds.width / 2,
       y: shapeBounds.top + shapeBounds.height / 2
     };
 
-    // Calculate initial angle of rotation for mouse or touch
-    var initialAngle;
-    if (e.type === 'mousedown') {
-      initialAngle = Math.atan2(e.clientX - shapeCenter.x, -(e.clientY - shapeCenter.y)) * (180 / Math.PI);
-    } else {
-      initialAngle = Math.atan2(e.touches[0].clientX - shapeCenter.x, -(e.touches[0].clientY - shapeCenter.y)) * (180 / Math.PI);
-    }
+    const initialAngle = e.type === 'mousedown' 
+      ? Math.atan2(e.clientX - shapeCenter.x, -(e.clientY - shapeCenter.y)) * (180 / Math.PI)
+      : Math.atan2(e.touches[0].clientX - shapeCenter.x, -(e.touches[0].clientY - shapeCenter.y)) * (180 / Math.PI);
 
     function drag(e) {
-      e.preventDefault(); // Prevent scrolling and other default behaviors
+      e.preventDefault();
       
-      // calculate deltas for mouse or touch
-      let deltaX, deltaY;
-      if (e.type === 'mousemove') {
-        deltaX = e.clientX - shapeCenter.x;
-        deltaY = e.clientY - shapeCenter.y;
-      } else {
-        deltaX = e.touches[0].clientX - shapeCenter.x;
-        deltaY = e.touches[0].clientY - shapeCenter.y;
-      }
+      const deltaX = e.type === 'mousemove' ? e.clientX - shapeCenter.x : e.touches[0].clientX - shapeCenter.x;
+      const deltaY = e.type === 'mousemove' ? e.clientY - shapeCenter.y : e.touches[0].clientY - shapeCenter.y;
       const angle = Math.atan2(deltaX, -(deltaY)) * (180 / Math.PI);
       const newRotation = angle - initialAngle;
-      const distance = 2 * Math.sqrt(deltaX * deltaX + deltaY * deltaY); // Twice the distance between the point of rotation and the cursor
-      currentHeight = distance / currentScale; // Divide by scale to get the actual CSS height needed
+      const distance = 2 * Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+      currentHeight = distance / currentScale;
 
-      // Reset transform origin and apply scale, rotation (preserving the pinch scale)
       shape.style.transformOrigin = 'center center';
       shape.style.transform = `scale(${currentScale}) rotate(${currentAngle + newRotation}deg)`;
       shape.style.height = `${currentHeight}px`;
-      shape.style.width = `${startWidth}px`; // Keep width constant
+      shape.style.width = `${startWidth}px`;
 
       const svg = shape.querySelector('svg');
       const polygon = svg.querySelector('polygon');
@@ -582,19 +238,17 @@ $(function () {
       shape.setAttribute('height', currentHeight);
 
       if (shape.getAttribute("data-shape") === "triangle") {
-        polygon.setAttribute('points', `${startWidth / 2},0 ${startWidth},${currentHeight} 0,${currentHeight}`); // For triangle
+        polygon.setAttribute('points', `${startWidth / 2},0 ${startWidth},${currentHeight} 0,${currentHeight}`);
       } else if (shape.getAttribute("data-shape") === "diamond") {
-        polygon.setAttribute('points', `${startWidth / 2},0 ${startWidth},${currentHeight / 2} ${startWidth / 2},${currentHeight} 0,${currentHeight / 2}`); // For diamond
+        polygon.setAttribute('points', `${startWidth / 2},0 ${startWidth},${currentHeight / 2} ${startWidth / 2},${currentHeight} 0,${currentHeight / 2}`);
       } else {
         rect.setAttribute('height', currentHeight);
         rect.setAttribute('width', startWidth);
       }
 
-      // Recalculate shape center and adjust position
       const newTop = shapeCenter.y - currentHeight / 2;
       shape.style.top = `${newTop}px`;
       
-      // Update shapeCenter for next iteration
       const updatedBounds = shape.getBoundingClientRect();
       shapeCenter = {
         x: updatedBounds.left + updatedBounds.width / 2,
@@ -606,11 +260,9 @@ $(function () {
       $(document).off('mousemove touchmove', drag);
       $(document).off('mouseup touchend', stopDrag);
       
-      // Update current angle from the actual transform
       const matrix = new DOMMatrix(getComputedStyle(shape).transform);
       currentAngle = Math.atan2(matrix.b, matrix.a) * (180 / Math.PI);
       
-      // Ensure drag handle maintains counter-scale
       const dragHandle = $(shape).find('.drag-handle');
       if (dragHandle.length > 0) {
         dragHandle.css({
@@ -618,21 +270,10 @@ $(function () {
         });
       }
       
-      isDraggingHandle = false;
-      
-      // Save changes to localStorage
-      if (workingCanvas === "default") {
-        canvases.default = $("#canvas").html();
-        localStorage.setItem("shapes", JSON.stringify(canvases));
-      }
+      canvasBuilder.setIsDraggingHandle(false);
+      canvasBuilder.saveToStorage();
     }
   }
-
-
-  document.addEventListener('contextmenu', function (e) {
-    e.preventDefault();
-  });
-
 });
 </script>
 
