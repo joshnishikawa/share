@@ -1,0 +1,414 @@
+<%- include('../../head'); -%>
+
+<style>
+  #supplyMenu {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .supply {
+    width: 50%;
+    height: calc(100% / 6);
+    position: relative;
+  }
+
+  /* Rotate marker, pen, pencil, and ruler 45 degrees counter-clockwise in menu */
+  #supplyMenu .supply[data-shape="marker"] object,
+  #supplyMenu .supply[data-shape="pen"] object,
+  #supplyMenu .supply[data-shape="pencil"] object,
+  #supplyMenu .supply[data-shape="ruler"] object {
+    transform: rotate(-45deg);
+  }
+
+  #supplyMenu .supply svg {
+    pointer-events: none;
+  }
+
+  .canvas-supply svg {
+    pointer-events: none;
+  }
+
+  /* In snapshots, hide the object element so background image (colored SVG) shows */
+  .canvas-snapshot .canvas-supply object {
+    opacity: 0;
+  }
+
+  .canvas-supply {
+    position: absolute;
+    cursor: move;
+  }
+
+  .selected {
+    filter: drop-shadow(0 0 0.5rem #0f0);
+  }
+
+  #colorMenu ul li,
+  #tagMenuFiller {
+    font-weight: bold;
+    height: 9%;
+  }
+
+  #colorMenu ul li:hover {
+    cursor: pointer;
+  }
+</style>
+
+
+<div class="container-fluid g-0">
+  <div class="row g-0" style="height:100vh;">
+    <div id="colorMenu" class="col ps-1 pt-1 bg-light" style="max-width:50px;">
+      <ul class="nav vert-tabs d-flex flex-column" style="height:100%;">
+        <li class="nav-item rounded-start p-2" data-color="red" style="color:white;background-color:red;"></li>
+        <li class="nav-item rounded-start p-2" data-color="orange" style="background-color: orange;"></li>
+        <li class="nav-item rounded-start p-2" data-color="yellow" style="background-color: yellow;"></li>
+        <li class="nav-item rounded-start p-2" data-color="green" style="color:white;background-color: green;"></li>
+        <li class="nav-item rounded-start p-2" data-color="blue" style="color:white;background-color: blue;"></li>
+        <li class="nav-item rounded-start p-2" data-color="purple" style="color:white;background-color: purple;"></li>
+        <li class="nav-item rounded-start p-2" data-color="hotpink" style="background-color: hotpink;"></li>
+        <li class="nav-item rounded-start p-2 border border-end-0" data-color="white" style="background-color: white"></li>
+        <li class="nav-item rounded-start p-2" data-color="black" style="color:white;background-color: black;"></li>
+
+        <div id="tagMenuFiller" class="p-1" style="position:relative;flex: auto">
+          <div style="position:absolute;bottom:5px;">
+            <button id="manageCanvases" class="btn btn-sm btn-primary">
+              <i class="material-icons">view_module</i>
+            </button>
+          </div>
+        </div>
+
+      </ul>
+    </div>
+    
+    <div id="supplyMenu" class="col bg-light p-2" style="height:100%;max-width:200px;border:10px solid rgba(0,0,0,0);">
+      <div class="supply" data-shape="calendar">
+        <object data="/image/colorable/calendar.svg" type="image/svg+xml" style="width:100%;height:100%;pointer-events:none;"></object>
+      </div>
+      
+      <div class="supply" data-shape="eraser">
+        <object data="/image/colorable/eraser.svg" type="image/svg+xml" style="width:100%;height:100%;pointer-events:none;"></object>
+      </div>
+
+      <div class="supply" data-shape="glue">
+        <object data="/image/colorable/glue.svg" type="image/svg+xml" style="width:100%;height:100%;pointer-events:none;"></object>
+      </div>
+
+      <div class="supply" data-shape="marker">
+        <object data="/image/colorable/marker.svg" type="image/svg+xml" style="width:100%;height:100%;pointer-events:none;"></object>
+      </div>
+
+      <div class="supply" data-shape="notebook">
+        <object data="/image/colorable/notebook.svg" type="image/svg+xml" style="width:100%;height:100%;pointer-events:none;"></object>
+      </div>
+
+      <div class="supply" data-shape="pen">
+        <object data="/image/colorable/pen.svg" type="image/svg+xml" style="width:100%;height:100%;pointer-events:none;"></object>
+      </div>
+
+      <div class="supply" data-shape="pencil">
+        <object data="/image/colorable/pencil.svg" type="image/svg+xml" style="width:100%;height:100%;pointer-events:none;"></object>
+      </div>
+
+      <div class="supply" data-shape="post-it">
+        <object data="/image/colorable/pencilcase.svg" type="image/svg+xml" style="width:100%;height:100%;pointer-events:none;"></object>
+      </div>
+
+      <div class="supply" data-shape="ruler">
+        <object data="/image/colorable/ruler.svg" type="image/svg+xml" style="width:100%;height:100%;pointer-events:none;"></object>
+      </div>
+
+      <div class="supply" data-shape="scissors">
+        <object data="/image/colorable/scissors.svg" type="image/svg+xml" style="width:100%;height:100%;pointer-events:none;"></object>
+      </div>
+
+      <div class="supply" data-shape="sharpener">
+        <object data="/image/colorable/sharpener.svg" type="image/svg+xml" style="width:100%;height:100%;pointer-events:none;"></object>
+      </div>
+
+      <div class="supply" data-shape="stapler">
+        <object data="/image/colorable/stapler.svg" type="image/svg+xml" style="width:100%;height:100%;pointer-events:none;"></object>
+      </div>
+    </div>
+
+    <!-- Canvas area for dragging and dropping objects -->
+    <div class="col" style="max-height:100vh;overflow:hidden;">
+      <div id="canvas" class="border bg-med" style="height: 100%;overflow:hidden;"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="canvasManagerModal" tabindex="-1" aria-labelledby="canvasManagerModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="canvasManagerModalLabel">Manage Canvases</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="canvasGrid" class="canvas-grid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.canvas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 150px));
+  gap: 15px;
+  padding: 10px;
+  justify-content: center;
+  max-width: calc(4 * 150px + 3 * 15px + 20px); /* 4 items + 3 gaps + padding */
+  margin: 0 auto;
+}
+
+.canvas-grid-item {
+  aspect-ratio: 1;
+  max-width: 150px;
+  border: 3px solid #ccc;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  overflow: hidden;
+  position: relative;
+}
+
+.canvas-action-btn {
+  background: #f8f9fa;
+}
+
+.canvas-action-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#deleteCanvasBtn {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+#deleteCanvasBtn.drag-active {
+  opacity: 1;
+  cursor: pointer;
+}
+
+.canvas-action-btn:hover:not(.disabled) {
+  border-color: #0d6efd;
+  transform: scale(1.05);
+}
+
+#addCanvasBtn:hover.disabled {
+  border-color: #ccc;
+  transform: none;
+}
+
+#deleteCanvasBtn:hover {
+  border-color: #ccc;
+  transform: none;
+}
+
+#deleteCanvasBtn.drag-active:hover {
+  border-color: #0d6efd;
+  transform: scale(1.05);
+}
+
+#addCanvasBtn.add-active {
+  border-color: #198754;
+  background-color: #e6f4ea;
+  transform: scale(1.1);
+}
+
+#deleteCanvasBtn.delete-active {
+  border-color: #dc3545;
+  background-color: #ffe6e6;
+  transform: scale(1.1);
+}
+
+.canvas-snapshot {
+  background: white;
+  position: relative;
+}
+
+.canvas-snapshot.active {
+  border-color: #0d6efd;
+  border-width: 4px;
+  box-shadow: 0 0 10px rgba(13, 110, 253, 0.5);
+}
+
+.canvas-snapshot:hover {
+  border-color: #0d6efd;
+  transform: scale(1.05);
+}
+
+.canvas-snapshot:hover.dragging,
+.canvas-snapshot.no-hover:hover {
+  border-color: #ccc;
+  transform: none;
+}
+
+.canvas-snapshot.dragging {
+  opacity: 0.3;
+}
+
+.canvas-thumbnail {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  background: #f0f0f0;
+}
+
+.drag-clone {
+  pointer-events: none;
+  width: 150px;
+  height: 150px;
+  background: white;
+}
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+<script src="/javascripts/canvas_builder.js"></script>
+<script src="/javascripts/canvas_manager.js"></script>
+
+<script>
+$(function () {
+  // No default color - items use their default SVG colors until a color is selected
+  let currentColor = null;
+  
+  // Initialize canvas builder for supplies
+  const canvasBuilder = new CanvasBuilder({
+    storageKey: 'supplies',
+    itemSelector: '.supply',
+    menuContainerId: 'supplyMenu',
+    canvasId: 'canvas',
+    canvasItemClass: 'canvas-supply',
+    colorableSelector: '.colorable', // Enable color changing for colorable elements
+    savePromptText: "Enter a name for this canvas:",
+    enableScale: false,
+    enableRotate: true,
+    enableDragHandles: false
+  });
+
+  canvasBuilder.init();
+
+  // Override saveToStorage to serialize SVG colors before saving
+  const originalSaveToStorage = canvasBuilder.saveToStorage || function() {};
+  
+  // Function to serialize colored SVG to data URL
+  function serializeSVGObject(objectElement) {
+    const svgDoc = objectElement.contentDocument;
+    if (svgDoc && svgDoc.querySelector('svg')) {
+      const svgElement = svgDoc.querySelector('svg');
+      const serializer = new XMLSerializer();
+      const svgString = serializer.serializeToString(svgElement);
+      return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgString);
+    }
+    return null;
+  }
+
+  // Function to apply color to colorable elements in SVG object
+  function applyColorToSVG(objectElement, color) {
+    const svgDoc = objectElement.contentDocument;
+    if (svgDoc) {
+      $(svgDoc).find('.colorable').each(function() {
+        $(this).attr('fill', color);
+        // Also update style attribute if it contains fill
+        const style = $(this).attr('style');
+        if (style && style.includes('fill:')) {
+          const newStyle = style.replace(/fill:[^;]+/g, `fill:${color}`);
+          $(this).attr('style', newStyle);
+        }
+      });
+    }
+  }
+
+  // Watch for new items added to canvas
+  const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      mutation.addedNodes.forEach(function(node) {
+        if ($(node).hasClass('canvas-supply')) {
+          const objectElement = $(node).find('object')[0];
+          if (objectElement) {
+            // Check if item already has a saved color
+            const savedColor = $(node).attr('data-supply-color');
+            const colorToApply = savedColor || currentColor;
+            
+            // Store the color on the element if a color is selected
+            if (!savedColor && currentColor) {
+              $(node).attr('data-supply-color', currentColor);
+            }
+            
+            // Wait for SVG to load, then apply color (only if there's a color to apply)
+            if (colorToApply) {
+              objectElement.addEventListener('load', function() {
+                applyColorToSVG(objectElement, colorToApply);
+                // After applying color, serialize and store as background image for snapshots
+                setTimeout(function() {
+                  const dataURL = serializeSVGObject(objectElement);
+                  if (dataURL) {
+                    $(node).css('background-image', `url("${dataURL}")`);
+                    $(node).css('background-size', 'contain');
+                    $(node).css('background-repeat', 'no-repeat');
+                    $(node).css('background-position', 'center');
+                    // Hide the object element in snapshots by making it transparent in thumbnails
+                    $(node).attr('data-colored-svg', dataURL);
+                  }
+                }, 50);
+              });
+            }
+          }
+        }
+      });
+    });
+  });
+
+  observer.observe(document.getElementById('canvas'), { childList: true });
+
+  // Apply saved colors to existing canvas items on page load
+  $('.canvas-supply').each(function() {
+    const node = $(this);
+    const savedColor = node.attr('data-supply-color');
+    if (savedColor) {
+      const objectElement = node.find('object')[0];
+      if (objectElement) {
+        const applyAndSerialize = function() {
+          applyColorToSVG(objectElement, savedColor);
+          setTimeout(function() {
+            const dataURL = serializeSVGObject(objectElement);
+            if (dataURL) {
+              node.css('background-image', `url("${dataURL}")`);
+              node.css('background-size', 'contain');
+              node.css('background-repeat', 'no-repeat');
+              node.css('background-position', 'center');
+              node.attr('data-colored-svg', dataURL);
+            }
+          }, 50);
+        };
+        
+        if (objectElement.contentDocument) {
+          applyAndSerialize();
+        } else {
+          objectElement.addEventListener('load', applyAndSerialize);
+        }
+      }
+    }
+  });
+
+  // Color menu functionality
+  $('#colorMenu .nav-item').on('click', function () {
+    const color = $(this).data('color');
+    currentColor = color; // Update current color
+    $('#supplyMenu').addClass("rounded-3").css('border', `10px solid ${color}`);
+    
+    // Change colorable element fills in menu SVGs only
+    $('#supplyMenu .supply object').each(function() {
+      applyColorToSVG(this, color);
+    });
+  });
+});
+</script>
+
+<%- include('../../foot'); -%>

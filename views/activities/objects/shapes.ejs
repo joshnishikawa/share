@@ -1,4 +1,4 @@
-<%- include('../head'); -%>
+<%- include('../../head'); -%>
 
 <style>
   .shape {
@@ -267,13 +267,13 @@ $(function () {
     canvasId: 'canvas',
     canvasItemClass: 'canvas-shape',
     colorableSelector: 'path, circle, rect, polygon',
-    minScale: 0.5,
+    minScale: 0.3,
     maxScale: 3.0,
     savePromptText: "<%- __('shapesName') %>",
     enableScale: true,
     enableRotate: true,
     enableDragHandles: true,
-    dragHandleShapes: ['rectangle', 'triangle', 'diamond'],
+    dragHandleShapes: ['rectangle', 'triangle', 'diamond', 'heart'],
     onItemAdded: function(clone) {
       // Add drag handle for rectangle, triangle, and diamond
       if (clone.attr("data-shape") === "rectangle" || clone.attr("data-shape") === "triangle" || clone.attr("data-shape") === "diamond") {
@@ -382,4 +382,4 @@ $(function () {
 });
 </script>
 
-<%- include('../foot'); -%>
+<%- include('../../foot'); -%>

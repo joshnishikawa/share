@@ -68,10 +68,10 @@ router.get('/api/any-vocab', async (req, res)=>{
     // get array of words from vocabulary table
     let words = {};
     var rows;
-    var deck = req.query.deck;
+    var deck = JSON.parse(req.query.deck);
 
     if (req.query.deck) {
-      rows = vocabulary.filter(item => vocabulary.includes(item.word));
+      rows = vocabulary.filter(item => deck.includes(item.id));
     }
     else { rows = vocabulary;}
 
@@ -215,7 +215,7 @@ router.get('/visuals', (req, res)=>{
 
 router.get('/shapes', (req, res)=>{
   try{
-    res.render('activities/shapes');
+    res.render('activities/objects/shapes');
   }
   catch(err){
     res.send(err);
@@ -224,9 +224,9 @@ router.get('/shapes', (req, res)=>{
 });
 
 
-router.get('/objects', (req, res)=>{
+router.get('/supplies', (req, res)=>{
   try{
-    res.render('activities/objects');
+    res.render('activities/objects/supplies');
   }
   catch(err){
     res.send(err);
@@ -264,7 +264,6 @@ router.post('/:activity', async(req, res)=>{
     let activity = req.params.activity;
 
     let params = req.body;
-    console.log('params:', params);
     let deck = params.deck;
     delete params.deck;
     let deckType = params.deckType;

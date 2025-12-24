@@ -343,7 +343,7 @@ function CanvasBuilder(options) {
     let initialLeft = 0;
     let initialTop = 0;
 
-    mc.get('pinch').set({ enable: config.enableScale });
+    mc.get('pinch').set({ enable: config.enableScale || config.enableRotate });
     mc.get('rotate').set({ enable: false });
 
     mc.on("panstart", function (e) {
