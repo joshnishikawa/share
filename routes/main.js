@@ -68,16 +68,20 @@ router.get('/api/any-vocab', async (req, res)=>{
     // get array of words from vocabulary table
     let words = {};
     var rows;
-    var deck = JSON.parse(req.query.deck);
+    var deck = req.query.deck ? JSON.parse(req.query.deck) : [];
 
     if (req.query.deck) {
-      rows = vocabulary.filter(item => deck.includes(item.id));
+      rows = vocabulary.filter(item => deck.includes(item.word));
     }
-    else { rows = vocabulary;}
+    else {
+      // parse everything from vocabulary table
+      rows = vocabulary;
+    }
 
     for (let row of rows){
       words[row.word] = {meaning: row.meaning, image: row.image, audio: row.audio};
     }
+    console.log(words);
     res.json(words);
   }
   catch(err){
@@ -99,7 +103,7 @@ router.get('/api/nh-vocab', async (req, res) => {
         translations[t] = translatedTheme;
       }
     }
-console.log('translations:', translations);
+
     res.json({ NH_vocab, NH_colors, translations });
   }
   catch(err){

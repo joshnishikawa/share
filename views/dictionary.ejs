@@ -87,9 +87,9 @@ $(function(){
       function processWord(EnglishWord, JapaneseWord) {
         let image = '';
         let audio = '';
-        
+
         if (Object.keys(words).includes(EnglishWord)) {
-          image = `<img src="${words[EnglishWord].image}" class="img-fluid" style="max-height:300px;">`;
+          image = `<img src="${words[EnglishWord].image}" class="img-fluid" style="max-height:300px;" alt="${EnglishWord}">`;
           audio = words[EnglishWord].audio;
           if (JapaneseWord != words[EnglishWord].meaning) {
             JapaneseWord += `, ${words[EnglishWord].meaning}`;
@@ -98,7 +98,7 @@ $(function(){
           let lc = EnglishWord.toLowerCase();
           if (Object.keys(words).includes(lc)) {
             EnglishWord = lc;
-            image = `<img src="${words[EnglishWord].image}" class="img-fluid" style="max-height:300px;">`;
+            image = `<img src="${words[EnglishWord].image}" class="img-fluid" style="max-height:300px;" alt="${EnglishWord}">`;
             audio = words[lc].audio;
             if (JapaneseWord != words[lc].meaning) {
               JapaneseWord += `, ${words[lc].meaning}`;
