@@ -1,0 +1,242 @@
+<%- include('../../head'); -%>
+
+<style>
+  .object {
+    width: 50%;
+    height: calc(100% / 6);
+    position: relative;
+  }
+
+  .object svg {
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .canvas-object {
+    position: absolute;
+    cursor: move;
+  }
+
+  .canvas-object svg {
+    pointer-events: none;
+  }
+
+  .selected {
+    filter: drop-shadow(0 0 0.5rem #0f0);
+  }
+
+  #tagMenuFiller {
+    font-weight: bold;
+    height: 9%;
+  }
+
+  #canvasWrapper {
+    background-image: url('/image/room.svg') !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-attachment: scroll !important;
+  }
+
+  #canvasWrapper {
+    background-image: url('/image/room.svg') !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-attachment: scroll !important;
+  }
+</style>
+
+
+<div class="container-fluid g-0">
+  <div class="row g-0" style="height:100vh;">
+    
+    <div class="col bg-light p-2" style="height:100%;max-width:200px;display:flex;flex-direction:column;">
+      <div id="objectMenu" style="flex:1;display:flex;flex-wrap:wrap;overflow-y:auto;">
+        <%- include('./room/bag'); -%>
+        <%- include('./room/ball'); -%>
+        <%- include('./room/basket'); -%>
+        <%- include('./room/book'); -%>
+        <%- include('./room/box'); -%>
+        <%- include('./room/cap'); -%>
+        <%- include('./room/clock'); -%>
+        <%- include('./room/dog'); -%>
+        <%- include('./room/mug'); -%>
+        <%- include('./room/recorder'); -%>
+        <%- include('./room/riceball'); -%>
+        <%- include('./room/socks'); -%>
+      </div>
+      <div class="mt-2">
+        <button id="manageCanvases" class="btn btn-sm btn-primary">
+          <i class="material-icons">view_module</i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Canvas area for dragging and dropping objects -->
+    <div id="canvasWrapper" class="col" style="max-height:100vh;overflow:hidden;">
+      <div id="canvas" style="height:100%;overflow:hidden;"></div>
+    </div>
+  </div>
+</div>
+
+<%- include('../../foot'); -%>
+
+<div class="modal fade" id="canvasManagerModal" tabindex="-1" aria-labelledby="canvasManagerModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="canvasManagerModalLabel">Manage Canvases</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="canvasGrid" class="canvas-grid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.canvas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 150px));
+  gap: 15px;
+  padding: 10px;
+  justify-content: center;
+  max-width: calc(4 * 150px + 3 * 15px + 20px);
+  margin: 0 auto;
+}
+
+.canvas-grid-item {
+  aspect-ratio: 1;
+  max-width: 150px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.canvas-action-btn {
+  border-color: #0d6efd;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.canvas-action-btn:hover {
+  border-color: #0d6efd;
+  transform: scale(1.05);
+}
+
+#addCanvasBtn.disabled {
+  border-color: #ccc;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#addCanvasBtn:hover.disabled {
+  border-color: #ccc;
+  transform: none;
+}
+
+#deleteCanvasBtn:hover {
+  border-color: #ccc;
+  transform: none;
+}
+
+#deleteCanvasBtn.drag-active:hover {
+  border-color: #0d6efd;
+  transform: scale(1.05);
+}
+
+#addCanvasBtn.add-active {
+  border-color: #198754;
+  background-color: #e6f4ea;
+  transform: scale(1.1);
+}
+
+#deleteCanvasBtn.delete-active {
+  border-color: #dc3545;
+  background-color: #ffe6e6;
+  transform: scale(1.1);
+}
+
+.canvas-snapshot {
+  background: white;
+  position: relative;
+}
+
+.canvas-snapshot.active {
+  border-color: #0d6efd;
+  border-width: 4px;
+  box-shadow: 0 0 10px rgba(13, 110, 253, 0.5);
+}
+
+.canvas-snapshot:hover {
+  border-color: #0d6efd;
+  transform: scale(1.05);
+}
+
+.canvas-snapshot:hover.dragging,
+.canvas-snapshot.no-hover:hover {
+  border-color: #ccc;
+  transform: none;
+}
+
+.canvas-snapshot.dragging {
+  opacity: 0.3;
+}
+
+.canvas-thumbnail {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  background: #f0f0f0;
+}
+
+.drag-clone {
+  pointer-events: none;
+  width: 150px;
+  height: 150px;
+  background: white;
+}
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+<script src="/javascripts/canvas_builder.js"></script>
+<script src="/javascripts/canvas_manager.js"></script>
+
+<script>
+$(function () {
+  // Initialize canvas builder for objects
+  const canvasBuilder = new CanvasBuilder({
+    storageKey: 'objects',
+    itemSelector: '.object',
+    menuContainerId: 'objectMenu',
+    canvasId: 'canvas',
+    canvasItemClass: 'canvas-object',
+    savePromptText: "Enter a name for this canvas:",
+    enableScale: true,
+    enableRotate: true,
+    enableDragHandles: false
+  });
+
+  canvasBuilder.init();
+
+  // Initialize canvas manager
+  const canvasManager = new CanvasManager(canvasBuilder);
+
+  // Manage canvases button
+  $('#manageCanvases').on('click', function() {
+    canvasManager.open();
+  });
+});
+</script>

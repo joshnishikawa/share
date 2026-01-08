@@ -117,12 +117,19 @@ function CanvasBuilder(options) {
   // Generate thumbnail HTML for the current canvas
   function generateThumbnail() {
     const canvasHtml = $(`#${config.canvasId}`).html();
+    const canvasWrapper = $(`#${config.canvasId}`).parent();
+    const bgImage = canvasWrapper.css('background-image');
+    
     const thumbnailDiv = $('<div>').html(canvasHtml).css({
       transform: 'scale(0.1)',
       transformOrigin: 'top left',
       width: '1000%',
       height: '1000%',
-      pointerEvents: 'none'
+      pointerEvents: 'none',
+      backgroundImage: bgImage,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat'
     });
     return thumbnailDiv.prop('outerHTML');
   }

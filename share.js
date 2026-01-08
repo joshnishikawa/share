@@ -40,7 +40,13 @@ app.set('views', path.join(__dirname, 'views'));
 
 // PROCESS USER REQUESTS *IN ORDER* ////////////////////////////////////////////
 app.use( logger('dev') );
-app.use(  express.static( path.join(__dirname, 'public') )  );
+app.use(  express.static( path.join(__dirname, 'public'), {
+  setHeaders: (res, filepath) => {
+    if (filepath.endsWith('.svg')) {
+      res.setHeader('Content-Type', 'image/svg+xml');
+    }
+  }
+}) );
 app.use( i18n.init );
 app.use('/teachers', TRouter);
 // app.use('/media', mediaRouter);
