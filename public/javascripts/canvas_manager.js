@@ -42,16 +42,20 @@ function CanvasManager(canvasBuilder) {
         </div>
       `);
       
-      // Create thumbnail
+      // Create thumbnail - use saved thumbnail if available, otherwise generate from html
       const thumb = snapshot.find('.canvas-thumbnail');
-      const tempDiv = $('<div>').html(canvas.html).css({
-        transform: 'scale(0.1)',
-        transformOrigin: 'top left',
-        width: '1000%',
-        height: '1000%',
-        pointerEvents: 'none'
-      });
-      thumb.append(tempDiv);
+      if (canvas.thumbnail) {
+        thumb.html(canvas.thumbnail);
+      } else {
+        const tempDiv = $('<div>').html(canvas.html).css({
+          transform: 'scale(0.1)',
+          transformOrigin: 'top left',
+          width: '1000%',
+          height: '1000%',
+          pointerEvents: 'none'
+        });
+        thumb.append(tempDiv);
+      }
       
       grid.append(snapshot);
     });
@@ -197,16 +201,20 @@ function CanvasManager(canvasBuilder) {
             </div>
           `);
           
-          // Create thumbnail
+          // Create thumbnail - use saved thumbnail if available
           const thumb = newSnapshot.find('.canvas-thumbnail');
-          const tempDiv = $('<div>').html(clonedCanvas.html).css({
-            transform: 'scale(0.1)',
-            transformOrigin: 'top left',
-            width: '1000%',
-            height: '1000%',
-            pointerEvents: 'none'
-          });
-          thumb.append(tempDiv);
+          if (clonedCanvas.thumbnail) {
+            thumb.html(clonedCanvas.thumbnail);
+          } else {
+            const tempDiv = $('<div>').html(clonedCanvas.html).css({
+              transform: 'scale(0.1)',
+              transformOrigin: 'top left',
+              width: '1000%',
+              height: '1000%',
+              pointerEvents: 'none'
+            });
+            thumb.append(tempDiv);
+          }
           
           $("#canvasGrid").append(newSnapshot);
           

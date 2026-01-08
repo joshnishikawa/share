@@ -81,7 +81,6 @@ router.get('/api/any-vocab', async (req, res)=>{
     for (let row of rows){
       words[row.word] = {meaning: row.meaning, image: row.image, audio: row.audio};
     }
-    console.log(words);
     res.json(words);
   }
   catch(err){

@@ -9006,7 +9006,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "ball",
   "meaning": "ボール",
-  "image": "/image/NH/objects_ball.png",
+  "image": "/image/NH/objects+_ball.png",
   "audio": "/audio/words/ball.mp3"
 },
 {
@@ -9016,7 +9016,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "basket",
   "meaning": "バスケット",
-  "image": "/image/NH/objects_basket.png",
+  "image": "/image/NH/objects+_basket.png",
   "audio": "/audio/words/basket.mp3"
 },
 {
@@ -9026,7 +9026,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "book",
   "meaning": "本",
-  "image": "/image/NH/objects_book.png",
+  "image": "/image/NH/objects+_book.png",
   "audio": "/audio/words/book.mp3"
 },
 {
@@ -9036,7 +9036,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "album",
   "meaning": "アルバム",
-  "image": "/image/NH/objects_album.png",
+  "image": "/image/NH/objects+_album.png",
   "audio": "/audio/words/album.mp3"
 },
 {
@@ -9046,7 +9046,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "box",
   "meaning": "箱",
-  "image": "/image/NH/objects_box.png",
+  "image": "/image/NH/objects+_box.png",
   "audio": "/audio/words/box.mp3"
 },
 {
@@ -9056,7 +9056,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "calendar",
   "meaning": "カレンダー",
-  "image": "/image/NH/objects_calendar.png",
+  "image": "/image/NH/objects+_calendar.png",
   "audio": "/audio/words/calendar.mp3"
 },
 {
@@ -9066,7 +9066,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "card",
   "meaning": "カード",
-  "image": "/image/NH/objects_card.png",
+  "image": "/image/NH/objects+_card.png",
   "audio": "/audio/words/card.mp3"
 },
 {
@@ -9076,7 +9076,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "fan",
   "meaning": "扇風機",
-  "image": "/image/NH/objects_fan.png",
+  "image": "/image/NH/objects+_fan.png",
   "audio": "/audio/words/fan.mp3"
 },
 {
@@ -9086,7 +9086,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "map",
   "meaning": "地図",
-  "image": "/image/NH/objects_map.png",
+  "image": "/image/NH/objects+_map.png",
   "audio": "/audio/words/map.mp3"
 },
 {
@@ -9096,7 +9096,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "picture",
   "meaning": "絵",
-  "image": "/image/NH/objects_picture.png",
+  "image": "/image/NH/objects+_picture.png",
   "audio": "/audio/words/picture.mp3"
 },
 {
@@ -9106,7 +9106,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "doll",
   "meaning": "人形",
-  "image": "/image/NH/objects_doll.png",
+  "image": "/image/NH/objects+_doll.png",
   "audio": "/audio/words/doll.mp3"
 },
 {
@@ -9116,7 +9116,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "ring",
   "meaning": "指輪",
-  "image": "/image/NH/objects_ring.png",
+  "image": "/image/NH/objects+_ring.png",
   "audio": "/audio/words/ring.mp3"
 },
 {
@@ -9126,7 +9126,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "clock",
   "meaning": "時計",
-  "image": "/image/NH/objects_clock.png",
+  "image": "/image/NH/objects+_clock.png",
   "audio": "/audio/words/clock.mp3"
 },
 {
@@ -9136,7 +9136,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "camera",
   "meaning": "カメラ",
-  "image": "/image/NH/objects_camera.png",
+  "image": "/image/NH/objects+_camera.png",
   "audio": "/audio/words/camera.mp3"
 },
 {
@@ -9146,7 +9146,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "telephone",
   "meaning": "電話",
-  "image": "/image/NH/objects_telephone.png",
+  "image": "/image/NH/objects+_telephone.png",
   "audio": "/audio/words/telephone.mp3"
 },
 {
@@ -9156,7 +9156,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "eco-friendly bag",
   "meaning": "エコバッグ",
-  "image": "/image/NH/objects_eco_friendly_bag.png",
+  "image": "/image/NH/objects+_eco-friendly_bag.png",
   "audio": "/audio/words/eco_friendly_bag.mp3"
 },
 {
@@ -9166,7 +9166,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "plastic bag",
   "meaning": "ビニール袋",
-  "image": "/image/NH/objects_plastic_bag.png",
+  "image": "/image/NH/objects+_plastic_bag.png",
   "audio": "/audio/words/plastic_bag.mp3"
 },
 {
@@ -9176,7 +9176,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "bucket",
   "meaning": "バケツ",
-  "image": "/image/NH/objects_bucket.png",
+  "image": "/image/NH/objects+_bucket.png",
   "audio": "/audio/words/bucket.mp3"
 },
 {
@@ -9186,7 +9186,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "garbage",
   "meaning": "ゴミ",
-  "image": "/image/NH/objects_garbage.png",
+  "image": "/image/NH/objects+_garbage.png",
   "audio": "/audio/words/garbage.mp3"
 },
 {
@@ -9196,7 +9196,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "wheelchair",
   "meaning": "車椅子",
-  "image": "/image/NH/objects_wheelchair.png",
+  "image": "/image/NH/objects+_wheelchair.png",
   "audio": "/audio/words/wheelchair.mp3"
 },
 {
@@ -9206,7 +9206,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "cup",
   "meaning": "カップ",
-  "image": "/image/NH/objects_cup.png",
+  "image": "/image/NH/objects+_cup.png",
   "audio": "/audio/words/cup.mp3"
 },
 {
@@ -9216,7 +9216,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "fork",
   "meaning": "フォーク",
-  "image": "/image/NH/objects_fork.png",
+  "image": "/image/NH/objects+_fork.png",
   "audio": "/audio/words/fork.mp3"
 },
 {
@@ -9226,7 +9226,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "spoon",
   "meaning": "スプーン",
-  "image": "/image/NH/objects_spoon.png",
+  "image": "/image/NH/objects+_spoon.png",
   "audio": "/audio/words/spoon.mp3"
 },
 {
@@ -9236,7 +9236,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "dish",
   "meaning": "皿",
-  "image": "/image/NH/objects_dish.png",
+  "image": "/image/NH/objects+_dish.png",
   "audio": "/audio/words/dish.mp3"
 },
 {
@@ -9246,7 +9246,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "pot",
   "meaning": "鍋",
-  "image": "/image/NH/objects_pot.png",
+  "image": "/image/NH/objects+_pot.png",
   "audio": "/audio/words/pot.mp3"
 },
 {
@@ -9256,7 +9256,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "gate",
   "meaning": "門",
-  "image": "/image/NH/objects_gate.png",
+  "image": "/image/NH/objects+_gate.png",
   "audio": "/audio/words/gate.mp3"
 },
 {
@@ -9266,7 +9266,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "elevator",
   "meaning": "エレベーター",
-  "image": "/image/NH/objects_elevator.png",
+  "image": "/image/NH/objects+_elevator.png",
   "audio": "/audio/words/elevator.mp3"
 },
 {
@@ -9276,7 +9276,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "door",
   "meaning": "ドア",
-  "image": "/image/NH/objects_door.png",
+  "image": "/image/NH/objects+_door.png",
   "audio": "/audio/words/door.mp3"
 },
 {
@@ -9286,7 +9286,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "key",
   "meaning": "鍵",
-  "image": "/image/NH/objects_key.png",
+  "image": "/image/NH/objects+_key.png",
   "audio": "/audio/words/key.mp3"
 },
 {
@@ -9296,7 +9296,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "room",
   "meaning": "部屋",
-  "image": "/image/NH/objects_room.png",
+  "image": "/image/NH/objects+_room.png",
   "audio": "/audio/words/room.mp3"
 },
 {
@@ -9306,7 +9306,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "rug",
   "meaning": "敷物",
-  "image": "/image/NH/objects_rug.png",
+  "image": "/image/NH/objects+_rug.png",
   "audio": "/audio/words/rug.mp3"
 },
 {
@@ -9316,7 +9316,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "quilt",
   "meaning": "キルト",
-  "image": "/image/NH/objects_quilt.png",
+  "image": "/image/NH/objects+_quilt.png",
   "audio": "/audio/words/quilt.mp3"
 },
 {
@@ -9326,7 +9326,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "sofa",
   "meaning": "ソファ",
-  "image": "/image/NH/objects_sofa.png",
+  "image": "/image/NH/objects+_sofa.png",
   "audio": "/audio/words/sofa.mp3"
 },
 {
@@ -9336,7 +9336,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "table",
   "meaning": "テーブル",
-  "image": "/image/NH/objects_table.png",
+  "image": "/image/NH/objects+_table.png",
   "audio": "/audio/words/table.mp3"
 },
 {
@@ -9346,7 +9346,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "lamp",
   "meaning": "ランプ",
-  "image": "/image/NH/objects_lamp.png",
+  "image": "/image/NH/objects+_lamp.png",
   "audio": "/audio/words/lamp.mp3"
 },
 {
@@ -9356,7 +9356,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "wall",
   "meaning": "壁",
-  "image": "/image/NH/objects_wall.png",
+  "image": "/image/NH/objects+_wall.png",
   "audio": "/audio/words/wall.mp3"
 },
 {
@@ -9366,7 +9366,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "window",
   "meaning": "窓",
-  "image": "/image/NH/objects_window.png",
+  "image": "/image/NH/objects+_window.png",
   "audio": "/audio/words/window.mp3"
 },
 {
@@ -9376,7 +9376,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "bath",
   "meaning": "風呂",
-  "image": "/image/NH/objects_bath.png",
+  "image": "/image/NH/objects+_bath.png",
   "audio": "/audio/words/bath.mp3"
 },
 {
@@ -9386,7 +9386,7 @@ const vocabulary = [
   "theme": "objects+",
   "word": "yen",
   "meaning": "円",
-  "image": "/image/NH/objects_yen.png",
+  "image": "/image/NH/objects+_yen.png",
   "audio": "/audio/words/yen.mp3"
 },
 {

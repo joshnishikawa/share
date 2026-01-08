@@ -15,6 +15,7 @@ function CanvasBuilder(options) {
     minScale: options.minScale || 0.5,
     maxScale: options.maxScale || 3.0,
     onItemAdded: options.onItemAdded || null, // Callback when item added to canvas
+    onCanvasLoaded: options.onCanvasLoaded || null, // Callback when canvas is loaded
     savePromptText: options.savePromptText || 'Enter a name for this canvas:',
     enableScale: options.enableScale !== undefined ? options.enableScale : true,
     enableRotate: options.enableRotate !== undefined ? options.enableRotate : true,
@@ -105,13 +106,32 @@ function CanvasBuilder(options) {
           handle.css('transform', `scale(${1 / currentScale})`);
         }
       });
+      
+      // Call onCanvasLoaded callback if provided
+      if (config.onCanvasLoaded) {
+        config.onCanvasLoaded();
+      }
     }
+  }
+
+  // Generate thumbnail HTML for the current canvas
+  function generateThumbnail() {
+    const canvasHtml = $(`#${config.canvasId}`).html();
+    const thumbnailDiv = $('<div>').html(canvasHtml).css({
+      transform: 'scale(0.1)',
+      transformOrigin: 'top left',
+      width: '1000%',
+      height: '1000%',
+      pointerEvents: 'none'
+    });
+    return thumbnailDiv.prop('outerHTML');
   }
 
   // Save current canvas to localStorage
   function saveToStorage() {
     savedCanvases[currentCanvasIndex].html = $(`#${config.canvasId}`).html();
     savedCanvases[currentCanvasIndex].timestamp = Date.now();
+    savedCanvases[currentCanvasIndex].thumbnail = generateThumbnail();
     localStorage.setItem(config.storageKey, JSON.stringify(savedCanvases));
   }
 
@@ -198,14 +218,6 @@ function CanvasBuilder(options) {
       $(`.${config.canvasItemClass}`).removeClass("selected");
       const clone = item.clone().removeClass(config.itemSelector.substring(1)).addClass(`${config.canvasItemClass} selected`);
       
-      // Remove colorable class from cloned elements to prevent color changes on canvas
-      if (config.colorableSelector) {
-        const className = config.colorableSelector.startsWith('.') 
-          ? config.colorableSelector.substring(1) 
-          : config.colorableSelector;
-        clone.find('*').removeClass(className);
-      }
-      
       $(`#${config.canvasId}`).append(clone);
       makeTouchable(clone);
       activeClone = clone;
@@ -214,15 +226,14 @@ function CanvasBuilder(options) {
       const canvasOffset = $(`#${config.canvasId}`).offset();
       const menuOffset = $(menuElement).offset();
       
-      // Calculate the touch position relative to the menu item
-      const itemOffset = item.offset();
-      const touchOffsetX = touch.clientX - itemOffset.left;
-      const touchOffsetY = touch.clientY - itemOffset.top;
+      // Center the item under the cursor/finger
+      const itemWidth = item.width();
+      const itemHeight = item.height();
 
       clone.css({
         position: 'absolute',
-        left: touch.clientX - canvasOffset.left - touchOffsetX,
-        top: touch.clientY - canvasOffset.top - touchOffsetY,
+        left: touch.clientX - canvasOffset.left - (itemWidth / 2),
+        top: touch.clientY - canvasOffset.top - (itemHeight / 2),
         'z-index': z++
       });
 
@@ -241,8 +252,8 @@ function CanvasBuilder(options) {
         const canvasOffset = $(`#${config.canvasId}`).offset();
 
         activeClone.css({
-          left: touch.clientX - canvasOffset.left - touchOffsetX,
-          top: touch.clientY - canvasOffset.top - touchOffsetY,
+          left: touch.clientX - canvasOffset.left - (itemWidth / 2),
+          top: touch.clientY - canvasOffset.top - (itemHeight / 2),
           transform: `scale(1) rotate(0deg)`
         });
       };
@@ -253,7 +264,12 @@ function CanvasBuilder(options) {
         $(document).off('mouseup touchend', endHandler);
         activeClone = null;
         isDraggingFromMenu = false;
-        saveToStorage();
+        // Don't save immediately - allow for async color processing
+        // Items that need color processing will call saveToStorage() themselves
+        // For items without color processing, save after a brief delay
+        setTimeout(function() {
+          saveToStorage();
+        }, 100);
       };
 
       $(document).on('mousemove touchmove', moveHandler);
@@ -468,7 +484,9 @@ function CanvasBuilder(options) {
       const selectors = config.colorableSelector.split(',').map(s => 
         `#${config.menuContainerId} ${config.itemSelector} ${s.trim()}`
       ).join(', ');
-      $(selectors).attr('fill', color);
+      $(selectors).each(function() {
+        this.setAttribute('fill', color);
+      });
     }
   };
 
