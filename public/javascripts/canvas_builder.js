@@ -26,7 +26,7 @@ function CanvasBuilder(options) {
   // Internal state
   let savedCanvases = []; // Array of saved canvas snapshots
   let currentCanvasIndex = 0; // Index of currently active canvas
-  let z = 1; // Z-index counter
+  let z = 1000; // Z-index counter
   let isDraggingHandle = false;
   let tapHandlerActive = false;
   const self = this; // Reference for passing to CanvasManager
@@ -117,19 +117,12 @@ function CanvasBuilder(options) {
   // Generate thumbnail HTML for the current canvas
   function generateThumbnail() {
     const canvasHtml = $(`#${config.canvasId}`).html();
-    const canvasWrapper = $(`#${config.canvasId}`).parent();
-    const bgImage = canvasWrapper.css('background-image');
-    
     const thumbnailDiv = $('<div>').html(canvasHtml).css({
       transform: 'scale(0.1)',
       transformOrigin: 'top left',
       width: '1000%',
       height: '1000%',
-      pointerEvents: 'none',
-      backgroundImage: bgImage,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat'
+      pointerEvents: 'none'
     });
     return thumbnailDiv.prop('outerHTML');
   }
@@ -230,17 +223,17 @@ function CanvasBuilder(options) {
       activeClone = clone;
       isDraggingFromMenu = true;
 
-      const canvasOffset = $(`#${config.canvasId}`).offset();
-      const menuOffset = $(menuElement).offset();
+      const canvas = document.getElementById(config.canvasId);
+      const canvasBounds = canvas.getBoundingClientRect();
       
-      // Center the item under the cursor/finger
-      const itemWidth = item.width();
-      const itemHeight = item.height();
+      // Get clone's actual width/height after rendering
+      const cloneWidth = clone.width();
+      const cloneHeight = clone.height();
 
       clone.css({
         position: 'absolute',
-        left: touch.clientX - canvasOffset.left - (itemWidth / 2),
-        top: touch.clientY - canvasOffset.top - (itemHeight / 2),
+        left: touch.clientX - canvasBounds.left - (cloneWidth / 2),
+        top: touch.clientY - canvasBounds.top - (cloneHeight / 2),
         'z-index': z++
       });
 
@@ -256,11 +249,12 @@ function CanvasBuilder(options) {
         if (!activeClone) return;
         const touch = e.type === 'touchmove' ? e.originalEvent.touches[0] : e;
         
-        const canvasOffset = $(`#${config.canvasId}`).offset();
+        const canvas = document.getElementById(config.canvasId);
+        const canvasBounds = canvas.getBoundingClientRect();
 
         activeClone.css({
-          left: touch.clientX - canvasOffset.left - (itemWidth / 2),
-          top: touch.clientY - canvasOffset.top - (itemHeight / 2),
+          left: touch.clientX - canvasBounds.left - (cloneWidth / 2),
+          top: touch.clientY - canvasBounds.top - (cloneHeight / 2),
           transform: `scale(1) rotate(0deg)`
         });
       };
@@ -385,13 +379,21 @@ function CanvasBuilder(options) {
       });
     });
 
-    mc.on("panend", function () {
+    mc.on("panend", function (e) {
       if (isDraggingHandle) return;
 
-      // Remove if dragged off left edge
-      if (parseInt(item.css("left")) <= 0) {
-        item.remove();
-        saveToStorage();
+      // Remove if dragged back over menu
+      const menuElement = document.getElementById(config.menuContainerId);
+      if (menuElement) {
+        const menuBounds = menuElement.getBoundingClientRect();
+        const itemBounds = item[0].getBoundingClientRect();
+        const itemCenterX = itemBounds.left + itemBounds.width / 2;
+        
+        // Check if item center is over menu
+        if (itemCenterX >= menuBounds.left && itemCenterX <= menuBounds.right) {
+          item.remove();
+          saveToStorage();
+        }
       }
     });
 
