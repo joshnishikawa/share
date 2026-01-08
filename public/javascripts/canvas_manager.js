@@ -42,19 +42,31 @@ function CanvasManager(canvasBuilder) {
         </div>
       `);
       
-      // Create thumbnail - use saved thumbnail if available, otherwise generate from html
+      // Create thumbnail - use saved thumbnail if available
       const thumb = snapshot.find('.canvas-thumbnail');
-      if (canvas.thumbnail) {
-        thumb.html(canvas.thumbnail);
-      } else {
-        const tempDiv = $('<div>').html(canvas.html).css({
-          transform: 'scale(0.1)',
-          transformOrigin: 'top left',
-          width: '1000%',
-          height: '1000%',
-          pointerEvents: 'none'
+      if (canvas.thumbnail && canvas.thumbnail.startsWith('data:image')) {
+        // Valid image thumbnail
+        const img = $('<img>').attr('src', canvas.thumbnail).css({
+          width: '100%',
+          height: '100%',
+          objectFit: 'contain'
         });
-        thumb.append(tempDiv);
+        thumb.append(img);
+      } else {
+        // Generate thumbnail asynchronously
+        thumb.html('<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#999;">Loading...</div>');
+        
+        builder.generateThumbnailForCanvas(index).then(dataUrl => {
+          if (dataUrl) {
+            thumb.empty();
+            const img = $('<img>').attr('src', dataUrl).css({
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain'
+            });
+            thumb.append(img);
+          }
+        });
       }
       
       grid.append(snapshot);
@@ -203,17 +215,30 @@ function CanvasManager(canvasBuilder) {
           
           // Create thumbnail - use saved thumbnail if available
           const thumb = newSnapshot.find('.canvas-thumbnail');
-          if (clonedCanvas.thumbnail) {
-            thumb.html(clonedCanvas.thumbnail);
-          } else {
-            const tempDiv = $('<div>').html(clonedCanvas.html).css({
-              transform: 'scale(0.1)',
-              transformOrigin: 'top left',
-              width: '1000%',
-              height: '1000%',
-              pointerEvents: 'none'
+          if (clonedCanvas.thumbnail && clonedCanvas.thumbnail.startsWith('data:image')) {
+            // Valid image thumbnail
+            const img = $('<img>').attr('src', clonedCanvas.thumbnail).css({
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain'
             });
-            thumb.append(tempDiv);
+            thumb.append(img);
+          } else {
+            // Generate thumbnail asynchronously
+            thumb.html('<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#999;">Loading...</div>');
+            
+            const newIndex = newCanvases.length - 1;
+            builder.generateThumbnailForCanvas(newIndex).then(dataUrl => {
+              if (dataUrl) {
+                thumb.empty();
+                const img = $('<img>').attr('src', dataUrl).css({
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain'
+                });
+                thumb.append(img);
+              }
+            });
           }
           
           $("#canvasGrid").append(newSnapshot);

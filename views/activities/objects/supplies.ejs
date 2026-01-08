@@ -1,6 +1,10 @@
 <%- include('../../head'); -%>
 
 <style>
+  #canvasWrapper {
+    background-image: url('/image/medBG.png');
+  }
+
   #supplyMenu {
     display: flex;
     flex-wrap: wrap;
@@ -92,8 +96,8 @@
     </div>
 
     <!-- Canvas area for dragging and dropping supplies -->
-    <div class="col" style="max-height:100vh;overflow:hidden;">
-      <div id="canvas" class="border bg-med" style="height: 100%;overflow:hidden;"></div>
+    <div id="canvasWrapper" class="col" style="max-height:100vh;overflow:visible;">
+      <div id="canvas" style="height:100%;overflow:visible;position:relative;"></div>
     </div>
   </div>
 </div>
@@ -117,17 +121,17 @@
 <style>
 .canvas-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 150px));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 200px));
   gap: 15px;
   padding: 10px;
   justify-content: center;
-  max-width: calc(4 * 150px + 3 * 15px + 20px);
+  max-width: calc(4 * 200px + 3 * 15px + 20px);
   margin: 0 auto;
 }
 
 .canvas-grid-item {
-  aspect-ratio: 1;
-  max-width: 150px;
+  aspect-ratio: 4 / 3;
+  max-width: 200px;
   border: 2px solid #ccc;
   border-radius: 8px;
   cursor: pointer;
@@ -221,8 +225,8 @@
 
 .drag-clone {
   pointer-events: none;
-  width: 150px;
-  height: 150px;
+  aspect-ratio: 4 / 3;
+  width: 200px;
   background: white;
 }
 </style>

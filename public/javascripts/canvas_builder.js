@@ -114,24 +114,184 @@ function CanvasBuilder(options) {
     }
   }
 
-  // Generate thumbnail HTML for the current canvas
+  // Generate thumbnail using Canvas API with async image loading
+  async function generateThumbnailAsync() {
+    try {
+      const canvasElement = $(`#${config.canvasId}`);
+      const canvasWrapper = canvasElement.parent();
+      
+      // Use wrapper dimensions (which has the background on all pages now)
+      const wrapperRect = canvasWrapper[0].getBoundingClientRect();
+      const fullWidth = wrapperRect.width;
+      const fullHeight = wrapperRect.height;
+      
+      // Scale down to create smaller thumbnails (max 300px width)
+      const maxWidth = 300;
+      const scale = Math.min(1, maxWidth / fullWidth);
+      const width = Math.floor(fullWidth * scale);
+      const height = Math.floor(fullHeight * scale);
+      
+      // Create offscreen canvas
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      
+      // Scale context for all drawing operations
+      ctx.scale(scale, scale);
+      
+      // Fill background color first
+      ctx.fillStyle = '#f0f0f0';
+      ctx.fillRect(0, 0, fullWidth, fullHeight);
+      
+      // Get background image from wrapper (consistent across all pages now)
+      const bgImage = canvasWrapper.css('background-image');
+      
+      // Draw background image
+      if (bgImage && bgImage !== 'none') {
+        const bgUrl = bgImage.replace(/url\(["']?([^"']+)["']?\)/g, '$1');
+        
+        try {
+          await new Promise((resolve, reject) => {
+            const bgImg = new Image();
+            bgImg.crossOrigin = 'anonymous';
+            bgImg.onload = () => {
+              ctx.drawImage(bgImg, 0, 0, fullWidth, fullHeight);
+              resolve();
+            };
+            bgImg.onerror = () => resolve(); // Continue even if bg fails
+            bgImg.src = bgUrl;
+            // Timeout after 1 second
+            setTimeout(() => resolve(), 1000);
+          });
+        } catch (e) {
+          console.warn('Background image failed to load');
+        }
+      }
+      
+      // Draw each canvas object sorted by z-index (lowest to highest)
+      const objects = canvasElement.find(`.${config.canvasItemClass}`).toArray();
+      objects.sort((a, b) => {
+        const zIndexA = parseInt($(a).css('z-index')) || 0;
+        const zIndexB = parseInt($(b).css('z-index')) || 0;
+        return zIndexA - zIndexB;
+      });
+      
+      for (const obj of objects) {
+        const $obj = $(obj);
+        const left = parseFloat($obj.css('left')) || 0;
+        const top = parseFloat($obj.css('top')) || 0;
+        const objWidth = $obj.width();
+        const objHeight = $obj.height();
+        const transform = $obj.css('transform');
+        const transformOrigin = $obj.css('transform-origin');
+        
+        // Get the inner SVG
+        const innerSvg = $obj.find('svg')[0];
+        if (innerSvg) {
+          ctx.save();
+          
+          // Apply position transform
+          ctx.translate(left, top);
+          
+          // Parse transform origin (default is '50% 50%' or 'center center')
+          let originX = objWidth / 2;
+          let originY = objHeight / 2;
+          
+          if (transformOrigin && transformOrigin !== 'none') {
+            const parts = transformOrigin.split(' ');
+            if (parts.length >= 2) {
+              // Handle pixel values or percentages
+              if (parts[0].includes('px')) {
+                originX = parseFloat(parts[0]);
+              } else if (parts[0].includes('%')) {
+                originX = (parseFloat(parts[0]) / 100) * objWidth;
+              }
+              if (parts[1].includes('px')) {
+                originY = parseFloat(parts[1]);
+              } else if (parts[1].includes('%')) {
+                originY = (parseFloat(parts[1]) / 100) * objHeight;
+              }
+            }
+          }
+          
+          // Translate to transform origin
+          ctx.translate(originX, originY);
+          
+          // Apply rotation/scale transform if exists
+          if (transform && transform !== 'none') {
+            const matrix = transform.match(/matrix\(([^)]+)\)/);
+            if (matrix) {
+              const vals = matrix[1].split(',').map(v => parseFloat(v.trim()));
+              ctx.transform(vals[0], vals[1], vals[2], vals[3], vals[4], vals[5]);
+            }
+          }
+          
+          // Translate back from transform origin
+          ctx.translate(-originX, -originY);
+          
+          // Convert SVG to image and draw
+          try {
+            await new Promise((resolve, reject) => {
+              const svgClone = innerSvg.cloneNode(true);
+              const serializer = new XMLSerializer();
+              const svgString = serializer.serializeToString(svgClone);
+              const svgBlob = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
+              const url = URL.createObjectURL(svgBlob);
+              
+              const img = new Image();
+              img.onload = () => {
+                ctx.drawImage(img, 0, 0, objWidth, objHeight);
+                URL.revokeObjectURL(url);
+                resolve();
+              };
+              img.onerror = () => {
+                URL.revokeObjectURL(url);
+                resolve(); // Continue even if one object fails
+              };
+              img.src = url;
+              // Timeout after 500ms per object
+              setTimeout(() => {
+                URL.revokeObjectURL(url);
+                resolve();
+              }, 500);
+            });
+          } catch (e) {
+            console.warn('Object SVG failed to render');
+          }
+          
+          ctx.restore();
+        }
+      }
+      
+      // Return canvas as data URL with JPEG compression for smaller file size
+      return canvas.toDataURL('image/jpeg', 0.7);
+      
+    } catch (e) {
+      console.error('Thumbnail generation failed:', e);
+      return '';
+    }
+  }
+  
+  // Synchronous wrapper for backward compatibility
   function generateThumbnail() {
-    const canvasHtml = $(`#${config.canvasId}`).html();
-    const thumbnailDiv = $('<div>').html(canvasHtml).css({
-      transform: 'scale(0.1)',
-      transformOrigin: 'top left',
-      width: '1000%',
-      height: '1000%',
-      pointerEvents: 'none'
+    // Generate async and store result
+    generateThumbnailAsync().then(dataUrl => {
+      if (savedCanvases[currentCanvasIndex]) {
+        savedCanvases[currentCanvasIndex].thumbnail = dataUrl;
+        localStorage.setItem(config.storageKey, JSON.stringify(savedCanvases));
+      }
     });
-    return thumbnailDiv.prop('outerHTML');
+    return ''; // Return empty initially, will be updated async
   }
 
   // Save current canvas to localStorage
   function saveToStorage() {
     savedCanvases[currentCanvasIndex].html = $(`#${config.canvasId}`).html();
     savedCanvases[currentCanvasIndex].timestamp = Date.now();
-    savedCanvases[currentCanvasIndex].thumbnail = generateThumbnail();
+    // Generate thumbnail asynchronously - it will save when ready
+    generateThumbnail();
+    // Save immediately with current data (thumbnail will update async)
     localStorage.setItem(config.storageKey, JSON.stringify(savedCanvases));
   }
 
@@ -320,6 +480,11 @@ function CanvasBuilder(options) {
         $(this).css("z-index", z++);
       }
     }
+    
+    // Always save when selection/z-index changes
+    if (reorderZIndex) {
+      saveToStorage();
+    }
   }
 
   // Utility functions
@@ -392,9 +557,11 @@ function CanvasBuilder(options) {
         // Check if item center is over menu
         if (itemCenterX >= menuBounds.left && itemCenterX <= menuBounds.right) {
           item.remove();
-          saveToStorage();
         }
       }
+      
+      // Always save after pan ends (whether removed or just moved)
+      saveToStorage();
     });
 
     if (config.enableScale || config.enableRotate) {
@@ -505,6 +672,30 @@ function CanvasBuilder(options) {
 
   this.setIsDraggingHandle = function(value) {
     isDraggingHandle = value;
+  };
+
+  // Generate thumbnail for a specific canvas by temporarily loading it
+  this.generateThumbnailForCanvas = async function(index) {
+    if (index < 0 || index >= savedCanvases.length) return '';
+    
+    // Save current canvas state
+    const originalIndex = currentCanvasIndex;
+    const originalHtml = $(`#${config.canvasId}`).html();
+    
+    // Load the target canvas temporarily
+    $(`#${config.canvasId}`).html(savedCanvases[index].html);
+    
+    // Generate thumbnail
+    const thumbnailDataUrl = await generateThumbnailAsync();
+    
+    // Restore original canvas
+    $(`#${config.canvasId}`).html(originalHtml);
+    
+    // Update the saved canvas with new thumbnail
+    savedCanvases[index].thumbnail = thumbnailDataUrl;
+    localStorage.setItem(config.storageKey, JSON.stringify(savedCanvases));
+    
+    return thumbnailDataUrl;
   };
 
   this.saveToStorage = saveToStorage;
