@@ -1,10 +1,6 @@
-var Dictionary = require('japaneasy');
-var dict = new Dictionary();
-
 const express = require('express');
 const router = express.Router();
 const fs = require('fs');
-const https = require('https');
 const path = require('path');
 
 const bodyParser = require('body-parser');
@@ -35,19 +31,6 @@ function convertOBJtoSRT(subs){
   }
   return subarr.join("\n\n");
 }
-
-const download = (url, newfilepath) => new Promise((resolve, reject) => {
-  const file = fs.createWriteStream(newfilepath);
-  https.get(url, (response) => {
-    response.pipe(file);
-    file.on('finish', () => {
-      file.close(resolve);
-    });
-  }).on('error', (err) => {
-    fs.unlink(newfilepath);
-    reject(err.message);
-  });
-});
 
 
 router.get('/editsubs', (req, res)=>{

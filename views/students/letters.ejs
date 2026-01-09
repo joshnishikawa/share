@@ -116,12 +116,12 @@
       </a>
     </div>
 
-    <div class="col-sm mb-1"></div>
 
-    <!-- <div class="col-sm mb-1">
-      <div class="text-center bg-light border border-3 border-success rounded-3 shadow w-100 h-100">
+    <div class="col-sm mb-1">
+      <div class="text-center bg-light border border-3 border-success rounded-3 shadow w-100 h-100 YM">
         <h5>Letters and Sounds</h5>
-        <div class="d-flex justify-content-around m-3 p-3">
+        <span class="text-danger"><%- __('sound_on') %></span>
+        <div class="d-flex justify-content-around p-3">
 
           <i class="material-icons text-success" style="font-size:4rem;text-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important">
             record_voice_over
@@ -143,41 +143,41 @@
           <button id="resetSRS" class="btn btn-danger" style="display:none;">Reset</button>
         </div>
       </div>
-    </div> -->
+    </div>
 
 
   </div>
 </div>
 
-<!-- <script type="text/javascript" src="/javascripts/progress.js"></script> -->
+<script type="text/javascript" src="/javascripts/progress.js"></script>
 
 <script>
 $(function(){
   $(`#letters-tab`).addClass("active");
   
-  let ranks = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-  let {abcranks} = getCookieObject();
-  if (abcranks) ranks = abcranks.split(",").map(Number);
+  // Initialize progressPie selectors
+  progressPie.leftHalf = document.querySelector(".left-half");
+  progressPie.rightHalf = document.querySelector(".right-half");
+  
+  let ranks = JSON.parse(localStorage.getItem('abc_SRS')) 
+              || [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 
-  // // get sum of ranks
-  // let percent = Math.round( progressToPercent(ranks, ranks.length * 5) );
-  // if (percent >= 100){
-  //   $("#startSRS").prop('disabled', true);
-  //   $("#resetSRS").show();
-  // }
+  // get sum of ranks and update progress display
+  let percent = progressToPercent(ranks, ranks.length * 5);
+  
+  if (percent >= 100){
+    $("#startSRS").prop('disabled', true);
+    $("#resetSRS").show();
+  }
 
 
   $("#startSRS").on('click', ()=>{
-    window.location.href = "abc/srs";
+    window.location.href = "letters/SRS";
   });
 
   $("#resetSRS").on('click', ()=>{
-    $.post("/abc/reset", (data)=>{
-      if (data == "success"){
-        document.cookie = "ranks=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        window.location.reload();
-      }
-    });
+    localStorage.removeItem('abc_SRS');
+    window.location.reload();
   });
 
 });

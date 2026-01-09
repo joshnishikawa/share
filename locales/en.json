@@ -87,7 +87,7 @@
 		},
 		"slots": {
 			"1": "Choose the tab for what you want to practice.",
-      "2": "Click the 'SPIN' button for the next phrase." 
+			"2": "Click the 'SPIN' button for the next phrase."
 		}
 	},
 	"navbar": {
@@ -314,5 +314,6 @@
 	"town+": "town+",
 	"club activites+": "club activites+",
 	"lp_name": "lp_name",
-	"typeNotSupported": "typeNotSupported"
+	"typeNotSupported": "typeNotSupported",
+	"sound_on": "Make sure your sound is ON!"
 }

@@ -1,11 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const fs = require('fs');
-const path = require('path');
-const bodyParser = require('body-parser');
-router.use(bodyParser.urlencoded({extended: true}));
-const cookieParser = require('cookie-parser');
-router.use(cookieParser());
 
 
 router.get('/', (req, res)=>{
@@ -63,13 +57,9 @@ router.get('/write', (req, res)=>{
 });
 
 
-router.post('/SRS', (req, res)=>{
+router.get('/SRS', (req, res)=>{
   try{
-    // set cookie
-    let cookie = req.body.ranks.join(',');
-    console.log(cookie);
-    res.cookie('lettersranks', cookie.toString(), {path: '/letters', maxAge: 252288000, encode: v => v});
-    res.send('success');
+    res.render('activities/SRS');
   }
   catch(err){
     res.send(err);
