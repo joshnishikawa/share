@@ -1,0 +1,113 @@
+<%- include('../head.ejs') -%>
+<%- include('navbar.ejs') -%>
+
+<div class="container-fluid">
+  <div class="row">
+
+    <div class="col-sm mb-1">
+      <a href="things/shapes" class="btn btn-light mb-1 border border-3 border-success shadow w-100 h-50 YM">
+        <h5>Multi-Touch Shapes</h5>
+        <div class="d-flex justify-content-around">
+          <div class="shape" data-shape="circle">
+            <svg class="circle-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="50" cy="50" r="45" fill="red"/>
+            </svg>
+          </div>
+          <div class="shape" data-shape="square">
+            <svg class="square-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="10" y="10" width="80" height="80" fill="blue"/>
+            </svg>
+          </div>
+          <div class="shape" data-shape="triangle">
+            <svg class="triangle-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <polygon points="50,5 95,95 5,95" fill="green"/>
+            </svg>
+          </div>
+          <div class="shape" data-shape="rectangle">
+            <svg class="rectangle-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="10" y="20" width="80" height="60" fill="yellow"/>
+            </svg>
+          </div>
+        </div>
+      </a>
+
+      <a href="speech" class="btn btn-light border mb-1 border-3 border-success shadow w-100 h-50 YM" style="overflow: hidden;">
+        <div class="container text-center h-100 g-0">
+          <h5>Say Colors</h5>
+          <div class="row g-0">
+            <div class="col pt-3 bg-danger w-25 text-center">
+              <i class="material-icons text-white" style="font-size:4rem;">
+                record_voice_over
+              </i>
+            </div>
+            <div class="col pt-3 bg-warning w-25">
+              <i class="material-icons text-white" style="font-size:4rem;">
+                record_voice_over
+              </i>
+            </div>
+            <div class="col pt-3 bg-success w-25">
+              <i class="material-icons text-white" style="font-size:4rem;">
+                record_voice_over
+              </i>
+            </div>
+            <div class="col pt-3 bg-primary w-25">
+              <i class="material-icons text-white" style="font-size:4rem;">
+                record_voice_over
+              </i>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col-sm mb-1">
+      <a href="things/supplies" class="btn btn-light mb-1 border border-3 border-success shadow w-100 h-50 YM">
+        <h5>School Supplies</h5>
+        <div class="d-flex justify-content-around">
+          <img src="/image/colorable/stapler.svg" class="img-fluid" style="width:20%;" alt="Stapler">
+          <img src="/image/colorable/pencilcase.svg" class="img-fluid" style="width:20%;" alt="Pencilcase">
+          <img src="/image/colorable/scissors.svg" class="img-fluid" style="width:20%;" alt="Scissors">
+        </div>
+      </a>
+
+      <a href="things/room" class="btn btn-light mb-1 border border-3 border-success shadow w-100 h-50 YM" 
+         style="height: 150px; background-image: url('/image/room.svg');background-size:cover; background-position: bottom;">
+        <h5>Bedroom</h5>
+        <div class="d-flex justify-content-around">
+          <img src="/image/objects/book.svg" class="img-fluid" style="width:20%;" alt="Book">
+          <img src="/image/objects/dog.svg" class="img-fluid" style="width:20%;" alt="Dog">
+          <img src="/image/objects/ball.svg" class="img-fluid" style="width:20%;" alt="Ball">
+        </div>
+      </a>
+    </div>
+
+
+    <div class="col-sm-2 mb-1" style="height:300px;">
+      <a href="things/dressup/boy" class="btn btn-light position-relative border-3 border-success shadow w-100 h-100 YM" style="overflow:hidden;">
+        <h5>Dressup</h5>
+        <img src="/image/dressup/boy/_boy.png" class="img-fluid" style="position:absolute;left:0;top:0;" alt="Boy">
+        <img src="/image/dressup/boy/dog_T-shirt.png" class="img-fluid" style="position:absolute;left:0;top:0;" alt="Dog T-shirt">
+        <img src="/image/dressup/boy/cargo_shorts.png" class="img-fluid" style="position:absolute;left:0;top:0;" alt="Cargo_shorts">
+      </a>
+    </div>
+
+    <div class="col-sm-2 mb-1" style="height:300px;">
+      <a href="things/dressup/girl" class="btn btn-light position-relative border-3 border-success shadow w-100 h-100 YM" style="overflow:hidden;">
+        <h5>Dressup</h5>
+        <img src="/image/dressup/girl/_girl.png" class="img-fluid" style="position:absolute;left:0;top:0;" alt="Girl">
+        <img src="/image/dressup/girl/dress.png" class="img-fluid" style="position:absolute;left:0;top:0;" alt="Dress">
+        <img src="/image/dressup/girl/sunglasses.png" class="img-fluid" style="position:absolute;left:0;top:0;" alt="Sunglasses">
+      </a>
+    </div>
+
+  </div>
+</div>
+
+
+<script>
+$(function(){
+  $(`#things-tab`).addClass("active");
+  });
+</script>
+
+<%- include('../foot.ejs') -%>

@@ -10,7 +10,7 @@ router.use(cookieParser());
 
 router.get('/', (req, res)=>{
   try{
-    res.render('students/abc');
+    res.render('students/letters');
   }
   catch(err){
     res.send(err);
@@ -21,7 +21,7 @@ router.get('/', (req, res)=>{
 
 router.get('/pairs', (req, res)=>{
   try{
-    res.render('activities/abc/pairs');
+    res.render('activities/letters/pairs');
   }
   catch(err){
     res.send(err);
@@ -32,7 +32,7 @@ router.get('/pairs', (req, res)=>{
 
 router.get('/haystack', (req, res)=>{
   try{
-    res.render('activities/abc/haystack');
+    res.render('activities/letters/haystack');
   }
   catch(err){
     res.send(err);
@@ -43,7 +43,7 @@ router.get('/haystack', (req, res)=>{
 
 router.get('/alphabetical', (req, res)=>{
   try{
-    res.render('activities/abc/alphabetical');
+    res.render('activities/letters/alphabetical');
   }
   catch(err){
     res.send(err);
@@ -54,7 +54,7 @@ router.get('/alphabetical', (req, res)=>{
 
 router.get('/write', (req, res)=>{
   try{
-    res.render('activities/abc/write');
+    res.render('activities/letters/write');
   }
   catch(err){
     res.send(err);
@@ -68,20 +68,8 @@ router.post('/SRS', (req, res)=>{
     // set cookie
     let cookie = req.body.ranks.join(',');
     console.log(cookie);
-    res.cookie('abcranks', cookie.toString(), {path: '/abc', maxAge: 252288000, encode: v => v});
+    res.cookie('lettersranks', cookie.toString(), {path: '/letters', maxAge: 252288000, encode: v => v});
     res.send('success');
-  }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
-
-
-router.get('/dressup/:type', (req, res)=>{
-  try{
-
-    res.render(`activities/abc/dressup_${req.params.type}.ejs`);
   }
   catch(err){
     res.send(err);

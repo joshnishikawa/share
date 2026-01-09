@@ -3,7 +3,8 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 const bodyParser = require('body-parser');
-const abc = require('./abc.js');
+const letters = require('./letters.js');
+const things = require('./things.js');
 const labs = require('./labs.js');
 const creds = {
   host: process.env.host,
@@ -25,8 +26,19 @@ const NH_colors = {
 }
 
 router.use(bodyParser.urlencoded({extended: true}));
-router.use('/abc', abc);
+router.use('/letters', letters);
+router.use('/things', things);
 router.use('/labs', labs);
+
+router.get('/abc', (req, res)=>{
+  try{
+    res.redirect('/letters');
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
 
 
 async function getNHVocab(){
@@ -107,17 +119,6 @@ router.get('/api/nh-vocab', async (req, res) => {
   }
   catch(err){
     res.status(500).json({ error: err.message });
-    console.error(err);
-  }
-});
-
-
-router.get('/test', (req, res)=>{
-  try{
-    res.render('tools/test');
-  }
-  catch(err){
-    res.send(err);
     console.error(err);
   }
 });
@@ -216,30 +217,9 @@ router.get('/visuals', (req, res)=>{
 });
 
 
-router.get('/shapes', (req, res)=>{
+router.get('/shapes', (req, res)=>{ // moved to things
   try{
-    res.render('activities/objects/shapes');
-  }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
-
-
-router.get('/supplies', (req, res)=>{
-  try{
-    res.render('activities/objects/supplies');
-  }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
-
-router.get('/objects', (req, res)=>{
-  try{
-    res.render('activities/objects/objects');
+    res.redirect('/things/shapes');
   }
   catch(err){
     res.send(err);
