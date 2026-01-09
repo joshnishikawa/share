@@ -253,6 +253,7 @@ router.get('/speak_spell', (req, res)=>{
 
 router.post('/:activity', async(req, res)=>{
   try{
+    console.log('POST body:', req.body);
     if ( !valid(req.params.activity, req.body) ) throw '404';
     let activity = req.params.activity;
 
@@ -343,7 +344,7 @@ router.get('/:activity/:id', async (req, res)=>{
 
 
 function valid(activity, params){
-  if ( !["bingo", "flash", "grid", "match", "recall", "reveal", "type", "spell", "write", "printcards"].includes(activity)) return false;
+  if ( !["bingo", "flash", "grid", "match", "recall", "reveal", "type", "spell", "write", "printcards", "dobble"].includes(activity)) return false;
   if ( !params.deck ) return false;
   try{
     JSON.parse(params.deck);

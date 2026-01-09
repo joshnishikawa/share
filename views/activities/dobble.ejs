@@ -1,0 +1,60 @@
+<%- include('../head') %>
+
+<div class="btn btn-primary btn-lg" id="next">Next</div>
+
+<div class="container text-center display-1">
+  <div class="row">
+    <div id="card1" class="col d-flex flex-wrap border rounded-3 border-primary justify-content-center"></div>
+    <div id="card2" class="col d-flex flex-wrap border rounded-3 border-primary justify-content-center"></div>
+  </div>
+</div>
+
+
+<script>
+$(function(){
+const deckType = '<%- deckType %>';
+
+var deck = <%- JSON.stringify(deck) %>;
+// limit deck to 62 items max for now
+if (deck.length > 62) deck = deck.slice(0,62);
+const keys = "ABCDEFGHIJKLMNOPQRSTUVWXYZqwertyuiopasdfghjklzxcvbnm1234567890".split("");
+// create mapping of deck items to SET symbols
+var SET = [];
+for (let i = 0; i < deck.length; i++) {
+  SET.push( { [keys[i]]: deck[i] } );
+}
+
+console.log(SET);
+let numOfItems = 9; // make user selectable
+
+$('#next').on('click', load2Cards);
+
+function load2Cards(){
+  if (gameSet.length < numOfItems*2-1) gameSet = FYshuffle( SET );
+  let card1 = [gameSet.pop()];
+  let card2 = card1.slice();
+  let roundSet = gameSet.slice(); // copy remaining set after selecting item
+  
+  for (let i = 0; i < numOfItems-1; i++) {
+    card1.push(roundSet.pop());
+    card2.push(roundSet.pop());
+  }
+  card1 = FYshuffle(card1);
+  card2 = FYshuffle(card2);
+
+  $("#card1").html("");
+  $("#card2").html("");
+
+  for (let i = 0; i < numOfItems; i++) {
+    const item1 = Object.values(card1[i])[0];
+    const item2 = Object.values(card2[i])[0];
+    $("#card1").append(`<img src="${item1.image}" class="" style="width:150px" alt="" />`);
+    $("#card2").append(`<img src="${item2.image}" class="" style="width:150px" alt="" />`);
+  }
+}
+
+let gameSet = FYshuffle( SET.slice() );
+});
+</script>
+
+<%- include('../foot') %>
