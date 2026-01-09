@@ -33,11 +33,10 @@ $(function(){
   document.title = `Write`;
 
   const deck = <%- JSON.stringify(deck) %>;
-  const paramsData = `<%- params %>`;
-  const params = JSON.parse(paramsData);
-  var L1 = (params.L1 == 'on' ? true : false);
-  var trace = (params.trace == 'on' ? true : false);
-  var write = (params.write == 'on' ? true : false);
+  const query = <%- JSON.stringify(query) %>;
+  var L1 = (query.L1 == 'on' ? true : false);
+  var trace = (query.trace == 'on' ? true : false);
+  var write = (query.write == 'on' ? true : false);
   $("#L1").prop('checked', L1);
   $("#trace").prop('checked', trace);
   $("#write").prop('checked', write);
