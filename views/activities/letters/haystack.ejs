@@ -1,6 +1,11 @@
 <%- include('../../head'); -%>
 <body>
 
+  <button id="home" class="btn btn-sm btn-outline-secondary p-0" style="position:absolute;right:0;" onclick="location.href='/letters';">
+    <i class="material-icons">home</i>
+  </button>
+
+
   <div id="menu" class="container-fluid d-block text-center" style="user-select: none;">
     <div class="row">
       <div class="col d-flex flex-wrap justify-content-center">
@@ -29,7 +34,7 @@
 
 <script>
 $(function(){
-
+  document.title = 'Haystack';
   document.addEventListener('contextmenu', function (event) {
     event.preventDefault();
   });

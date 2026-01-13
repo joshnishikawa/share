@@ -1,5 +1,10 @@
-<%- include('../head'); -%>
+<%- include('../../head'); -%>
 <body class="lightBG">
+
+  <button id="home" class="btn btn-sm btn-outline-secondary p-0" style="position:absolute;right:0;" onclick="location.href='/letters';">
+    <i class="material-icons">home</i>
+  </button>
+
 <div style="min-height:100vh;" class="noselect"><!-- just for keeping the footer at the bottom-->
   <div id="rank" style="position:fixed;bottom:0;right:0;"></div>
 
@@ -118,6 +123,7 @@
 
 
 $(function(){
+  document.title = 'SRS Letters';
   window.scrollTo(0,0);
   ranks = JSON.parse(localStorage.getItem('abc_SRS')) 
               || [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
@@ -137,4 +143,4 @@ $(function(){
 <!-- define this after update() and checkProgress() are defined above -->
 <script src="/javascripts/abc.js"></script>
 
-<%- include('../foot'); -%>
+<%- include('../../foot'); -%>

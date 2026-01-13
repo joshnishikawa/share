@@ -344,7 +344,7 @@ router.get('/:activity/:id', async (req, res)=>{
 
 
 function valid(activity, params){
-  if ( !["bingo", "flash", "grid", "match", "recall", "reveal", "type", "spell", "write", "printcards", "dobble"].includes(activity)) return false;
+  if ( !["bingo", "flash", "grid", "match", "recall", "reveal", "type", "spell", "penmanship", "printcards", "twins"].includes(activity)) return false;
   if ( !params.deck ) return false;
   try{
     JSON.parse(params.deck);

@@ -1,6 +1,11 @@
 <%- include('../../head'); -%>
 <body>
 
+  <button id="home" class="btn btn-sm btn-outline-secondary p-0" style="position:absolute;right:0;" onclick="location.href='/letters';">
+    <i class="material-icons">home</i>
+  </button>
+
+  
   <div style="min-height:100vh;user-select: none;">
     <div id="buttons" class="container d-block text-center">
       <div class="row">
@@ -43,7 +48,7 @@
 
 <script>
 $(function(){
-
+  document.title = 'Find Pairs';
   document.addEventListener('contextmenu', function (event) {
     event.preventDefault();
   });

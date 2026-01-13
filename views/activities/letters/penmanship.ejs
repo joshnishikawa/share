@@ -1,6 +1,10 @@
 <%- include('../../head'); -%>
 <body>
 
+  <button id="home" class="btn btn-sm btn-outline-secondary p-0" style="position:absolute;right:0;" onclick="location.href='/letters';">
+    <i class="material-icons">home</i>
+  </button>
+
   <div class="container-fluid" style="min-height:100vh;">
     <div class="row">
 
@@ -21,6 +25,7 @@
 <script>
 
 $(function(){
+  document.title = 'Penmanship';
   let letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"];
   let sounds = {
     "a": "aei", "b": "bmp", "c": "cdgknstxyz", "d": "cdgknstxyz", "e": "aei", 

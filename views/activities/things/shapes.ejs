@@ -42,104 +42,8 @@
   #colorMenu ul li:hover {
     cursor: pointer;
   }
-</style>
 
-
-<div class="container-fluid g-0">
-  <div class="row g-0" style="height:100vh;">
-    <div id="colorMenu" class="col ps-1 pt-1 bg-light" style="max-width:100px;">
-      <ul class="nav vert-tabs d-flex flex-column" style="height:100%;">
-        <li class="nav-item rounded-start p-2" style="color:white;background-color:red;">RED</li>
-        <li class="nav-item rounded-start p-2" style="background-color: orange;">ORANGE</li>
-        <li class="nav-item rounded-start p-2" style="background-color: yellow;">YELLOW</li>
-        <li class="nav-item rounded-start p-2" style="color:white;background-color: green;">GREEN</li>
-        <li class="nav-item rounded-start p-2" style="color:white;background-color: blue;">BLUE</li>
-        <li class="nav-item rounded-start p-2" style="color:white;background-color: purple;">PURPLE</li>
-        <li class="nav-item rounded-start p-2" style="background-color: hotpink;">PINK</li>
-        <li class="nav-item rounded-start p-2 border border-end-0" style="background-color: white">WHITE</li>
-        <li class="nav-item rounded-start p-2" style="color:white;background-color: black;">BLACK</li>
-
-        
-      </ul>
-      <div style="position:relative;">
-        <button id="manageCanvases" class="btn btn-sm btn-primary mb-1"
-                style="position:absolute;bottom:0;">
-          <i class="material-icons">view_module</i>
-        </button>
-      </div>
-    </div>
-
-    <div id="shapeMenu" class="col bg-light p-2" style="height:100%;max-width:100px;border:10px solid rgba(0,0,0,0);">
-      <div class="shape" data-shape="circle">
-        <svg class="circle-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none"
-          xmlns="http://www.w3.org/2000/svg">
-          <circle cx="50" cy="50" r="49" fill="purple" stroke="black" stroke-width="1" />
-        </svg>
-      </div>
-      <div class="shape" data-shape="square">
-        <svg class="square-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none"
-          xmlns="http://www.w3.org/2000/svg">
-          <rect x="0" y="0" width="100" height="100" fill="green" stroke="black" stroke-width="1" />
-        </svg>
-      </div>
-      <div class="shape" data-shape="triangle">
-        <svg class="triangle-svg" width="100%" height="100%" viewBox="0 0 100 87" fill="none"
-          xmlns="http://www.w3.org/2000/svg">
-          <polygon points="50,0 100,86 0,86" fill="hotpink" stroke="black" stroke-width="1" />
-        </svg>
-      </div>
-      <div class="shape" data-shape="rectangle">
-        <svg class="rectangle-svg" width="100%" height="100%" viewBox="0 0 100 60" fill="none"
-          xmlns="http://www.w3.org/2000/svg">
-          <rect x="0" y="0" width="100" height="60" fill="orange" stroke="black" stroke-width="1" />
-        </svg>
-      </div>
-      <div class="shape" data-shape="diamond">
-        <svg class="diamond-svg" width="100%" height="100%" viewBox="0 0 100 80" fill="none"
-          xmlns="http://www.w3.org/2000/svg">
-          <polygon points="50,0 100,40 50,80 0,40" fill="blue" stroke="black" stroke-width="1" />
-        </svg>
-      </div>
-      <div class="shape" data-shape="star">
-        <svg class="star-svg" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 85"
-          fill="none">
-          <polygon points="45,0 56,30 90,30 63,52 73,85 45,65 17,85 27,52 0,30 34,30" fill="yellow" stroke="black"
-            stroke-width="1" />
-        </svg>
-      </div>
-      <div class="shape" data-shape="heart">
-        <svg class="heart-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none"
-          xmlns="http://www.w3.org/2000/svg">
-          <path
-            d="m 29.703568,1.0010808 a 28.70313,31.396622 0 0 0 -20.2964316,9.1950552 28.70313,31.396622 0 0 0 -1e-7,44.401932 L 49.999999,99 90.592864,54.598068 a 28.70313,31.396622 0 0 0 0,-44.401932 28.70313,31.396622 0 0 0 -40.592864,0 28.70313,31.396622 0 0 0 -20.296432,-9.1950552 z"
-            fill="red" stroke="black" stroke-width="1" />
-        </svg>
-      </div>
-    </div>
-
-    <!-- Canvas area for dragging and dropping shapes -->
-    <div id="canvasWrapper" class="col" style="max-height:100vh;overflow:visible;">
-      <div id="canvas" style="height:100%;overflow:visible;position:relative;"></div>
-    </div>
-  </div>
-</div>
-
-<div class="modal fade" id="canvasManagerModal" tabindex="-1" aria-labelledby="canvasManagerModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="canvasManagerModalLabel">Manage Canvases</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div id="canvasGrid" class="canvas-grid"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<style>
-.canvas-grid {
+  .canvas-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 200px));
   gap: 15px;
@@ -255,7 +159,101 @@
   width: 200px;
   background: white;
 }
+
 </style>
+
+<div class="container-fluid g-0">
+  <div class="row g-0" style="height:100vh;">
+    <div id="colorMenu" class="col ps-1 pt-1 bg-light" style="max-width:100px;">
+      <ul class="nav vert-tabs d-flex flex-column" style="height:100%;">
+        <li class="nav-item rounded-start p-2" style="color:white;background-color:red;">RED</li>
+        <li class="nav-item rounded-start p-2" style="background-color: orange;">ORANGE</li>
+        <li class="nav-item rounded-start p-2" style="background-color: yellow;">YELLOW</li>
+        <li class="nav-item rounded-start p-2" style="color:white;background-color: green;">GREEN</li>
+        <li class="nav-item rounded-start p-2" style="color:white;background-color: blue;">BLUE</li>
+        <li class="nav-item rounded-start p-2" style="color:white;background-color: purple;">PURPLE</li>
+        <li class="nav-item rounded-start p-2" style="background-color: hotpink;">PINK</li>
+        <li class="nav-item rounded-start p-2 border border-end-0" style="background-color: white">WHITE</li>
+        <li class="nav-item rounded-start p-2" style="color:white;background-color: black;">BLACK</li>
+
+        
+      </ul>
+      <div style="position:relative;">
+        <button id="manageCanvases" class="btn btn-sm btn-primary mb-1"
+                style="position:absolute;bottom:0;">
+          <i class="material-icons">view_module</i>
+        </button>
+      </div>
+    </div>
+
+    <div id="shapeMenu" class="col bg-light p-2" style="height:100%;max-width:100px;border:10px solid rgba(0,0,0,0);">
+      <div class="shape" data-shape="circle">
+        <svg class="circle-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="49" fill="purple" stroke="black" stroke-width="1" />
+        </svg>
+      </div>
+      <div class="shape" data-shape="square">
+        <svg class="square-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="0" width="100" height="100" fill="green" stroke="black" stroke-width="1" />
+        </svg>
+      </div>
+      <div class="shape" data-shape="triangle">
+        <svg class="triangle-svg" width="100%" height="100%" viewBox="0 0 100 87" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <polygon points="50,0 100,86 0,86" fill="hotpink" stroke="black" stroke-width="1" />
+        </svg>
+      </div>
+      <div class="shape" data-shape="rectangle">
+        <svg class="rectangle-svg" width="100%" height="100%" viewBox="0 0 100 60" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="0" width="100" height="60" fill="orange" stroke="black" stroke-width="1" />
+        </svg>
+      </div>
+      <div class="shape" data-shape="diamond">
+        <svg class="diamond-svg" width="100%" height="100%" viewBox="0 0 100 80" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <polygon points="50,0 100,40 50,80 0,40" fill="blue" stroke="black" stroke-width="1" />
+        </svg>
+      </div>
+      <div class="shape" data-shape="star">
+        <svg class="star-svg" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 85"
+          fill="none">
+          <polygon points="45,0 56,30 90,30 63,52 73,85 45,65 17,85 27,52 0,30 34,30" fill="yellow" stroke="black"
+            stroke-width="1" />
+        </svg>
+      </div>
+      <div class="shape" data-shape="heart">
+        <svg class="heart-svg" width="100%" height="100%" viewBox="0 0 100 100" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="m 29.703568,1.0010808 a 28.70313,31.396622 0 0 0 -20.2964316,9.1950552 28.70313,31.396622 0 0 0 -1e-7,44.401932 L 49.999999,99 90.592864,54.598068 a 28.70313,31.396622 0 0 0 0,-44.401932 28.70313,31.396622 0 0 0 -40.592864,0 28.70313,31.396622 0 0 0 -20.296432,-9.1950552 z"
+            fill="red" stroke="black" stroke-width="1" />
+        </svg>
+      </div>
+    </div>
+
+    <!-- Canvas area for dragging and dropping shapes -->
+    <div id="canvasWrapper" class="col" style="max-height:100vh;overflow:visible;">
+      <div id="canvas" style="height:100%;overflow:visible;position:relative;"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="canvasManagerModal" tabindex="-1" aria-labelledby="canvasManagerModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="canvasManagerModalLabel">Manage Canvases</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="canvasGrid" class="canvas-grid"></div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
 <script src="/javascripts/canvas_builder.js"></script>
@@ -263,6 +261,7 @@
 
 <script>
 $(function () {
+  document.title = "Shapes";
   // Initialize canvas builder
   const canvasBuilder = new CanvasBuilder({
     storageKey: 'shapes',

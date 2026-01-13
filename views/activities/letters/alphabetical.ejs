@@ -12,6 +12,11 @@
 
 <body>
 
+  <button id="home" class="btn btn-sm btn-outline-secondary p-0" style="position:absolute;right:0;" onclick="location.href='/letters';">
+    <i class="material-icons">home</i>
+  </button>
+
+
   <div id="info" class="container">
     <div class="row pb-5">
 
@@ -59,6 +64,7 @@
 
 <script>
 $(function(){
+  document.title = 'Alphabetical';
   let finished = false;
   let timeLimit = 60; // seconds
   let starttime = 0;  // defined when the user clicks start

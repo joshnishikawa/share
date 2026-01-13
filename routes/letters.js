@@ -46,9 +46,9 @@ router.get('/alphabetical', (req, res)=>{
 });
 
 
-router.get('/write', (req, res)=>{
+router.get('/penmanship', (req, res)=>{
   try{
-    res.render('activities/letters/write');
+    res.render('activities/letters/penmanship');
   }
   catch(err){
     res.send(err);
@@ -59,7 +59,7 @@ router.get('/write', (req, res)=>{
 
 router.get('/SRS', (req, res)=>{
   try{
-    res.render('activities/SRS');
+    res.render('activities/letters/SRS');
   }
   catch(err){
     res.send(err);

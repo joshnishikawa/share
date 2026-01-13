@@ -52,74 +52,7 @@
   #colorMenu ul li:hover {
     cursor: pointer;
   }
-</style>
-
-
-<div class="container-fluid g-0">
-  <div class="row g-0" style="height:100vh;">
-    <div id="colorMenu" class="col ps-1 pt-1 bg-light" style="max-width:50px;">
-      <ul class="nav vert-tabs d-flex flex-column" style="height:100%;">
-        <li class="nav-item rounded-start p-2" data-color="red" style="color:white;background-color:red;"></li>
-        <li class="nav-item rounded-start p-2" data-color="orange" style="background-color: orange;"></li>
-        <li class="nav-item rounded-start p-2" data-color="yellow" style="background-color: yellow;"></li>
-        <li class="nav-item rounded-start p-2" data-color="green" style="color:white;background-color: green;"></li>
-        <li class="nav-item rounded-start p-2" data-color="blue" style="color:white;background-color: blue;"></li>
-        <li class="nav-item rounded-start p-2" data-color="purple" style="color:white;background-color: purple;"></li>
-        <li class="nav-item rounded-start p-2" data-color="hotpink" style="background-color: hotpink;"></li>
-        <li class="nav-item rounded-start p-2 border border-end-0" data-color="white" style="background-color: white"></li>
-        <li class="nav-item rounded-start p-2" data-color="black" style="color:white;background-color: black;"></li>
-
-        <div id="tagMenuFiller" class="p-1" style="position:relative;flex: auto">
-          <div style="position:absolute;bottom:5px;">
-            <button id="manageCanvases" class="btn btn-sm btn-primary">
-              <i class="material-icons">view_module</i>
-            </button>
-          </div>
-        </div>
-
-      </ul>
-    </div>
-    
-    <div id="supplyMenu" class="col bg-light p-2" style="height:100%;max-width:200px;border:10px solid rgba(0,0,0,0);">
-      <%- include('./supplies/calendar'); -%>
-      <%- include('./supplies/eraser'); -%>
-      <%- include('./supplies/glue'); -%>
-      <%- include('./supplies/marker'); -%>
-      <%- include('./supplies/notebook'); -%>
-      <%- include('./supplies/pen'); -%>
-      <%- include('./supplies/pencil'); -%>
-      <%- include('./supplies/pencilcase'); -%>
-      <%- include('./supplies/ruler'); -%>
-      <%- include('./supplies/scissors'); -%>
-      <%- include('./supplies/sharpener'); -%>
-      <%- include('./supplies/stapler'); -%>
-    </div>
-
-    <!-- Canvas area for dragging and dropping supplies -->
-    <div id="canvasWrapper" class="col" style="max-height:100vh;overflow:visible;">
-      <div id="canvas" style="height:100%;overflow:visible;position:relative;"></div>
-    </div>
-  </div>
-</div>
-
-<%- include('../../foot'); -%>
-
-<div class="modal fade" id="canvasManagerModal" tabindex="-1" aria-labelledby="canvasManagerModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="canvasManagerModalLabel">Manage Canvases</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div id="canvasGrid" class="canvas-grid"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<style>
-.canvas-grid {
+  .canvas-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 200px));
   gap: 15px;
@@ -229,7 +162,73 @@
   width: 200px;
   background: white;
 }
+
 </style>
+
+
+<div class="container-fluid g-0">
+  <div class="row g-0" style="height:100vh;">
+    <div id="colorMenu" class="col ps-1 pt-1 bg-light" style="max-width:50px;">
+      <ul class="nav vert-tabs d-flex flex-column" style="height:100%;">
+        <li class="nav-item rounded-start p-2" data-color="red" style="color:white;background-color:red;"></li>
+        <li class="nav-item rounded-start p-2" data-color="orange" style="background-color: orange;"></li>
+        <li class="nav-item rounded-start p-2" data-color="yellow" style="background-color: yellow;"></li>
+        <li class="nav-item rounded-start p-2" data-color="green" style="color:white;background-color: green;"></li>
+        <li class="nav-item rounded-start p-2" data-color="blue" style="color:white;background-color: blue;"></li>
+        <li class="nav-item rounded-start p-2" data-color="purple" style="color:white;background-color: purple;"></li>
+        <li class="nav-item rounded-start p-2" data-color="hotpink" style="background-color: hotpink;"></li>
+        <li class="nav-item rounded-start p-2 border border-end-0" data-color="white" style="background-color: white"></li>
+        <li class="nav-item rounded-start p-2" data-color="black" style="color:white;background-color: black;"></li>
+
+        <div id="tagMenuFiller" class="p-1" style="position:relative;flex: auto">
+          <div style="position:absolute;bottom:5px;">
+            <button id="manageCanvases" class="btn btn-sm btn-primary">
+              <i class="material-icons">view_module</i>
+            </button>
+          </div>
+        </div>
+
+      </ul>
+    </div>
+    
+    <div id="supplyMenu" class="col bg-light p-2" style="height:100%;max-width:200px;border:10px solid rgba(0,0,0,0);">
+      <%- include('./supplies/calendar'); -%>
+      <%- include('./supplies/eraser'); -%>
+      <%- include('./supplies/glue'); -%>
+      <%- include('./supplies/marker'); -%>
+      <%- include('./supplies/notebook'); -%>
+      <%- include('./supplies/pen'); -%>
+      <%- include('./supplies/pencil'); -%>
+      <%- include('./supplies/pencilcase'); -%>
+      <%- include('./supplies/ruler'); -%>
+      <%- include('./supplies/scissors'); -%>
+      <%- include('./supplies/sharpener'); -%>
+      <%- include('./supplies/stapler'); -%>
+    </div>
+
+    <!-- Canvas area for dragging and dropping supplies -->
+    <div id="canvasWrapper" class="col" style="max-height:100vh;overflow:visible;">
+      <div id="canvas" style="height:100%;overflow:visible;position:relative;"></div>
+    </div>
+  </div>
+</div>
+
+<%- include('../../foot'); -%>
+
+<div class="modal fade" id="canvasManagerModal" tabindex="-1" aria-labelledby="canvasManagerModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="canvasManagerModalLabel">Manage Canvases</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="canvasGrid" class="canvas-grid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
 <script src="/javascripts/canvas_builder.js"></script>
@@ -237,6 +236,7 @@
 
 <script>
 $(function () {
+  document.title = "Supplies";
   // Initialize canvas builder for supplies
   const canvasBuilder = new CanvasBuilder({
     storageKey: 'supplies',

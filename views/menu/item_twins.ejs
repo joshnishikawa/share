@@ -1,29 +1,26 @@
 <div class="rounded-3 d-flex">
   <div class="d-flex me-3">
-    <i class="material-icons text-secondary point" data-bs-toggle="modal" data-bs-target="#dobble_modal">
+    <i class="material-icons text-secondary point" data-bs-toggle="modal" data-bs-target="#twins_modal">
       info
     </i>
-    <strong class="text-primary fs-5">DOBBLE</strong>
+    <strong class="text-primary fs-5">TWINS</strong>
   </div>
 
 
-  <form id="dobbleForm" action="/dobble" method="POST" class="menuitem d-flex justify-content-end w-100">
+  <form id="twinsForm" action="/twins" method="POST" class="menuitem d-flex justify-content-end w-100">
     <input type="hidden" value="" name="deck">
     <input type="hidden" value="NH" name="deckType">
-
-    <div class="d-flex" style="height:100%;">
-      <button id="dobbleButton" type="submit" class="btn btn-sm btn-primary YM" style="height:100%;">Start</button>
-    </div>
+    <button type="submit" class="btn btn-sm btn-primary YM" style="height:100%;">Start</button>
   </form>
 
 </div>
 
-<div id="dobble_modal" class="modal fade">
+<div id="twins_modal" class="modal fade">
   <div class="modal-dialog">
     <div class="modal-content">
     
       <div class="modal-header">
-        <h3 class="modal-title">DOBBLE</h3>
+        <h3 class="modal-title">TWINS</h3>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">

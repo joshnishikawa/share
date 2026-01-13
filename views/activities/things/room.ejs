@@ -46,59 +46,7 @@
     background-repeat: no-repeat !important;
     background-attachment: scroll !important;
   }
-</style>
-
-
-<div class="container-fluid g-0">
-  <div class="row g-0" style="height:100vh;">
-    
-    <div class="col bg-light p-2" style="height:100%;max-width:200px;display:flex;flex-direction:column;">
-      <div id="objectMenu" style="flex:1;display:flex;flex-wrap:wrap;overflow-y:auto;">
-        <%- include('./room/bag'); -%>
-        <%- include('./room/ball'); -%>
-        <%- include('./room/basket'); -%>
-        <%- include('./room/book'); -%>
-        <%- include('./room/box'); -%>
-        <%- include('./room/cap'); -%>
-        <%- include('./room/clock'); -%>
-        <%- include('./room/dog'); -%>
-        <%- include('./room/mug'); -%>
-        <%- include('./room/recorder'); -%>
-        <%- include('./room/riceball'); -%>
-        <%- include('./room/socks'); -%>
-      </div>
-      <div class="mt-2">
-        <button id="manageCanvases" class="btn btn-sm btn-primary">
-          <i class="material-icons">view_module</i>
-        </button>
-      </div>
-    </div>
-
-    <!-- Canvas area for dragging and dropping objects -->
-    <div id="canvasWrapper" class="col" style="max-height:100vh;overflow:visible;">
-      <div id="canvas" style="height:100%;overflow:visible;position:relative;"></div>
-    </div>
-  </div>
-</div>
-
-<%- include('../../foot'); -%>
-
-<div class="modal fade" id="canvasManagerModal" tabindex="-1" aria-labelledby="canvasManagerModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="canvasManagerModalLabel">Manage Canvases</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div id="canvasGrid" class="canvas-grid"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<style>
-.canvas-grid {
+  .canvas-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 200px));
   gap: 15px;
@@ -208,7 +156,58 @@
   width: 200px;
   background: white;
 }
+
 </style>
+
+
+<div class="container-fluid g-0">
+  <div class="row g-0" style="height:100vh;">
+    
+    <div class="col bg-light p-2" style="height:100%;max-width:200px;display:flex;flex-direction:column;">
+      <div id="objectMenu" style="flex:1;display:flex;flex-wrap:wrap;overflow-y:auto;">
+        <%- include('./room/bag'); -%>
+        <%- include('./room/ball'); -%>
+        <%- include('./room/basket'); -%>
+        <%- include('./room/book'); -%>
+        <%- include('./room/box'); -%>
+        <%- include('./room/cap'); -%>
+        <%- include('./room/clock'); -%>
+        <%- include('./room/dog'); -%>
+        <%- include('./room/mug'); -%>
+        <%- include('./room/recorder'); -%>
+        <%- include('./room/riceball'); -%>
+        <%- include('./room/socks'); -%>
+      </div>
+      <div class="mt-2">
+        <button id="manageCanvases" class="btn btn-sm btn-primary">
+          <i class="material-icons">view_module</i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Canvas area for dragging and dropping objects -->
+    <div id="canvasWrapper" class="col" style="max-height:100vh;overflow:visible;">
+      <div id="canvas" style="height:100%;overflow:visible;position:relative;"></div>
+    </div>
+  </div>
+</div>
+
+<%- include('../../foot'); -%>
+
+<div class="modal fade" id="canvasManagerModal" tabindex="-1" aria-labelledby="canvasManagerModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="canvasManagerModalLabel">Manage Canvases</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="canvasGrid" class="canvas-grid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
 <script src="/javascripts/canvas_builder.js"></script>
@@ -216,6 +215,7 @@
 
 <script>
 $(function () {
+  document.title = "Bedroom";
   // Initialize canvas builder for objects
   const canvasBuilder = new CanvasBuilder({
     storageKey: 'objects',

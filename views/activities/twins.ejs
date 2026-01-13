@@ -1,0 +1,84 @@
+<%- include('../head') %>
+
+<div class="d-flex" style="position:relative;">
+  <%- include('../menu/item_twins'); -%>
+
+  <button id="next" class="btn btn-sm btn-outline-success py-0 mx-3">
+    <i class="material-icons">arrow_forward</i>
+  </button>
+
+  <button id="home" class="btn btn-sm btn-outline-secondary p-0" style="position:absolute;right:0;" onclick="location.href='/NH'">
+    <i class="material-icons">home</i>
+  </button>
+
+</div>
+
+<div class="container" style="min-height:100vh;">
+  <div class="row pt-3">
+    <div id="cards_A" class="col d-flex flex-wrap border rounded-3 border-primary justify-content-center"></div>
+    <div class="col-1"></div>
+    <div id="cards_B" class="col d-flex flex-wrap border rounded-3 border-primary justify-content-center"></div>
+  </div>
+</div>
+
+
+<script>
+$(function(){
+$("form button[type=submit]").hide();
+const deckType = '<%- deckType %>';
+document.title = `Twins ${deckType}`;
+
+var deck = <%- JSON.stringify(deck) %>;
+var numOfItems = 9; // TODO: make user selectable
+var unusedCards = [];
+
+$('#next').on('click', load2Cards);
+
+$(document).on('keyup',function(e) {
+  if (e.key === "ArrowRight" || e.key === " ") {
+    load2Cards();
+  }
+});
+
+
+function load2Cards(){
+  let thisHand = FYshuffle( deck.slice() );
+  if (unusedCards.length == 0) {
+    unusedCards = FYshuffle(deck.slice());
+  }
+  let item = unusedCards.pop();
+  let cards_A = [ item ];
+  let cards_B = [ item ];
+  
+  while (cards_A.length < numOfItems) {
+    let candidate = thisHand.pop();
+    if (!cards_A.includes(candidate)) {
+      cards_A.push( candidate );
+    }
+  }
+
+  while (cards_B.length < numOfItems) {
+    let candidate = thisHand.pop();
+    if (!cards_B.includes(candidate) && !cards_A.includes(candidate)) {
+      cards_B.push( candidate );
+    }
+  }
+  
+  cards_A = FYshuffle(cards_A);
+  cards_B = FYshuffle(cards_B);
+
+  $("#cards_A").html("");
+  $("#cards_B").html("");
+
+  for (let i = 0; i < numOfItems; i++) {
+    $("#cards_A").append(`<img src="${cards_A[i].image}" class="" style="width:150px" alt="" />`);
+    $("#cards_B").append(`<img src="${cards_B[i].image}" class="" style="width:150px" alt="" />`);
+  }
+}
+
+load2Cards();
+
+});
+</script>
+
+<%- include('../foot') %>
