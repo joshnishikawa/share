@@ -29,7 +29,11 @@ const deckType = '<%- deckType %>';
 document.title = `Twins ${deckType}`;
 
 var deck = <%- JSON.stringify(deck) %>;
-var numOfItems = 9; // TODO: make user selectable
+var numOfItems = deck.length >= 18 ? 9 : deck.length >= 8 ? 4 : 0;
+if (numOfItems == 0) {
+  alert("Not enough items in this deck to play Twins.");
+  location.href='/NH';
+}
 var unusedCards = [];
 
 $('#next').on('click', load2Cards);
@@ -66,13 +70,13 @@ function load2Cards(){
   
   cards_A = FYshuffle(cards_A);
   cards_B = FYshuffle(cards_B);
-
   $("#cards_A").html("");
   $("#cards_B").html("");
+  let w = numOfItems == 9 ? 33 : 50;
 
   for (let i = 0; i < numOfItems; i++) {
-    $("#cards_A").append(`<img src="${cards_A[i].image}" class="" style="width:150px" alt="" />`);
-    $("#cards_B").append(`<img src="${cards_B[i].image}" class="" style="width:150px" alt="" />`);
+    $("#cards_A").append(`<img src="${cards_A[i].image}" class="" style="width:${w}%" alt="" />`);
+    $("#cards_B").append(`<img src="${cards_B[i].image}" class="" style="width:${w}%" alt="" />`);
   }
 }
 
