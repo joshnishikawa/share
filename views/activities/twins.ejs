@@ -15,9 +15,9 @@
 
 <div class="container" style="min-height:100vh;">
   <div class="row pt-3">
-    <div id="cards_A" class="col d-flex flex-wrap border rounded-3 border-primary justify-content-center"></div>
+    <div id="cards_A" class="col d-flex flex-wrap alert alert-primary justify-content-center shadow p-3"></div>
     <div class="col-1"></div>
-    <div id="cards_B" class="col d-flex flex-wrap border rounded-3 border-primary justify-content-center"></div>
+    <div id="cards_B" class="col d-flex flex-wrap alert alert-primary justify-content-center shadow p-3"></div>
   </div>
 </div>
 
@@ -28,19 +28,44 @@ $("form button[type=submit]").hide();
 const deckType = '<%- deckType %>';
 document.title = `Twins ${deckType}`;
 
+var unusedCards = [];
 var deck = <%- JSON.stringify(deck) %>;
-var numOfItems = deck.length >= 18 ? 9 : deck.length >= 8 ? 4 : 0;
+const query = <%- JSON.stringify(query) %>;
+var numOfItems = query.number ? parseInt(query.number) 
+                              : deck.length >= 18 ? 9 
+                              : deck.length >= 8 ? 4 : 0;
 if (numOfItems == 0) {
   alert("Not enough items in this deck to play Twins.");
   location.href='/NH';
 }
-var unusedCards = [];
+else {
+  $(`input[name=number][value=${numOfItems}]`).prop('checked', true);
+}
 
 $('#next').on('click', load2Cards);
 
-$(document).on('keyup',function(e) {
+$('input[name=number]').on('change', function(){
+  numOfItems = parseInt( $(this).val() );
+  unusedCards = [];
+  load2Cards();
+});
+
+$(document).off('keyup').on('keyup',function(e) {
   if (e.key === "ArrowRight" || e.key === " ") {
-    load2Cards();
+    // highlight matching items for one second before loading new cards
+    // $("#cards_A img, #cards_B img").css("border", "none");
+    let matchedSrc = '';
+    $("#cards_A img").each(function(){
+      let src = $(this).attr("src");
+      if ( $(`#cards_B img[src='${src}']`).length > 0 ) {
+        matchedSrc = src;
+      }
+    });
+    $(`#cards_A img[src='${matchedSrc}'], #cards_B img[src='${matchedSrc}']`)
+    .addClass('alert alert-warning p-0 m-0');
+    setTimeout(() => {  
+      load2Cards();
+    }, 2000);
   }
 });
 
