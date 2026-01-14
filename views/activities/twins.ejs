@@ -42,32 +42,43 @@ else {
   $(`input[name=number][value=${numOfItems}]`).prop('checked', true);
 }
 
-$('#next').on('click', load2Cards);
 
 $('input[name=number]').on('change', function(){
   numOfItems = parseInt( $(this).val() );
   unusedCards = [];
+  const url = new URL(window.location.href);
+  url.searchParams.set('number', numOfItems);
+  window.history.replaceState({}, '', url);
   load2Cards();
+});
+
+$('#next').on('click', function(){
+  highlight();
+  setTimeout(() => {  
+    load2Cards();
+  }, 2000);
 });
 
 $(document).off('keyup').on('keyup',function(e) {
   if (e.key === "ArrowRight" || e.key === " ") {
-    // highlight matching items for one second before loading new cards
-    // $("#cards_A img, #cards_B img").css("border", "none");
-    let matchedSrc = '';
+    highlight();
+    setTimeout(() => {  
+      load2Cards();
+    }, 2000);
+  }
+});
+
+
+function highlight(){
+      let matchedSrc = '';
     $("#cards_A img").each(function(){
       let src = $(this).attr("src");
       if ( $(`#cards_B img[src='${src}']`).length > 0 ) {
         matchedSrc = src;
       }
     });
-    $(`#cards_A img[src='${matchedSrc}'], #cards_B img[src='${matchedSrc}']`)
-    .addClass('alert alert-warning p-0 m-0');
-    setTimeout(() => {  
-      load2Cards();
-    }, 2000);
-  }
-});
+    $(`#cards_A img[src='${matchedSrc}'], #cards_B img[src='${matchedSrc}']`).addClass('alert alert-warning p-0 m-0');
+}
 
 
 function load2Cards(){
