@@ -81,9 +81,8 @@ router.get('/api/any-vocab', async (req, res)=>{
     let words = {};
     var rows;
     var deck = req.query.deck ? JSON.parse(req.query.deck) : [];
-
     if (req.query.deck) {
-      rows = vocabulary.filter(item => deck.includes(item.word));
+      rows = vocabulary.filter(item => deck.includes(item.id));
     }
     else {
       // parse everything from vocabulary table
@@ -345,7 +344,9 @@ router.get('/:activity/:id', async (req, res)=>{
 
 function valid(activity, params){
   if ( !["bingo", "flash", "grid", "match", "recall", "reveal", "type", "spell", "penmanship", "printcards", "twins"].includes(activity)) return false;
-  if ( !params.deck ) return false;
+  if ( !params.deck ) {
+    return false;
+  }
   try{
     JSON.parse(params.deck);
   }

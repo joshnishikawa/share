@@ -48,9 +48,9 @@ $(function(){
       alert("<%- __('pleaseSelect') %>");
     }
     else {
-      var words = {};
-      $.get('/api/any-vocab', {deck: JSON.stringify(window.deck)}, async (data) => {
-        await $("#cardsForm input[name='deck']").val(JSON.stringify(data));
+      $.get('/api/any-vocab', {deck: JSON.stringify(window.deck)})
+       .then((data) => {
+        $("#cardsForm input[name='deck']").val(JSON.stringify(data));
         $("#cardsForm").submit();
       });
     }

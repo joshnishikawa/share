@@ -3,7 +3,15 @@
     <i class="material-icons text-secondary point" data-bs-toggle="modal" data-bs-target="#twins_modal">
       info
     </i>
-    <strong class="text-primary fs-5">TWINS</strong>
+    <strong class="text-primary fs-5 pe-2">TWINS</strong>
+
+    <div class="alert alert-primary p-0 m-0 me-1" style="height:30px;width:30px;">
+      <div class="alert alert-warning border border-warning p-0 m-0" style="height:10px;width:10px;"></div>
+    </div>
+    <div class="alert alert-primary p-0 m-0" style="height:30px;width:30px;">
+      <div class="alert alert-warning border border-warning p-0" style="height:10px;width:10px;margin:9px;"></div>
+    </div>
+
   </div>
 
 
@@ -12,11 +20,11 @@
     <input type="hidden" value="NH" name="deckType">
     <input id="number" class="form-check-input" type="radio" value="9" name="number">
     <label class="form-check-label small ms-1 me-3" for="number">
-      9 items
+      3x3
     </label>
     <input id="number" class="form-check-input" type="radio" value="4" name="number">
     <label class="form-check-label small ms-1 me-3" for="number">
-      4 items
+      2x2
     </label>
 
     <button type="submit" class="btn btn-sm btn-primary YM" style="height:100%;">Start</button>
@@ -33,7 +41,11 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <p>An activity similar to but not as awesome as the original Dobble game.</p>
+        <p>An activity bases on the concept of Dobble (Spot It). Although not 
+          as awesome as the original, it's awesome in its own way!</p>
+        <p> As soon as anyone calls out the match, you push <kbd>Space</kbd> or
+          <kbd>&rarr;</kbd>. When the matching cards have a yellow background, 
+          the whole class repeats.</p>
       </div>
     </div>
   </div>
