@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const colorableDir = './public/image/colorable';
-const outputDir = './views/activities/objects/supplies';
+const outputDir = './views/activities/things/supplies';
 
 // Read all SVG files
 const files = fs.readdirSync(colorableDir).filter(f => f.endsWith('.svg'));
