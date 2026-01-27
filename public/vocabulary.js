@@ -10989,6 +10989,268 @@ const vocabulary = [
   "image": "/image/NH/club_science_club.png",
   "audio": "/audio/words/science_club.mp3"
 },
+// countries: The U.S., Australia, Brazil, Canada, China, Egypt, France, Germany, Ghana, India, Italy, Japan, Mexico, Kenya, Korea, Mongolia, Morocco, Norway, Peru, Russia, Singapore, Spain, Sweden, Thailand, Turkey, The U.K., Vietnam
+{
+  "id": 1141,
+  "book": "NH",
+  "page": "page_8_9",
+  "theme": "countries+",
+  "word": "The U.S.",
+  "meaning": "アメリカ合衆国",
+  "image": "/image/NH/countries_America.gif",
+  "audio": "/audio/words/The_US.mp3"
+},
+
+{
+  "id": 1142,
+  "book": "NH",
+  "page": "page_8_9",
+  "theme": "countries+",
+  "word": "Australia",
+  "meaning": "オーストラリア",
+  "image": "/image/NH/countries_Australia.gif",
+  "audio": "/audio/words/Australia.mp3"
+},
+{
+  "id": 1143,
+  "book": "NH",
+  "page": "page_8_9",
+  "theme": "countries+",
+  "word": "Brazil",
+  "meaning": "ブラジル",
+  "image": "/image/NH/countries_Brazil.gif",
+  "audio": "/audio/words/Brazil.mp3"
+},
+{
+  "id": 1144,
+  "book": "NH",
+  "page": "page_8_9",
+  "theme": "countries+",
+  "word": "Canada",
+  "meaning": "カナダ",
+  "image": "/image/NH/countries_Canada.gif",
+  "audio": "/audio/words/Canada.mp3"
+},
+{
+  "id": 1145,
+  "book": "NH",
+  "page": "page_8_9",
+  "theme": "countries+",
+  "word": "China",
+  "meaning": "中国",
+  "image": "/image/NH/countries_China.gif",
+  "audio": "/audio/words/China.mp3"
+},
+{
+  "id": 1146,
+  "book": "NH",
+  "page": "page_8_9",
+  "theme": "countries+",
+  "word": "Egypt",
+  "meaning": "エジプト",
+  "image": "/image/NH/countries_Egypt.gif",
+  "audio": "/audio/words/Egypt.mp3"
+},
+{
+  "id": 1147,
+  "book": "NH",
+  "page": "page_8_9",
+  "theme": "countries+",
+  "word": "France",
+  "meaning": "フランス",
+  "image": "/image/NH/countries_France.gif",
+  "audio": "/audio/words/France.mp3"
+},
+{
+  "id": 1148,
+  "book": "NH",
+  "page": "page_8_9",
+  "theme": "countries+",
+  "word": "Germany",
+  "meaning": "ドイツ",
+  "image": "/image/NH/countries_Germany.gif",
+  "audio": "/audio/words/Germany.mp3"
+},
+{
+  "id": 1149,
+  "book": "NH",
+  "page": "page_8_9",
+  "theme": "countries+",
+  "word": "Ghana",
+  "meaning": "ガーナ",
+  "image": "/image/NH/countries_Ghana.gif",
+  "audio": "/audio/words/Ghana.mp3"
+},
+{
+  "id": 1150,
+  "book": "NH",
+  "page": "page_8_9",
+  "theme": "countries+",
+  "word": "India",
+  "meaning": "インド",
+  "image": "/image/NH/countries_India.gif",
+  "audio": "/audio/words/India.mp3"
+},
+{
+  "id": 1151,
+  "book": "NH",
+  "page": "page_8_9",
+  "theme": "countries+",
+  "word": "Italy",
+  "meaning": "イタリア",
+  "image": "/image/NH/countries_Italy.gif",
+  "audio": "/audio/words/Italy.mp3"
+},
+{
+  "id": 1152,
+  "book": "NH",
+  "page": "page_8_9",
+  "theme": "countries+",
+  "word": "Japan",
+  "meaning": "日本",
+  "image": "/image/NH/countries_Japan.gif",
+  "audio": "/audio/words/Japan.mp3"
+},
+{
+  "id": 1153,
+  "book": "NH",
+  "page": "page_8_9",
+  "theme": "countries+",
+  "word": "Kenya",
+  "meaning": "ケニア",
+  "image": "/image/NH/countries_Kenya.gif",
+  "audio": "/audio/words/Kenya.mp3"
+},
+{
+  "id": 1154,
+  "book": "NH",
+  "page": "page_8_9",
+  "theme": "countries+",
+  "word": "Korea",
+  "meaning": "韓国",
+  "image": "/image/NH/countries_Korea.gif",
+  "audio": "/audio/words/Korea.mp3"
+},
+{
+  "id": 1155,
+  "book": "NH",
+  "page": "page_8_9",
+  "theme": "countries+",
+  "word": "Mongolia",
+  "meaning": "モンゴル",
+  "image": "/image/NH/countries_Mongolia.gif",
+  "audio": "/audio/words/Mongolia.mp3"
+},
+{
+  "id": 1156,
+  "book": "NH",
+  "page": "page_8_9",
+  "theme": "countries+",
+  "word": "Morocco",
+  "meaning": "モロッコ",
+  "image": "/image/NH/countries_Morocco.gif",
+  "audio": "/audio/words/Morocco.mp3"
+},
+{
+  "id": 1157,
+  "book": "NH",
+  "page": "page_8_9",
+  "theme": "countries+",
+  "word": "Norway",
+  "meaning": "ノルウェー",
+  "image": "/image/NH/countries_Norway.gif",
+  "audio": "/audio/words/Norway.mp3"
+},
+{
+  "id": 1158,
+  "book": "NH",
+  "page": "page_8_9",
+  "theme": "countries+",
+  "word": "Peru",
+  "meaning": "ペルー",
+  "image": "/image/NH/countries_Peru.gif",
+  "audio": "/audio/words/Peru.mp3"
+},
+{
+  "id": 1159,
+  "book": "NH",
+  "page": "page_8_9",
+  "theme": "countries+",
+  "word": "Russia",
+  "meaning": "ロシア",
+  "image": "/image/NH/countries_Russia.gif",
+  "audio": "/audio/words/Russia.mp3"
+},
+{
+  "id": 1160,
+  "book": "NH",
+  "page": "page_8_9",
+  "theme": "countries+",
+  "word": "Singapore",
+  "meaning": "シンガポール",
+  "image": "/image/NH/countries_Singapore.gif",
+  "audio": "/audio/words/Singapore.mp3"
+},
+{
+  "id": 1161,
+  "book": "NH",
+  "page": "page_8_9",
+  "theme": "countries+",
+  "word": "Spain",
+  "meaning": "スペイン",
+  "image": "/image/NH/countries_Spain.gif",
+  "audio": "/audio/words/Spain.mp3"
+},
+{
+  "id": 1162,
+  "book": "NH",
+  "page": "page_8_9",
+  "theme": "countries+",
+  "word": "Sweden",
+  "meaning": "スウェーデン",
+  "image": "/image/NH/countries_Sweden.gif",
+  "audio": "/audio/words/Sweden.mp3"
+},
+{
+  "id": 1163,
+  "book": "NH",
+  "page": "page_8_9",
+  "theme": "countries+",
+  "word": "Thailand",
+  "meaning": "タイ",
+  "image": "/image/NH/countries_Thailand.gif",
+  "audio": "/audio/words/Thailand.mp3"
+},
+{
+  "id": 1164,
+  "book": "NH",
+  "page": "page_8_9",
+  "theme": "countries+",
+  "word": "Türkiye",
+  "meaning": "トルコ",
+  "image": "/image/NH/countries_Turkey.gif",
+  "audio": "/audio/words/Turkey.mp3"
+},
+{
+  "id": 1165,
+  "book": "NH",
+  "page": "page_8_9",
+  "theme": "countries+",
+  "word": "The U.K.",
+  "meaning": "イギリス",
+  "image": "/image/NH/countries_U.K.gif",
+  "audio": "/audio/words/The_UK.mp3"
+},
+{
+  "id": 1166,
+  "book": "NH",
+  "page": "page_8_9",
+  "theme": "countries+",
+  "word": "Vietnam",
+  "meaning": "ベトナム",
+  "image": "/image/NH/countries_Vietnam.gif",
+  "audio": "/audio/words/Vietnam.mp3"
+},
 {
   "id": 9190,
   "book": "",

@@ -28,6 +28,7 @@ $("form button[type=submit]").hide();
 const deckType = '<%- deckType %>';
 document.title = `Double ${deckType}`;
 
+var lit = false;
 var unusedCards = [];
 var deck = <%- JSON.stringify(deck) %>;
 const query = <%- JSON.stringify(query) %>;
@@ -53,18 +54,18 @@ $('input[name=number]').on('change', function(){
 });
 
 $('#next').on('click', function(){
-  highlight();
-  setTimeout(() => {  
+  if (lit){
     load2Cards();
-  }, 2000);
+  }
+  else {
+    highlight();
+  }
+  lit = !lit;
 });
 
 $(document).off('keyup').on('keyup',function(e) {
   if (e.key === "ArrowRight" || e.key === " ") {
-    highlight();
-    setTimeout(() => {  
-      load2Cards();
-    }, 2000);
+    $('#next').click();
   }
 });
 
