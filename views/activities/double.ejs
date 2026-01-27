@@ -1,7 +1,7 @@
 <%- include('../head') %>
 
 <div class="d-flex" style="position:relative;">
-  <%- include('../menu/item_twins'); -%>
+  <%- include('../menu/item_double'); -%>
 
   <button id="next" class="btn btn-sm btn-outline-success py-0 mx-3">
     <i class="material-icons">arrow_forward</i>
@@ -26,7 +26,7 @@
 $(function(){
 $("form button[type=submit]").hide();
 const deckType = '<%- deckType %>';
-document.title = `Twins ${deckType}`;
+document.title = `Double ${deckType}`;
 
 var unusedCards = [];
 var deck = <%- JSON.stringify(deck) %>;
@@ -35,7 +35,7 @@ var numOfItems = query.number ? parseInt(query.number)
                               : deck.length >= 18 ? 9 
                               : deck.length >= 8 ? 4 : 0;
 if (numOfItems == 0) {
-  alert("Not enough items in this deck to play Twins.");
+  alert("Not enough items in this deck to play Double.");
   location.href='/NH';
 }
 else {

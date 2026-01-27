@@ -208,7 +208,6 @@ router.get('/visuals', (req, res)=>{
 
     fs.readdir( path.join(__dirname, `../public/image/visuals/${book}`), (err, pages)=>{
       if (err) throw err;
-      console.log(book, pages, page);
       res.render('tools/visuals', {book, pages, page});
     });
   }
@@ -252,7 +251,6 @@ router.get('/speak_spell', (req, res)=>{
 
 router.post('/:activity', async(req, res)=>{
   try{
-    console.log('POST body:', req.body);
     if ( !valid(req.params.activity, req.body) ) throw '404';
     let activity = req.params.activity;
 
@@ -331,7 +329,6 @@ router.get('/:activity/:id', async (req, res)=>{
       deck = deck.sort( (a, b) => ids.indexOf(a.id) - ids.indexOf(b.id));
     }
 
-    console.log('query:', query);
     res.render(`activities/${req.params.activity}`, {deckType, deck, query});
   }
   catch(err ){
@@ -343,7 +340,7 @@ router.get('/:activity/:id', async (req, res)=>{
 
 
 function valid(activity, params){
-  if ( !["bingo", "flash", "grid", "match", "recall", "reveal", "type", "spell", "penmanship", "printcards", "twins"].includes(activity)) return false;
+  if ( !["bingo", "flash", "grid", "match", "recall", "reveal", "type", "spell", "penmanship", "printcards", "double", "write"].includes(activity)) return false;
   if ( !params.deck ) {
     return false;
   }
