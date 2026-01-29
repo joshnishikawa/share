@@ -30,6 +30,29 @@ router.use('/letters', letters);
 router.use('/things', things);
 router.use('/labs', labs);
 
+
+router.get('/LT1', (req, res)=>{
+  try{
+    res.sendFile(path.join(__dirname, '../public/LT1/index.html'));
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
+
+router.get('/LT2', (req, res)=>{
+  try{
+    res.sendFile(path.join(__dirname, '../public/LT2/index.html'));
+  }
+  catch(err){
+    res.send(err);
+    console.error(err);
+  }
+});
+
+
 router.get('/abc', (req, res)=>{
   try{
     res.redirect('/letters');
