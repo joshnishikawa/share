@@ -39,24 +39,17 @@ $(function(){
   var deck = <%- JSON.stringify(deck) %>;
   const query = <%- JSON.stringify(query) %>;
   console.log(query);
-  var showtext = query.showtext === 'true' ? true : false;
-  history.replaceState(null, '', `?showtext=${showtext}`);
+  var textsize = query.textsize || 5;
+  history.replaceState(null, '', `?textsize=${textsize}`);
   
   setText = ()=>{
-    if (showtext) {
-      $('.txt').show();
-      $('#showtext').prop('checked', true);
-    }
-    else {
-      $('.txt').hide();
-      $('#showtext').prop('checked', false);
-    }
-    history.replaceState(null, '', `?showtext=${showtext}`);
+    $(".txt").css('font-size', `${textsize}rem`);
+    history.replaceState(null, '', `?textsize=${textsize}`);
   };
 
 
-  $("#showtext").on('change', ()=>{
-    showtext = $("#showtext").prop('checked'); // do before setText()
+  $("#textsize").on('change', ()=>{
+    textsize = $("#textsize").val();
     setText();
   });
 
@@ -70,7 +63,7 @@ $(function(){
               class="img-fluid" style="width:100%;" 
               onerror="altOnly(this)">
 
-        <div class="txt text-center YM w-100" style="font-size:15rem;line-height:12rem;" contenteditable="true">
+        <div class="txt text-center YM w-100" style="font-size:5rem;line-height:12rem;" contenteditable="true">
           ${i}
         </div>
 

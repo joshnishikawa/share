@@ -11,11 +11,14 @@
     <input type="hidden" value="" name="deck">
     <input type="hidden" value="nolink" name="deckType">
 
-    <div class="d-flex" style="height:100%;">
+    <div class="d-flex justify-content-between" style="height:100%;">
 
-      <div class="form-check me-3">
-        <input id="showtext" type="checkbox" value="true" name="showtext" class="form-check-input">
-        <label class="form-check-label small text-center" for="showtext">Text</label>
+      <div class="form-group mx-3">
+        <div class="d-flex rounded-3 border border-secondary">
+          <label for="textsize" class="form-label px-1 mt-1 mb-0">Text Size</label>
+          <input id="textsize" type="number" value="5" class="form-control form-control-sm border-0" 
+                 style="width:4.5rem;" aria-label="text size in em">
+        </div>
       </div>
 
       <button id="cardsButton" type="submit" class="btn btn-sm btn-primary" style="height:100%;">Start</button>
@@ -55,6 +58,14 @@ $(function(){
       });
     }
   });
-});
 
+  $(`#textsize`).on('change', function(){
+    let size = $(this).val();
+    if (isNaN(size) || size < 1) {
+      size = 5;
+      $(this).val(size);
+    }
+    $('.txt').css('font-size', `${size}em`);
+  });
+});
 </script>
