@@ -7,17 +7,18 @@
   </div>
 
 
-  <form id="cardsForm" action="/printcards" method="POST" class="d-flex justify-content-end w-100">
+  <form id="cardsForm" action="/vocab/printcards" method="POST" class="menuitem d-flex justify-content-end w-100">
     <input type="hidden" value="" name="deck">
     <input type="hidden" value="nolink" name="deckType">
 
-    <div class="d-flex justify-content-between" style="height:100%;">
+    <div class="d-flex" style="height:100%;">
 
       <div class="form-group mx-3">
         <div class="d-flex rounded-3 border border-secondary">
           <label for="textsize" class="form-label px-1 mt-1 mb-0">Text Size</label>
-          <input id="textsize" type="number" value="5" class="form-control form-control-sm border-0" 
-                 style="width:4.5rem;" aria-label="text size in em">
+          <input id="textsize" type="number" value="5" 
+                 class="form-control form-control-sm border border-top-0 border-bottom-0 border-end-0 border-secondary" 
+                 style="width:4rem;" aria-label="text size in em">
         </div>
       </div>
 

@@ -1,4 +1,4 @@
-<%- include('../head'); -%>
+<%- include('../../head'); -%>
 <style>
   @media print {
     #menucontainer {
@@ -28,7 +28,7 @@
   <div id="menucontainer"><!-- to adios the entire menu when printing -->
     <div id="menu" class="d-flex" style="position:relative;">
 
-      <%- include('../menu/item_grid'); -%>
+      <%- include('../../menu/item_grid'); -%>
 
       <button id="shuffle" class="btn btn-sm btn-outline-primary d-flex align-items-center">
         <i class="material-icons">shuffle</i>
@@ -214,4 +214,4 @@ $(function(){
 
 </script>
   
-<%- include('../foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->
+<%- include('../../foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->

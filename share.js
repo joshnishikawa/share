@@ -5,13 +5,13 @@ const app = express();
 const server = require('http').createServer(app);
 
 const socket_io = require('socket.io')(server);
-const io = require('./routes/io');
-io(socket_io);
+const groups = require('./sockets/_GROUPS.js');
+groups(socket_io);
 
 const createError = require('http-errors');
 const logger = require('morgan');
 const path = require('path');
-const mainRouter = require('./routes/main');
+const mainRouter = require('./routes/_MAIN.js');
 const TRouter = require('./routes/teachers');
 const mediaRouter = require('./routes/media');
 

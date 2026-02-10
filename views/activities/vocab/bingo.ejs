@@ -1,4 +1,4 @@
-<%- include('../head'); -%>
+<%- include('../../head'); -%>
 <style>
   #display div{ width: 16%;}
 </style>
@@ -7,7 +7,7 @@
 
   
 <div class="d-flex" style="position:relative;">
-  <%- include('../menu/item_bingo'); -%>
+  <%- include('../../menu/item_bingo'); -%>
 
   <button id="start" class="btn btn-sm btn-outline-success py-0 mx-3">
     <i class="material-icons">play_arrow</i>
@@ -16,7 +16,7 @@
     <i class="material-icons">check_circle</i>
   </button>
 
-  <form id="gotogrid" action="/grid" method="POST" target="_blank">
+  <form id="gotogrid" action="/vocab/grid" method="POST" target="_blank">
     <input type="hidden" value="" name="deck">
     <input type="hidden" value="nolink" name="deckType">
     <input type="hidden" value="" name="spaces">
@@ -143,4 +143,4 @@ $(function(){
 
 </script>
 
-<%- include('../foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->
+<%- include('../../foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->

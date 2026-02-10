@@ -2,7 +2,7 @@
 
 <body>
 <div class="d-flex" style="position:relative;">
-  <form id="visuals_form" action="visuals" method="GET" class="d-flex p-0">
+  <form id="interview_form" action="interview" method="GET" class="d-flex p-0">
     <select id="page_select" class="form-control form-control-sm" name="page" required>
 <% for (let d of pages ) { %>
       <option value="<%- d %>"><%- d %></option>
@@ -34,14 +34,14 @@ $(function(){
   if (!page) {
     // load the first page by default
     $('#page_select').val($('#page_select option:first').val());
-    $('#visuals_form').submit();
+    $('#interview_form').submit();
   }
 
   $('#page_select').val(page);
-  if (page) $('#img_container').html(`<img src="/image/visuals/brainbox/${page}" alt="visuals" class="img-fluid" />`);
+  if (page) $('#img_container').html(`<img src="/image/interview/brainbox/${page}" alt="interview" class="img-fluid" />`);
   $('#img_container img').css('max-height', '100vh');
   $('#page_select').on('change', function(){
-    $('#visuals_form').submit();
+    $('#interview_form').submit();
   });
 
 
@@ -50,14 +50,14 @@ $(function(){
       const next = $('#page_select option:selected').next();
       if (next.length) {
         $('#page_select').val(next.val());
-        $('#visuals_form').submit();
+        $('#interview_form').submit();
       }
     }
     if (e.key === 'ArrowLeft') {
       const prev = $('#page_select option:selected').prev();
       if (prev.length) {
         $('#page_select').val(prev.val());
-        $('#visuals_form').submit();
+        $('#interview_form').submit();
       }
     }
   });
