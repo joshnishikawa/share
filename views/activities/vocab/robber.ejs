@@ -1,0 +1,381 @@
+<%- include('../../head'); -%>
+<style>
+  .container {
+    container-type: size;
+  }
+
+  .flip-back{
+    font-weight: bold;
+    -webkit-text-stroke: 1px black;
+  }
+  .flip-front img{
+    position:absolute;
+    margin: auto;
+    left: 0;
+    right: 0;
+    top: 0;
+    text-align:center;
+    max-width:90%;
+    max-height:70%;
+  }
+  .flip-front div{
+    position:absolute;
+    bottom: 5%;
+    left: 0;
+    right: 0;
+    text-align:center;
+  }
+
+</style>
+
+<body>
+<div class="d-flex" style="position:relative;">
+  <%- include('../../menu/item_robber'); -%>
+  <button id="home" class="btn btn-sm btn-outline-secondary p-0" style="position:absolute;right:0;" onclick="location.href='/'">
+    <i class="material-icons">home</i>
+  </button>
+</div> 
+
+<div class="pt-3" style="min-height:100vh;user-select: none;">
+  <div id="grid" class="d-flex flex-wrap"></div>
+</div>
+
+
+<script>
+const deckType = '<%- deckType %>';
+
+$(function(){
+$("form button[type=submit]").hide();
+
+var backs = <%- JSON.stringify(deck) %>;
+FYshuffle(backs);
+var numOfCards = backs.length;
+var even = numOfCards % 2 == 0;
+document.title = `Robber`;
+
+
+let {length, colspan, rowheight} = getGrid({length: numOfCards, even});
+for (let i = 0; i < numOfCards; i++){
+  $("#grid").append(
+    `<div class="col-${colspan} vocab p-0" style="height:${rowheight}vh;">
+      <div id="index${i}" class="container flip" style="height:80%;">
+        <div class="flip-card shadow">
+
+          <div class="flip-front bg-white rounded border YM">
+            <img src="/image/money.png" alt="card" class="rounded" 
+                  style="max-width:90%;max-height:90%;">
+          </div>
+          <div class="flip-back rounded border border-primary text-center alert-primary"
+                style="font-size:${Math.floor(rowheight * 0.7)}vh;">
+            ${backs[i].image ? `<img src="${backs[i].image}" alt="card" class="rounded img-fluid" style="max-width:90%;max-height:90%;">` : `${backs[i].text}`}
+          </div>
+        </div>
+      </div>
+    </div>`);
+}
+
+
+var timer = 5;
+var flags = {
+  cop: false,
+  bomb: false, // can be false, "armed", or "defused"
+  squad: false,
+  thief: "casing" // can be "casing", "spotted" "caught"
+}
+var thiefIndex = null;
+var copIndex = null;
+var bombIndex = null;
+var squadIndex = null;
+var flipped = 0;
+
+
+function flip(index){
+  flipped += 1;
+  let item = getItem(index);
+
+  if (flags.bomb == "armed" && item != "squad") {
+    if (timer == 0){
+      setTimeout(() => {
+        game_over("boom");
+      }, 600);
+      return;
+    }
+    else {
+      timer -= 1;
+      $(`#index${bombIndex} .flip-front div`).text(`00:0${timer}`);
+    }
+  }
+
+  switch(item){
+    case "money":
+      if (flipped == numOfCards) game_over("getaway");
+      break;
+    case "bomb":
+      flags.bomb = "armed";
+      bombIndex = index;
+      $(`#index${index} .flip-front`).html(`<img src="/image/bomb.png" alt="bomb"><div style="font-size:2rem;font-weight:bold;color:red;">00:${String(timer).padStart(2, '0')}</div>`);
+      break;
+    case "squad":
+      handleSquad(index);
+      break;
+    case "cop":
+      copIndex = index;
+      $(`#index${index} .flip-front`).html('<img src="/image/police.png" alt="cop">');
+      break;
+    case "thief":
+      handleThief(index);
+      break;
+
+    default: 
+      return;
+  }
+}
+
+function getItem(index){
+  let unflipped = numOfCards - flipped;
+
+  if (flipped == 1 || unflipped == 0){ // first and last item must be money
+    console.log("Giving money (first or last item)");
+    return "money";
+  }
+  else if (unflipped == 3 && !flags.cop){
+    console.log("Last chance to add a cop.");
+    flags.cop = true;
+    return "cop";
+  }
+  else if (unflipped == 6 && !flags.bomb){
+    console.log("Last chance to add a bomb.");
+    flags.bomb = "armed";
+    return "bomb";
+  }
+  else {
+    let items = [];
+
+    switch(flags.thief) {
+      case "casing": // thief hasn't been spotted yet
+        items.push("thief");
+        break;
+      
+      case "spotted":
+        if (!flags.cop) { // thief spotted but no cop yet
+          items.push("cop");
+        }
+        items.push("thief");
+        if (!flags.squad) {
+          items.push(!flags.bomb ? "bomb" : "squad");
+        }
+        items.push("money");
+        break;
+      
+      case "caught":
+        if (!flags.squad) {
+          items.push(!flags.bomb ? "bomb" : "squad");
+        }
+        break;
+    }
+
+    FYshuffle(items);
+
+    // x in y chance to pop an item where x = items.length, y = unflipped
+    let chance = items.length / unflipped;
+    let rand = Math.random();
+    console.log(`items.length: ${items.length}, unflipped: ${unflipped}, chance: ${chance}, rand: ${rand}`);
+    if (rand < chance){
+      let item = items.pop();
+      flags[item] = true;
+      return item;
+    }
+    else return "money";
+  }
+}
+
+function handleThief(index){
+  flags.thief = "spotted";
+  thiefIndex = index;
+  $(`#index${index} .flip-front`).html('<img src="/image/thief.png" alt="thief">');
+  if (flags.cop){
+    flags.thief = "caught";
+    setTimeout(() => {
+      jumpToCard(copIndex, thiefIndex, 
+        '<img src="/image/police.png" alt="cop"><div style="font-size:2rem;color:orange;font-weight:bold;">GOTCHA!</div>',
+        () => {
+          // make money visible again
+          $(`.flipped .flip-front img`).each(function(){
+            if ($(this).attr('src') == "/image/money.png"){
+              $(this).css('visibility', 'visible');
+            }
+          });
+        }
+      );
+    }, 600);
+    if (flags.squad && flags.bomb == "defused") game_over("gotcha");
+  }
+  else { // no cop, thief escapes with money
+    flags.thief = "spotted";
+    setTimeout(() => {
+      let imagesToAnimate = [];
+      let thiefCard = $(`#index${index}`);
+      let thiefImg = $(`#index${index} .flip-front img`).clone();
+      let thiefPos = thiefCard.offset();
+      
+      thiefImg.css({
+        position: 'absolute',
+        top: thiefPos.top,
+        left: thiefPos.left,
+        zIndex: 1000,
+        width: thiefCard.find('.flip-front img').width(),
+        height: thiefCard.find('.flip-front img').height()
+      });
+      imagesToAnimate.push(thiefImg);
+      $(`#index${index} .flip-front img`).css('visibility', 'hidden');
+      
+      $(`.flipped .flip-front img`).each(function(){
+        if ($(this).attr('src') == "/image/money.png"){
+          let moneyCard = $(this).closest('.flipped');
+          let moneyImg = $(this).clone();
+          let moneyPos = moneyCard.offset();
+          
+          moneyImg.css({
+            position: 'absolute',
+            top: moneyPos.top,
+            left: moneyPos.left,
+            zIndex: 1000,
+            width: $(this).width(),
+            height: $(this).height()
+          });
+          imagesToAnimate.push(moneyImg);
+          $(this).css('visibility', 'hidden');
+        }
+      });
+      
+      imagesToAnimate.forEach(img => {
+        $('body').append(img);
+        img.animate({
+          left: -200
+        }, 800, function(){
+          $(this).remove();
+        });
+      });
+    }, 600);
+  }
+}
+
+function handleSquad(index){
+  squadIndex = index;
+  $(`#index${index} .flip-front`).html('<img src="/image/bombsquad.png" alt="squad">');
+  
+  if (flags.bomb == "armed"){
+    jumpToCard(squadIndex, bombIndex, 
+      '<img src="/image/bombsquad.png" alt="squad"><div style="font-size:2rem;color:green;font-weight:bold;">DEFUSED</div>');
+
+    timer = 0;
+    flags.bomb = "defused";
+  }
+  if (flags.cop && flags.thief === "caught") game_over("gotcha");
+}
+
+function jumpToCard(fromIndex, toIndex, newContent, callback){
+  setTimeout(() => {
+    let fromCard = $(`#index${fromIndex}`);
+    let toCard = $(`#index${toIndex}`);
+    let jumpImg = $(`#index${fromIndex} .flip-front img`).clone();
+    
+    let fromPos = fromCard.offset();
+    let toPos = toCard.offset();
+    
+    jumpImg.css({
+      position: 'absolute',
+      top: fromPos.top,
+      left: fromPos.left,
+      zIndex: 1000,
+      width: fromCard.find('.flip-front img').width(),
+      height: fromCard.find('.flip-front img').height()
+    });
+    $('body').append(jumpImg);
+    
+    // Remove the original image from the source card
+    $(`#index${fromIndex} .flip-front`).html('');
+    
+    jumpImg.animate({
+      top: toPos.top,
+      left: toPos.left
+    }, 500, function(){
+      $(this).remove();
+      $(`#index${toIndex} .flip-front`).html(newContent);
+      if (callback) callback();
+    });
+  }, 300);
+}
+
+function game_over(result){
+  $(".flip").off('click');
+  switch(result){
+    case "boom":
+      // the bomb image is replaced by the boom image. Then it grows to fill the screen.
+      $(`#index${bombIndex} .flip-front`).html('<img src="/image/boom.png" alt="boom">');
+      let bombCard = $(`#index${bombIndex}`);
+      let bombImg = $(`#index${bombIndex} .flip-front img`).clone();
+      let bombPos = bombCard.offset();
+      bombImg.css({
+        position: 'absolute',
+        top: bombPos.top,
+        left: bombPos.left,
+        zIndex: 1000,
+        width: bombCard.find('.flip-front img').width(),
+        height: bombCard.find('.flip-front img').height()
+      });
+      $('body').append(bombImg);
+      bombImg.animate({
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%'
+      }, 300);
+      $(".flip").off('click');
+      break;
+    case "gotcha":
+      $(".flip").off('click');
+      break;
+    case "getaway":
+      // Thief peeks in from the left side for one second
+      let thiefImg = $('<img src="/image/thief.png" alt="thief" class="rounded img-fluid">');
+      thiefImg.css({
+        position: 'fixed',
+        top: '50%',
+        right: '-150px',
+        transform: 'translateY(-50%)',
+        zIndex: 1000,
+        width: '100px',
+        height: 'auto'
+      });
+      $('body').append(thiefImg);
+      thiefImg.animate({
+        right: '20px'
+      }, 1000, function(){
+        setTimeout(() => {
+          thiefImg.animate({
+            right: '-200px'
+          }, 1000, function(){
+            thiefImg.remove();
+          });
+        }, 1000);
+      });
+      break;
+    default:
+      alert("Game Over");
+      break;
+  }
+}
+
+
+$(".flip").on('click', function(){
+  let id = $(this).attr('id');
+  let index = id.replace('index', '');
+  flip(index);
+  $(this).addClass('flipped').off('click');
+});
+
+});
+</script>
+
+<%- include('../../foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->
