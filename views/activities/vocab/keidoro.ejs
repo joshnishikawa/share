@@ -55,7 +55,7 @@ document.title = `Keidoro`;
 
 
 let {length, colspan, rowheight} = getGrid({length: numOfCards, even});
-let allLoot = FYshuffle(["money", "gold", "coins", "treasure", "stack", "ring"]);
+let allLoot = FYshuffle(["money", "gold", "coins", "treasure", "stack", "ring", "ring2", "lapis", "car", "watch", "500", "100", "1"]);
 for (let i = 0; i < numOfCards; i++){
   let loot = allLoot[i % allLoot.length];
   $("#grid").append(
@@ -79,10 +79,11 @@ for (let i = 0; i < numOfCards; i++){
 
 var timer = 5;
 var flags = {
-  cop: false,
-  bomb: false, // can be false, "armed", or "defused"
+  cop: false,     // can be 5, 4, 3, 2, 1 "done" or false
+  bomb: false,    // can be false, "armed", or "defused"
   squad: false,
-  thief: "casing" // can be "casing", "spotted" "caught"
+  thief: "casing",// can be "casing", "spotted" "caught"
+  money: false    // not used
 }
 var thiefIndex = null;
 var copIndex = null;
@@ -95,7 +96,7 @@ function flip(index){
   flipped += 1;
   let item = getItem(index);
 
-  if (flags.bomb == "armed" && item != "squad") {
+  if (flags.bomb == "armed" && !["squad", "cop"].includes(item)){ 
     if (timer == 0){
       setTimeout(() => {
         game_over("boom");
@@ -108,6 +109,70 @@ function flip(index){
     }
   }
 
+  if (flags.cop && flags.thief != "caught" && !["thief", "squad"].includes(item)){
+    switch(flags.cop){
+      case 5:
+        flags.cop = 4;
+        $("#search").html(
+          `<i class="material-icons" style="color:red;">close</i>
+          <i class="material-icons" style="color:green;">search</i>
+          <i class="material-icons" style="color:green;">search</i>
+          <i class="material-icons" style="color:green;">search</i>
+          <i class="material-icons" style="color:green;">search</i>`
+        );
+        break;
+      case 4:
+        flags.cop = 3;
+        $("#search").html(
+          `<i class="material-icons" style="color:red;">close</i>
+          <i class="material-icons" style="color:red;">close</i>
+          <i class="material-icons" style="color:green;">search</i>
+          <i class="material-icons" style="color:green;">search</i>
+          <i class="material-icons" style="color:green;">search</i>`
+        );
+        break;
+      case 3:
+        flags.cop = 2;
+        $("#search").html(
+          `<i class="material-icons" style="color:red;">close</i>
+          <i class="material-icons" style="color:red;">close</i>
+          <i class="material-icons" style="color:red;">close</i>
+          <i class="material-icons" style="color:green;">search</i>
+          <i class="material-icons" style="color:green;">search</i>`
+        );
+        break;
+      case 2:
+        flags.cop = 1;
+        $("#search").html(
+          `<i class="material-icons" style="color:red;">close</i>
+          <i class="material-icons" style="color:red;">close</i>
+          <i class="material-icons" style="color:red;">close</i>
+          <i class="material-icons" style="color:red;">close</i>
+          <i class="material-icons" style="color:green;">search</i>`
+        );
+        break;
+      case 1:
+        flags.cop = "done";
+        $("#search").html(
+          ``
+        );
+        $(`#index${copIndex} .flip-front`).html(
+          `<img src="/image/keidoro/gakkari.png" alt="cop">
+          <div id="search" style="font-size:2rem;font-weight:bold;">
+          <i class="material-icons" style="color:red;">close</i>
+          <i class="material-icons" style="color:red;">close</i>
+          <i class="material-icons" style="color:red;">close</i>
+          <i class="material-icons" style="color:red;">close</i>
+          <i class="material-icons" style="color:red;">close</i>
+          `);
+        
+        game_over("getaway");
+
+        break;
+    }
+
+  }
+
   switch(item){
     case "money":
       if (flipped == numOfCards) game_over("getaway");
@@ -115,14 +180,14 @@ function flip(index){
     case "bomb":
       flags.bomb = "armed";
       bombIndex = index;
-      $(`#index${index} .flip-front`).html(`<img src="/image/keidoro/bomb.png" alt="bomb"><div style="font-size:2rem;font-weight:bold;color:red;">00:${String(timer).padStart(2, '0')}</div>`);
+      $(`#index${index} .flip-front`).html(`<img src="/image/keidoro/bomb.png" alt="bomb">
+      <div style="font-size:2rem;font-weight:bold;color:red;">00:${String(timer).padStart(2, '0')}</div>`);
       break;
     case "squad":
       handleSquad(index);
       break;
     case "cop":
-      copIndex = index;
-      $(`#index${index} .flip-front`).html('<img src="/image/keidoro/cop.png" alt="cop">');
+      handleCop(index);
       break;
     case "thief":
       handleThief(index);
@@ -136,33 +201,25 @@ function flip(index){
 function getItem(index){
   let unflipped = numOfCards - flipped;
 
-  if (flipped == 1 || unflipped == 0){ // first and last item must be money
-    console.log("Giving money (first or last item)");
-    return "money";
-  }
-  else if (unflipped == 3 && !flags.cop){
-    console.log("Last chance to add a cop.");
-    flags.cop = true;
-    return "cop";
-  }
+  if (flipped == 1) return "money";
+  else if (unflipped == 0 && flags.thief != "caught") return "thief";
+  else if (unflipped == 4 && !flags.cop) return "cop";
   else if (unflipped == 6 && !flags.bomb){
-    console.log("Last chance to add a bomb.");
     flags.bomb = "armed";
     return "bomb";
   }
   else {
-    let items = [];
+    let items = ["money"];
 
     switch(flags.thief) {
       case "casing": // thief hasn't been spotted yet
-        items.push("thief");
+        if (Math.random() < 0.5) items.push("thief");
         break;
-      
       case "spotted":
+        if (Math.random() < 0.5) items.push("thief");
         if (!flags.cop) { // thief spotted but no cop yet
           items.push("cop");
         }
-        items.push("thief");
         if (!flags.squad) {
           items.push(!flags.bomb ? "bomb" : "squad");
         }
@@ -177,17 +234,9 @@ function getItem(index){
     }
 
     FYshuffle(items);
-
-    // x in y chance to pop an item where x = items.length, y = unflipped
-    let chance = items.length / unflipped;
-    let rand = Math.random();
-    console.log(`items.length: ${items.length}, unflipped: ${unflipped}, chance: ${chance}, rand: ${rand}`);
-    if (rand < chance){
-      let item = items.pop();
-      flags[item] = true;
-      return item;
-    }
-    else return "money";
+    let item = items.pop();
+    flags[item] = true;
+    return item;
   }
 }
 
@@ -281,6 +330,19 @@ function handleSquad(index){
   }
 }
 
+function handleCop(index){
+  copIndex = index;
+  flags.cop = 5;
+  $(`#index${index} .flip-front`).html(`<img src="/image/keidoro/cop.png" alt="cop">
+    <div id="search" style="font-size:2rem;font-weight:bold;">
+      <i class="material-icons" style="color:green;">search</i>
+      <i class="material-icons" style="color:green;">search</i>
+      <i class="material-icons" style="color:green;">search</i>
+      <i class="material-icons" style="color:green;">search</i>
+      <i class="material-icons" style="color:green;">search</i>
+    </div>`);
+}
+
 function jumpToCard(fromIndex, toIndex, newContent, callback){
   setTimeout(() => {
     let fromCard = $(`#index${fromIndex}`);
@@ -341,22 +403,25 @@ function game_over(result){
       $(".flip").off('click');
       break;
     case "gotcha":
-      // Show success image that grows to fill the screen.
-      let successImg = $('<img src="/image/keidoro/success.png" alt="success" style="background-color: rgba(255, 255, 255, 0.5);">');
-      successImg.css({
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        zIndex: 1000,
-        width: '0',
-        height: '0'
+      // Show success image in a modal
+      let modal = $(`
+        <div class="modal fade show" tabindex="-1" style="display: block;">
+          <div class="modal-dialog modal-dialog-centered" style="max-width: 90vw; max-height: 90vh;">
+            <div class="modal-content bg-transparent border-0">
+              <img src="/image/keidoro/success.png" alt="success" class="img-fluid" style="max-height: 90vh;">
+            </div>
+          </div>
+        </div>
+        <div class="modal-backdrop fade show"></div>
+      `);
+      $('body').append(modal);
+      modal.on('click', function(e){
+        e.stopPropagation();
+        modal.remove();
+        setTimeout(() => {
+          $(document).on('click', () => location.reload());
+        }, 100);
       });
-      $('body').append(successImg);
-      successImg.animate({
-        width: '100%',
-        height: '100%'
-      }, 300);
       $(".flip").off('click');
       break;
     case "getaway":
@@ -388,9 +453,11 @@ function game_over(result){
       alert("Game Over");
       break;
   }
-  setTimeout(() => {
-    $(document).on('click', () => location.reload());
-  }, 1000);
+  if (result !== "gotcha") {
+    setTimeout(() => {
+      $(document).on('click', () => location.reload());
+    }, 1000);
+  }
 }
 
 

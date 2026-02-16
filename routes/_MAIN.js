@@ -254,7 +254,7 @@ router.get('/:activity/:id', async(req, res)=>{
   try{
     console.log(req.params.activity);
     if ( ["bingo", "flash", "grid", "match", "recall", "reveal", "type", "spell", "penmanship", "printcards", "double", "write"].includes(req.params.activity) ){
-      res.redirect(`vocab/${req.params.activity}/${req.params.id}`);
+      res.redirect(`/vocab/${req.params.activity}/${req.params.id}`);
     }
     else {
       console.log('404 redirect failed for activity:', req.params.activity);
