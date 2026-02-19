@@ -67,7 +67,7 @@ for (let i = 0; i < numOfCards; i++){
             <img src="/image/keidoro/${loot}.png" alt="card" class="rounded loot" 
                   style="max-width:90%;max-height:90%;">
           </div>
-          <div class="flip-back rounded border border-primary text-center alert-primary"
+          <div class="flip-back rounded border border-success text-center alert-success"
                 style="font-size:${Math.floor(rowheight * 0.7)}vh;">
             ${backs[i].image ? `<img src="${backs[i].image}" alt="card" class="rounded img-fluid" style="max-width:90%;max-height:90%;">` : `${backs[i].text}`}
           </div>
@@ -96,8 +96,8 @@ function flip(index){
   let item = getItem(index);
   flipped += 1; // must be after getItem
 
-  if (flags.bomb == "armed" && !["squad", "cop", "bomb", "thief"].includes(item)){ 
-    if (timer == 0){
+  if (flags.bomb === "armed" && !["squad", "cop", "bomb", "thief"].includes(item)){ 
+    if (timer === 0){
       setTimeout(() => {
         game_over("boom");
       }, 600);
@@ -109,73 +109,28 @@ function flip(index){
     }
   }
 
-  if (flags.cop && flags.thief != "caught" && !["thief", "squad", "bomb"].includes(item)){
-    switch(flags.cop){
-      case 5:
-        flags.cop = 4;
-        $("#search").html(
-          `<i class="material-icons" style="color:red;">close</i>
-          <i class="material-icons" style="color:green;">search</i>
-          <i class="material-icons" style="color:green;">search</i>
-          <i class="material-icons" style="color:green;">search</i>
-          <i class="material-icons" style="color:green;">search</i>`
-        );
-        break;
-      case 4:
-        flags.cop = 3;
-        $("#search").html(
-          `<i class="material-icons" style="color:red;">close</i>
-          <i class="material-icons" style="color:red;">close</i>
-          <i class="material-icons" style="color:green;">search</i>
-          <i class="material-icons" style="color:green;">search</i>
-          <i class="material-icons" style="color:green;">search</i>`
-        );
-        break;
-      case 3:
-        flags.cop = 2;
-        $("#search").html(
-          `<i class="material-icons" style="color:red;">close</i>
-          <i class="material-icons" style="color:red;">close</i>
-          <i class="material-icons" style="color:red;">close</i>
-          <i class="material-icons" style="color:green;">search</i>
-          <i class="material-icons" style="color:green;">search</i>`
-        );
-        break;
-      case 2:
-        flags.cop = 1;
-        $("#search").html(
-          `<i class="material-icons" style="color:red;">close</i>
-          <i class="material-icons" style="color:red;">close</i>
-          <i class="material-icons" style="color:red;">close</i>
-          <i class="material-icons" style="color:red;">close</i>
-          <i class="material-icons" style="color:green;">search</i>`
-        );
-        break;
-      case 1:
-        flags.cop = "done";
-        $("#search").html(
-          ``
-        );
-        $(`#index${copIndex} .flip-front`).html(
-          `<img src="/image/keidoro/gakkari.png" alt="cop">
-          <div id="search" style="font-size:2rem;font-weight:bold;">
-          <i class="material-icons" style="color:red;">close</i>
-          <i class="material-icons" style="color:red;">close</i>
-          <i class="material-icons" style="color:red;">close</i>
-          <i class="material-icons" style="color:red;">close</i>
-          <i class="material-icons" style="color:red;">close</i>
-          `);
-        
-        game_over("getaway");
-
-        break;
+  if (flags.cop && flags.thief !== "caught" && !["thief", "squad", "bomb", "cop"].includes(item)){
+    flags.cop -= 1;
+    
+    if (flags.cop === 0) {
+      flags.cop = "done";
+      $("#search").html('');
+      $(`#index${copIndex} .flip-front`).html(
+        `<img src="/image/keidoro/gakkari.png" alt="cop">
+        <div id="search" style="font-size:2rem;font-weight:bold;">
+        ${'<i class="material-icons" style="color:red;">close</i>'.repeat(5)}
+        </div>`);
+      game_over("getaway");
+    } else {
+      const red = '<i class="material-icons" style="color:red;">close</i>';
+      const green = '<i class="material-icons" style="color:green;">search</i>';
+      $("#search").html(red.repeat(5 - flags.cop) + green.repeat(flags.cop));
     }
-
   }
 
   switch(item){
     case "money":
-      if (flipped == numOfCards) game_over("getaway");
+      if (flipped === numOfCards) game_over("getaway");
       break;
     case "bomb":
       flags.bomb = "armed";
@@ -200,13 +155,9 @@ function flip(index){
 
 function getItem(index){
   let unflipped = numOfCards - flipped;
-  let unfound = 0; // how many of flags.bomb, flags.cop, flags.squad are false
-  if (!flags.bomb) unfound++;
-  if (!flags.cop) unfound++;
-  if (!flags.squad) unfound++;
-  if (flags.thief != "caught") unfound++;
+  let unfound = [!flags.bomb, !flags.cop, !flags.squad, flags.thief !== "caught"].filter(Boolean).length;
 
-  if (flipped == 0) return "money";
+  if (flipped === 0) return "money";
   else if (unflipped - unfound <= 5 && (!flags.bomb || !flags.cop)){
     if (!flags.cop){
       flags.cop = 5;
@@ -263,7 +214,7 @@ function handleThief(index){
               $(this).css('visibility', 'visible');
             }
           });
-          if (flags.squad && flags.bomb == "defused") game_over("gotcha");
+          if (flags.squad && flags.bomb === "defused") game_over("gotcha");
         }
       );
     }, 600);
@@ -322,31 +273,27 @@ function handleSquad(index){
   squadIndex = index;
   $(`#index${index} .flip-front`).html('<img src="/image/keidoro/bombsquad.png" alt="squad">');
   
-  if (flags.bomb == "armed"){
+  if (flags.bomb === "armed"){
+    timer = 0;
+    flags.bomb = "defused";
     jumpToCard(squadIndex, bombIndex, 
       '<img src="/image/keidoro/bombsquad.png" alt="squad"><div style="font-size:2rem;color:green;font-weight:bold;">DEFUSED</div>',
       () => {
         if (flags.cop && flags.thief === "caught") game_over("gotcha");
       });
-
-    timer = 0;
-    flags.bomb = "defused";
   }
-  else {
-    if (flags.cop && flags.thief === "caught") game_over("gotcha");
+  else if (flags.cop && flags.thief === "caught") {
+    game_over("gotcha");
   }
 }
 
 function handleCop(index){
   copIndex = index;
   flags.cop = 5;
+  const green = '<i class="material-icons" style="color:green;">search</i>';
   $(`#index${index} .flip-front`).html(`<img src="/image/keidoro/cop.png" alt="cop">
     <div id="search" style="font-size:2rem;font-weight:bold;">
-      <i class="material-icons" style="color:green;">search</i>
-      <i class="material-icons" style="color:green;">search</i>
-      <i class="material-icons" style="color:green;">search</i>
-      <i class="material-icons" style="color:green;">search</i>
-      <i class="material-icons" style="color:green;">search</i>
+      ${green.repeat(5)}
     </div>`);
 }
 
@@ -388,9 +335,9 @@ function game_over(result){
   switch(result){
     case "boom":
       // the bomb image is replaced by the boom image. Then it grows to fill the screen.
-      $(`#index${bombIndex} .flip-front`).html('<img src="/image/keidoro/boom.png" alt="boom">');
       let bombCard = $(`#index${bombIndex}`);
-      let bombImg = $(`#index${bombIndex} .flip-front img`).clone();
+      bombCard.find('.flip-front').html('<img src="/image/keidoro/boom.png" alt="boom">');
+      let bombImg = bombCard.find('.flip-front img').clone();
       let bombPos = bombCard.offset();
       bombImg.css({
         position: 'absolute',
@@ -407,7 +354,6 @@ function game_over(result){
         width: '100%',
         height: '100%'
       }, 300);
-      $(".flip").off('click');
       break;
     case "gotcha":
       // Show success image in a modal
