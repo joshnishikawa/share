@@ -32,19 +32,20 @@
   }
 
   #canvasWrapper {
-    background-image: url('/image/room.svg') !important;
-    background-size: cover !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
-    background-attachment: scroll !important;
+    position: relative;
+    overflow: hidden;
   }
 
-  #canvasWrapper {
-    background-image: url('/image/room.svg') !important;
-    background-size: cover !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
-    background-attachment: scroll !important;
+  #canvas {
+    width: 1366px;
+    height: 768px;
+    background-image: url('/image/room.svg');
+    background-size: cover;
+    background-position: right bottom;
+    background-repeat: no-repeat;
+    position: absolute;
+    bottom: 0;
+    right: 0;
   }
   .canvas-grid {
   display: grid;
@@ -186,8 +187,8 @@
     </div>
 
     <!-- Canvas area for dragging and dropping objects -->
-    <div id="canvasWrapper" class="col" style="max-height:100vh;overflow:visible;">
-      <div id="canvas" style="height:100%;overflow:visible;position:relative;"></div>
+    <div id="canvasWrapper" class="p-0" style="max-height:100vh;flex:1;">
+      <div id="canvas"></div>
     </div>
   </div>
 </div>

@@ -118,12 +118,10 @@ function CanvasBuilder(options) {
   async function generateThumbnailAsync() {
     try {
       const canvasElement = $(`#${config.canvasId}`);
-      const canvasWrapper = canvasElement.parent();
       
-      // Use wrapper dimensions (which has the background on all pages now)
-      const wrapperRect = canvasWrapper[0].getBoundingClientRect();
-      const fullWidth = wrapperRect.width;
-      const fullHeight = wrapperRect.height;
+      // Use canvas fixed dimensions (1366x768)
+      const fullWidth = 1366;
+      const fullHeight = 768;
       
       // Scale down to create smaller thumbnails (max 300px width)
       const maxWidth = 300;
@@ -144,13 +142,13 @@ function CanvasBuilder(options) {
       ctx.fillStyle = '#f0f0f0';
       ctx.fillRect(0, 0, fullWidth, fullHeight);
       
-      // Get background image from wrapper (consistent across all pages now)
-      const bgImage = canvasWrapper.css('background-image');
+      // Get background image from canvas element
+      const bgImage = canvasElement.css('background-image');
       
       // Draw background image
       if (bgImage && bgImage !== 'none') {
         const bgUrl = bgImage.replace(/url\(["']?([^"']+)["']?\)/g, '$1');
-        
+
         try {
           await new Promise((resolve, reject) => {
             const bgImg = new Image();

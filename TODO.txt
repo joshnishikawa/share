@@ -1,3 +1,5 @@
+FIXME: When bedroom resizes, objects move relative to the background.
+
 audio samples for all static vocab
 
 ////////// IDEAS FOR STUDENT ACTIVITIES ////////////////////////////////////////
