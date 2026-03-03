@@ -9,7 +9,7 @@
     }
 </style>
 
-<div class="ms-3 text-muted">NEW HORIZON VOCAB</div>
+<!-- <div class="ms-3 text-muted">NEW HORIZON VOCAB</div> -->
 
 <div id="themes" class="d-flex flex-wrap">
   <!-- Content will be populated dynamically -->
@@ -59,7 +59,6 @@ $(function(){
       }
       
       if (p == '+') {
-        html += '<div id="deleteme" class="flex-grow-1">.</div>';
         html += '<div id="growme" class="rounded-3 p-1 flex-grow-1" style="margin:1px;background-color:lightgray;">';
         html += '<div id="' + p + '" class="d-flex flex-wrap">';
         
@@ -78,8 +77,8 @@ $(function(){
         html += '</div>';
       } else {
         html += '<div class="rounded-3 p-1 d-flex" style="margin:1px;background-color:' + color + '">';
-        html += '<div class="vertical-label">' + p.replace(/_/g, ' ') + '</div>';
-        html += '<div id="' + p + '">';
+        // html += '<div class="!vertical-label me-3">' + p.replace(/_/g, ', ') + '</div>';
+        html += '<div id="' + p + '" class="d-flex flex-wrap">';
         
         for (let t in NH_vocab[p]) {
           let id = t.replace(/ /g, "_");
@@ -102,11 +101,6 @@ $(function(){
 
   // Function to set up event handlers
   function setupEventHandlers() {
-    $(window).on('resize', function(){
-      $("#deleteme").show();
-      $("#growme").width( Math.max($("#deleteme").width()-10, 55) );
-      $("#deleteme").hide();
-    });
 
     $("#themes input").on('change', function(){
       let list = [];
@@ -137,8 +131,6 @@ $(function(){
       
       // Set up event handlers
       setupEventHandlers();
-      $("#growme").width( Math.max($("#deleteme").width()-10, 55) );
-      $("#deleteme").hide();
     })
     .fail(function(xhr, status, error) {
       console.error('Failed to load NH vocabulary data:', error);

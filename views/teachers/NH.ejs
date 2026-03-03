@@ -1,14 +1,15 @@
 <%- include('../head.ejs') -%>
-<%- include('navbar.ejs') -%>
+
+<div id="menu-container" class="d-flex">
+  <%- include('navbar.ejs') -%>
+  <%- include('../menu/select_NH.ejs') -%>
+</div>
+
 
 <div class="container-fluid pb-3">
   <div class="row">
-    <div class="col-9 g-0">
-      <%- include('../menu/select_NH.ejs') -%>
-    </div>
-
-    <div class="col-3">
-      <%- include('../menu/lists.ejs') -%>
+    <div class="col-12 g-0">
+      <%//- include('../menu/lists.ejs') -%>
     </div>
   </div>
 

@@ -18,13 +18,13 @@ const mysql = require('mysql2/promise');
 const db = mysql.createPool(creds);
 const vocabulary = require('../public/vocabulary.js');
 const NH_colors = {
-  "#ffa9a0" : ["page_8_9", "page_22_23"],   // red
-  "#ddefb7" : ["page_10_11", "page_24_25"], // green
-  "#cdaed2" : ["page_12_13", "page_34_35"], // purple
-  "#ffd3b5" : ["page_14_15", "page_26_27"], // orange
-  "#bfe0fa" : ["page_16_17", "page_28_29"], // blue
-  "#c4bd9a" : ["page_18_19", "page_30_31"], // olive
-  "#ffcbda" : ["page_20_21", "page_32_33"]  // pink
+  "#ffa9a0" : ["8_9", "22_23"],   // red
+  "#ddefb7" : ["10_11", "24_25"], // green
+  "#cdaed2" : ["12_13", "34_35"], // purple
+  "#ffd3b5" : ["14_15", "26_27"], // orange
+  "#bfe0fa" : ["16_17", "28_29"], // blue
+  "#c4bd9a" : ["18_19", "30_31"], // olive
+  "#ffcbda" : ["20_21", "32_33"]  // pink
 }
 
 router.use(bodyParser.urlencoded({extended: true}));

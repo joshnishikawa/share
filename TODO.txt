@@ -1,12 +1,9 @@
-FIXME: When bedroom resizes, objects move relative to the background.
-
 audio samples for all static vocab
 
 ////////// IDEAS FOR STUDENT ACTIVITIES ////////////////////////////////////////
 Get the spoken picture dictionary working
 
 find the given word among a group of like words
-word find
 
 Find all letters that (sound like 'p', have a descender, are tall, etc.)
 Phonics: Click to listen. Drag into groups.
@@ -80,7 +77,7 @@ Time Bomb: Pause for 3 seconds = die. Don't finish in 1 minute = die. Three stri
   adj./noun (long - length, dark - darkness, able - ability)
   verb/prog. (study - studying, use - using, run - running)
   verb/past (walk - walked, ride - rode, study - studied, read - read)
-  verb/participle "
+  verb/participle (walk - walked, ride - ridden, study - studied, read - read)
   3rd person (like - likes, wish - wishes, have - has)
   comparative (tall - taller, large - larger, early - earlier, beautiful - more beautiful, good - better)
   superlative "
