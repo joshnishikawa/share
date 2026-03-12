@@ -1,46 +1,51 @@
 <%- include('../head.ejs') -%>
-<%- include('navbar.ejs') -%>
 
-<div class="container-fluid">
+<div id="menu-container" class="d-flex">
+  <%- include('navbar.ejs') -%>
 
-  <div class="row">
-    <div class="col">
-      <div id="tags" class="d-flex flex-wrap"></div>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-4">
+        <div class="d-flex mt-1">
+          <div class="text-muted">LETTERS, NUMBERS, WORDS</div>
+          <div class="flex-grow-1"><hr/></div>
+        </div>
+
+        <div id="tags" class="d-flex flex-wrap"></div>
+      </div>
+
+      <div class="col-4">
+        <div class="d-flex mt-1">
+          <div class="text-muted">LIST</div>
+          <div class="flex-grow-1"><hr/></div>
+        </div>
+        <div id="list" class="border bg-light p-2" style="user-select:none;"></div>
+      </div>
+
+      <div class="col-4">
+        <div class="d-flex mt-1">
+          <div class="text-muted">ACTIVITIES</div>
+          <div class="flex-grow-1"><hr/></div>
+        </div>
+
+        <div class="menuitemwrapper">
+          <%- include('../menu/item_flash.ejs') -%>
+        </div>
+      
+        <div class="menuitemwrapper">
+          <%- include('../menu/item_match.ejs') -%>
+        </div>
+      
+        <div class="menuitemwrapper">
+          <%- include('../menu/item_bingo.ejs') -%>
+        </div>
+      
+        <div class="menuitemwrapper">
+          <%- include('../menu/item_type.ejs') -%>
+        </div>
+
+      </div>
     </div>
-  </div>
-
-  <div class="d-flex pt-3">
-    <div class="text-muted">VOCAB ACTIVITIES</div>
-    <div class="flex-grow-1"><hr/></div>
-  </div>
-
-  <div class="row">
-
-    <div class="col menuitemwrapper">
-      <%- include('../menu/item_flash.ejs') -%>
-    </div>
-  
-    <div class="col menuitemwrapper">
-      <%- include('../menu/item_match.ejs') -%>
-    </div>
-  
-    <div class="col menuitemwrapper">
-      <%- include('../menu/item_bingo.ejs') -%>
-    </div>
-  
-  </div>
-  <div class="row">
-
-    <div class="col menuitemwrapper border-0">
-    </div>
-  
-    <div class="col menuitemwrapper border-0">
-    </div>
-
-    <div class="col menuitemwrapper">
-      <%- include('../menu/item_type.ejs') -%>
-    </div>
-
   </div>
 </div>
 
@@ -53,7 +58,7 @@ $(function(){
 
   for (let t in text_decks) {
     if ( ["animals", "objects", "shapes", "colors"].includes(t) ) continue;
-    $("#tags").append(`<div class="form-check m-3">
+    $("#tags").append(`<div class="form-check m-2">
       <input class="form-check-input" type="radio" name="tags" id="tag_${t}" value="${t}" aria-label="tags">
       <label class="form-check-label me-3" style="margin-left:-5px;" for="tag_${t}">${t} (${text_decks[t].length})</label>
     </div>`);
@@ -65,6 +70,7 @@ $(function(){
     for (let i=0; i<deck.length; i++) {
       window.deck.push({word: deck[i]});
     }
+    $("#list").html(deck.join(", "));
   });
 
 

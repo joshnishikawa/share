@@ -1,8 +1,13 @@
 <%- include('../head'); -%>
-<div class="d-flex">
-  <%- include('../menu/item_richtext.ejs'); -%>
-  <div id="save" class="btn btn-sm btn-outline-primary">SAVE</div>
-  <div id="copy" class="btn btn-sm btn-outline-primary">COPY</div>
+
+<div id="menu-container" class="d-flex">
+  <%- include('../teachers/navbar.ejs') -%>
+
+  <div style="flex:1;min-width:0;">
+    <!-- THE editor DIV NEEDS A FIXED HEIGHT OR EMBEDS WILL BREAK -->
+    <div id="editor" class="bg-white" style="width:100%;height:100vh;font-size:1rem;padding:50px;z-index:1;" autofocus></div>
+
+  </div>
 </div>
 
 
@@ -12,8 +17,25 @@
 <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js" defer></script>
 <style>.ql-code:after {font-size:0.7em;vertical-align:top;content:"kbd";}</style>
 
-<!-- THE editor DIV NEEDS A FIXED HEIGHT OR EMBEDS WILL BREAK -->
-<div id="editor" class="bg-white" style="height:100vh;font-size:1rem;padding:50px;z-index:1;" autofocus></div>
+
+
+<div id="richtext_modal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h3 class="modal-title">Rich Text</h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>This is a simple rich text editor. There are many rich-text editors
+          out there. This one just allows you to SAVE the text as an html file 
+          or COPY the html to the clipboard.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
 
 
 <script>
@@ -26,7 +48,7 @@
   }
 
 $(function(){
-  $("form button[type=submit]").hide();
+  $(`#rt-tab`).addClass("active");
 
   $('#save').click(function(){
     var title = $("#postRichText input[name=title]").val() || Date.now();
@@ -143,6 +165,9 @@ ${formatHTML(editor.root.innerHTML)}
     theme: 'snow'
   });
 
+  $(".ql-toolbar").append(`
+        <div id="save" class="btn btn-sm btn-outline-primary">SAVE</div>
+        <div id="copy" class="btn btn-sm btn-outline-primary">COPY</div>`);
   $(".ql-toolbar").addClass("sticky-top bg-light");
 
 });

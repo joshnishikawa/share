@@ -1,30 +1,9 @@
-<ul id="navbar" class="nav nav-tabs bg-white d-flex pt-1 mb-3 YM" style="position:relative;">
-  <button class="btn btn-outline-secondary m-1 py-0" data-bs-toggle="modal" data-bs-target="#menu_modal">
-    <i class="material-icons" style="line-height:1rem;vertical-align:middle;">info</i>
-  </button>
-  <li class="nav-item"><a id="letters-tab" href="letters" class="nav-link" data-toggle="tab">Letters</a></li>
-  <li class="nav-item"><a id="things-tab" href="things" class="nav-link" data-toggle="tab">Things</a></li>
-  <li class="nav-item"><a id="NH-tab" href="NH" class="nav-link" data-toggle="tab">New Horizon</a></li>
-  <!-- <li class="nav-item"><a id="groups-tab" href="groups" class="nav-link" data-toggle="tab">Groups</a></li> -->
-  <button id="home" class="btn btn-sm btn-outline-secondary m-1 py-0" style="position:absolute;right:0;" onclick="location.href='/teachers'">
+<ul id="navbar" class="nav flex-column nav-tabs bg-white d-flex pt-1 ms-1 YM" style="min-height: 100vh;">
+  <li class="nav-item vertical-label p-0"><a id="letters-tab" href="letters" class="nav-link border-start-0" data-toggle="tab">Letters</a></li>
+  <li class="nav-item vertical-label p-0"><a id="things-tab" href="things" class="nav-link border-start-0" data-toggle="tab">Things</a></li>
+  <li class="nav-item vertical-label p-0"><a id="NH-tab" href="NH" class="nav-link border-start-0" data-toggle="tab">New Horizon</a></li>
+  <!-- <li class="nav-item vertical-label p-0"><a id="groups-tab" href="groups" class="nav-link border-start-0" data-toggle="tab">Groups</a></li> -->
+  <button id="home" class="btn btn-sm btn-outline-secondary m-1 py-0" style="position:absolute;bottom:0;" onclick="location.href='/teachers'">
     <i class="material-icons">school</i>
   </button>
 </ul>
-
-
-<div id="menu_modal" class="modal fade">
-  <div class="modal-dialog modal-xl">
-    <div class="modal-content">
-
-      <div class="modal-header">
-        <h3 class="modal-title"><%- __('navbar.students.title') %></h3>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <p><%- __('navbar.students.1') %></p>
-        <p><%- __('navbar.students.2') %></p>
-        <p><%- __('navbar.students.3') %></p>
-      </div>
-    </div>
-  </div>
-</div>

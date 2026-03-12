@@ -1,166 +1,169 @@
 <%- include('../head.ejs') -%>
-<%- include('navbar.ejs') -%>
 
-<div class="container-fluid pb-3">
-  <div class="row">
-    <div class="col-1">
-      <a href="/LT1" class="btn btn-lg p-0"><img src="/LT1/assets/images/ico/favicon.ico" style="height: 75px;" alt="Lets Try 1"></a>
-      <a href="/LT2" class="btn btn-lg p-0"><img src="/LT2/assets/images/ico/favicon2.ico" style="height:75px;" alt="Lets Try 2"></a>
 
-    </div>
-    <div class="col-7">
-      <%- include('../menu/select_LT.ejs') -%>
-    </div>
+<div id="menu-container" class="d-flex">
+  <%- include('navbar.ejs') -%>
 
-    <div class="col-4">
-      <%- include('../menu/lists.ejs') -%>
-    </div>
-  </div>
 
-  <div class="d-flex mt-3">
-    <div class="text-muted">VOCAB ACTIVITIES</div>
-    <div class="flex-grow-1"><hr/></div>
-  </div>
-
-  <div class="row">
-
-    <div class="col menuitemwrapper">
-      <%- include('../menu/item_flash.ejs') -%>
-    </div>
-  
-    <div class="col menuitemwrapper">
-      <%- include('../menu/item_match.ejs') -%>
-    </div>
-  
-    <div class="col menuitemwrapper">
-      <%- include('../menu/item_recall.ejs') -%>
-    </div>
-  
-  </div>
-  <div class="row">
-  
-    <div class="col menuitemwrapper">
-      <%- include('../menu/item_bingo.ejs') -%>
-    </div>
-  
-    <div class="col menuitemwrapper">
-      <%- include('../menu/item_reveal.ejs') -%>
-    </div>
-  
-    <div class="col menuitemwrapper">
-      <%- include('../menu/item_grid.ejs') -%>
-    </div>
-  </div>
-  <div class="row">
-  
-    <div class="col menuitemwrapper border-0"></div>
-
-    <div class="col menuitemwrapper border-0"></div>
-
-    <div class="col menuitemwrapper">
-      <%- include('../menu/item_cards.ejs') -%>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col">
-      <div class="d-flex mt-3">
-        <div class="text-muted">OTHER G3 ACTIVITIES</div>
-        <div class="flex-grow-1"><hr/></div>
+  <div class="container-fluid pb-3">
+    <div class="row">
+      <div class="col-4">
+        <div class="d-flex mt-1">
+          <div class="text-muted">Let's Try VOCABULARY</div>
+          <div class="flex-grow-1"><hr/></div>
+        </div>
+        <%- include('../menu/select_LT.ejs') -%>
       </div>
-    </div>
-    <div class="col">
-      <div class="d-flex mt-3">
-        <div class="text-muted">OTHER G4 ACTIVITIES</div>
-        <div class="flex-grow-1"><hr/></div>
+
+      <div class="col-4 text-center">
+        <div class="d-flex mt-1">
+          <div class="text-muted">SELECT OR EDIT LISTS</div>
+          <div class="flex-grow-1"><hr/></div>
+        </div>
+        <%- include('../menu/lists.ejs') -%>
+        <div><%- __('list') %><span id="numOfItems"> (0)</span></div>
+        <div id="list" class="d-flex flex-wrap bg-white border rounded-3"></div>
       </div>
-    </div>
-  </div>
-  
-  <div class="row">
-    <div class="col d-flex flex-wrap align-items-start">
-<!-- G3 ----------------------------------------------------------------------->
-      <a href="http://englishjones.com/things/shapes" target="blank" class="btn btn-sm btn-primary m-1">
-        <strong>SHAPES</strong>
-      </a>
-
-      <a href="https://school.bunkei.co.jp/digikyo/eigo/soragakiabc/practice-type/select-upper" target="blank" class="btn btn-sm btn-primary m-1">
-        <strong>SORAGAKI ABC</strong>
-      </a>
-
-      <a href="https://altivities.earthiverse.ca/abcrace/" target="blank" class="btn btn-sm btn-primary m-1">
-        <strong>ABC RACE</strong>
-      </a>
-
-      <a href="https://www.plip-plop-land.com/secretabc" target="blank" class="btn btn-sm btn-primary m-1">
-        <strong>SECRET WORD</strong>
-      </a>
-
-      <a href="https://www.gamestolearnenglish.com/fast-english/embed.html#a/animals/00010203040506091011121314151617182021222426272829303132" target="blank" class="btn btn-sm btn-primary m-1">
-        <strong>FAST ANIMALS 1</strong>
-      </a>
-
-      <a href="https://www.gamestolearnenglish.com/fast-vocab/embed.html#a/animals/00010203040506091011121314151617182021222426272829303132" target="blank" class="btn btn-sm btn-primary m-1">
-        <strong>FAST ANIMALS 2</strong>
-      </a>
-
-    </div>
-
-
-    <div class="col d-flex flex-wrap align-items-start">
-<!-- G4 ----------------------------------------------------------------------->
-      <a href="https://school.bunkei.co.jp/digikyo/eigo/soragakiabc/practice-type/select-lower" target="blank" class="btn btn-sm btn-primary m-1">
-        <strong>SORAGAKI abc</strong>
-      </a>
-
-      <a href="https://altivities.earthiverse.ca/abcrace/" target="blank" class="btn btn-sm btn-primary m-1">
-        <strong>abc Race</strong>
-      </a>
-
-      <a href="https://www.plip-plop-land.com/alphabetmaze" target="blank" class="btn btn-sm btn-primary m-1">
-        <strong>abc MAZE</strong>
-      </a>
-
-      <a href="https://www.plip-plop-land.com/secretabc" target="blank" class="btn btn-sm btn-primary m-1">
-        <strong>SECRET WORD</strong>
-      </a>
-
-      <a href="https://www.gamestolearnenglish.com/fast-english/embed.html#a/clothes/000102030506081011121314151618202327" target="blank" class="btn btn-sm btn-primary m-1">
-        <strong>FAST CLOTHES 1</strong>
-      </a>
-
-      <a href="https://www.gamestolearnenglish.com/fast-vocab/embed.html#a/clothes/000102030506081011121314151618202327" target="blank" class="btn btn-sm btn-primary m-1">
-        <strong>FAST CLOTHES 2</strong>
-      </a>
       
-      <a href="http://englishjones.com/things/supplies" target="blank" class="btn btn-sm btn-primary m-1">
-        <strong>SUPPLIES</strong>
-      </a>
+      <div class="col-4">
+        <div class="d-flex mt-1">
+          <div class="text-muted">VOCAB ACTIVITIES</div>
+          <div class="flex-grow-1"><hr/></div>
+        </div>
 
-      <a href="https://www.gamestolearnenglish.com/fast-english/embed.html#a/stationery/0001030405060708101112131415161718192122" target="blank" class="btn btn-sm btn-primary m-1">
-        <strong>FAST SUPPLIES 1</strong>
-      </a>
 
-      <a href="https://www.gamestolearnenglish.com/fast-vocab/embed.html#a/stationery/0001030405060708101112131415161718192122" target="blank" class="btn btn-sm btn-primary m-1">
-        <strong>FAST SUPPLIES 2</strong>
-      </a>
+        <div class="col menuitemwrapper">
+          <%- include('../menu/item_flash.ejs') -%>
+        </div>
+      
+        <div class="col menuitemwrapper">
+          <%- include('../menu/item_match.ejs') -%>
+        </div>
+      
+        <div class="col menuitemwrapper">
+          <%- include('../menu/item_recall.ejs') -%>
+        </div>
 
-      <a href="http://www.kumamoto-kmm.ed.jp/kyouzai/web/Original-pizza/index.html" target="blank" class="btn btn-sm btn-primary m-1">
-        <strong>PIZZA</strong>
-      </a>
+        <div class="col menuitemwrapper">
+          <%- include('../menu/item_bingo.ejs') -%>
+        </div>
+      
+        <div class="col menuitemwrapper">
+          <%- include('../menu/item_reveal.ejs') -%>
+        </div>
+      
+        <div class="col menuitemwrapper">
+          <%- include('../menu/item_grid.ejs') -%>
+        </div>
 
-      <a href="http://www.kumamoto-kmm.ed.jp/kyouzai/web/Original_Parfait/index.html" target="blank" class="btn btn-sm btn-primary m-1">
-        <strong>PARFAIT</strong>
-      </a>
-
-      <a href="https://www.plip-plop-land.com/gettingaround" target="blank" class="btn btn-sm btn-primary m-1">
-        <strong>DIRECTIONS</strong>
-      </a>
+        <div class="col menuitemwrapper">
+          <%- include('../menu/item_cards.ejs') -%>
+        </div>
+      </div>
 
     </div>
-  </div>
-</div>
+    <div class="row">
+      <div class="col-6">
+        <div class="d-flex align-content-start mt-3">
+          <div class="text-muted">OTHER G3 ACTIVITIES</div>
+          <div class="flex-grow-1"><hr/></div>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="d-flex align-content-start mt-3">
+          <div class="text-muted">OTHER G4 ACTIVITIES</div>
+          <div class="flex-grow-1"><hr/></div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-2 text-center pt-3">
+        <a href="/LT1" class="btn btn-lg p-0">
+          <img src="/LT1/assets/images/ico/favicon.ico" alt="Lets Try 1">
+        </a>
+      </div>
+      <div class="col-4">
+  <!-- G3 ----------------------------------------------------------------------->
+        <a href="https://school.bunkei.co.jp/digikyo/eigo/soragakiabc/practice-type/select-upper" target="blank" class="btn btn-sm btn-primary m-1">
+          <strong>SORAGAKI ABC</strong>
+        </a>
 
+        <a href="https://altivities.earthiverse.ca/abcrace/" target="blank" class="btn btn-sm btn-primary m-1">
+          <strong>ABC RACE</strong>
+        </a>
+
+        <a href="https://www.plip-plop-land.com/secretabc" target="blank" class="btn btn-sm btn-primary m-1">
+          <strong>SECRET WORD</strong>
+        </a>
+
+        <a href="https://www.gamestolearnenglish.com/fast-english/embed.html#a/animals/00010203040506091011121314151617182021222426272829303132" target="blank" class="btn btn-sm btn-primary m-1">
+          <strong>ANIMALS 1</strong>
+        </a>
+
+        <a href="https://www.gamestolearnenglish.com/fast-vocab/embed.html#a/animals/00010203040506091011121314151617182021222426272829303132" target="blank" class="btn btn-sm btn-primary m-1">
+          <strong>ANIMALS 2</strong>
+        </a>
+
+
+      </div>
+
+      <div class="col-2 text-center pt-3">
+        <a href="/LT2" class="btn btn-lg p-0">
+          <img src="/LT2/assets/images/ico/favicon2.ico" alt="Lets Try 2">
+        </a>
+      </div>
+      <div class="col-4">
+          <!-- G4 ----------------------------------------------------------------------->
+        <a href="https://school.bunkei.co.jp/digikyo/eigo/soragakiabc/practice-type/select-lower" target="blank" class="btn btn-sm btn-primary m-1">
+          <strong>SORAGAKI abc</strong>
+        </a>
+
+        <a href="https://altivities.earthiverse.ca/abcrace/" target="blank" class="btn btn-sm btn-primary m-1">
+          <strong>abc Race</strong>
+        </a>
+
+        <a href="https://www.plip-plop-land.com/alphabetmaze" target="blank" class="btn btn-sm btn-primary m-1">
+          <strong>abc MAZE</strong>
+        </a>
+
+        <a href="https://www.plip-plop-land.com/secretabc" target="blank" class="btn btn-sm btn-primary m-1">
+          <strong>SECRET WORD</strong>
+        </a>
+
+        <a href="https://www.gamestolearnenglish.com/fast-english/embed.html#a/clothes/000102030506081011121314151618202327" target="blank" class="btn btn-sm btn-primary m-1">
+          <strong>CLOTHES 1</strong>
+        </a>
+
+        <a href="https://www.gamestolearnenglish.com/fast-vocab/embed.html#a/clothes/000102030506081011121314151618202327" target="blank" class="btn btn-sm btn-primary m-1">
+          <strong>CLOTHES 2</strong>
+        </a>
+        
+        <a href="https://www.gamestolearnenglish.com/fast-english/embed.html#a/stationery/0001030405060708101112131415161718192122" target="blank" class="btn btn-sm btn-primary m-1">
+          <strong>SUPPLIES 1</strong>
+        </a>
+
+        <a href="https://www.gamestolearnenglish.com/fast-vocab/embed.html#a/stationery/0001030405060708101112131415161718192122" target="blank" class="btn btn-sm btn-primary m-1">
+          <strong>SUPPLIES 2</strong>
+        </a>
+
+        <a href="http://www.kumamoto-kmm.ed.jp/kyouzai/web/Original-pizza/index.html" target="blank" class="btn btn-sm btn-primary m-1">
+          <strong>PIZZA</strong>
+        </a>
+
+        <a href="http://www.kumamoto-kmm.ed.jp/kyouzai/web/Original_Parfait/index.html" target="blank" class="btn btn-sm btn-primary m-1">
+          <strong>PARFAIT</strong>
+        </a>
+
+        <a href="https://www.plip-plop-land.com/gettingaround" target="blank" class="btn btn-sm btn-primary m-1">
+          <strong>DIRECTIONS</strong>
+        </a>
+
+      </div>
+    </div>
+    
+  </div>
+
+</div>
 
 <script>
 $(function(){

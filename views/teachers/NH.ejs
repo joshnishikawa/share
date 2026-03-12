@@ -2,235 +2,107 @@
 
 <div id="menu-container" class="d-flex">
   <%- include('navbar.ejs') -%>
-  <%- include('../menu/select_NH.ejs') -%>
-</div>
-
-
-<div class="container-fluid pb-3">
-  <div class="row">
-    <div class="col-12 g-0">
-      <%//- include('../menu/lists.ejs') -%>
-    </div>
-  </div>
-
-  <div class="d-flex mt-3">
-    <div class="text-muted">VOCAB ACTIVITIES</div>
-    <div class="flex-grow-1"><hr/></div>
-  </div>
-
-  <div class="row">
-
-    <div class="col menuitemwrapper">
-      <%- include('../menu/item_flash.ejs') -%>
-    </div>
   
-    <div class="col menuitemwrapper">
-      <%- include('../menu/item_match.ejs') -%>
-    </div>
   
-    <div class="col menuitemwrapper">
-      <%- include('../menu/item_recall.ejs') -%>
-    </div>
-  
-  </div>
-  <div class="row">
-  
-    <div class="col menuitemwrapper">
-      <%- include('../menu/item_bingo.ejs') -%>
-    </div>
-
-    <div class="col menuitemwrapper">
-      <%- include('../menu/item_reveal.ejs') -%>
-    </div>
-
-    <div class="col menuitemwrapper">
-      <%- include('../menu/item_grid.ejs') -%>
-    </div>
-  
-  </div>
-  <div class="row">
-
-    <div class="col menuitemwrapper">
-      <%- include('../menu/item_type.ejs') -%>
-    </div>
-
-    <div class="col menuitemwrapper">
-      <%- include('../menu/item_spell.ejs') -%>
-    </div>
-    <div class="col menuitemwrapper">
-      <%- include('../menu/item_double.ejs') -%>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col menuitemwrapper">
-      <%- include('../menu/item_cards.ejs') -%>
-    </div>
-    <div class="col menuitemwrapper">
-      <%- include('../menu/item_keidoro.ejs') -%>
-    </div>
-    <div class="col menuitemwrapper border-0">
-    </div>
-  </div>
-
-  <div class="d-flex mt-3">
-    <div class="text-muted">OTHER ACTIVITIES</div>
-    <div class="flex-grow-1"><hr/></div>
-  </div>
-
-
-
-  <div class="row">
-    <div class="col menuitemwrapper">
-      <div class="d-flex justify-content-between">
-        <div>
-          <i class="material-icons text-secondary" 
-            style="line-height:1.4rem;font-size:1.4rem;cursor:pointer;" 
-            data-bs-toggle="modal" data-bs-target="#restaurant_modal">
-            info
-          </i>
-          <strong class="text-primary fs-5">RESTAURANT</strong>
-        </div>
-        <div>
-          <a href="http://www.kumamoto-kmm.ed.jp/kyouzai/web/Lunch-menu2/index.html" target="blank" class="btn btn-sm btn-primary">
-            Start
-          </a>
-        </div>
+  <div class="container-fluid pb-3">
+    <div class="row">
+      <div class="col-12 d-flex mt-1">
+        <div class="text-muted">New Horizon VOCABULARY</div>
+        <div class="flex-grow-1"><hr/></div>
       </div>
+      <%- include('../menu/select_NH.ejs') -%>
     </div>
-  
-  
-  <!-- SCHEDULE ----------------------------------------------------------------->
-  
-    <div class="col menuitemwrapper">
-      <div class="d-flex justify-content-between">
-        <div>
-          <i class="material-icons text-secondary" 
-            style="line-height:1.4rem;font-size:1.4rem;cursor:pointer;" 
-            data-bs-toggle="modal" data-bs-target="#schedule_modal">
-            info
-          </i>
-          <strong class="text-primary fs-5">SCHEDULE</strong>
-        </div>
-        <div>
-          <a href="http://www.kumamoto-kmm.ed.jp/kyouzai/web/Original_Timetable/index.html" target="blank" class="btn btn-sm btn-primary">
-            Start
-          </a>
-        </div>
+
+    <div class="row">
+      <div class="col-4">
+        <%- include('../menu/lists.ejs') -%>
       </div>
-    </div>
-  
-  <!-- INTERVIEW -------------------------------------------------------------->
-    <div class="col menuitemwrapper">
-      <div class="d-flex justify-content-between">
-        <div>
-          <i class="material-icons text-secondary" 
-            style="line-height:1.4rem;font-size:1.4rem;cursor:pointer;" 
-            data-bs-toggle="modal" data-bs-target="#interview_modal">
-            info
-          </i>
-          <strong class="fs-5 text-primary">INTERVIEW</strong>
-        </div>
-        <div>
-          <a href="/tools/interview" class="btn btn-sm btn-primary">Start</a>
-        </div>
+      <div class="col-8">
+        <div><%- __('list') %><span id="numOfItems"> (0)</span></div>
+        <div id="list" class="d-flex flex-wrap bg-white border rounded-3"></div>      
       </div>
     </div>
 
-    <!-- SLOTS ----------------------------------------------------------------->
-  
-    <div class="col menuitemwrapper">
-      <%- include('../menu/item_slots.ejs') -%>
-    </div>
-  
-
-  </div>
-
-</div>
-
-
-
-
-
-
-
-
-
-
-<div id="restaurant_modal" class="modal fade">
-  <div class="modal-dialog">
-    <div class="modal-content">
     
-      <div class="modal-header">
-        <h3 class="modal-title">RESTAURANT</h3>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <div class="row">
+      <div class="d-flex mt-1">
+        <div class="text-muted">VOCAB ACTIVITIES</div>
+        <div class="flex-grow-1"><hr/></div>
       </div>
-      <div class="modal-body">
-        <p>Student 1 uses their tablet to take Student 2's order.</p>
-        <p>
-          S1: What would you like?<br/>
-          S2: I'd like a hamburger, please.<br/>
-          S1: OK.<br/>
-          S2: How much is it?<br/>
-          S1: [Clicks "How much?"] It's __________ yen.<br/>
-          [Repeat for other items.]
-        </p>
-        <p>
-          S1: __________ yen please.<br/>
-          S2: Here you are / go.<br/>
-          S1: Thank you and here you are / go.<br/>
-          S2: Thank you.
-        </p>
 
-          <a href="http://www.kumamoto-kmm.ed.jp/kyouzai/web/tab_menu1.htm#eigo" target="blank">
-          http://www.kumamoto-kmm.ed.jp/kyouzai/web/tab_menu1.htm#eigo
-        </a>
-
+      <div class="col menuitemwrapper">
+        <%- include('../menu/item_flash.ejs') -%>
       </div>
-    </div>
-  </div>
-</div>
-
-<div id="schedule_modal" class="modal fade">
-  <div class="modal-dialog">
-    <div class="modal-content">
     
-      <div class="modal-header">
-        <h3 class="modal-title">SCHEDULE</h3>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      <div class="col menuitemwrapper">
+        <%- include('../menu/item_match.ejs') -%>
       </div>
-      <div class="modal-body">
-        <p>Student 1 uses their tablet to make a schedule for Student 2.</p>
-        <p>S1: What do you have on Monday?<br/>
-            S2: I have math, science, and English.<br/>
-            S1: What do you have on Tuesday?<br/>
-            S2: I have math, science, and English.<br/>
-            .<br/>
-            .<br/>
-            .<br/>
-          </p>
+    
+      <div class="col menuitemwrapper">
+        <%- include('../menu/item_recall.ejs') -%>
+      </div>
+    
+    </div>
+    <div class="row">
+    
+      <div class="col menuitemwrapper">
+        <%- include('../menu/item_bingo.ejs') -%>
+      </div>
 
-          <a href="http://www.kumamoto-kmm.ed.jp/kyouzai/web/tab_menu1.htm#eigo" target="blank">
-          http://www.kumamoto-kmm.ed.jp/kyouzai/web/tab_menu1.htm#eigo
-        </a>
+      <div class="col menuitemwrapper">
+        <%- include('../menu/item_reveal.ejs') -%>
+      </div>
 
+      <div class="col menuitemwrapper">
+        <%- include('../menu/item_grid.ejs') -%>
+      </div>
+    
+    </div>
+    <div class="row">
+
+      <div class="col menuitemwrapper">
+        <%- include('../menu/item_type.ejs') -%>
+      </div>
+
+      <div class="col menuitemwrapper">
+        <%- include('../menu/item_spell.ejs') -%>
+      </div>
+      <div class="col menuitemwrapper">
+        <%- include('../menu/item_double.ejs') -%>
       </div>
     </div>
-  </div>
-</div>
 
-
-<div id="interview_modal" class="modal fade">
-  <div class="modal-dialog">
-    <div class="modal-content">
-
-      <div class="modal-header">
-        <h3 class="modal-title">Interview</h3>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <div class="row">
+      <div class="col menuitemwrapper">
+        <%- include('../menu/item_cards.ejs') -%>
       </div>
-      <div class="modal-body">
-        <p>You can simply display a large visual aid on the screen for practice doing Eiken-style Q&A.</p>
+      <div class="col menuitemwrapper">
+        <%- include('../menu/item_keidoro.ejs') -%>
       </div>
+      <div class="col menuitemwrapper border-0">
+      </div>
+    </div>
+
+    <div class="d-flex mt-3">
+      <div class="text-muted">OTHER ACTIVITIES</div>
+      <div class="flex-grow-1"><hr/></div>
+    </div>
+
+
+
+    <div class="row">
+      <div class="col">
+        <a href="http://www.kumamoto-kmm.ed.jp/kyouzai/web/Lunch-menu2/index.html" target="blank" class="btn btn-sm btn-primary m-1">
+          RESTAURANT
+        </a>
+        <a href="http://www.kumamoto-kmm.ed.jp/kyouzai/web/Original_Timetable/index.html" target="blank" class="btn btn-sm btn-primary m-1">
+          SCHEDULE
+        </a>
+        <a href="/tools/interview" class="btn btn-sm btn-primary m-1">
+          INTERVIEW
+        </a>
+      </div>
+    
     </div>
   </div>
 </div>

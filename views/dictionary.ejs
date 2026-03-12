@@ -5,26 +5,28 @@
 </style>
 
 
-<div class="container-fluid" style="height:350px;">
+<div class="container-fluid g-0">
 
   <div class="row">
 <!-- SELECT VOCAB FORMS ------------------------------------------------------->
-    <div class="col-md-4">
-      <div class="border border-white rounded-3 alert-secondary px-3">
-        <span class="text-primary display-6 YM">Dictionary</span>
-        <input id="searchInput" name="word" type="text"
-               class="form-control my-2" placeholder="日本語 / English" style="text-align:right;" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false">
-
-        <!-- <div class="d-flex justify-content-end">
-          <div class="text-muted me-3"><%//- __('speech') %></div>
-          <div id="speech_recognition" class="btn btn-success">
-            <i class="material-icons">mic</i>
-          </div>
-        </div> -->
+    <div class="col-4">
+      <div class="d-flex mt-1">
+        <div class="text-muted">DICTIONARY</div>
+        <div class="flex-grow-1"><hr/></div>
       </div>
+
+      <input id="searchInput" name="word" type="text"
+              class="form-control my-2" placeholder="日本語 / English" style="text-align:right;" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false">
+
+      <!-- <div class="d-flex justify-content-end">
+        <div class="text-muted me-3"><%//- __('speech') %></div>
+        <div id="speech_recognition" class="btn btn-success">
+          <i class="material-icons">mic</i>
+        </div>
+      </div> -->
     </div>
 
-    <div class="col-md-8">
+    <div class="col-8">
       <div id="output"></div>
     </div>
 
@@ -89,7 +91,7 @@ $(function(){
         let audio = '';
 
         if (Object.keys(words).includes(EnglishWord)) {
-          image = `<img src="${words[EnglishWord].image}" class="img-fluid" style="max-height:300px;" alt="${EnglishWord}">`;
+          image = `<img src="${words[EnglishWord].image}" class="img-fluid" style="max-height:150px;" alt="${EnglishWord}">`;
           audio = words[EnglishWord].audio;
           if (JapaneseWord != words[EnglishWord].meaning) {
             JapaneseWord += `, ${words[EnglishWord].meaning}`;
@@ -98,7 +100,7 @@ $(function(){
           let lc = EnglishWord.toLowerCase();
           if (Object.keys(words).includes(lc)) {
             EnglishWord = lc;
-            image = `<img src="${words[EnglishWord].image}" class="img-fluid" style="max-height:300px;" alt="${EnglishWord}">`;
+            image = `<img src="${words[EnglishWord].image}" class="img-fluid" style="max-height:150px;" alt="${EnglishWord}">`;
             audio = words[lc].audio;
             if (JapaneseWord != words[lc].meaning) {
               JapaneseWord += `, ${words[lc].meaning}`;
@@ -152,7 +154,7 @@ $(function(){
     let JapaneseWord = await translate(EnglishWord, { from: "en", to: "ja" });
 
     if (Object.keys(words).includes(EnglishWord)) {
-      image = `<img src="${words[EnglishWord].image}" class="img-fluid" style="max-height:300px;">`;
+      image = `<img src="${words[EnglishWord].image}" class="img-fluid" style="max-height:150px;" alt="${EnglishWord}">`;
       audio = words[EnglishWord].audio;
       if (JapaneseWord != words[EnglishWord].meaning) {
         JapaneseWord += `, ${words[EnglishWord].meaning}`;
@@ -161,7 +163,7 @@ $(function(){
       let lc = EnglishWord.toLowerCase();
       if (Object.keys(words).includes(lc)) {
         EnglishWord = lc;
-        image = `<img src="${words[EnglishWord].image}" class="img-fluid" style="max-height:300px;">`;
+        image = `<img src="${words[EnglishWord].image}" class="img-fluid" style="max-height:150px;" alt="${EnglishWord}">`;
         audio = words[lc].audio;
         if (JapaneseWord != words[lc].meaning) {
           JapaneseWord += `, ${words[lc].meaning}`;
@@ -186,8 +188,8 @@ $(function(){
      $("#output").html(
      `<div class="bg-light shadow border rounded-3 p-3 YM d-flex">
         <div>
-          <span class="text-primary display-1">${w.word} </span> <br />
-          <span class="display-5">${w.meaning}</span>
+          <span class="text-primary fs-1">${w.word} </span> <br />
+          <span class="fs-3">${w.meaning}</span>
         </div>
         <div class="w-100 text-center">${w.image}</div>
       </div>`);

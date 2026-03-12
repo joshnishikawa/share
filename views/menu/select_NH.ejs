@@ -7,11 +7,12 @@
       white-space: nowrap;
       padding: 0.5rem 0;
     }
+  
 </style>
 
 <!-- <div class="ms-3 text-muted">NEW HORIZON VOCAB</div> -->
 
-<div id="themes" class="d-flex flex-wrap">
+<div id="themes" class="d-flex flex-wrap align-content-start">
   <!-- Content will be populated dynamically -->
 </div>
 
@@ -59,13 +60,13 @@ $(function(){
       }
       
       if (p == '+') {
-        html += '<div id="growme" class="rounded-3 p-1 flex-grow-1" style="margin:1px;background-color:lightgray;">';
+        html += '<div class="rounded-3 p-1" style="display: block !important;margin:2px;background-color:lightgray;">';
         html += '<div id="' + p + '" class="d-flex flex-wrap">';
         
         for (let t in NH_vocab[p]) {
           let id = t.replace(/ /g, "_");
           let translatedTheme = translations[t] || t; // fallback to original if no translation
-          html += '<div class="form-check" style="width:fit-content;">';
+          html += '<div class="form-check">';
           html += '<input id="theme_' + id + '" name="themes" aria-label="themes" class="form-check-input" type="checkbox" value="' + t + '">';
           html += '<label class="form-check-label me-3" style="margin-left:-5px;" for="theme_' + id + '">';
           html += translatedTheme + ' <u>' + Object.keys(NH_vocab[p][t]).length + '</u>';
@@ -76,9 +77,9 @@ $(function(){
         html += '</div>';
         html += '</div>';
       } else {
-        html += '<div class="rounded-3 p-1 d-flex" style="margin:1px;background-color:' + color + '">';
-        // html += '<div class="!vertical-label me-3">' + p.replace(/_/g, ', ') + '</div>';
-        html += '<div id="' + p + '" class="d-flex flex-wrap">';
+        html += '<div class="rounded-3 p-1 d-flex" style="margin:2px;background-color:' + color + '">';
+        html += '<div class="vertical-label">' + p.replace(/_/g, ', ') + '</div>';
+        html += '<div id="' + p + '">';
         
         for (let t in NH_vocab[p]) {
           let id = t.replace(/ /g, "_");
@@ -101,7 +102,6 @@ $(function(){
 
   // Function to set up event handlers
   function setupEventHandlers() {
-
     $("#themes input").on('change', function(){
       let list = [];
       let p = $(this).parent().parent().attr('id');
