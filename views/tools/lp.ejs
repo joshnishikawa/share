@@ -1,480 +1,478 @@
 <%- include('../head'); -%>
-<style>
-  #sheet {
-    width: 21cm;
-    height: 29.7cm;
-  }
-  @media print {
-    #toolbox, #sidenavbar {
-      display: none !important;
+  <style>
+    #sheet {
+      width: 21cm;
+      height: 29.7cm;
     }
-    body{background-image: none !important;}
-  }
 
-  [contenteditable="true"] {
-    cursor:pointer;
-    color: black;
-  }
+    @media print {
 
-  [contenteditable="true"].single-line {
-    white-space: nowrap;
-    overflow: hidden;
-  } 
-  [contenteditable="true"].single-line br {
-      display:none;
-  }
-  [contenteditable="true"].single-line * {
-      display:inline;
-      white-space:nowrap;
-  }
-  [contenteditable="true"].multi-line {
-    height: calc(100% - 1.5rem);
-    white-space: pre-wrap;
-    overflow: hidden;
-  }
+      #toolbox,
+      #sidenavbar {
+        display: none !important;
+      }
 
-</style>
+      body {
+        background-image: none !important;
+      }
+    }
 
-<body>
-<div id="menu-container" class="d-flex">
-  <%- include('../teachers/navbar.ejs') -%>
+    [contenteditable="true"] {
+      cursor: pointer;
+      color: black;
+    }
 
-<!-- ####################################################################### -->
-  <div id="sheet" class="container-fluid YM bg-white text-muted border border-white rounded-3">
-    <div class="row" style="height:5%;">
+    [contenteditable="true"].single-line {
+      white-space: nowrap;
+      overflow: hidden;
+    }
 
-      <div class="col-2 border rounded-3">
-        Date:
-        <div contenteditable="true" class="single-line"></div>
+    [contenteditable="true"].single-line br {
+      display: none;
+    }
+
+    [contenteditable="true"].single-line * {
+      display: inline;
+      white-space: nowrap;
+    }
+
+    [contenteditable="true"].multi-line {
+      height: calc(100% - 1.5rem);
+      white-space: pre-wrap;
+      overflow: hidden;
+    }
+  </style>
+
+  <body>
+    <div id="menu-container" class="d-flex">
+      <%- include('../teachers/navbar.ejs') -%>
+
+      <div class="d-flex flex-column justify-content-center align-items-center w-100 ">
+
+      <!-- ####################################################################### -->
+      <div id="toolbox" class="d-flex bg-light sticky-top w-75 shadow shadow-sm mb-3 border border-secondary border-top-0 rounded-3">
+
+        <select id="lp_select" class="form-select form-select small"
+          aria-label="Default select example" style="width:200px;"></select>
+        <button id="add_lp_modal" class="btn btn-sm btn-outline-success border-0">
+          <i class="material-icons">note_add</i>
+        </button>
+
+        <button id="print" class="btn btn-sm btn-outline-success border-0" onclick="window.print();">
+          <i class="material-icons">print</i>
+        </button>
+
+        <button id="delete_LP_modal" class="btn btn-sm btn-outline-danger border-0" style="display:none;">
+          <i class="material-icons">delete</i>
+        </button>
+
+        <button id="clear" class="btn btn-sm btn-outline-danger border-0" style="display:none;">
+          <div class="d-flex">
+            <div class="material-icons">clear</div>
+            <div class="align-top" style="font-size:0.5rem;">dblclick <br /> to clear</div>
+          </div>
+        </button>
+
+        <div class="dropdown">
+          <button class="btn btn-sm btn-outline-secondary border-0 px-3 dropdown-toggle w-100" type="button"
+            id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="material-icons">format_size</i>
+          </button>
+          <ul class="dropdown-menu w-100" aria-labelledby="dropdownMenuButton1">
+            <li><button class="dropdown-item" onclick="document.execCommand('fontSize', false, '1')">1</button></li>
+            <li><button class="dropdown-item" onclick="document.execCommand('fontSize', false, '2')">2</button></li>
+            <li><button class="dropdown-item" onclick="document.execCommand('fontSize', false, '3')">3</button></li>
+            <li><button class="dropdown-item" onclick="document.execCommand('fontSize', false, '4')">4</button></li>
+            <li><button class="dropdown-item" onclick="document.execCommand('fontSize', false, '5')">5</button></li>
+            <li><button class="dropdown-item" onclick="document.execCommand('fontSize', false, '6')">6</button></li>
+            <li><button class="dropdown-item" onclick="document.execCommand('fontSize', false, '7')">7</button></li>
+          </ul>
+        </div>
+
+        <button data-value="black" class="textcolor btn btn-sm btn-outline-secondary border-0 text-body">
+          <i class="material-icons">format_color_text</i>
+        </button>
+
+        <button data-value="red" class="textcolor btn btn-sm btn-outline-secondary border-0 text-danger">
+          <i class="material-icons">format_color_text</i>
+        </button>
+
+        <button data-value="blue" class="textcolor btn btn-sm btn-outline-secondary border-0 text-primary">
+          <i class="material-icons">format_color_text</i>
+        </button>
+
+        <button class="btn btn-sm btn-outline-secondary border-0"
+          onclick="document.execCommand('insertUnorderedList', false, null);">
+          <i class="material-icons">format_list_bulleted</i>
+        </button>
+        <button class="btn btn-sm btn-outline-secondary border-0"
+          onclick="document.execCommand('insertOrderedList', false, null);">
+          <i class="material-icons">format_list_numbered</i>
+        </button>
+
+        <button class="btn btn-sm btn-outline-secondary border-0"
+          onclick="document.execCommand('justifyLeft', false, null);">
+          <i class="material-icons">format_align_left</i>
+        </button>
+        <button class="btn btn-sm btn-outline-secondary border-0"
+          onclick="document.execCommand('justifyCenter', false, null);">
+          <i class="material-icons">format_align_center</i>
+        </button>
+
+        <button class="btn btn-sm btn-outline-secondary border-0" data-bs-toggle="modal" data-bs-target="#lp_modal" style="position:absolute;top:0;right:0;">
+          <i class="material-icons">info</i>
+        </button>
+
       </div>
-      <div class="col-2 border rounded-3">
-        Class:
-        <div contenteditable="true" class="single-line"></div>
-      </div>
-      <div class="col-8 border rounded-3">
-        Today's Goal:
-        <div contenteditable="true" class="single-line"></div>
-      </div>
 
-    </div>
-    <div class="row" style="height:11%;">
+      <!-- ####################################################################### -->
 
-      <div class="col-3 border rounded-3">
-        <span class="fs-3">① </span>
-        <u class="align-top">Get Started</u>
-        <p class="small">Greetings, Day/Date, Weather, Small Talk, Today's Word</p>
+      <div id="sheet" class="container-fluid YM bg-white text-muted border border-white rounded-3">
+        <div class="row" style="height:5%;">
+
+          <div class="col-2 border rounded-3">
+            Date:
+            <div contenteditable="true" class="single-line"></div>
+          </div>
+          <div class="col-2 border rounded-3">
+            Class:
+            <div contenteditable="true" class="single-line"></div>
+          </div>
+          <div class="col-8 border rounded-3">
+            Today's Goal:
+            <div contenteditable="true" class="single-line"></div>
+          </div>
+
+        </div>
+        <div class="row" style="height:11%;">
+
+          <div class="col-3 border rounded-3">
+            <span class="fs-3">① </span>
+            <u class="align-top">Get Started</u>
+            <p class="small">Greetings, Day/Date, Weather, Small Talk, Today's Word</p>
+
+          </div>
+          <div class="col-9 border rounded-3" style="position:relative;">
+            <div class="editor multi-line" contenteditable="true"></div>
+            <div class="small" style="position:absolute;bottom:0;">
+              挨拶・曜日・日付・天気・スモールトーク・今日の英単語
+            </div>
+          </div>
+
+        </div>
+        <div class="row" style="height:15%;">
+
+          <div class="col-3 border rounded-3">
+            <span class="fs-3">② </span>
+            <u class="align-top">Warm Up / Review</u>
+            <p class="small">Practice what you learned last time in pairs or groups. Speaking time!</p>
+          </div>
+          <div class="col-9 border rounded-3" style="position:relative;">
+            <div class="editor multi-line" contenteditable="true"></div>
+            <div class="small" style="position:absolute;bottom:0;">
+              前回学んだことを復習・ペアやグループで練習・スピーキングタイム
+            </div>
+          </div>
+
+        </div>
+        <div class="row" style="height:29%;">
+
+          <div class="col-3 border rounded-3">
+            <span class="fs-3">③ </span>
+            <u class="align-top">Something New</u>
+            <p class="small">Focus on today's goal. Listen, watch, think, ask, discuss, learn.</p>
+            <p class="small">今日の目標に集中する・聞く・見る・考える・尋ねる・話す・学ぶ</p>
+            <p class="small">JTE リード<br />ALT モデリング</p>
+          </div>
+          <div class="col-9 border rounded-3" style="position:relative;">
+            <div class="editor multi-line" contenteditable="true"></div>
+            <div class="bg-white" style="height:6px;position:absolute;bottom:-3px;left:50px;right:50px;">&nbsp;</div>
+          </div>
+
+        </div>
+        <div class="row" style="height:29%;">
+
+          <div class="col-3 border rounded-3">
+            <span class="fs-3">④ </span>
+            <u class="align-top">Something Fun</u>
+            <p class="small">Do an activity to practice what you learned today.
+              Switch to a different topic. Try out new things. Have fun!</p>
+            <p class="small">今日学んだことを練習・違うトピックに移る・新しいことを試す・楽しむ</p>
+            <p class="small">ALT リード<br />JTE 生徒をサポート</p>
+          </div>
+          <div class="col-9 border rounded-3">
+            <div class="editor multi-line" contenteditable="true"></div>
+          </div>
+
+        </div>
+        <div class="row" style="height:11%;">
+
+          <div class="col-3 border rounded-3">
+            <span class="fs-3">⑤ </span>
+            <u class="align-top">Think Back/Ahead</u>
+            <p class="small">What did you learn today? When's the next class? Good-byes.</p>
+          </div>
+          <div class="col-9 border rounded-3" style="position:relative;">
+            <div class="editor multi-line" contenteditable="true"></div>
+            <div class="small" style="position:absolute;bottom:0;">
+              今日何を学んだか？友達と共有・次回の授業日・さようなら
+            </div>
+          </div>
+
+        </div>
 
       </div>
-      <div class="col-9 border rounded-3" style="position:relative;">
-        <div class="editor multi-line" contenteditable="true"></div>
-        <div class="small" style="position:absolute;bottom:0;">
-          挨拶・曜日・日付・天気・スモールトーク・今日の英単語
+      </div>
+  </div>
+
+  <div id="lp_modal" class="modal fade">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h3 class="modal-title">Lesson Planner</h3>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>
+            This is a simple outline for a team-teaching lesson plan. It's meant to
+            privide a very basic structure for a lesson that is taught by two teachers so
+            that everyone knows, at a glance, what they are supposed to be doing at any
+            given time. The idea is to keep the lesson moving smoothly and to keep the
+            students engaged.
+
+            These 8 keyboard shortcuts will help you format your lesson plan.
+            <strong>Bold</strong>: <kbd>Ctrl + B</kbd><br />
+            <i>Italic</i>: <kbd>Ctrl + I</kbd> <br />
+            <u>Underline</u>: <kbd>Ctrl + U</kbd><br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&rarr;Increase indent: <kbd>Tab</kbd><br />
+            &larr;Decrease indent: <kbd>Shift + Tab</kbd><br />
+            Align left: <kbd>Ctrl + Shift + L</kbd><br />
+            Align center: <kbd>Ctrl + Shift + E</kbd><br />
+            Align right: <kbd>Ctrl + Shift + R</kbd><br />
+
+          </p>
         </div>
       </div>
-
-    </div>
-    <div class="row" style="height:15%;">
-
-      <div class="col-3 border rounded-3">
-        <span class="fs-3">② </span>
-        <u class="align-top">Warm Up / Review</u>
-        <p class="small">Practice what you learned last time in pairs or groups. Speaking time!</p>
-      </div>
-      <div class="col-9 border rounded-3" style="position:relative;">
-        <div class="editor multi-line" contenteditable="true"></div>
-        <div class="small" style="position:absolute;bottom:0;">
-          前回学んだことを復習・ペアやグループで練習・スピーキングタイム
-        </div>
-      </div>
-
-    </div>
-    <div class="row" style="height:29%;">
-
-      <div class="col-3 border rounded-3">
-        <span class="fs-3">③ </span>
-        <u class="align-top">Something New</u>
-        <p class="small">Focus on today's goal. Listen, watch, think, ask, discuss, learn.</p>
-        <p class="small">今日の目標に集中する・聞く・見る・考える・尋ねる・話す・学ぶ</p>
-        <p class="small">JTE リード<br/>ALT モデリング</p>
-      </div>
-      <div class="col-9 border rounded-3" style="position:relative;">
-        <div class="editor multi-line" contenteditable="true"></div>
-        <div class="bg-white" style="height:6px;position:absolute;bottom:-3px;left:50px;right:50px;">&nbsp;</div>
-      </div>
-
-    </div>
-    <div class="row" style="height:29%;">
-
-      <div class="col-3 border rounded-3">
-        <span class="fs-3">④ </span>
-        <u class="align-top">Something Fun</u>
-        <p class="small">Do an activity to practice what you learned today.
-          Switch to a different topic. Try out new things. Have fun!</p>
-        <p class="small">今日学んだことを練習・違うトピックに移る・新しいことを試す・楽しむ</p>
-        <p class="small">ALT リード<br/>JTE 生徒をサポート</p>
-      </div>
-      <div class="col-9 border rounded-3">
-        <div class="editor multi-line" contenteditable="true"></div>
-      </div>
-
-    </div>
-    <div class="row" style="height:11%;">
-
-      <div class="col-3 border rounded-3">
-        <span class="fs-3">⑤ </span>
-        <u class="align-top">Think Back/Ahead</u>
-        <p class="small">What did you learn today? When's the next class? Good-byes.</p>
-      </div>
-      <div class="col-9 border rounded-3" style="position:relative;">
-        <div class="editor multi-line" contenteditable="true"></div>
-        <div class="small" style="position:absolute;bottom:0;">
-          今日何を学んだか？友達と共有・次回の授業日・さようなら
-        </div>
-      </div>
-
-    </div>
-
-  </div>
-</div>
-
-<div id="toolbox" class="bg-light m-3" style="position:fixed;top:0;right:0;"><!-- to hide the entire menu when printing -->
-  <div id="menu" class="d-flex flex-column">
-    <button class="btn btn-sm btn-outline-secondary p-0 mb-4" data-bs-toggle="modal" data-bs-target="#lp_modal">
-      <i class="material-icons">info</i>
-    </button>
-
-    <select id="lp_select" class="form-select form-select border border-success small" aria-label="Default select example"></select>
-    <button id="add_lp_modal" class="btn btn-sm btn-outline-success">
-      <i class="material-icons">note_add</i>
-    </button>
-
-    <button id="print" class="btn btn-sm btn-outline-success mb-4" onclick="window.print();">
-      <i class="material-icons">print</i>
-    </button>
-
-    <button id="save" class="btn btn-sm btn-outline-primary mb-4">
-      <i class="material-icons">save</i>
-      <span class="align-top small">Save</span>
-    </button>
-
-    <div class="btn-group" role="group">
-      <button class="btn btn-sm btn-outline-secondary py-0" onclick="document.execCommand('insertUnorderedList', false, null);">
-        <i class="material-icons">format_list_bulleted</i>
-      </button>
-      <button class="btn btn-sm btn-outline-secondary py-0" onclick="document.execCommand('insertOrderedList', false, null);">
-        <i class="material-icons">format_list_numbered</i>
-      </button>
-    </div>
-
-    <div class="btn-group" role="group">
-      <button class="btn btn-sm btn-outline-secondary py-0" onclick="document.execCommand('justifyLeft', false, null);">
-        <i class="material-icons">format_align_left</i>
-      </button>
-      <button class="btn btn-sm btn-outline-secondary py-0" onclick="document.execCommand('justifyCenter', false, null);">
-        <i class="material-icons">format_align_center</i>
-      </button>
-    </div>
-
-    <!-- dropdown list for font size and color picker -->
-
-    <div class="dropdown">
-      <button class="btn btn-sm btn-outline-secondary py-0 px-3 dropdown-toggle w-100" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-        <i class="material-icons">format_size</i>
-      </button>
-      <ul class="dropdown-menu w-100 m-0" aria-labelledby="dropdownMenuButton1">
-        <li><button class="dropdown-item" onclick="document.execCommand('fontSize', false, '1')">1</button></li>
-        <li><button class="dropdown-item" onclick="document.execCommand('fontSize', false, '2')">2</button></li>
-        <li><button class="dropdown-item" onclick="document.execCommand('fontSize', false, '3')">3</button></li>
-        <li><button class="dropdown-item" onclick="document.execCommand('fontSize', false, '4')">4</button></li>
-        <li><button class="dropdown-item" onclick="document.execCommand('fontSize', false, '5')">5</button></li>
-        <li><button class="dropdown-item" onclick="document.execCommand('fontSize', false, '6')">6</button></li>
-        <li><button class="dropdown-item" onclick="document.execCommand('fontSize', false, '7')">7</button></li>
-      </ul>
-    </div>
-
-    <!-- button group -->
-    <div class="btn-group" role="group">
-      <button data-value="black" class="textcolor btn btn-sm btn-outline-secondary text-body p-0">
-        <i class="material-icons">format_color_text</i>
-      </button>
-
-      <button data-value="red" class="textcolor btn btn-sm btn-outline-secondary text-danger p-0">
-        <i class="material-icons">format_color_text</i>
-      </button>
-
-      <button data-value="blue" class="textcolor btn btn-sm btn-outline-secondary text-primary p-0">
-        <i class="material-icons">format_color_text</i>
-      </button>
-    </div>
-    
-    <button id="clear" class="btn btn-sm btn-outline-danger mt-4" style="display:none;">
-      <i class="material-icons">clear</i>
-      <span class="align-top small">dblclick</span>
-    </button>
-    <button id="delete_LP_modal" class="btn btn-sm btn-outline-danger" style="display:none;">
-      <i class="material-icons">delete</i>
-    </button>
-  </div>
-</div>
-
-
-<div id="lp_modal" class="modal fade">
-  <div class="modal-dialog">
-    <div class="modal-content">
-    
-      <div class="modal-header">
-        <h3 class="modal-title">Lesson Planner</h3>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-<p>
-  This is a simple outline for a team-teaching lesson plan. It's meant to
-  privide a very basic structure for a lesson that is taught by two teachers so
-  that everyone knows, at a glance, what they are supposed to be doing at any
-  given time. The idea is to keep the lesson moving smoothly and to keep the
-  students engaged.
-
-  These 8 keyboard shortcuts will help you format your lesson plan.
-  <strong>Bold</strong>: <kbd>Ctrl + B</kbd><br/>
-  <i>Italic</i>: <kbd>Ctrl + I</kbd> <br/>
-  <u>Underline</u>: <kbd>Ctrl + U</kbd><br/>
-  &nbsp;&nbsp;&nbsp;&nbsp;&rarr;Increase indent: <kbd>Tab</kbd><br/>
-  &larr;Decrease indent: <kbd>Shift + Tab</kbd><br/>
-  Align left: <kbd>Ctrl + Shift + L</kbd><br/>
-  Align center: <kbd>Ctrl + Shift + E</kbd><br/>
-  Align right: <kbd>Ctrl + Shift + R</kbd><br/>
-  
-</p>
-      </div>
     </div>
   </div>
-</div>
 
 
   <!-- modal to add new list -->
-<div id="addModal" class="modal fade" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="addModalLabel">Add New Lesson Plan</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" id="addModalBody">
-        Please choose a name.
-        <form id="add_lp_form" class="form d-flex">
-          <input id="lp_name" type="text" class="form-control mx-3" name="lp_name" 
-          placeholder="<%- __('lp_name') %>" required>
-          <input type="hidden" name="lp" value="getLP()">
-          <button id="list_submit" type="submit" class="btn btn-success w-50" disabled>
-            <i class="material-icons">note_add</i>
-          </button>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- modal to confirm delete -->
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="deleteModalLabel">Delete Lesson Plan</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" id="deleteModalBody">
-        Are you sure you want to delete this lesson plan?
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-danger" id="deleteLP">Delete</button>
+  <div id="addModal" class="modal fade" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addModalLabel">Add New Lesson Plan</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="addModalBody">
+          Please choose a name.
+          <form id="add_lp_form" class="form d-flex">
+            <input id="lp_name" type="text" class="form-control mx-3" name="lp_name"
+              placeholder="<%- __('lp_name') %>" required>
+            <input type="hidden" name="lp" value="getLP()">
+            <button id="list_submit" type="submit" class="btn btn-success w-50" disabled>
+              <i class="material-icons">note_add</i>
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   </div>
-</div>
+
+  <!-- modal to confirm delete -->
+  <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModalLabel">Delete Lesson Plan</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="deleteModalBody">
+          Are you sure you want to delete this lesson plan?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-danger" id="deleteLP">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 
-<script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js" defer></script>
-<script>
-$(window).on('pageshow', function(){
-  $(`#lp-tab`).addClass("active");
+  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js" defer></script>
+  <script>
+    $(window).on('pageshow', function () {
+      $(`#lp-tab`).addClass("active");
 
-  var lps = {};
+      var lps = {};
 
-  $("#lp_select").html('<option value="default"></option>');
-  // populate lp_select from local storage
-  lps = JSON.parse(localStorage.getItem('lps'));
+      $("#lp_select").html('<option value="default"></option>');
+      // populate lp_select from local storage
+      lps = JSON.parse(localStorage.getItem('lps'));
 
-  if (lps) {
-    for (let l of Object.keys(lps) ) {
-      if (l == 'default' && lps[l]) {
-        $('#sheet').html(lps[l]);
+      if (lps) {
+        for (let l of Object.keys(lps)) {
+          if (l == 'default' && lps[l]) {
+            $('#sheet').html(lps[l]);
+            setTitle();
+            $('#clear').show();
+          }
+          else {
+            $("#lp_select").append(`<option value="${l}">${l}</option>`);
+          }
+        }
+      }
+      else {
+        lps = { "default": "" };
+        localStorage.setItem('lps', JSON.stringify(lps));
+      }
+
+
+      $(".textcolor").on('mousedown', function (e) {
+        e.preventDefault();
+        let color = $(this).attr('data-value');
+        document.execCommand('foreColor', false, color);
+      });
+
+
+      $("#clear").on('dblclick', function () {
+        $(".single-line").empty();
+        $(".editor").empty();
+        $(this).hide();
+      });
+
+
+      $(".editor, .single-line").off('blur').on('blur', () => {
+        updateLP();
+      });
+
+
+      $('.editor').on('keydown', function (e) {
+        if (e.key === 'Tab') {
+          e.preventDefault();
+          document.execCommand('insertText', false, '    ');
+        }
+        // CTRL + SHIFT + R
+        if (e.ctrlKey && e.shiftKey && e.key === 'R') {
+          e.preventDefault();
+          document.execCommand('justifyRight', false, null);
+        }
+        // CTRL + SHIFT + E
+        if (e.ctrlKey && e.shiftKey && e.key === 'E') {
+          e.preventDefault();
+          document.execCommand('justifyCenter', false, null);
+        }
+        // CTRL + SHIFT + L
+        if (e.ctrlKey && e.shiftKey && e.key === 'L') {
+          e.preventDefault();
+          document.execCommand('justifyLeft', false, null);
+        }
+      });
+
+
+      $("#lp_select").on('change', function () {
+        let lp = $(this).val();
+        $('#sheet').html(lps[lp]);
+        $(".editor, .single-line").off('blur').on('blur', () => {
+          updateLP();
+        });
         setTitle();
         $('#clear').show();
+        $('#delete_LP_modal').show();
+      });
+
+
+      $("#add_lp_form").on('submit', function (e) {
+        e.preventDefault();
+        let lpname = $("#lp_name").val();
+        let lp = $("#sheet").html();
+        lps[lpname] = lp;
+        localStorage.setItem('lps', JSON.stringify(lps));
+        $("#lp_select").append(`<option value="${lpname}">${lpname}</option>`);
+        $("#lp_select").val(lpname);
+        $("#list_submit").prop('disabled', true);
+        $("#addModal").modal('hide');
+      });
+
+
+      // add new list
+      $("#add_lp_modal").on('click', () => {
+        $("#addModal").modal('show');
+      });
+
+
+      $('#addModal').on('shown.bs.modal', function () {
+        $('#lp_name').trigger('focus');
+      });
+
+
+      $("#lp_name").on('input', () => {
+        let lpname = $("#lp_name").val();
+        if (!lpname) {
+          $("#list_submit").prop('disabled', true);
+        } else {
+          $("#list_submit").prop('disabled', false);
+          if (Object.keys(lps).includes(lpname)) {
+            $("#list_submit").html('<i class="material-icons">edit_note</i>Update');
+          }
+          else {
+            $("#list_submit").html('<i class="material-icons">note_add</i>Add');
+          }
+        }
+      });
+
+
+      function getLP() {
+        return $('#sheet').html();
       }
-      else {
-        $("#lp_select").append(`<option value="${l}">${l}</option>`);
+
+
+      function updateLP() {
+        setTitle();
+        let lp = $("#lp_select").val();
+        console.log(lp);
+        lps[lp] = $('#sheet').html();
+        localStorage.setItem('lps', JSON.stringify(lps));
       }
-    }
-  }
-  else {
-    lps = {"default": ""};
-    localStorage.setItem('lps', JSON.stringify(lps));
-  }
+
+      function setTitle() {
+        let date = $(".single-line").eq(0).text().replace(/[^a-zA-Z0-9]/g, '-');
+        let grade = $(".single-line").eq(1).text().replace(/[^a-zA-Z0-9]/g, '-');
+        document.title = `LP_${grade}_${date}`;
+      }
 
 
-  $(".textcolor").on('mousedown', function(e){
-    e.preventDefault();
-    let color = $(this).attr('data-value');
-    document.execCommand('foreColor', false, color);
-  });
 
 
-  $("#clear").on('dblclick', function(){
-    $(".single-line").empty();
-    $(".editor").empty();
-    $(this).hide();
-  });
+
+      $("#delete_LP_modal").on('click', () => {
+        $("#deleteModal").modal('show');
+      });
+
+      $("#deleteLP").on('click', () => {
+        deleteLP();
+        $("#deleteModal").modal('hide');
+      });
 
 
-  $(".editor, .single-line").off('blur').on('blur', () => {
-    updateLP();
-  });
+      function deleteLP() {
+        let lp = $("#lp_select").val();
+        delete lps[lp];
+        localStorage.setItem('lps', JSON.stringify(lps));
+        $(".single-line").empty();
+        $(".editor").empty();
+        $("#lp_select option[value='" + lp + "']").remove();
+        setTitle();
+        $('#clear').hide();
+        $('#delete_LP_modal').hide();
+        $("#lp_select").val('default');
+      }
 
-
-  $('.editor').on('keydown', function(e) {
-    if (e.key === 'Tab') {
-      e.preventDefault();
-      document.execCommand('insertText', false, '    ');
-    }
-    // CTRL + SHIFT + R
-    if (e.ctrlKey && e.shiftKey && e.key === 'R') {
-      e.preventDefault();
-      document.execCommand('justifyRight', false, null);
-    }
-    // CTRL + SHIFT + E
-    if (e.ctrlKey && e.shiftKey && e.key === 'E') {
-      e.preventDefault();
-      document.execCommand('justifyCenter', false, null);
-    }
-    // CTRL + SHIFT + L
-    if (e.ctrlKey && e.shiftKey && e.key === 'L') {
-      e.preventDefault();
-      document.execCommand('justifyLeft', false, null);
-    }
-  });
-
-
-  $("#lp_select").on('change', function(){
-    let lp = $(this).val();
-    $('#sheet').html(lps[lp]);
-    $(".editor, .single-line").off('blur').on('blur', () => {
-      updateLP();
     });
-    setTitle();
-    $('#clear').show();
-    $('#delete_LP_modal').show();
-  });
-
-
-  $("#add_lp_form").on('submit', function(e){
-    e.preventDefault();
-    let lpname = $("#lp_name").val();
-    let lp = $("#sheet").html();
-    lps[lpname] = lp;
-    localStorage.setItem('lps', JSON.stringify(lps));
-    $("#lp_select").append(`<option value="${lpname}">${lpname}</option>`);
-    $("#lp_select").val(lpname);
-    $("#list_submit").prop('disabled', true);
-    $("#addModal").modal('hide');
-  });
-
-
-  // add new list
-  $("#add_lp_modal").on('click', () => {
-    $("#addModal").modal('show');
-  });
-
-
-  $('#addModal').on('shown.bs.modal', function () {
-    $('#lp_name').trigger('focus');
-  });
-
-
-  $("#lp_name").on('input', () => {
-    let lpname = $("#lp_name").val();
-    if (!lpname) {
-      $("#list_submit").prop('disabled', true);
-    } else {
-      $("#list_submit").prop('disabled', false);
-      if (Object.keys(lps).includes(lpname)) {
-        $("#list_submit").html('<i class="material-icons">edit_note</i>Update');
-      }
-      else {
-        $("#list_submit").html('<i class="material-icons">note_add</i>Add');
-      }
-    }
-  });
-
-
-  function getLP(){
-    return $('#sheet').html();
-  }
-
-
-  function updateLP(){
-    setTitle();
-    let lp = $("#lp_select").val();
-    console.log(lp);
-    lps[lp] = $('#sheet').html();
-    localStorage.setItem('lps', JSON.stringify(lps));
-  }
-
-  function setTitle(){
-    let date = $(".single-line").eq(0).text().replace(/[^a-zA-Z0-9]/g, '-');
-    let grade = $(".single-line").eq(1).text().replace(/[^a-zA-Z0-9]/g, '-');
-    document.title = `LP_${grade}_${date}`;
-  }
+  </script>
 
 
 
-
-
-  $("#delete_LP_modal").on('click', () => {
-    $("#deleteModal").modal('show');
-  });
-
-  $("#deleteLP").on('click', ()=>{
-    deleteLP();
-    $("#deleteModal").modal('hide');
-  });
-
-
-  function deleteLP(){
-    let lp = $("#lp_select").val();
-    delete lps[lp];
-    localStorage.setItem('lps', JSON.stringify(lps));
-    $(".single-line").empty();
-    $(".editor").empty();
-    $("#lp_select option[value='"+lp+"']").remove();
-    setTitle();
-    $('#clear').hide();
-    $('#delete_LP_modal').hide();
-    $("#lp_select").val('default');
-  }
-
-
-  $('#save').click(function(){
-    // save this page without the menu or script
-    var title = Date.now();
-    var html = document.documentElement.outerHTML;
-    var blob = new Blob([html], {type: "text/html"});
-    saveAs(blob, title + ".html");
-  });
-
-});
-</script>
-
-
-  
-<%- include('../foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->
+  <%- include('../foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->

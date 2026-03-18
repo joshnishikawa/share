@@ -166,8 +166,10 @@ ${formatHTML(editor.root.innerHTML)}
   });
 
   $(".ql-toolbar").append(`
+      <div  style="position:absolute;top:5px;right:5px;">
         <div id="save" class="btn btn-sm btn-outline-primary">SAVE</div>
-        <div id="copy" class="btn btn-sm btn-outline-primary">COPY</div>`);
+        <div id="copy" class="btn btn-sm btn-outline-primary">COPY</div>
+      </div>`);
   $(".ql-toolbar").addClass("sticky-top bg-light");
 
 });
