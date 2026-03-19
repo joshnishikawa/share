@@ -51,13 +51,18 @@ class SyncManager {
    */
   mergeData(storageKey, serverData) {
     const localData = this.getLocalData(storageKey);
+    const hadLocalData = localData && localData.length > 0;
 
-    if (!localData || localData.length === 0) {
-      // No local data, just save server data
-      console.log('SyncManager: No local data, using server data');
-      localStorage.setItem(storageKey, JSON.stringify(serverData));
-      // Reload page to show server data
-      window.location.reload();
+    if (!hadLocalData) {
+      // No local data, save server data
+      if (serverData && serverData.length > 0) {
+        console.log('SyncManager: No local data, using server data');
+        localStorage.setItem(storageKey, JSON.stringify(serverData));
+        // Only reload if we actually added data
+        window.location.reload();
+      } else {
+        console.log('SyncManager: No local or server data');
+      }
       return;
     }
 
@@ -70,6 +75,7 @@ class SyncManager {
     // Merge logic: create a map by index, use newest timestamp
     const merged = [];
     const maxLength = Math.max(localData.length, serverData.length);
+    let hasChanges = false;
 
     for (let i = 0; i < maxLength; i++) {
       const localItem = localData[i];
@@ -79,24 +85,35 @@ class SyncManager {
         // Both exist, use newest
         const localTime = localItem.timestamp || 0;
         const serverTime = serverItem.timestamp || 0;
-        merged[i] = localTime > serverTime ? localItem : serverItem;
+        const chosen = localTime > serverTime ? localItem : serverItem;
+        merged[i] = chosen;
+        // Check if we chose server data (meaning local was older)
+        if (localTime < serverTime) {
+          hasChanges = true;
+        }
       } else if (localItem) {
         // Only local exists
         merged[i] = localItem;
       } else if (serverItem) {
-        // Only server exists
+        // Only server exists (server has more canvases than local)
         merged[i] = serverItem;
+        hasChanges = true;
       }
     }
 
-    console.log('SyncManager: Merged data:', merged.length, 'items');
-    localStorage.setItem(storageKey, JSON.stringify(merged));
+    if (hasChanges) {
+      console.log('SyncManager: Merged data with changes:', merged.length, 'items');
+      localStorage.setItem(storageKey, JSON.stringify(merged));
+      // Reload page to show merged data
+      window.location.reload();
+    } else {
+      console.log('SyncManager: Data already up to date, no changes needed');
+    }
 
-    // Reload page to show merged data
-    window.location.reload();
-
-    // Push merged data back to server
-    this.syncToServer(storageKey, 0); // Immediate sync after merge
+    // Push merged data back to server if there were changes
+    if (hasChanges) {
+      this.syncToServer(storageKey, 0); // Immediate sync after merge
+    }
   }
 
   /**
