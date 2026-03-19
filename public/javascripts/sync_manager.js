@@ -56,6 +56,8 @@ class SyncManager {
       // No local data, just save server data
       console.log('SyncManager: No local data, using server data');
       localStorage.setItem(storageKey, JSON.stringify(serverData));
+      // Reload page to show server data
+      window.location.reload();
       return;
     }
 
@@ -89,6 +91,9 @@ class SyncManager {
 
     console.log('SyncManager: Merged data:', merged.length, 'items');
     localStorage.setItem(storageKey, JSON.stringify(merged));
+
+    // Reload page to show merged data
+    window.location.reload();
 
     // Push merged data back to server
     this.syncToServer(storageKey, 0); // Immediate sync after merge

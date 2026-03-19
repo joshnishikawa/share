@@ -42,9 +42,7 @@ function CanvasBuilder(options) {
   // Set sync manager for server synchronization
   this.setSyncManager = function(manager) {
     syncManager = manager;
-    if (syncManager) {
-      syncManager.initSync(config.storageKey);
-    }
+    // Note: initSync is called manually after auth state is confirmed
   };
 
   // Migrate old object-based storage to new array format

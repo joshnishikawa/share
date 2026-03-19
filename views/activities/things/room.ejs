@@ -241,8 +241,17 @@ $(function () {
 
   canvasBuilder.init();
 
-  // Set up sync manager
+  // Set up sync manager AFTER auth widget finishes loading
   const syncManager = new SyncManager(authWidget);
+
+  // Wait for auth widget to finish loading before initializing sync
+  authWidget.onAuthChange(function(authenticated, user) {
+    if (authenticated) {
+      console.log('User authenticated, initializing sync');
+      syncManager.initSync('objects');
+    }
+  });
+
   canvasBuilder.setSyncManager(syncManager);
 
   // Initialize canvas manager
