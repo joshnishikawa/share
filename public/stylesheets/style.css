@@ -143,11 +143,6 @@ body {
   border: 2px solid #ddd;
 }
 
-.auth-widget .user-name {
-  font-weight: 500;
-  color: #333;
-}
-
 .auth-widget .btn-logout {
   color: #666;
   text-decoration: none;
