@@ -120,3 +120,56 @@ body {
   margin: 0.25rem;
   padding: 0.25rem;
 }
+
+/* Auth Widget */
+.auth-widget {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+  background: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.auth-widget .profile-pic {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+}
+
+.auth-widget .user-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.auth-widget .btn-logout {
+  color: #666;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.auth-widget .btn-logout:hover {
+  color: #e74c3c;
+}
+
+.auth-widget.signed-out .btn-signin {
+  background: #4285f4;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.auth-widget.signed-out .btn-signin:hover {
+  background: #357ae8;
+}

@@ -1,5 +1,8 @@
 <%- include('../../head'); -%>
 
+<!-- Auth Widget -->
+<div id="authWidget"></div>
+
 <style>
   #canvasWrapper {
     background-image: url('/image/medBG.png');
@@ -231,12 +234,18 @@
 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+<script src="/javascripts/auth_widget.js"></script>
+<script src="/javascripts/sync_manager.js"></script>
 <script src="/javascripts/canvas_builder.js"></script>
 <script src="/javascripts/canvas_manager.js"></script>
 
 <script>
 $(function () {
   document.title = "Supplies";
+
+  // Initialize auth widget
+  const authWidget = new AuthWidget('authWidget');
+
   // Initialize canvas builder for supplies
   const canvasBuilder = new CanvasBuilder({
     storageKey: 'supplies',
@@ -252,6 +261,10 @@ $(function () {
   });
 
   canvasBuilder.init();
+
+  // Set up sync manager
+  const syncManager = new SyncManager(authWidget);
+  canvasBuilder.setSyncManager(syncManager);
 
   // Color menu functionality
   $('#colorMenu .nav-item').on('click', function () {

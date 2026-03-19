@@ -30,12 +30,21 @@ function CanvasBuilder(options) {
   let isDraggingHandle = false;
   let tapHandlerActive = false;
   const self = this; // Reference for passing to CanvasManager
+  let syncManager = null; // SyncManager instance for server sync
 
   // Initialize
   this.init = function() {
     loadFromStorage();
     setupEventHandlers();
     setupMenuDragging();
+  };
+
+  // Set sync manager for server synchronization
+  this.setSyncManager = function(manager) {
+    syncManager = manager;
+    if (syncManager) {
+      syncManager.initSync(config.storageKey);
+    }
   };
 
   // Migrate old object-based storage to new array format
@@ -291,6 +300,10 @@ function CanvasBuilder(options) {
     generateThumbnail();
     // Save immediately with current data (thumbnail will update async)
     localStorage.setItem(config.storageKey, JSON.stringify(savedCanvases));
+    // Sync to server if authenticated
+    if (syncManager) {
+      syncManager.syncToServer(config.storageKey);
+    }
   }
 
   // Setup event handlers
