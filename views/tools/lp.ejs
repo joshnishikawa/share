@@ -350,22 +350,41 @@
 
 
       $('.editor').on('keydown', function (e) {
+        // Handle Tab for indent/outdent first (before other Tab checks)
         if (e.key === 'Tab') {
           e.preventDefault();
-          document.execCommand('insertText', false, '    ');
+          if (e.shiftKey) {
+            document.execCommand('outdent', false, null);
+          } else {
+            document.execCommand('indent', false, null);
+          }
+        }
+        // Handle Backspace to remove indent
+        else if (e.key === 'Backspace') {
+          const sel = window.getSelection();
+          if (sel.rangeCount === 0) return;
+          const range = sel.getRangeAt(0);
+          const node = range.startContainer;
+          const offset = range.startOffset;
+
+          // If cursor is at the very start of a text node, try to outdent
+          if (offset === 0 && node.nodeType === 3) {
+            e.preventDefault();
+            document.execCommand('outdent', false, null);
+          }
         }
         // CTRL + SHIFT + R
-        if (e.ctrlKey && e.shiftKey && e.key === 'R') {
+        else if (e.ctrlKey && e.shiftKey && e.key === 'R') {
           e.preventDefault();
           document.execCommand('justifyRight', false, null);
         }
         // CTRL + SHIFT + E
-        if (e.ctrlKey && e.shiftKey && e.key === 'E') {
+        else if (e.ctrlKey && e.shiftKey && e.key === 'E') {
           e.preventDefault();
           document.execCommand('justifyCenter', false, null);
         }
         // CTRL + SHIFT + L
-        if (e.ctrlKey && e.shiftKey && e.key === 'L') {
+        else if (e.ctrlKey && e.shiftKey && e.key === 'L') {
           e.preventDefault();
           document.execCommand('justifyLeft', false, null);
         }
