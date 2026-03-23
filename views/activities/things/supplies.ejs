@@ -1,8 +1,5 @@
 <%- include('../../head'); -%>
 
-<!-- Auth Widget -->
-<div id="authWidget"></div>
-
 <style>
   #canvasWrapper {
     background-image: url('/image/medBG.png');
@@ -228,6 +225,8 @@
       <div class="modal-body">
         <div id="canvasGrid" class="canvas-grid"></div>
       </div>
+        <div class="modal-footer"><div id="authWidget" data-signin-text="<%= __('signInToSync') %>" style="margin-left: auto; margin-right: 10px;"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -260,20 +259,19 @@ $(function () {
     enableDragHandles: false
   });
 
-  canvasBuilder.init();
-
-  // Set up sync manager AFTER auth widget finishes loading
+  // Set up sync manager
   const syncManager = new SyncManager(authWidget);
 
-  // Wait for auth widget to finish loading before initializing sync
-  authWidget.onAuthChange(function(authenticated, user) {
+  // Wait for auth widget to finish loading before initializing
+  authWidget.onAuthChange(async function(authenticated, user) {
     if (authenticated) {
       console.log('User authenticated, initializing sync');
-      syncManager.initSync('supplies');
+      await syncManager.initSync('supplies');
     }
+    // Initialize canvas AFTER sync completes (or if not authenticated)
+    canvasBuilder.init();
+    canvasBuilder.setSyncManager(syncManager);
   });
-
-  canvasBuilder.setSyncManager(syncManager);
 
   // Color menu functionality
   $('#colorMenu .nav-item').on('click', function () {

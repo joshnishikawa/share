@@ -36,7 +36,8 @@ class SyncManager {
       } else {
         // No server data, push local data to server if it exists
         const localData = this.getLocalData(storageKey);
-        if (localData && localData.length > 0) {
+        const hasLocalData = localData && (Array.isArray(localData) ? localData.length > 0 : Object.keys(localData).length > 0);
+        if (hasLocalData) {
           console.log('SyncManager: No server data, pushing local data');
           await this.syncToServer(storageKey, 0); // Immediate sync
         }
@@ -47,15 +48,19 @@ class SyncManager {
   }
 
   /**
-   * Merge server data with localStorage (newest timestamp wins)
+   * Merge server data with localStorage (newest timestamp wins for arrays, merge keys for objects)
    */
   mergeData(storageKey, serverData) {
     const localData = this.getLocalData(storageKey);
-    const hadLocalData = localData && localData.length > 0;
 
-    if (!hadLocalData) {
+    // Check if data is an object (lists) or array (canvas)
+    const isObject = serverData && typeof serverData === 'object' && !Array.isArray(serverData);
+    const hasLocalData = localData && (Array.isArray(localData) ? localData.length > 0 : Object.keys(localData).length > 0);
+    const hasServerData = serverData && (Array.isArray(serverData) ? serverData.length > 0 : Object.keys(serverData).length > 0);
+
+    if (!hasLocalData) {
       // No local data, save server data
-      if (serverData && serverData.length > 0) {
+      if (hasServerData) {
         console.log('SyncManager: No local data, using server data');
         localStorage.setItem(storageKey, JSON.stringify(serverData));
         // Only reload if we actually added data
@@ -66,13 +71,31 @@ class SyncManager {
       return;
     }
 
-    if (!serverData || serverData.length === 0) {
+    if (!hasServerData) {
       // No server data, keep local data
       console.log('SyncManager: No server data, keeping local data');
       return;
     }
 
-    // Merge logic: create a map by index, use newest timestamp
+    // Handle object merging (for lists)
+    if (isObject) {
+      const merged = { ...localData, ...serverData };
+      const hasChanges = JSON.stringify(localData) !== JSON.stringify(merged);
+
+      if (hasChanges) {
+        console.log('SyncManager: Merged list data with changes');
+        localStorage.setItem(storageKey, JSON.stringify(merged));
+        // Reload page to show merged data
+        window.location.reload();
+        // Push merged data back to server
+        this.syncToServer(storageKey, 0);
+      } else {
+        console.log('SyncManager: List data already up to date');
+      }
+      return;
+    }
+
+    // Handle array merging (for canvas data with timestamps)
     const merged = [];
     const maxLength = Math.max(localData.length, serverData.length);
     let hasChanges = false;

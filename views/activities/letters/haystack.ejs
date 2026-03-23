@@ -1,10 +1,12 @@
 <%- include('../../head'); -%>
 <body>
 
-  <button id="home" class="btn btn-sm btn-outline-secondary p-0" style="position:absolute;right:0;" onclick="location.href='/letters';">
-    <i class="material-icons">home</i>
-  </button>
-
+  <div class="d-flex" style="position:absolute;right:0;">
+    <button id="home" class="btn btn-sm btn-outline-secondary p-0" onclick="location.href='/letters';">
+      <i class="material-icons">home</i>
+    </button>
+    <div id="authWidget" data-signin-text="<%= __('signInToSync') %>"></div>
+  </div>
 
   <div id="menu" class="container-fluid d-block text-center" style="user-select: none;">
     <div class="row">
@@ -32,6 +34,8 @@
 
 
 
+<script src="/javascripts/auth_widget.js"></script>
+<script src="/javascripts/sync_manager.js"></script>
 <script>
 $(function(){
   document.title = 'Haystack';
@@ -39,12 +43,40 @@ $(function(){
     event.preventDefault();
   });
 
+  // Initialize auth widget and sync manager
+  const authWidget = new AuthWidget('authWidget');
+  const syncManager = new SyncManager(authWidget);
+
   // get times from local storage
   let times = JSON.parse(localStorage.getItem('haystack'));
   times = times ? times : {};
   for (let i in times){
     if (typeof times[i] == 'string') times[i] = parseFloat(times[i]); // for old bug
   }
+
+  // Helper function to save times
+  function saveTimes() {
+    localStorage.setItem('haystack', JSON.stringify(times));
+    if (syncManager && authWidget.isAuthenticated()) {
+      syncManager.syncToServer('haystack');
+    }
+  }
+
+  // Initialize sync when authenticated (including on page load)
+  authWidget.onAuthChange(async function(authenticated, user) {
+    if (authenticated) {
+      await syncManager.initSync('haystack');
+      // Reload times from localStorage after sync
+      const synced = JSON.parse(localStorage.getItem('haystack'));
+      if (synced) {
+        times = synced;
+        for (let i in times){
+          if (typeof times[i] == 'string') times[i] = parseFloat(times[i]);
+          $(`button[data-value="${i}"] .time`).html(`${times[i].toFixed(2)}`);
+        }
+      }
+    }
+  });
   
   var cap = ["A", "B", "C", "D", "E", "F", "G", "H", "I",
                  "J", "K", "L", "M", "N", "O", "P", "Q", "R",
@@ -168,14 +200,14 @@ $(function(){
           if (times[letter]){
             if (time < parseFloat(times[letter])) {
               times[letter] = time;
-              localStorage.setItem('haystack', JSON.stringify(times));
+              saveTimes();
               $(`button[data-value="${letter}"] .time`).html(`${time.toFixed(2)}`);
             }
           }
           // if there is no previous time, use this time
           else if (!times[letter]) {
             times[letter] = time;
-            localStorage.setItem('haystack', JSON.stringify(times));
+            saveTimes();
             $(`button[data-value="${letter}"] .time`).html(`${time.toFixed(2)}`);
           }
           

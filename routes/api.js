@@ -1,5 +1,6 @@
 const express = require('express');
 const mysql = require('mysql2/promise');
+const rateLimit = require('express-rate-limit');
 const router = express.Router();
 
 // Create database connection pool
@@ -13,9 +14,21 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
+// Rate limiter for sync endpoints (30 requests/minute per user)
+const syncLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many sync requests, please try again later' }
+});
+
 // Middleware to check authentication
 function requireAuth(req, res, next) {
-  if (req.isAuthenticated()) {
+  if (req.isAuthenticated() &&
+      req.user &&
+      Number.isInteger(req.user.id) &&
+      req.user.id > 0) {
     return next();
   }
   res.status(401).json({ error: 'Not authenticated' });
@@ -42,9 +55,9 @@ router.get('/user', function(req, res) {
 });
 
 // GET /api/sync/canvas/:key - Get canvas data for storage key
-router.get('/sync/canvas/:key', requireAuth, async function(req, res) {
+router.get('/sync/canvas/:key', requireAuth, syncLimiter, async function(req, res) {
   const storageKey = req.params.key;
-  const validKeys = ['shapes', 'supplies', 'objects'];
+  const validKeys = ['shapes', 'supplies', 'objects', 'haystack', 'pairs', 'NH', 'LT', 'lps'];
 
   if (!validKeys.includes(storageKey)) {
     return res.status(400).json({ error: 'Invalid storage key' });
@@ -82,9 +95,9 @@ router.get('/sync/canvas/:key', requireAuth, async function(req, res) {
 });
 
 // POST /api/sync/canvas/:key - Save canvas data for storage key
-router.post('/sync/canvas/:key', requireAuth, express.json({ limit: '50mb' }), async function(req, res) {
+router.post('/sync/canvas/:key', requireAuth, syncLimiter, express.json({ limit: '2mb' }), async function(req, res) {
   const storageKey = req.params.key;
-  const validKeys = ['shapes', 'supplies', 'objects'];
+  const validKeys = ['shapes', 'supplies', 'objects', 'haystack', 'pairs', 'NH', 'LT', 'lps'];
 
   if (!validKeys.includes(storageKey)) {
     return res.status(400).json({ error: 'Invalid storage key' });
@@ -92,6 +105,35 @@ router.post('/sync/canvas/:key', requireAuth, express.json({ limit: '50mb' }), a
 
   if (!req.body.data) {
     return res.status(400).json({ error: 'Missing data field' });
+  }
+
+  // Validate data limits for objects (lists, times, lesson plans)
+  if (typeof req.body.data === 'object' && !Array.isArray(req.body.data)) {
+    const itemCount = Object.keys(req.body.data).length;
+
+    // Set reasonable limits per storage type
+    const limits = {
+      'NH': 100,       // Max 100 lists
+      'LT': 100,       // Max 100 lists
+      'lps': 100,      // Max 100 lesson plans
+      'haystack': 52,  // Max 52 letter combinations (Aa-Zz)
+      'pairs': 10      // Max 10 pairs combinations
+    };
+
+    const maxItems = limits[storageKey] || 100;
+
+    if (itemCount > maxItems) {
+      return res.status(400).json({
+        error: `Too many items (max ${maxItems} for ${storageKey})`
+      });
+    }
+  }
+
+  // Validate array length for canvas data (shapes, supplies, objects)
+  if (Array.isArray(req.body.data) && req.body.data.length > 10) {
+    return res.status(400).json({
+      error: 'Too many canvas items (max 10)'
+    });
   }
 
   try {
@@ -123,6 +165,11 @@ router.post('/sync/canvas/:key', requireAuth, express.json({ limit: '50mb' }), a
 // GET /api/preferences/:key - Get user preference
 router.get('/preferences/:key', requireAuth, async function(req, res) {
   const prefKey = req.params.key;
+
+  // Validate preference key format (alphanumeric, underscore, hyphen only, max 50 chars)
+  if (!/^[a-zA-Z0-9_-]{1,50}$/.test(prefKey)) {
+    return res.status(400).json({ error: 'Invalid preference key format' });
+  }
 
   try {
     const connection = await pool.getConnection();
@@ -159,8 +206,19 @@ router.get('/preferences/:key', requireAuth, async function(req, res) {
 router.post('/preferences/:key', requireAuth, express.json(), async function(req, res) {
   const prefKey = req.params.key;
 
-  if (!req.body.value) {
-    return res.status(400).json({ error: 'Missing value field' });
+  // Validate preference key format (alphanumeric, underscore, hyphen only, max 50 chars)
+  if (!/^[a-zA-Z0-9_-]{1,50}$/.test(prefKey)) {
+    return res.status(400).json({ error: 'Invalid preference key format' });
+  }
+
+  // Validate value exists and is a string
+  if (!req.body.value || typeof req.body.value !== 'string') {
+    return res.status(400).json({ error: 'Missing or invalid value field' });
+  }
+
+  // Validate value length (max 10KB)
+  if (req.body.value.length > 10000) {
+    return res.status(400).json({ error: 'Value too large (max 10KB)' });
   }
 
   try {

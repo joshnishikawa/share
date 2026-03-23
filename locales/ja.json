@@ -136,5 +136,8 @@
 	"LetsTry": {
 		"vocab": "Let's Try - 語彙"
 	},
-	"sound_on": "音声をONにしてください！"
+	"sound_on": "音声をONにしてください！",
+	"signInToSync": "サインインで同期",
+	"countries+": "countries+",
+	"lp_name": "lp_name"
 }

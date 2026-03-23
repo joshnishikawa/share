@@ -77,17 +77,27 @@ app.use(  express.static( path.join(__dirname, 'public'), {
   }
 }) );
 
+// Trust proxy for secure cookies behind reverse proxy
+app.set('trust proxy', 1);
+
+// Security: Enforce SESSION_SECRET in production
+if (!process.env.SESSION_SECRET) {
+  console.error('FATAL: SESSION_SECRET environment variable must be set');
+  process.exit(1);
+}
+
 // Session configuration
 app.use(session({
   key: 'session_cookie',
-  secret: process.env.SESSION_SECRET || 'dev_secret_change_in_production',
+  secret: process.env.SESSION_SECRET,
   store: sessionStore,
   resave: false,
-  saveUninitialized: false,
+  saveUninitialized: true, // Must be true to save returnTo before OAuth
   cookie: {
     maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production'
+    secure: 'auto', // Auto-detect based on connection (works with proxies)
+    sameSite: 'lax' // Allow cookies to be sent during OAuth redirects
   }
 }));
 

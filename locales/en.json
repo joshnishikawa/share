@@ -316,5 +316,6 @@
 	"lp_name": "lp_name",
 	"typeNotSupported": "typeNotSupported",
 	"sound_on": "Make sure your sound is ON!",
-	"countries+": "countries+"
+	"countries+": "countries+",
+	"signInToSync": "Sign in to sync"
 }

@@ -119,10 +119,13 @@
           <i class="material-icons">format_align_center</i>
         </button>
 
-        <button class="btn btn-sm btn-outline-secondary border-0" data-bs-toggle="modal" data-bs-target="#lp_modal" style="position:absolute;top:0;right:0;">
-          <i class="material-icons">info</i>
-        </button>
-
+        
+        <div class="d-flex" style="position:absolute;top:0;right:0;">
+          <button class="btn btn-sm btn-outline-secondary border-0" data-bs-toggle="modal" data-bs-target="#lp_modal">
+            <i class="material-icons">info</i>
+          </button>
+          <div id="authWidget" data-signin-text="<%= __('signInToSync') %>" class="ms-auto me-5"></div>
+        </div>
       </div>
 
       <!-- ####################################################################### -->
@@ -302,9 +305,39 @@
 
 
   <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js" defer></script>
+  <script src="/javascripts/auth_widget.js"></script>
+  <script src="/javascripts/sync_manager.js"></script>
   <script>
     $(window).on('pageshow', function () {
       $(`#lp-tab`).addClass("active");
+
+      // Initialize auth widget and sync manager
+      const authWidget = new AuthWidget('authWidget');
+      const syncManager = new SyncManager(authWidget);
+
+      // Initialize sync after auth
+      authWidget.onAuthChange(async function(authenticated, user) {
+        if (authenticated) {
+          await syncManager.initSync('lps');
+          // Reload lesson plans from localStorage after sync
+          const synced = JSON.parse(localStorage.getItem('lps'));
+          if (synced) {
+            lps = synced;
+            // Repopulate select dropdown
+            $("#lp_select").html('<option value="default"></option>');
+            for (let l of Object.keys(lps)) {
+              if (l == 'default' && lps[l]) {
+                $('#sheet').html(lps[l]);
+                setTitle();
+                $('#clear').show();
+              }
+              else {
+                $("#lp_select").append(`<option value="${l}">${l}</option>`);
+              }
+            }
+          }
+        }
+      });
 
       var lps = {};
 
@@ -409,6 +442,12 @@
         let lp = $("#sheet").html();
         lps[lpname] = lp;
         localStorage.setItem('lps', JSON.stringify(lps));
+
+        // Sync to server if authenticated
+        if (syncManager && authWidget.isAuthenticated()) {
+          syncManager.syncToServer('lps');
+        }
+
         $("#lp_select").append(`<option value="${lpname}">${lpname}</option>`);
         $("#lp_select").val(lpname);
         $("#list_submit").prop('disabled', true);
@@ -454,6 +493,11 @@
         console.log(lp);
         lps[lp] = $('#sheet').html();
         localStorage.setItem('lps', JSON.stringify(lps));
+
+        // Sync to server if authenticated
+        if (syncManager && authWidget.isAuthenticated()) {
+          syncManager.syncToServer('lps');
+        }
       }
 
       function setTitle() {
@@ -480,6 +524,12 @@
         let lp = $("#lp_select").val();
         delete lps[lp];
         localStorage.setItem('lps', JSON.stringify(lps));
+
+        // Sync to server if authenticated
+        if (syncManager && authWidget.isAuthenticated()) {
+          syncManager.syncToServer('lps');
+        }
+
         $(".single-line").empty();
         $(".editor").empty();
         $("#lp_select option[value='" + lp + "']").remove();

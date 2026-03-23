@@ -1,6 +1,6 @@
 <div class="w-100 mb-3">
   <form id="add_list_form" class="form d-flex">
-    <select id="list_select" class="form-control"></select>
+    <select id="list_select" class="form-control w-50"></select>
     <div id="add_list_modal" type="submit" class="btn btn-sm btn-success">
       <i class="material-icons">note_add</i>
     </div>
@@ -8,8 +8,8 @@
     <div id="delete_list_modal" class="btn btn-sm btn-danger">
       <i class="material-icons">delete</i>
     </div>
+    <div id="authWidget" data-signin-text="<%= __('signInToSync') %>"></div>
   </form>
-
 </div>
 
 <!-- MODALS ------------------------------------------------------------------->
@@ -179,6 +179,11 @@ $(window).on('pageshow', function(){
 
     localStorage.setItem(`${window.deckType}`, JSON.stringify(lists));
 
+    // Sync to server if authenticated
+    if (window.syncManager && window.syncManager.authWidget.isAuthenticated()) {
+      window.syncManager.syncToServer(window.deckType);
+    }
+
     // create and select new list item
     $("#list_select").append(`<option value="${listname}">${listname}</option>`);
     $("#list_select").val(listname);
@@ -204,6 +209,12 @@ $(window).on('pageshow', function(){
     if (list) {
       delete lists[list];
       localStorage.setItem(`${window.deckType}`, JSON.stringify(lists));
+
+      // Sync to server if authenticated
+      if (window.syncManager && window.syncManager.authWidget.isAuthenticated()) {
+        window.syncManager.syncToServer(window.deckType);
+      }
+
       $("#list_select option:selected").remove();
     }
   }

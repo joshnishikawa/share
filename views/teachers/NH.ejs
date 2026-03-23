@@ -112,23 +112,39 @@
 </div>
 
 
+<script src="/javascripts/auth_widget.js"></script>
+<script src="/javascripts/sync_manager.js"></script>
 <script>
 $(function(){
-  var deckType = 'NH';
+  window.deckType = 'NH';
   window.deck = [];
   window.local = [];
+
+  // Initialize auth widget and sync manager
+  const authWidget = new AuthWidget('authWidget');
+  const syncManager = new SyncManager(authWidget);
+
+  // Make syncManager available globally for lists.ejs
+  window.syncManager = syncManager;
+
+  // Initialize sync when authenticated (including on page load)
+  authWidget.onAuthChange(async function(authenticated, user) {
+    if (authenticated) {
+      await syncManager.initSync('NH');
+    }
+  });
 
   $(`#NH-tab`).addClass("active");
 
   $(".menuitem").on('submit', (e)=>{
     e.preventDefault();
-    
-    if (!window.deck || window.deck.length == 0) {
+
+    if (!window.deck?.length) {
       alert("<%- __('pleaseSelect') %>");
     }
     else {
       $(e.target).find("input[name='deck']").val(JSON.stringify(window.deck));
-      $(e.target).find("input[name='deckType']").val(deckType);
+      $(e.target).find("input[name='deckType']").val(window.deckType);
       e.target.submit();
     }
   });
