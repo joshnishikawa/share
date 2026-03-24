@@ -179,8 +179,12 @@
         <%- include('./room/riceball'); -%>
         <%- include('./room/socks'); -%>
       </div>
-      <div class="mt-2">
-        <button id="manageCanvases" class="btn btn-sm btn-primary">
+      <div class="d-flex mt-2">
+        <button id="home" class="btn btn-sm btn-outline-secondary m-1 p-0" onclick="location.href='/things';">
+          <i class="material-icons">home</i>
+        </button>
+
+        <button id="manageCanvases" class="btn btn-sm btn-primary m-1">
           <i class="material-icons">view_module</i>
         </button>
       </div>

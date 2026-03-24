@@ -45,13 +45,14 @@ class AuthWidget {
 
     if (this.authenticated && this.user) {
       // Signed in - show profile
-      this.container.className = 'auth-widget signed-in';
+      this.container.className = 'auth-widget signed-in btn btn-sm btn-primary';
       this.container.innerHTML = `
         <img src="${this.escapeHtml(this.user.profile_picture || '/default-avatar.png')}"
              alt="${this.escapeHtml(this.user.name)}"
-             class="profile-pic ms-3"
+             class="profile-pic"
+             style="width: 24px; height: 24px; border-radius: 50%; margin-right: 8px;"
              title="${this.escapeHtml(this.user.name)}" />
-        <a href="/auth/logout" class="btn-logout me-3" title="Sign out">
+        <a href="/auth/logout" class="btn-logout" title="Sign out" style="text-decoration: none; color: inherit;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
             <polyline points="16 17 21 12 16 7"></polyline>
@@ -61,9 +62,9 @@ class AuthWidget {
       `;
     } else {
       // Not signed in - show sign-in button
-      this.container.className = 'auth-widget signed-out';
+      this.container.className = 'auth-widget signed-out btn btn-sm btn-primary';
       this.container.innerHTML = `
-        <a href="/auth/google" class="btn-signin">
+        <a href="/auth/google" style="text-decoration: none; color: inherit; display: flex; align-items: center;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
             <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
