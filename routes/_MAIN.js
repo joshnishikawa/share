@@ -162,6 +162,20 @@ router.get('/slots', (req, res)=>{
 });
 
 
+router.get('/interview', (req, res)=>{
+  try{
+    let book = req.query.book ?? 'brainbox';
+    let page = req.query.page ?? 'airport.png';
+
+    fs.readdir( path.join(__dirname, `../public/image/interview/${book}`), (err, pages)=>{
+      if (err) throw err;
+      res.render('activities/interview', {book, pages, page});
+    });
+  }
+  catch(err){ console.error(err); }
+});
+
+
 router.get('/shapes', (req, res)=>{ // moved to things
   try{
     res.redirect('/things/shapes');

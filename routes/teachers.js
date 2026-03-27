@@ -103,16 +103,6 @@ router.get('/text', (req, res)=>{
 });
 
 
-router.get('/tools', (req, res)=>{
-  try{
-    res.render('teachers/tools');
-  }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
-
 
 // router.get('/dlpicdic', async(req, res)=>{
      // this is a one-time use route to download all the images from New Horizon

@@ -254,3 +254,7 @@ class SyncManager {
     }
   }
 }
+
+if (typeof window !== 'undefined') {
+  window.SyncManager = SyncManager;
+}

@@ -45,6 +45,16 @@
       <div class="border border-white rounded-3 alert-secondary p-3">
         <%- include('../menu/lists') %>
       </div>
+
+      <div class="border border-white rounded-3 alert-secondary p-3 mt-3">
+        <div class="d-flex justify-content-between align-items-center">
+          <div><%- __('list') %><span id="numOfItems"> (0)</span></div>
+          <button id="clear_list" type="button" class="btn btn-sm btn-outline-danger" style="display:none;">
+            Clear List
+          </button>
+        </div>
+        <div id="list" class="d-flex flex-wrap bg-white border rounded-3 p-1" style="min-height:3rem;"></div>
+      </div>
   
     </div>
 
@@ -65,11 +75,28 @@
 
 
 <!-- <script src="javascripts/spell.js" type="text/javascript"></script> -->
+<script src="/javascripts/auth_widget.js"></script>
+<script src="/javascripts/sync_manager.js"></script>
 <script type="module">
   import translate from "https://cdn.jsdelivr.net/npm/translate/index.min.js";
   window.deckType = 'nolink'; // define before reading local storage
 
   $(function(){
+    function toggleClearListButton() {
+      $("#clear_list").toggle((window.deck || []).length > 0);
+    }
+
+    window.toggleClearListButton = toggleClearListButton;
+
+    const authWidget = new window.AuthWidget('authWidget');
+    const syncManager = new window.SyncManager(authWidget);
+    window.syncManager = syncManager;
+
+    authWidget.onAuthChange(async (authenticated) => {
+      if (authenticated) {
+        await syncManager.initSync(window.deckType);
+      }
+    });
 
     window.deck = [];
     window.local = [];
@@ -198,7 +225,8 @@
           // append w.meaning to d.meaning if not already there
           if (!d.meaning.includes(w.meaning)) {
             d.meaning += `, ${w.meaning}`;
-            $(`#${w.word}`).parent().html(`${w.word} - ${d.meaning}`);
+            let existingId = w.word.replace(/[ '-.]/g, '_');
+            $(`#${existingId}`).html(`${w.word} - ${d.meaning}`);
           }
           return;
         }
@@ -210,19 +238,31 @@
       $("#list").append( // in menu/lists.ejs
       `<div class="alert-primary rounded-3 m-1 ps-1 d-flex justify-content-between">
           <div id="${id}">${w.word} - ${w.meaning}</div>
-          <div data-value="${w.word.split(' ').join('_')}" class="list btn btn-close" style="font-size:10px;"></div>
+          <div data-value="${w.id}" class="list btn btn-close" style="font-size:10px;"></div>
         </div>`);
 
       $(".btn-close").off('click').on('click', (event) => {
         let val = $(event.target).data('value');
-        window.deck = window.deck.filter(d => d.word != val);
+        window.deck = window.deck.filter(d => d.id !== val && d.word !== val);
         window.local = window.local.filter(e => e.id !== val);
         $(event.target).parent().remove();
         $("#numOfItems").html(`&nbsp;(${window.deck.length})`);
+        toggleClearListButton();
       });
 
       $("#numOfItems").html(`&nbsp;(${window.deck.length})`);
+      toggleClearListButton();
     }
+
+    $("#clear_list").on('click', () => {
+      window.deck = [];
+      window.local = [];
+      $("#list").empty();
+      $("#numOfItems").html('&nbsp;(0)');
+      toggleClearListButton();
+    });
+
+    toggleClearListButton();
 
 
     $(".menuitem").on('submit', (e)=>{

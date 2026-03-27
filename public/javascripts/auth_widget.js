@@ -112,3 +112,7 @@ class AuthWidget {
     return text.replace(/[&<>"']/g, m => map[m]);
   }
 }
+
+if (typeof window !== 'undefined') {
+  window.AuthWidget = AuthWidget;
+}

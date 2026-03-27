@@ -114,9 +114,11 @@ $(window).on('pageshow', function(){
 
       $(this).parent().remove();
       $("#numOfItems").html(`&nbsp;(${window.deck.length})`);
+      if (window.toggleClearListButton) window.toggleClearListButton();
     });
 
     $("#numOfItems").html(`&nbsp;(${window.deck.length})`);
+    if (window.toggleClearListButton) window.toggleClearListButton();
   }
 
 
@@ -128,6 +130,7 @@ $(window).on('pageshow', function(){
       $(`#${id}`).remove();
     }
     $("#numOfItems").html(`&nbsp;(${window.deck.length})`);
+    if (window.toggleClearListButton) window.toggleClearListButton();
   }
 
 // LIST SELECT /////////////////////////////////////////////////////////////////

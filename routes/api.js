@@ -57,7 +57,7 @@ router.get('/user', function(req, res) {
 // GET /api/sync/canvas/:key - Get canvas data for storage key
 router.get('/sync/canvas/:key', requireAuth, syncLimiter, async function(req, res) {
   const storageKey = req.params.key;
-  const validKeys = ['shapes', 'supplies', 'objects', 'haystack', 'pairs', 'NH', 'LT', 'lps'];
+  const validKeys = ['shapes', 'supplies', 'objects', 'haystack', 'pairs', 'NH', 'LT', 'nolink', 'lps'];
 
   if (!validKeys.includes(storageKey)) {
     return res.status(400).json({ error: 'Invalid storage key' });
@@ -97,7 +97,7 @@ router.get('/sync/canvas/:key', requireAuth, syncLimiter, async function(req, re
 // POST /api/sync/canvas/:key - Save canvas data for storage key
 router.post('/sync/canvas/:key', requireAuth, syncLimiter, express.json({ limit: '2mb' }), async function(req, res) {
   const storageKey = req.params.key;
-  const validKeys = ['shapes', 'supplies', 'objects', 'haystack', 'pairs', 'NH', 'LT', 'lps'];
+  const validKeys = ['shapes', 'supplies', 'objects', 'haystack', 'pairs', 'NH', 'LT', 'nolink', 'lps'];
 
   if (!validKeys.includes(storageKey)) {
     return res.status(400).json({ error: 'Invalid storage key' });
@@ -115,6 +115,7 @@ router.post('/sync/canvas/:key', requireAuth, syncLimiter, express.json({ limit:
     const limits = {
       'NH': 100,       // Max 100 lists
       'LT': 100,       // Max 100 lists
+      'nolink': 100,   // Max 100 ad-hoc vocab lists
       'lps': 100,      // Max 100 lesson plans
       'haystack': 52,  // Max 52 letter combinations (Aa-Zz)
       'pairs': 10      // Max 10 pairs combinations
