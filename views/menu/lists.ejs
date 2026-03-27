@@ -1,13 +1,16 @@
 <div class="w-100 mb-3">
-  <form id="add_list_form" class="form d-flex">
-    <select id="list_select" class="form-control w-50"></select>
-    <div id="add_list_modal" type="submit" class="btn btn-sm btn-success">
-      <i class="material-icons">note_add</i>
+  <form id="add_list_form" class="form d-flex justify-content-between">
+    <div class="d-flex w-75">
+      <select id="list_select" class="form-control"></select>
+      <div id="add_list_modal" type="submit" class="btn btn-sm btn-success">
+        <i class="material-icons">note_add</i>
+      </div>
+
+      <div id="delete_list_modal" class="btn btn-sm btn-danger">
+        <i class="material-icons">delete</i>
+      </div>
     </div>
 
-    <div id="delete_list_modal" class="btn btn-sm btn-danger">
-      <i class="material-icons">delete</i>
-    </div>
     <div id="authWidget" class="btn btn-sm btn-primary" data-signin-text="<%= __('signInToSync') %>"></div>
   </form>
 </div>

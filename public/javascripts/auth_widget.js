@@ -45,12 +45,12 @@ class AuthWidget {
 
     if (this.authenticated && this.user) {
       // Signed in - show profile
-      this.container.className = 'auth-widget signed-in btn btn-sm btn-primary';
+      this.container.className = 'auth-widget signed-in btn btn-sm btn-outline-primary';
       this.container.innerHTML = `
         <img src="${this.escapeHtml(this.user.profile_picture || '/default-avatar.png')}"
              alt="${this.escapeHtml(this.user.name)}"
              class="profile-pic"
-             style="width: 24px; height: 24px; border-radius: 50%; margin-right: 8px;"
+             style="width: 24px; height: 24px; border-radius: 50%;"
              title="${this.escapeHtml(this.user.name)}" />
         <a href="/auth/logout" class="btn-logout" title="Sign out" style="text-decoration: none; color: inherit;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -62,7 +62,7 @@ class AuthWidget {
       `;
     } else {
       // Not signed in - show sign-in button
-      this.container.className = 'auth-widget signed-out btn btn-sm btn-primary';
+      this.container.className = 'auth-widget signed-out btn btn-sm btn-outline-primary';
       this.container.innerHTML = `
         <a href="/auth/google" style="text-decoration: none; color: inherit; display: flex; align-items: center;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
