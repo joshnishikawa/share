@@ -145,7 +145,7 @@
 
 $(function(){
   // localStorage.removeItem('player'); // DEBUG: so I don't have to clear my iPhone cache
-  $("#groups-tab").addClass("active");
+  $("#multiplayer-tab").addClass("active");
 
   $(".menuitem").on('submit', function(e){
     e.preventDefault();
@@ -305,7 +305,7 @@ $(function(){
   function loadActivity(activity) {
     // load from url
     if (activity == "choose") {
-      $("#activity").load("/pages/groups/choose.html", function() {
+      $("#activity").load("/pages/multiplayer/choose.html", function() {
         // Initialize the game after loading the HTML
         // if (typeof initChooseGame === 'function') {
         //   initChooseGame();

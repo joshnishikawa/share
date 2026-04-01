@@ -1,14 +1,17 @@
 <%- include('../../head'); -%>
 <body>
 
-  <div class="d-flex" style="position:absolute;right:0;">
-    <button id="home" class="btn btn-sm btn-outline-secondary p-0" onclick="location.href='/letters';">
-      <i class="material-icons">home</i>
-    </button>
-    <div id="authWidget" data-signin-text="<%= __('signInToSync') %>"></div>
-  </div>
+<div style="min-height:100vh;user-select: none;">
 
-  <div id="menu" class="container-fluid d-block text-center" style="user-select: none;">
+  <div id="menu" class="container-fluid d-block text-center">
+    <div class="d-flex" style="position:absolute;right:0;">
+      <button id="home" class="btn btn-sm btn-outline-secondary p-0" onclick="location.href='/letters';">
+        <i class="material-icons">home</i>
+      </button>
+      <div id="authWidget" data-signin-text="<%= __('signInToSync') %>"></div>
+    </div>
+
+
     <div class="row">
       <div class="col d-flex flex-wrap justify-content-center">
         <div class="display-1 YM"><%- __('activity.haystack.title') %></div>

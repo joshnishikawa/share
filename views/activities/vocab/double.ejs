@@ -39,19 +39,22 @@ if (numOfItems == 0) {
   alert("Not enough items in this deck to play Double.");
   location.href='/NH';
 }
-else {
-  $(`input[name=number][value=${numOfItems}]`).prop('checked', true);
+
+// Custom switch logic for number of items
+const switchInput = document.getElementById('numberSwitch');
+const hiddenValue = document.getElementById('numberValue');
+if (switchInput && hiddenValue) {
+  function updateNumberFromSwitch() {
+    numOfItems = switchInput.checked ? 9 : 4;
+    hiddenValue.value = numOfItems;
+    unusedCards = [];
+    const url = new URL(window.location.href);
+    url.searchParams.set('number', numOfItems);
+    window.history.replaceState({}, '', url);
+    load2Cards();
+  }
+  switchInput.addEventListener('change', updateNumberFromSwitch);
 }
-
-
-$('input[name=number]').on('change', function(){
-  numOfItems = parseInt( $(this).val() );
-  unusedCards = [];
-  const url = new URL(window.location.href);
-  url.searchParams.set('number', numOfItems);
-  window.history.replaceState({}, '', url);
-  load2Cards();
-});
 
 $('#next').on('click', function(){
   if (lit){

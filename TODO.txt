@@ -1,4 +1,4 @@
-FIXME: Recall field should stay focused but spacebar should not scroll page.
+FIXME: Recall field should stay focused.
 FIXME: Two-word vocab should appear before space 
 FIXME: Words should shrink to fit.
 FIXME: Reduce number of Keidoro cards to grid sizes.

@@ -5,8 +5,8 @@ const app = express();
 const server = require('http').createServer(app);
 
 const socket_io = require('socket.io')(server);
-const groups = require('./sockets/_GROUPS.js');
-groups(socket_io);
+const multiplayer = require('./sockets/_MULTIPLAYER.js');
+multiplayer(socket_io);
 
 const createError = require('http-errors');
 const logger = require('morgan');

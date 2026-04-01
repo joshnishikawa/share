@@ -210,15 +210,16 @@ router.get('/speak_spell', (req, res)=>{
 });
 
 
-router.get('/groups', (req, res)=>{
+router.get('/multiplayer', (req, res)=>{
   try{
-    res.render('students/groups');
+    res.render('students/multiplayer');
   }
   catch(err){
     res.send(err);
     console.error(err);
   }
 });
+
 
 
 // Redirects for edprecated routes /////////////////////////////////////////////

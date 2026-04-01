@@ -44,7 +44,7 @@ const chooseEvents = require("./choose.js");
 
 
 
-const groups = (io) => {
+const multiplayer = (io) => {
   const rooms = require("../rooms.json");
   var publicRooms = {};
   var privateRooms = {};
@@ -466,4 +466,4 @@ const groups = (io) => {
 };
 
 
-module.exports = groups;
+module.exports = multiplayer;

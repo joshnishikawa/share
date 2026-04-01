@@ -168,6 +168,9 @@ $(function(){
 
   let slash = false;
   $(document).on('keydown', function(e){
+    if (e.key == "Space"){
+      e.preventDefault();
+    }
     if (e.key == "/"){
       e.preventDefault();
       if (slash) return;

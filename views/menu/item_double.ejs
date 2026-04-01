@@ -3,31 +3,98 @@
     <i class="material-icons text-secondary point" data-bs-toggle="modal" data-bs-target="#double_modal">
       info
     </i>
-    <strong class="text-primary fs-5 pe-2">DOUBLE</strong>
+    <strong class="text-primary fs-5">D</strong>
 
-    <div class="alert alert-primary p-0 m-0 me-1" style="height:30px;width:30px;">
-      <div class="alert alert-warning border border-warning p-0 m-0" style="height:10px;width:10px;"></div>
+    <div class="alert alert-primary border border-primary p-0 my-auto" style="height:21px;width:21px;">
+      <div class="alert alert-warning border border-warning p-0 rounded-1" style="height:9px;width:9px;margin:5px;"></div>
     </div>
-    <div class="alert alert-primary p-0 m-0" style="height:30px;width:30px;">
-      <div class="alert alert-warning border border-warning p-0" style="height:10px;width:10px;margin:9px;"></div>
+    <div class="alert alert-primary border border-primary p-0 my-auto" style="height:21px;width:21px;">
+      <div class="alert alert-warning border border-warning p-0 rounded-bottom rounded-0 mx-auto" style="height:9px;width:9px;top:-1px;"></div>
     </div>
 
+    <strong class="text-primary fs-5 pe-2">BLE</strong>
   </div>
 
 
-  <form id="doubleForm" action="/vocab/double" method="POST" class="menuitem d-flex justify-content-end w-100">
+  <form id="doubleForm" action="/vocab/double" method="POST" class="menuitem d-flex justify-content-between w-100">
     <input type="hidden" value="" name="deck">
     <input type="hidden" value="NH" name="deckType">
-    <input id="number" class="form-check-input" type="radio" value="9" name="number">
-    <label class="form-check-label small ms-1 me-3" for="number">
-      3x3
-    </label>
-    <input id="number" class="form-check-input" type="radio" value="4" name="number">
-    <label class="form-check-label small ms-1 me-3" for="number">
-      2x2
-    </label>
+
+    <div class="d-flex align-items-center">
+      <span class="m-1" style="font-size:1rem;">4</span>
+      <label class="custom-switch">
+        <input type="checkbox" id="numberSwitch" name="numberSwitch" checked>
+        <span class="custom-slider"></span>
+        <input type="hidden" name="number" id="numberValue" value="9">
+      </label>
+      <span class="m-1" style="font-size:1rem;">9</span>
+    </div>
 
     <button type="submit" class="btn btn-sm btn-primary YM" style="height:100%;">Start</button>
+    <script>
+      // Set switch based on query string
+      (function() {
+        const params = new URLSearchParams(window.location.search);
+        const num = params.get('number');
+        const switchInput = document.getElementById('numberSwitch');
+        const hiddenValue = document.getElementById('numberValue');
+        if (num === '4') {
+          switchInput.checked = false;
+          hiddenValue.value = '4';
+        } else if (num === '9') {
+          switchInput.checked = true;
+          hiddenValue.value = '9';
+        }
+      })();
+    </script>
+    <style>
+      .custom-switch {
+        position: relative;
+        display: inline-block;
+        width: 38px;
+        height: 22px;
+        vertical-align: middle;
+        margin: 0 6px;
+      }
+      .custom-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .custom-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: #0d6efd;
+        border-radius: 22px;
+        transition: background 0.2s;
+      }
+      .custom-slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 2px;
+        bottom: 2px;
+        background: #fff;
+        border-radius: 50%;
+        transition: transform 0.2s;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+      }
+      .custom-switch input:checked + .custom-slider:before {
+        transform: translateX(16px);
+      }
+    </style>
+    <script>
+      // Custom switch: left=4, right=9
+      const switchInput = document.getElementById('numberSwitch');
+      const hiddenValue = document.getElementById('numberValue');
+      function updateNumberValue() {
+        hiddenValue.value = switchInput.checked ? '9' : '4';
+      }
+      switchInput.addEventListener('change', updateNumberValue);
+      updateNumberValue();
+    </script>
   </form>
 
 </div>
