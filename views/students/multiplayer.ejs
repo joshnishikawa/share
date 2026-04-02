@@ -6,15 +6,24 @@
     height: 16px;
     display: inline-block;
   }
+
+  #activityExit {
+    width: 34px;
+    height: 34px;
+    line-height: 1;
+    padding: 0;
+  }
 </style>
 
 
 <div id="menu-container" class="d-flex">
-  <%- include('navbar.ejs') -%>
+  <div id="studentSideMenu">
+    <%- include('navbar.ejs') -%>
+  </div>
 
   <div class="container-fluid mt-3">
     <div class="row">
-      <div class="col-sm-4 mb-3">
+      <div id="lobbyColumn" class="col-sm-4 mb-3">
 
   <!-- MY GROUP -->
         <div id="myGroup" class="container alert-primary border border-primary rounded-3 pb-3 mb-3">
@@ -78,22 +87,25 @@
 
       </div> 
 
-      <div id="activity" class="col-sm-8">
+      <div id="activityColumn" class="col-sm-8">
+        <div class="d-flex justify-content-end mb-2">
+          <button id="activityExit" class="btn btn-sm btn-outline-danger d-none" title="Leave activity" aria-label="Leave activity">
+            <i class="material-icons" style="font-size:16px;">logout</i>
+          </button>
+        </div>
 
-        <button class="btn btn-outline-primary activity d-flex justify-content-between w-100" id="choose" title="Choose activity" aria-label="Choose activity">
-          Choose  
-        </button>  
+        <div id="activityMenu">
+          <% activities.forEach(function(activity){ %>
+            <button class="btn btn-outline-primary activity d-flex justify-content-between w-100" id="<%= activity.id %>" title="<%= activity.label %> activity" aria-label="<%= activity.label %> activity">
+              <%= activity.label %>
+            </button>
+          <% }); %>
+        </div>
 
-        <button class="btn btn-outline-primary activity d-flex justify-content-between w-100" id="race" title="Race activity" aria-label="Race activity">
-          Race
-        </button>  
-
-        <button class="btn btn-outline-primary activity d-flex justify-content-between w-100" id="match" title="Match activity" aria-label="Match activity">
-          Match
-        </button>
+        <div id="activityContent" class="mt-2"></div>
       </div>
 
-      <div class="col-sm-4">
+      <div id="sideColumn" class="col-sm-4">
         <%//- include('../menu/select_NH.ejs') %>
       </div>
 
@@ -103,12 +115,16 @@
 </div>
 
 <script src="https://cdn.socket.io/4.0.1/socket.io.js"></script>
+<% activities.forEach(function(activity){ %>
+  <script src="/javascripts/multiplayer/activities/<%= activity.id %>.js"></script>
+<% }); %>
 
 <script>
 // VARIABLES ////////////////////////////////////////////////////////////////////
   var room = {};
   var player = {id: null, color: "#cccccc", roomname: null, roomtype: "private", closed: false, number: 1, activity: null};
   var socket = io();
+  var currentActivity = null;
   var timer;
   
   // Initialize global variables for NH vocabulary only if they don't exist
@@ -263,19 +279,19 @@ $(function(){
     return new Promise(function(resolve, reject) {
       socket.emit('getName', player);
 
-      // Remove any existing listener to prevent memory leaks
-      socket.off('setName.getName');
-      
-      socket.on('setName.getName', function(data) {
+      function onSetName(data) {
         if (data.id) {
           player.id = data.id;
-          socket.off('setName.getName'); // Clean up immediately
+          socket.off('setName', onSetName);
           resolve();
         } else {
-          socket.off('setName.getName'); // Clean up on error too
+          socket.off('setName', onSetName);
           reject('Failed to get name from server');
         }
-      });
+      }
+
+      socket.off('setName', onSetName);
+      socket.on('setName', onSetName);
     });
   }
 
@@ -303,15 +319,46 @@ $(function(){
   }
 
   function loadActivity(activity) {
-    // load from url
-    if (activity == "choose") {
-      $("#activity").load("/pages/multiplayer/choose.html", function() {
-        // Initialize the game after loading the HTML
-        // if (typeof initChooseGame === 'function') {
-        //   initChooseGame();
-        // }
-      });
+    if (currentActivity && window.multiplayerActivities && window.multiplayerActivities[currentActivity] && typeof window.multiplayerActivities[currentActivity].teardown === "function") {
+      window.multiplayerActivities[currentActivity].teardown(socket);
     }
+
+    $("#activityContent").load("/multiplayer/" + activity, function(responseText, status) {
+      if (status !== "success") {
+        $("#activityContent").html("<div class='alert alert-danger'>Failed to load activity.</div>");
+        return;
+      }
+
+      currentActivity = activity;
+      enterActivityMode();
+      if (window.multiplayerActivities && window.multiplayerActivities[activity] && typeof window.multiplayerActivities[activity].mount === "function") {
+        window.multiplayerActivities[activity].mount({ socket: socket, player: player, room: room });
+      }
+    });
+  }
+
+  function enterActivityMode() {
+    $("#studentSideMenu").addClass("d-none");
+    $("#lobbyColumn").addClass("d-none");
+    $("#sideColumn").addClass("d-none");
+    $("#activityMenu").addClass("d-none");
+    $("#activityColumn").removeClass("col-sm-8").addClass("col-12");
+    $("#activityExit").removeClass("d-none");
+  }
+
+  function exitActivityMode() {
+    if (currentActivity && window.multiplayerActivities && window.multiplayerActivities[currentActivity] && typeof window.multiplayerActivities[currentActivity].teardown === "function") {
+      window.multiplayerActivities[currentActivity].teardown(socket);
+    }
+    currentActivity = null;
+
+    $("#studentSideMenu").removeClass("d-none");
+    $("#activityContent").empty();
+    $("#activityExit").addClass("d-none");
+    $("#activityColumn").removeClass("col-12").addClass("col-sm-8");
+    $("#activityMenu").removeClass("d-none");
+    $("#lobbyColumn").removeClass("d-none");
+    $("#sideColumn").removeClass("d-none");
   }
 
 
@@ -321,14 +368,21 @@ $(function(){
     // Debounce room search to avoid excessive server calls
     clearTimeout(roomSearchTimeout);
     roomSearchTimeout = setTimeout(function() {
-      socket.emit('roomSearch', $("#roomSearch").val());
+      var query = $("#roomSearch").val().trim();
+      if (!query) {
+        $("#foundplayers").empty();
+        $("#join").prop('disabled', true);
+        return;
+      }
+      socket.emit('roomSearch', query);
     }, 300); // Wait 300ms after user stops typing
   });
 
   $("#roomSearchForm").on('submit', function(e){
     e.preventDefault();
     if ($("#join").prop('disabled')) return; // if #join disabled, room !exists
-    var newRoom = $("#roomSearch").val();
+    var newRoom = $("#roomSearch").val().trim();
+    if (!newRoom) return;
     socket.emit('join', {newRoom: newRoom, player: player});
     $("#roomSearch").val('');
     $("#foundplayers").empty();
@@ -345,6 +399,10 @@ $(function(){
   $("#leaveGroup").on('click', function(){
     socket.emit('leave', player);
     // Don't trigger room search here - let the server handle the rejoin
+  });
+
+  $("#activityExit").on('click', function(){
+    socket.emit('leave', player);
   });
 
   $(".activity").on("click", function () {
@@ -374,6 +432,13 @@ $(function(){
 
 
   socket.on('joined', function(data){
+    if (!data || !data.room) {
+      if (data && data.message) {
+        $("#info").text(data.message);
+      }
+      return;
+    }
+
     room = data.room;
     player.number = data.playerNum;
     player.roomname = room.roomname;
@@ -385,6 +450,8 @@ $(function(){
     if (room.activity) {
       player.activity = room.activity;
       loadActivity(room.activity);
+    } else {
+      exitActivityMode();
     }
   });
 
@@ -402,6 +469,8 @@ $(function(){
 
 
   socket.on('roomSearch', function(data){
+    $("#foundplayers").empty();
+
     if (data && data.roomname != player.roomname) {
       for (var i = 0; i < data.players.length; i++) {
         var p = data.players[i];
@@ -422,6 +491,8 @@ $(function(){
   });
   
   socket.on('youLeft', function(data){
+    exitActivityMode();
+
     room = {};
     player.roomname = null; // reset the roomname
     player.roomtype = "private"; // reset the roomtype
@@ -481,6 +552,16 @@ $(function(){
 
   socket.on('loadActivity', function(data){
     loadActivity(data);
+  });
+
+  socket.on('returnToLobby', function(data){
+    exitActivityMode();
+    player.activity = null;
+    localStorage.setItem('player', JSON.stringify(player));
+
+    if (data && data.players) {
+      updatePlayerList(data.players);
+    }
   });
 
 });

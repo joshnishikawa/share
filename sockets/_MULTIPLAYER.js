@@ -39,8 +39,7 @@ const nouns = [
 ];
 
 
-// Add other event handler modules here
-const chooseEvents = require("./choose.js");
+const registerMultiplayerActivityEvents = require("./multiplayer/activities");
 
 
 
@@ -306,8 +305,8 @@ const multiplayer = (io) => {
 
   // SOCKET.IO EVENTS ////////////////////////////////////////////////////////////
   io.sockets.on("connection", (socket) => {
-    // Initialize modular event handlers for this socket
-    chooseEvents(io, socket);
+    // Initialize modular event handlers for each multiplayer activity.
+    registerMultiplayerActivityEvents(io, socket);
 
     socket.on("join", function (data) {
       if (data.newRoom) {
@@ -320,7 +319,7 @@ const multiplayer = (io) => {
           joinPublicRoom(socket, data.player);
         } else {
           data.player.roomname = data.newRoom; // update the roomname
-          openPrivateRoom(socket, data.player);
+          joinPrivateRoom(socket, data.player);
         }
       } else {
         if (data.roomtype === "public") {
@@ -457,6 +456,24 @@ const multiplayer = (io) => {
       } else {
         socket.emit("error", { message: "Room not found or closed." });
       }
+    });
+
+    socket.on("activityComplete", function (data) {
+      if (!data || !data.roomname) return;
+
+      const roomname = data.roomname;
+      const room = privateRooms[roomname] || publicRooms[roomname];
+      if (!room) return;
+
+      if (data.activity && room.activity && room.activity !== data.activity) return;
+
+      room.activity = null;
+      room.players.forEach((p) => {
+        p.activity = null;
+      });
+
+      io.to(roomname).emit("activityChosen", room.players);
+      io.to(roomname).emit("returnToLobby", { roomname, players: room.players });
     });
 
     socket.on("disconnect", function () {

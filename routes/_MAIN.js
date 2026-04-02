@@ -8,6 +8,7 @@ const things = require('./things.js');
 const vocab = require('./vocab.js');
 const tools = require('./tools.js');
 const labs = require('./labs.js');
+const multiplayer = require('./multiplayer');
 const creds = {
   host: process.env.host,
   user: process.env.user,
@@ -33,6 +34,7 @@ router.use('/things', things);
 router.use('/vocab', vocab);
 router.use('/tools', tools);
 router.use('/labs', labs);
+router.use('/multiplayer', multiplayer);
 
 
 async function getNHVocab(){
@@ -208,18 +210,6 @@ router.get('/speak_spell', (req, res)=>{
     console.error(err);
   }
 });
-
-
-router.get('/multiplayer', (req, res)=>{
-  try{
-    res.render('students/multiplayer');
-  }
-  catch(err){
-    res.send(err);
-    console.error(err);
-  }
-});
-
 
 
 // Redirects for edprecated routes /////////////////////////////////////////////
