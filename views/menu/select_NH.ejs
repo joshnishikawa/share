@@ -30,6 +30,7 @@
           window.local.push(l);
         }
       }
+      if (typeof updateDoubleSwitch === 'function') updateDoubleSwitch();
     }
   }
 
@@ -39,6 +40,7 @@
         window.deck = window.deck.filter(d => d !== i && d !== i.id && d !== i.word);
         window.local = window.local.filter(l => l.id !== i.id && l.id !== i.word);
       }
+      if (typeof updateDoubleSwitch === 'function') updateDoubleSwitch();
     }
   }
   

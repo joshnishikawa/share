@@ -1,8 +1,8 @@
-<%- include('../head.ejs') -%>
+<%- include('../head') -%>
 
 
 <div id="menu-container" class="d-flex">
-  <%- include('navbar.ejs') -%>
+  <%- include('navbar') -%>
 
 
   <div class="container-fluid pb-3">
@@ -12,7 +12,7 @@
           <div class="text-muted">Let's Try VOCABULARY</div>
           <div class="flex-grow-1"><hr/></div>
         </div>
-        <%- include('../menu/select_LT.ejs') -%>
+        <%- include('../menu/select_LT') -%>
       </div>
 
       <div class="col-4 text-center">
@@ -20,8 +20,11 @@
           <div class="text-muted">SELECT OR EDIT LISTS</div>
           <div class="flex-grow-1"><hr/></div>
         </div>
-        <%- include('../menu/lists.ejs') -%>
-        <div><%- __('list') %><span id="numOfItems"> (0)</span></div>
+        <%- include('../menu/lists') -%>
+        <div class="d-flex justify-content-between align-items-center">
+          <div><%- __('list') %><span id="numOfItems"> (0)</span></div>
+          <button id="clear_list" type="button" class="btn btn-sm btn-outline-danger" style="display:none;">Clear</button>
+        </div>
         <div id="list" class="d-flex flex-wrap bg-white border rounded-3"></div>
       </div>
       
@@ -33,31 +36,31 @@
 
 
         <div class="col menuitemwrapper">
-          <%- include('../menu/item_flash.ejs') -%>
+          <%- include('../menu/item_flash') -%>
         </div>
       
         <div class="col menuitemwrapper">
-          <%- include('../menu/item_match.ejs') -%>
+          <%- include('../menu/item_match') -%>
         </div>
       
         <div class="col menuitemwrapper">
-          <%- include('../menu/item_recall.ejs') -%>
+          <%- include('../menu/item_recall') -%>
         </div>
 
         <div class="col menuitemwrapper">
-          <%- include('../menu/item_bingo.ejs') -%>
+          <%- include('../menu/item_bingo') -%>
         </div>
       
         <div class="col menuitemwrapper">
-          <%- include('../menu/item_reveal.ejs') -%>
+          <%- include('../menu/item_reveal') -%>
         </div>
       
         <div class="col menuitemwrapper">
-          <%- include('../menu/item_grid.ejs') -%>
+          <%- include('../menu/item_grid') -%>
         </div>
 
         <div class="col menuitemwrapper">
-          <%- include('../menu/item_cards.ejs') -%>
+          <%- include('../menu/item_cards') -%>
         </div>
       </div>
 
@@ -203,6 +206,20 @@ $(function(){
 
   $(`#LT-tab`).addClass("active");
 
+  function toggleClearListButton() {
+    $("#clear_list").toggle((window.deck || []).length > 0);
+  }
+  window.toggleClearListButton = toggleClearListButton;
+
+  $("#clear_list").on('click', () => {
+    window.deck = [];
+    window.local = [];
+    $("#list").empty();
+    $("#numOfItems").html('&nbsp;(0)');
+    $("#themes .form-check-input").prop('checked', false);
+    toggleClearListButton();
+  });
+
   $(".menuitem").on('submit', (e)=>{
     e.preventDefault();
     
@@ -212,6 +229,9 @@ $(function(){
     else {
       $(e.target).find("input[name='deck']").val(JSON.stringify(window.deck));
       $(e.target).find("input[name='deckType']").val(window.deckType);
+      if (!$(e.target).find("input[name='teacher']").length) {
+        $(e.target).append('<input type="hidden" name="teacher" value="1">');
+      }
       e.target.submit();
     }
   });
@@ -219,4 +239,4 @@ $(function(){
 });
 </script>
 
-<%- include('../foot.ejs') -%>
+<%- include('../foot') -%>

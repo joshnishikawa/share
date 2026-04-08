@@ -1,26 +1,50 @@
+/**
+ * multiplayer/activities/choose.js — "Choose" multiplayer activity (client)
+ * ──────────────────────────────────────────────────────────────────────
+ * Flow:
+ *   1. mount() is called by the multiplayer framework with {socket, player, room}.
+ *   2. Client emits 'choose/playerready'; server waits for all players.
+ *   3. Server sends 'choose/roundstart' with items[] and a chooserNumber.
+ *   4. The chooser uses Web Speech API to say a word; an image is selected.
+ *   5. Guessers tap the matching word; server tallies, emits 'choose/reveal'.
+ *   6. After all rounds, 'choose/gameover' fires, chooser emits 'activityComplete'.
+ *
+ * Roles:
+ *   - Chooser: sees images, speaks to select one, waits for guesses.
+ *   - Guesser: sees a quick slideshow preview, then picks a word after selection.
+ *
+ * Pattern: IIFE → registers on window.multiplayerActivities.choose = { mount, teardown }.
+ *          Uses jQuery for DOM, Socket.IO for transport, Web Speech API for input.
+ */
 (function() {
-  let selectedWord = null;
-  let roundItems = [];
-  let chooserNumber = null;
-  let hasSubmittedWord = false;
-  let currentPlayer = null;
-  let currentSocket = null;
-  let slideshowTimer = null;
-  let slideshowIndex = 0;
-  let recognition = null;
-  let speechSupported = false;
-  let isListening = false;
-  let autoListen = true;
-  let listenersAttached = false;
+  /* ── Module-level state (reset on every mount) ── */
+  let selectedWord = null;      // The word the chooser spoke / picked
+  let roundItems = [];           // Array of {word, image} for this round
+  let chooserNumber = null;      // Player number of the current chooser
+  let hasSubmittedWord = false;  // Whether this guesser already submitted
+  let currentPlayer = null;      // Player object passed in at mount
+  let currentSocket = null;      // Socket.IO socket passed in at mount
+  let slideshowTimer = null;     // setInterval id for guesser image preview
+  let slideshowIndex = 0;        // Current frame in the slideshow
+  let recognition = null;        // SpeechRecognition instance
+  let speechSupported = false;   // Whether the browser supports Web Speech API
+  let isListening = false;       // Whether recognition.start() is active
+  let autoListen = true;         // Auto-start listening (persisted in localStorage)
+  let listenersAttached = false; // Guard to prevent double-attaching socket listeners
 
+  /* ── Helpers ── */
+
+  /** True if this client is the chooser (speaker) for the current round. */
   function isChooser() {
     return Number(currentPlayer.number) === Number(chooserNumber);
   }
 
+  /** Strip to lowercase alpha + spaces for fuzzy speech matching. */
   function normalize(text) {
     return (text || '').toLowerCase().replace(/[^a-z\s]/g, '').trim();
   }
 
+  /** Look up the image filename for a given word in the current round. */
   function getImageForWord(word) {
     for (let i = 0; i < roundItems.length; i++) {
       if (roundItems[i].word === word) return roundItems[i].image;
@@ -28,6 +52,10 @@
     return null;
   }
 
+  /**
+   * Attempt to match a speech transcript to one of the round's words.
+   * Tries exact match first, then substring containment in either direction.
+   */
   function findRecognizedWord(transcript) {
     const spoken = normalize(transcript);
     if (!spoken) return null;
@@ -44,10 +72,14 @@
     return null;
   }
 
+  /* ── UI helpers ── */
+
+  /** Update the status banner text. */
   function setStatus(text) {
     $('#choose-status').text(text);
   }
 
+  /** Enable/disable the speak button and optionally change its label. */
   function setSpeakButtonState(enabled, label) {
     const $btn = $('#choose-speak-btn');
     if (!$btn.length) return;
@@ -55,11 +87,14 @@
     $btn.text(label || 'Tap To Speak');
   }
 
+  /* ── Speech Recognition lifecycle ── */
+
+  /** Start the speech recognizer (chooser-only, guarded). */
   function beginListening() {
     if (!isChooser()) return;
-    if (selectedWord) return;
+    if (selectedWord) return;          // Already chose — no more listening
     if (!speechSupported || !recognition) return;
-    if (isListening) return;
+    if (isListening) return;           // Prevent double-start
 
     $('#choose-heard').text('Listening...');
     setSpeakButtonState(false, 'Listening...');
@@ -86,6 +121,11 @@
     }
   }
 
+  /**
+   * Create and configure a SpeechRecognition instance.
+   * NOTE: recognition.lang is hard-coded to 'en-US'.
+   *       maxAlternatives = 3 gives findRecognizedWord more chances.
+   */
   function initializeSpeech() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
@@ -101,11 +141,22 @@
     recognition.interimResults = false;
     recognition.maxAlternatives = 3;
 
+    /** On successful recognition, attempt to match a word from all alternatives. */
     recognition.onresult = function(event) {
-      const transcript = event.results[event.results.length - 1][0].transcript;
-      $('#choose-heard').text('Heard: ' + transcript);
+      const result = event.results[event.results.length - 1];
+      let recognizedWord = null;
+      let heardText = result[0].transcript;
 
-      const recognizedWord = findRecognizedWord(transcript);
+      // Check all alternatives (maxAlternatives=3) for a match
+      for (let i = 0; i < result.length; i++) {
+        recognizedWord = findRecognizedWord(result[i].transcript);
+        if (recognizedWord) {
+          heardText = result[i].transcript;
+          break;
+        }
+      }
+
+      $('#choose-heard').text('Heard: ' + heardText);
       if (!recognizedWord) {
         setStatus('Not recognized as an available word. Try again.');
         return;
@@ -133,6 +184,8 @@
     };
   }
 
+  /* ── Slideshow (guesser sees a fast preview of all images) ── */
+
   function stopSlideshow() {
     if (slideshowTimer) {
       clearInterval(slideshowTimer);
@@ -140,6 +193,7 @@
     }
   }
 
+  /** Cycle through round images every 220 ms so guesser sees all of them. */
   function startSlideshow() {
     stopSlideshow();
     if (!roundItems.length) return;
@@ -156,6 +210,7 @@
     }, 220);
   }
 
+  /** Toggle between chooser and guesser UI panels. */
   function setRoleView() {
     if (isChooser()) {
       stopSlideshow();
@@ -176,6 +231,7 @@
     }
   }
 
+  /** Clean up all DOM handlers and socket listeners for this activity. */
   function teardown(socket) {
     if (!listenersAttached) return;
     stopSlideshow();
@@ -190,13 +246,18 @@
     listenersAttached = false;
   }
 
+  /**
+   * Display the selected image prominently and hide the rest.
+   */
   function showSelectedImage(word) {
     selectedWord = word;
     const imageName = getImageForWord(word);
     stopSlideshow();
 
     $('#choose-images img').addClass('thumb').hide();
-    $('#choose-images img[alt="' + word + '"]').removeClass('thumb').show();
+    $('#choose-images img').filter(function() {
+      return $(this).attr('alt') === word;
+    }).removeClass('thumb').show();
 
     if (imageName) {
       $('#choose-selected-preview')
@@ -212,6 +273,9 @@
     }
   }
 
+  /* ── Board rendering ── */
+
+  /** Build the image grid and word buttons for a new round. */
   function renderBoard() {
     const $images = $('#choose-images');
     const $words = $('#choose-words');
@@ -230,12 +294,14 @@
         alt: item.word,
       });
 
+      // Fall back to altOnly() (from script.js global) on broken images
       img.on('error', function() {
         if (typeof altOnly === 'function') {
           altOnly(this);
         }
       });
 
+      // Clicking image as chooser just reminds to use speech; guessers are ignored
       img.on('click', function() {
         if (!isChooser()) return;
         if (selectedWord) return;
@@ -249,9 +315,10 @@
         text: item.word,
       });
 
+      // Guesser taps a word → submit guess to server (one attempt only)
       word.on('click', function() {
-        if (isChooser()) return;
-        if (!selectedWord || hasSubmittedWord) return;
+        if (isChooser()) return;                     // Chooser can't guess
+        if (!selectedWord || hasSubmittedWord) return; // Wait / already guessed
 
         hasSubmittedWord = true;
         $('#choose-words .choose-word').addClass('choose-word-disabled');
@@ -284,12 +351,19 @@
     }
   }
 
+  /* ── Mount / Teardown (lifecycle managed by multiplayer framework) ── */
+
+  /**
+   * Initialize the Choose activity.
+   * Called by the multiplayer framework when this activity is selected.
+   * Resets all state, sets up speech, DOM handlers, and socket listeners.
+   */
   function mount(options) {
     const socket = options.socket;
     const player = options.player;
     const room = options.room;
 
-    teardown(socket);
+    teardown(socket);  // Clean up any previous session
 
     currentSocket = socket;
     currentPlayer = player;
@@ -305,6 +379,7 @@
     $('#choose-words').empty();
     $('#choose-heard').text('');
 
+    // Restore user preference for auto-listening (defaults to true)
     const storedAutoListen = localStorage.getItem('chooseAutoListen');
     autoListen = storedAutoListen === null ? true : storedAutoListen === '1';
     $('#choose-auto-listen').prop('checked', autoListen);
@@ -330,8 +405,11 @@
       }
     });
 
+    /* ── Socket event handlers ── */
+
+    // Server reports how many players are ready in the lobby
     socket.on('choose/waiting', function(data) {
-      if (hasRoundStarted()) return;
+      if (hasRoundStarted()) return; // Ignore late lobby messages
       if (data.ready >= data.expected) {
         setStatus('All players ready. Starting round...');
         return;
@@ -339,6 +417,7 @@
       setStatus('Waiting for players: ' + data.ready + '/' + data.expected);
     });
 
+    // New round: receive items and which player is the chooser
     socket.on('choose/roundstart', function(data) {
       roundItems = data.items || [];
       chooserNumber = data.chooserNumber;
@@ -347,16 +426,19 @@
       renderBoard();
     });
 
+    // Broadcast: the chooser selected an image — show it to all
     socket.on('choose/imageselected', function(data) {
       showSelectedImage(data.word);
     });
 
+    // Server reports how many guessers have submitted
     socket.on('choose/guesscount', function(data) {
       if (isChooser()) {
         setStatus('Guesses: ' + data.guessed + '/' + data.expected);
       }
     });
 
+    // Reveal correct answer + mark each guesser's pick as correct/incorrect
     socket.on('choose/reveal', function(data) {
       const correctWord = data.correctWord;
       $('#choose-words .choose-word').removeClass('choose-word-selected choose-word-correct choose-word-incorrect choose-word-disabled');
@@ -377,6 +459,7 @@
       setStatus('Answer: ' + correctWord);
     });
 
+    // All rounds done — chooser tells server the activity is finished
     socket.on('choose/gameover', function() {
       setStatus('Round complete. Starting over...');
       if (isChooser()) {
@@ -387,6 +470,7 @@
       }
     });
 
+    // Tell the server this player is ready to begin
     socket.emit('choose/playerready', {
       roomname: player.roomname,
       playerId: player.id,
@@ -397,6 +481,7 @@
     listenersAttached = true;
   }
 
+  /* ── Register with the multiplayer activity registry ── */
   window.multiplayerActivities = window.multiplayerActivities || {};
   window.multiplayerActivities.choose = {
     mount: mount,

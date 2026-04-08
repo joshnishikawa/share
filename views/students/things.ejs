@@ -1,7 +1,14 @@
-<%- include('../head.ejs') -%>
+<!--
+  students/things.ejs — "Things" activity menu page
+  ══════════════════════════════════════════════════
+  Activities: Multi-Touch Shapes, Say Colors (speech), School Supplies,
+  Bedroom, Dressup (boy/girl).
+  Pure menu page — no game logic, just links and decorative previews.
+-->
+<%- include('../head') -%>
 
 <div id="menu-container" class="d-flex">
-  <%- include('navbar.ejs') -%>
+  <%- include('navbar') -%>
 
   <div class="container-fluid mt-3">
     <div class="row">
@@ -114,4 +121,4 @@ $(function(){
   });
 </script>
 
-<%- include('../foot.ejs') -%>
+<%- include('../foot') -%>

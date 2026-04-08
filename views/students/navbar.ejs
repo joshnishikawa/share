@@ -1,3 +1,8 @@
+<!-- navbar.ejs — Student sidebar navigation (vertical tabs)
+     Tabs: Letters, Things, New Horizon. Multiplayer tab is commented out.
+     AUDIT: Uses data-toggle="tab" (Bootstrap 4 syntax) — should be
+            data-bs-toggle="tab" for Bootstrap 5. Tabs likely don't auto-toggle.
+     AUDIT: Home button uses onclick="location.href" — could be a plain <a>. -->
 <ul id="navbar" class="nav flex-column nav-tabs bg-white d-flex pt-1 ms-1 YM" style="min-height: 100vh;">
   <li class="nav-item vertical-label p-0"><a id="letters-tab" href="letters" class="nav-link border-start-0" data-toggle="tab">Letters</a></li>
   <li class="nav-item vertical-label p-0"><a id="things-tab" href="things" class="nav-link border-start-0" data-toggle="tab">Things</a></li>

@@ -115,10 +115,12 @@ $(window).on('pageshow', function(){
       $(this).parent().remove();
       $("#numOfItems").html(`&nbsp;(${window.deck.length})`);
       if (window.toggleClearListButton) window.toggleClearListButton();
+      if (typeof updateDoubleSwitch === 'function') updateDoubleSwitch();
     });
 
     $("#numOfItems").html(`&nbsp;(${window.deck.length})`);
     if (window.toggleClearListButton) window.toggleClearListButton();
+    if (typeof updateDoubleSwitch === 'function') updateDoubleSwitch();
   }
 
 
@@ -131,6 +133,7 @@ $(window).on('pageshow', function(){
     }
     $("#numOfItems").html(`&nbsp;(${window.deck.length})`);
     if (window.toggleClearListButton) window.toggleClearListButton();
+    if (typeof updateDoubleSwitch === 'function') updateDoubleSwitch();
   }
 
 // LIST SELECT /////////////////////////////////////////////////////////////////

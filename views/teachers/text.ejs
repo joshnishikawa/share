@@ -1,7 +1,7 @@
-<%- include('../head.ejs') -%>
+<%- include('../head') -%>
 
 <div id="menu-container" class="d-flex">
-  <%- include('navbar.ejs') -%>
+  <%- include('navbar') -%>
 
   <div class="container-fluid">
     <div class="row">
@@ -29,19 +29,19 @@
         </div>
 
         <div class="menuitemwrapper">
-          <%- include('../menu/item_flash.ejs') -%>
+          <%- include('../menu/item_flash') -%>
         </div>
       
         <div class="menuitemwrapper">
-          <%- include('../menu/item_match.ejs') -%>
+          <%- include('../menu/item_match') -%>
         </div>
       
         <div class="menuitemwrapper">
-          <%- include('../menu/item_bingo.ejs') -%>
+          <%- include('../menu/item_bingo') -%>
         </div>
       
         <div class="menuitemwrapper">
-          <%- include('../menu/item_type.ejs') -%>
+          <%- include('../menu/item_type') -%>
         </div>
 
       </div>
@@ -96,6 +96,9 @@ $(function(){
 
       $(e.target).find("input[name='deck']").val(JSON.stringify(window.deck));
       $(e.target).find("input[name='deckType']").val(window.deckType);
+      if (!$(e.target).find("input[name='teacher']").length) {
+        $(e.target).append('<input type="hidden" name="teacher" value="1">');
+      }
       e.target.submit();
     }
   });
@@ -103,4 +106,4 @@ $(function(){
 });
 </script>
 
-<%- include('../foot.ejs') -%>
+<%- include('../foot') -%>

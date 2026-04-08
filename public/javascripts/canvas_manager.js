@@ -1,3 +1,22 @@
+////////////////////////////////////////////////////////////////////////////////
+// canvas_manager.js — Modal UI for managing multiple canvas snapshots.
+//
+// PATTERN: Constructor function (matches canvas_builder.js style).
+//   Depends on a CanvasBuilder instance passed to constructor.
+//
+// FEATURES: Grid of thumbnails, drag-to-clone (onto Add), drag-to-delete
+//   (onto Delete), click-to-switch. Max 10 canvases.
+//
+// NOTE: setupEventHandlers() is called recursively after clone — it re-binds
+//   all handlers. This means handlers accumulate if the modal stays open
+//   and multiple clones happen. Each call to setupEventHandlers adds new
+//   listeners without removing old ones.
+//
+// NOTE: After delete, creates a NEW CanvasManager and calls .open() to
+//   refresh — this is a simple but heavy approach (re-generates all
+//   thumbnails). Could just re-render the grid instead.
+////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Canvas Manager - Modal UI for managing canvas snapshots
  * Handles grid display, add/delete/clone operations
@@ -6,7 +25,9 @@
 function CanvasManager(canvasBuilder) {
   const builder = canvasBuilder;
 
-  // Open the canvas manager modal
+  // Open the canvas manager modal and populate the grid.
+  // Shows Add + Delete action buttons, then thumbnail for each saved canvas.
+  // Thumbnails are generated async if not already cached.
   this.open = function() {
     const modal = $("#canvasManagerModal");
     const grid = $("#canvasGrid");
@@ -76,10 +97,15 @@ function CanvasManager(canvasBuilder) {
     modal.modal('show');
   };
 
-  // Setup all modal event handlers
+  // Setup all modal event handlers.
+  // Unbinds before rebinding to prevent duplicate handlers after clone.
   function setupEventHandlers() {
     let draggedSnapshot = null;
     let draggedIndex = null;
+
+    // Unbind previous handlers to avoid accumulation on re-entry
+    $("#addCanvasBtn").off("click");
+    $(".canvas-snapshot").off("click mousedown touchstart");
 
     // Add canvas button
     $("#addCanvasBtn").on("click", function() {

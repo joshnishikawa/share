@@ -13,7 +13,7 @@
 
 <div class="d-flex justify-content-between">
   <%- include('../../menu/item_spell'); -%>
-  <button id="home" class="btn btn-sm btn-outline-secondary p-0" onclick="location.href='/'">
+  <button id="home" class="btn btn-sm btn-outline-secondary p-0" onclick="location.href='<%= query.teacher ? '/teachers/' + deckType : deckType === 'NH' ? '/NH' : '/' %>'">
     <i class="material-icons">home</i>
   </button>
 </div>

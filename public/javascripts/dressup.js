@@ -1,36 +1,52 @@
+////////////////////////////////////////////////////////////////////////////////
+// dressup.js — Drag-to-dress character activity.
+//
+// PATTERN: Takes a config object with CSS selectors for clothing items,
+//   character element, and clothing class name. Uses jQuery animation
+//   for fly-to-character / fly-back-to-menu effects.
+//
+// CLICK-THROUGH: Implements pixel-level transparency detection to handle
+//   stacked clothing. If you click a transparent area of the top garment,
+//   it checks items underneath using canvas pixel inspection.
+//
+// POTENTIAL ISSUE: `isClickOnTransparentArea()` creates a new <canvas> and
+//   draws the image on EVERY click. Fine for occasional clicks, but could
+//   be slow if users click rapidly on complex images. Could cache the
+//   canvas or use a lookup.
+////////////////////////////////////////////////////////////////////////////////
+
 // Shared dressup functionality
 function initializeDressup(config) {
-  var clothingCounter = 0; // Unique ID counter for clothing items
-  var clothingOnCharacter = {}; // Track which clothing items are on the character
+  let clothingCounter = 0; // Unique ID counter for clothing items
+  let clothingOnCharacter = {}; // Track which clothing items are on the character
   
-  var clothingSelector = config.clothingSelector;
-  var characterSelector = config.characterSelector;
-  var clothingClass = config.clothingClass;
+  const clothingSelector = config.clothingSelector;
+  const characterSelector = config.characterSelector;
+  const clothingClass = config.clothingClass;
   
   // CLOTHING FUNCTIONALITY
   $(clothingSelector).on('click', function() {
-    var $clickedImg = $(this);
-    var clothingType = $clickedImg.attr('alt');
+    let $clickedImg = $(this);
+    let clothingType = $clickedImg.attr('alt');
     
     // Check if this clothing item is already on the character
     if (clothingOnCharacter[clothingType]) {
-      console.log('Clothing item', clothingType, 'is already on the character');
       return; // Don't add duplicates
     }
     
-    var $character = $(characterSelector);
-    var $characterContainer = $character.parent();
+    let $character = $(characterSelector);
+    let $characterContainer = $character.parent();
     
     // Get positions for animation (BEFORE hiding the element)
-    var clickedOffset = $clickedImg.offset();
-    var characterOffset = $character.offset();
+    let clickedOffset = $clickedImg.offset();
+    let characterOffset = $character.offset();
     
     // Store the original position before hiding
-    var originalOffset = clickedOffset;
+    let originalOffset = clickedOffset;
     
     // Create a clone to move to the character
-    var $clonedImg = $clickedImg.clone();
-    var uniqueId = 'clothing-' + (++clothingCounter);
+    let $clonedImg = $clickedImg.clone();
+    let uniqueId = 'clothing-' + (++clothingCounter);
     $clonedImg.attr('data-clothing-id', uniqueId);
     $clonedImg.attr('data-clothing-type', clothingType);
     
@@ -83,16 +99,19 @@ function initializeDressup(config) {
     });
   });
   
-  // Handle clicks on clothing items overlaid on the character to move them back
+  // Handle clicks on clothing items overlaid on the character.
+  // Uses transparency detection to pass clicks through to items underneath.
+  // SECURITY NOTE: `isClickOnTransparentArea()` uses canvas getImageData()
+  //   which will throw a SecurityError if the image is cross-origin.
+  //   The catch block handles this gracefully (assumes not transparent).
   $(document).on('click', '.' + clothingClass, function(e) {
     e.preventDefault();
     e.stopPropagation();
     
-    var $clickedClothing = $(this);
-    var targetItem = findClickableItemAtPoint($clickedClothing, e, clothingOnCharacter);
+    let $clickedClothing = $(this);
+    let targetItem = findClickableItemAtPoint($clickedClothing, e, clothingOnCharacter);
     
     if (targetItem && targetItem[0] !== $clickedClothing[0]) {
-      console.log('Click passed through to item:', targetItem.attr('data-clothing-type'));
       targetItem.trigger('click');
       return;
     }
@@ -102,31 +121,26 @@ function initializeDressup(config) {
 
   // Function to remove a clothing item and animate it back
   function removeClothingItem($clickedClothing, clothingTracker) {
-    var uniqueId = $clickedClothing.attr('data-clothing-id');
-    var clothingType = $clickedClothing.attr('data-clothing-type');
-    
-    console.log('Removing clothing item:', clothingType, 'ID:', uniqueId);
+    let uniqueId = $clickedClothing.attr('data-clothing-id');
+    let clothingType = $clickedClothing.attr('data-clothing-type');
     
     // Get the original element to restore
-    var originalData = clothingTracker[clothingType];
+    let originalData = clothingTracker[clothingType];
     if (originalData) {
-      var $originalElement = originalData.originalElement;
-      var originalOffset = originalData.originalOffset; // Use stored position
+      let $originalElement = originalData.originalElement;
+      let originalOffset = originalData.originalOffset; // Use stored position
       
       // Get positions for return animation
-      var currentOffset = $clickedClothing.offset();
-      
-      console.log('Current offset:', currentOffset);
-      console.log('Original offset:', originalOffset);
+      let currentOffset = $clickedClothing.offset();
       
       // Get current dimensions to maintain aspect ratio
-      var currentWidth = $clickedClothing.width();
-      var currentHeight = $clickedClothing.height();
-      var aspectRatio = currentWidth / currentHeight;
+      let currentWidth = $clickedClothing.width();
+      let currentHeight = $clickedClothing.height();
+      let aspectRatio = currentWidth / currentHeight;
       
       // Calculate target dimensions maintaining aspect ratio
-      var targetHeight = 200;
-      var targetWidth = targetHeight * aspectRatio;
+      let targetHeight = 200;
+      let targetWidth = targetHeight * aspectRatio;
       
       // Move to body for animation
       $clickedClothing.css({
@@ -147,7 +161,6 @@ function initializeDressup(config) {
         width: targetWidth,
         height: targetHeight
       }, 600, 'swing', function() {
-        console.log('Animation complete, restoring original item');
         // Remove the clone and show the original
         $clickedClothing.remove();
         $originalElement.show();
@@ -160,27 +173,24 @@ function initializeDressup(config) {
   
   // Function to recursively find the deepest clickable item at a point
   function findClickableItemAtPoint($startItem, event, clothingTracker) {
-    var itemsToCheck = [$startItem];
-    var checkedItems = [];
+    let itemsToCheck = [$startItem];
+    let checkedItems = [];
     
     while (itemsToCheck.length > 0) {
-      var $currentItem = itemsToCheck.shift();
+      let $currentItem = itemsToCheck.shift();
       checkedItems.push($currentItem);
       
       // Check if click is on transparent area of current item
       if (!isClickOnTransparentArea($currentItem[0], event)) {
-        console.log('Found non-transparent pixel on:', $currentItem.attr('data-clothing-type'));
         return $currentItem;
       }
-      
-      console.log('Transparent pixel on:', $currentItem.attr('data-clothing-type'), 'checking below...');
       
       // Hide all checked items temporarily to find what's underneath
       checkedItems.forEach(function($item) {
         $item.css('pointer-events', 'none');
       });
       
-      var elementBelow = document.elementFromPoint(event.clientX, event.clientY);
+      let elementBelow = document.elementFromPoint(event.clientX, event.clientY);
       
       // Restore pointer events
       checkedItems.forEach(function($item) {
@@ -189,9 +199,9 @@ function initializeDressup(config) {
       
       // If we found another clothing item below, add it to the check list
       if (elementBelow && $(elementBelow).hasClass(clothingClass)) {
-        var $itemBelow = $(elementBelow);
+        let $itemBelow = $(elementBelow);
         // Only add if we haven't already checked this item
-        var alreadyChecked = checkedItems.some(function($item) {
+        let alreadyChecked = checkedItems.some(function($item) {
           return $item[0] === $itemBelow[0];
         });
         if (!alreadyChecked) {
@@ -201,14 +211,13 @@ function initializeDressup(config) {
     }
     
     // If we get here, all items at this point are transparent
-    console.log('All items transparent at this point, ignoring click');
     return null;
   }
   
   // Function to check if click is on transparent area of image
   function isClickOnTransparentArea(img, event) {
-    var canvas = document.createElement('canvas');
-    var ctx = canvas.getContext('2d');
+    let canvas = document.createElement('canvas');
+    let ctx = canvas.getContext('2d');
     
     // Set canvas size to match image
     canvas.width = img.naturalWidth || img.width;
@@ -218,20 +227,19 @@ function initializeDressup(config) {
     ctx.drawImage(img, 0, 0);
     
     // Calculate click position relative to image
-    var rect = img.getBoundingClientRect();
-    var x = Math.floor((event.clientX - rect.left) / rect.width * canvas.width);
-    var y = Math.floor((event.clientY - rect.top) / rect.height * canvas.height);
+    let rect = img.getBoundingClientRect();
+    let x = Math.floor((event.clientX - rect.left) / rect.width * canvas.width);
+    let y = Math.floor((event.clientY - rect.top) / rect.height * canvas.height);
     
     // Get pixel data at click position
     try {
-      var pixelData = ctx.getImageData(x, y, 1, 1).data;
-      var alpha = pixelData[3]; // Alpha channel (transparency)
+      let pixelData = ctx.getImageData(x, y, 1, 1).data;
+      let alpha = pixelData[3]; // Alpha channel (transparency)
       
       // Consider alpha < 50 as transparent (adjust threshold as needed)
       return alpha < 50;
     } catch (e) {
       // If we can't read pixel data (CORS issues), assume not transparent
-      console.log('Cannot read pixel data:', e);
       return false;
     }
   }

@@ -22,10 +22,10 @@
 
     <div class="d-flex align-items-center">
       <span class="m-1" style="font-size:1rem;">4</span>
-      <label class="custom-switch">
-        <input type="checkbox" id="numberSwitch" name="numberSwitch" checked>
+      <label class="custom-switch" id="switchLabel">
+        <input type="checkbox" id="numberSwitch" name="numberSwitch">
         <span class="custom-slider"></span>
-        <input type="hidden" name="number" id="numberValue" value="9">
+        <input type="hidden" name="number" id="numberValue" value="4">
       </label>
       <span class="m-1" style="font-size:1rem;">9</span>
     </div>
@@ -84,16 +84,41 @@
       .custom-switch input:checked + .custom-slider:before {
         transform: translateX(16px);
       }
+      .custom-switch.disabled .custom-slider {
+        background: #adb5bd;
+        cursor: not-allowed;
+      }
+      .custom-switch.disabled input {
+        pointer-events: none;
+      }
     </style>
     <script>
       // Custom switch: left=4, right=9
       const switchInput = document.getElementById('numberSwitch');
       const hiddenValue = document.getElementById('numberValue');
+      const switchLabel = document.getElementById('switchLabel');
       function updateNumberValue() {
         hiddenValue.value = switchInput.checked ? '9' : '4';
       }
       switchInput.addEventListener('change', updateNumberValue);
       updateNumberValue();
+
+      // Enable/disable the 9-toggle based on deck size
+      window.updateDoubleSwitch = function() {
+        var d = window.deck || [];
+        if (d.length < 2 * 9 - 1) {
+          switchInput.disabled = true;
+          switchInput.checked = false;
+          switchLabel.classList.add('disabled');
+          switchLabel.title = 'Too few items';
+          updateNumberValue();
+        } else {
+          switchInput.disabled = false;
+          switchLabel.classList.remove('disabled');
+          switchLabel.title = '';
+        }
+      };
+      updateDoubleSwitch();
     </script>
   </form>
 

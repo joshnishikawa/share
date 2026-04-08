@@ -1,4 +1,34 @@
-<%- include('../head.ejs') -%>
+<!--
+  students/multiplayer.ejs — Multiplayer lobby + activity loader (570 lines)
+  ════════════════════════════════════════════════════════════════════════
+  This is the largest and most complex EJS view. It handles:
+    1. Player identity (name, color, pawn SVG) persisted in localStorage
+    2. Room management (create private, search & join public)
+    3. Activity selection + dynamic loading via $.load()
+    4. Socket.IO events for real-time multiplayer state
+
+  Server-rendered data:
+    • `activities` array — list of available multiplayer activities (id, label)
+    • `__('pleaseSelect')` — i18n string
+
+  AUDIT NOTES:
+    • XSS: `updatePlayerList()` inserts `p.id` and `p.color` from socket data
+      directly into HTML template literals — no escaping. A malicious player
+      name could inject HTML/JS into all other players' browsers.
+    • XSS: `roomSearch` handler inserts `p.id` and `p.color` from socket data
+      directly into HTML via string concatenation — same injection risk.
+    • XSS: `getPawn()` inserts `color` into SVG fill attributes — if color
+      contains a quote it breaks the SVG, but injection risk is lower.
+    • `loadActivity()` uses `$.load("/multiplayer/" + activity)` where
+      `activity` comes from a button ID — safe as long as IDs are controlled,
+      but no server-side validation of the activity name is visible here.
+    • `var` used throughout (not `let`/`const`) — older style.
+    • `reduceBrightness()` is a clever inline color utility but duplicates
+      functionality that could come from a library or CSS filter.
+    • The `getName()` Promise correctly cleans up its socket listener, which
+      is notably better practice than many other socket handlers in the codebase.
+-->
+<%- include('../head') -%>
 
 <style>
   .activity .pawn {
@@ -18,7 +48,7 @@
 
 <div id="menu-container" class="d-flex">
   <div id="studentSideMenu">
-    <%- include('navbar.ejs') -%>
+    <%- include('navbar') -%>
   </div>
 
   <div class="container-fluid mt-3">
@@ -106,7 +136,7 @@
       </div>
 
       <div id="sideColumn" class="col-sm-4">
-        <%//- include('../menu/select_NH.ejs') %>
+        <%//- include('../menu/select_NH') %>
       </div>
 
     </div>
@@ -121,11 +151,23 @@
 
 <script>
 // VARIABLES ////////////////////////////////////////////////////////////////////
-  var room = {};
-  var player = {id: null, color: "#cccccc", roomname: null, roomtype: "private", closed: false, number: 1, activity: null};
-  var socket = io();
-  var currentActivity = null;
-  var timer;
+  let room = {};
+  let player = {id: null, color: "#cccccc", roomname: null, roomtype: "private", closed: false, number: 1, activity: null};
+  const socket = io();
+  let currentActivity = null;
+  let timer;
+
+  // Escape HTML to prevent XSS when inserting user-controlled data into the DOM
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+  }
+
+  // Sanitize CSS color values — only allow valid hex colors
+  function sanitizeColor(color) {
+    return /^#[0-9a-fA-F]{3,6}$/.test(color) ? color : '#cccccc';
+  }
   
   // Initialize global variables for NH vocabulary only if they don't exist
   if (typeof window.deck === 'undefined') window.deck = [];
@@ -135,8 +177,8 @@
   // Define global functions only if they don't exist - Edge compatible
   if (typeof window.addWords === 'undefined') {
     window.addWords = function(list) {
-      for (var i = 0; i < list.length; i++) {
-        var l = list[i];
+      for (let i = 0; i < list.length; i++) {
+        const l = list[i];
         if (window.deck.indexOf(l.id) === -1) {
           window.deck.push(l.id);
           window.local.push(l);
@@ -147,8 +189,8 @@
 
   if (typeof window.removeWords === 'undefined') {
     window.removeWords = function(list) {
-      for (var i = 0; i < list.length; i++) {
-        var item = list[i];
+      for (let i = 0; i < list.length; i++) {
+        const item = list[i];
         window.deck = window.deck.filter(function(d) { 
           return d !== item && d !== item.id && d !== item.word; 
         });
@@ -178,10 +220,10 @@ $(function(){
 // FUNCTIONS ////////////////////////////////////////////////////////////////////
   function updatePlayerList(data){
     // Cache DOM elements to avoid repeated queries
-    var $group = $("#group");
-    var $leaveGroup = $("#leaveGroup");
-    var $otherPlayers = $("#otherPlayers");
-    var $activities = $(".activity");
+    const $group = $("#group");
+    const $leaveGroup = $("#leaveGroup");
+    const $otherPlayers = $("#otherPlayers");
+    const $activities = $(".activity");
     
     if (data.length != 1 || player.roomtype == "public") {
       $group.removeClass("d-flex").addClass("d-none");
@@ -197,10 +239,10 @@ $(function(){
     $activities.find(".pawn").remove();
 
     // Build HTML string instead of multiple DOM manipulations
-    var otherPlayersHTML = '';
+    let otherPlayersHTML = '';
 
-    for (var i = 0; i < data.length; i++) {
-      var p = data[i];
+    for (let i = 0; i < data.length; i++) {
+      const p = data[i];
       if (p.id == player.id){
         $("#myPawn").html(getPawn(player.color));
         $("#myName").text(p.id);
@@ -209,13 +251,15 @@ $(function(){
         localStorage.setItem('player', JSON.stringify(player));
       }
       else {
+        const safeId = escapeHtml(p.id);
+        const safeColor = sanitizeColor(p.color);
         otherPlayersHTML += `
           <div class="row bg-light border border-primary rounded-3">
             <div class="col-2">
               <div class="pawn${p.number} text-center my-1" style="margin:auto;width:24px;"></div>
             </div>
             <div class="col-10">
-              <div id="name${p.number}" class="fs-4" style="color: ${p.color};text-shadow:0px 0px 2px #555;">${p.id}</div>
+              <div id="name${p.number}" class="fs-4" style="color: ${safeColor};text-shadow:0px 0px 2px #555;">${safeId}</div>
             </div>
           </div>
         `;
@@ -228,8 +272,8 @@ $(function(){
     }
     
     // Set colors and pawns after DOM is updated
-    for (var i = 0; i < data.length; i++) {
-      var p = data[i];
+    for (let i = 0; i < data.length; i++) {
+      const p = data[i];
       if (p.id != player.id) {
         setColor(p.number, p.color);
       }
@@ -240,8 +284,8 @@ $(function(){
   }
 
   function getPawn(color) {
-    var shadow = reduceBrightness(color, 20);
-    var def = shadow.replace("#", "");
+    const shadow = reduceBrightness(color, 20);
+    const def = shadow.replace("#", "");
     return '<svg class="img-fluid pawn" width="64" height="128" viewBox="0 0 64 128" xmlns="http://www.w3.org/2000/svg">' +
       '<!-- Body of the pawn -->' +
       '<path transform="matrix(0.78482373,0,0,0.3410327,-40.6,58)" d="m 54.796244,189.05536 c -12.062025,-20.89204 13.56978,-65.28763 37.693831,-65.28763 24.124055,0 49.755855,44.39559 37.693825,65.28763 -12.06202,20.89204 -63.325631,20.89204 -75.387656,0 z" fill="' + color + '" />' +
@@ -266,12 +310,12 @@ $(function(){
   }
 
   function reduceBrightness(hex, percent) {
-    var num = parseInt(hex.replace("#", ""), 16),
+    const num = parseInt(hex.replace("#", ""), 16),
         amt = Math.round(2.55 * percent),
         R = (num >> 16) - amt,
         G = (num >> 8 & 0x00FF) - amt,
         B = (num & 0x0000FF) - amt;
-    var returnme = "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 + (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 + (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+    const returnme = "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 + (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 + (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
     return returnme;
   }
 
@@ -363,12 +407,12 @@ $(function(){
 
 
 // EVENTS //////////////////////////////////////////////////////////////////////
-  var roomSearchTimeout;
+  let roomSearchTimeout;
   $("#roomSearch").on('input', function(){
     // Debounce room search to avoid excessive server calls
     clearTimeout(roomSearchTimeout);
     roomSearchTimeout = setTimeout(function() {
-      var query = $("#roomSearch").val().trim();
+      const query = $("#roomSearch").val().trim();
       if (!query) {
         $("#foundplayers").empty();
         $("#join").prop('disabled', true);
@@ -381,7 +425,7 @@ $(function(){
   $("#roomSearchForm").on('submit', function(e){
     e.preventDefault();
     if ($("#join").prop('disabled')) return; // if #join disabled, room !exists
-    var newRoom = $("#roomSearch").val().trim();
+    const newRoom = $("#roomSearch").val().trim();
     if (!newRoom) return;
     socket.emit('join', {newRoom: newRoom, player: player});
     $("#roomSearch").val('');
@@ -392,7 +436,7 @@ $(function(){
   $("#getName").on('click', getName);
 
   $("#color").on('change', function(){
-    var color = $("#color").val();
+    const color = $("#color").val();
     setColor(player.number, color);
   });
 
@@ -406,14 +450,14 @@ $(function(){
   });
 
   $(".activity").on("click", function () {
-    var activity = $(this).attr("id");
+    const activity = $(this).attr("id");
     player.activity = activity;
     socket.emit("chooseActivity", player);
   });
 
 // SOCKET EVENTS ///////////////////////////////////////////////////////////////
   socket.on('connect', function(){
-    var stored_player;
+    let stored_player;
     try {
       stored_player = JSON.parse(localStorage.getItem('player'));
     } catch (e) {
@@ -472,9 +516,11 @@ $(function(){
     $("#foundplayers").empty();
 
     if (data && data.roomname != player.roomname) {
-      for (var i = 0; i < data.players.length; i++) {
-        var p = data.players[i];
-        $("#foundplayers").append('<div style="color: ' + p.color + ';text-shadow:0px 0px 2px #000;">' + p.id + '</div>');
+      for (let i = 0; i < data.players.length; i++) {
+        const p = data.players[i];
+        const safeColor = sanitizeColor(p.color);
+        const safeId = escapeHtml(p.id);
+        $("#foundplayers").append('<div style="color: ' + safeColor + ';text-shadow:0px 0px 2px #000;">' + safeId + '</div>');
       }
       $("#join").prop('disabled', false);
     }
@@ -518,8 +564,8 @@ $(function(){
   socket.on('setColor', function(data){
     // Update the player's color in the room data
     if (room && room.players) {
-      var foundPlayer = null;
-      for (var i = 0; i < room.players.length; i++) {
+      let foundPlayer = null;
+      for (let i = 0; i < room.players.length; i++) {
         if (room.players[i].number === data.number) {
           foundPlayer = room.players[i];
           break;
@@ -567,4 +613,4 @@ $(function(){
 });
 </script>
 
-<%- include('../foot.ejs') -%>
+<%- include('../foot') -%>

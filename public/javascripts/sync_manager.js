@@ -1,3 +1,20 @@
+////////////////////////////////////////////////////////////////////////////////
+// sync_manager.js — Handles bidirectional sync between localStorage and server.
+//
+// PATTERN: Like auth_widget.js, uses ES6 class, async/await, fetch, const/let.
+//          Clean structure with proper error handling throughout.
+//
+// FLOW:
+//   1. initSync(key) — On page load, fetch server data and merge with local.
+//   2. mergeData(key, serverData) — Conflict resolution:
+//      - Objects (lists): shallow merge { ...local, ...server } (server wins on conflicts)
+//      - Arrays (canvas): per-index newest-timestamp wins
+//   3. syncToServer(key) — Debounced push of local data to server.
+//   4. syncPreference / loadPreference — Key-value prefs sync.
+//
+// DEPENDS ON: AuthWidget instance (passed to constructor)
+////////////////////////////////////////////////////////////////////////////////
+
 /**
  * SyncManager - Handles localStorage <-> server synchronization
  * Usage: new SyncManager(authWidget)
@@ -6,7 +23,7 @@ class SyncManager {
   constructor(authWidget) {
     this.authWidget = authWidget;
     this.syncTimers = {}; // Debounce timers for each storage key
-    this.syncInProgress = {};
+    this.syncInProgress = {}; // Prevents concurrent syncs for the same key
   }
 
   /**
@@ -48,7 +65,16 @@ class SyncManager {
   }
 
   /**
-   * Merge server data with localStorage (newest timestamp wins for arrays, merge keys for objects)
+   * Merge server data with localStorage.
+   * - Objects: shallow spread merge (server keys overwrite local on conflict).
+   *   NOTE: This means server always wins on key conflicts for objects.
+   *   The spread order { ...local, ...server } is intentional.
+   * - Arrays: per-index comparison using .timestamp (newest wins).
+   *
+   *
+   * NOTE: window.location.reload() is called in 3 places in this method.
+   *       If the merge produces changes, the user sees a full page refresh
+   *       which can be jarring. Consider updating the UI in-place instead.
    */
   mergeData(storageKey, serverData) {
     const localData = this.getLocalData(storageKey);
@@ -85,10 +111,9 @@ class SyncManager {
       if (hasChanges) {
         console.log('SyncManager: Merged list data with changes');
         localStorage.setItem(storageKey, JSON.stringify(merged));
-        // Reload page to show merged data
-        window.location.reload();
-        // Push merged data back to server
+        // Push merged data back to server, then reload
         this.syncToServer(storageKey, 0);
+        window.location.reload();
       } else {
         console.log('SyncManager: List data already up to date');
       }
@@ -127,20 +152,24 @@ class SyncManager {
     if (hasChanges) {
       console.log('SyncManager: Merged data with changes:', merged.length, 'items');
       localStorage.setItem(storageKey, JSON.stringify(merged));
-      // Reload page to show merged data
+      // Push merged data back to server, then reload
+      this.syncToServer(storageKey, 0);
       window.location.reload();
     } else {
       console.log('SyncManager: Data already up to date, no changes needed');
     }
-
-    // Push merged data back to server if there were changes
-    if (hasChanges) {
-      this.syncToServer(storageKey, 0); // Immediate sync after merge
-    }
   }
 
   /**
-   * Sync localStorage data to server (debounced)
+   * Sync localStorage data to server (debounced).
+   * Default 500ms debounce; pass 0 for immediate sync.
+   * Uses syncInProgress flag to prevent concurrent syncs for the same key.
+   *
+   * NOTE: The debounce timer callback is async but setTimeout doesn't
+   *       await it — errors inside are caught by try/catch, but the caller
+   *       of syncToServer() can't await the actual sync completion.
+   *       This is generally fine for fire-and-forget, but means the
+   *       mergeData() calls to syncToServer(key, 0) don't actually wait.
    */
   async syncToServer(storageKey, delay = 500) {
     if (!this.authWidget.isAuthenticated()) {
@@ -191,7 +220,8 @@ class SyncManager {
   }
 
   /**
-   * Sync a user preference to server
+   * Sync a single user preference to server (POST /api/preferences/:key).
+   * Stores as key-value pair in user_preferences table.
    */
   async syncPreference(key, value) {
     if (!this.authWidget.isAuthenticated()) {
@@ -218,7 +248,8 @@ class SyncManager {
   }
 
   /**
-   * Load a user preference from server
+   * Load a single user preference from server (GET /api/preferences/:key).
+   * Returns null if not authenticated or on any error.
    */
   async loadPreference(key) {
     if (!this.authWidget.isAuthenticated()) {
@@ -240,7 +271,8 @@ class SyncManager {
   }
 
   /**
-   * Get local storage data
+   * Get and parse localStorage data. Returns null on missing or invalid JSON.
+   * NOTE: Good defensive parsing — catches malformed localStorage gracefully.
    */
   getLocalData(storageKey) {
     const data = localStorage.getItem(storageKey);

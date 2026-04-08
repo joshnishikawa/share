@@ -1,3 +1,11 @@
+<!--
+  activities/vocab/match.ejs — Card-matching (Memory) game
+  ═══════════════════════════════════════════════════
+  Flip cards to find matching pairs. Half show images, half show text.
+  Server-rendered data: `deck` (vocab array), `deckType`, `query` (URL params).
+  Uses getGrid() from script.js and FYshuffle() for layout and randomization.
+  Uses CSS container queries (.container { container-type: size }).
+-->
 <%- include('../../head'); -%>
 <style>
   .container {
@@ -30,7 +38,7 @@
     <label for="showtext" class="form-check-label">Match Image with Text</label>
   </div>
 
-  <button id="home" class="btn btn-sm btn-outline-secondary p-0" style="position:absolute;right:0;" onclick="location.href='/'">
+  <button id="home" class="btn btn-sm btn-outline-secondary p-0" style="position:absolute;right:0;" onclick="location.href='<%= query.teacher ? '/teachers/' + deckType : deckType === 'NH' ? '/NH' : '/' %>'">
     <i class="material-icons">home</i>
   </button>
 

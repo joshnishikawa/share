@@ -1,3 +1,29 @@
+////////////////////////////////////////////////////////////////////////////////
+// abc.js — ABC / phonics letter-learning data and activity orchestrator.
+//
+// STRUCTURE:
+//   1. `abc` array — 26 letter objects with vocab, distractor letters,
+//      phonics picture group, and sound file reference.
+//   2. `sounds` — Quick lookup of letter → sound filename.
+//   3. `loadAnActivity(card, rank)` — Orchestrator that picks an activity type
+//      based on the student's current rank (0-4) for each letter.
+//
+// ACTIVITY PROGRESSION (rank):
+//   0: Sort lowercase letters into uppercase boxes (sortWords)
+//   1: Sort pictures into letter boxes (sortPics)
+//   2: Listen and choose the letter you hear (chooseL2)
+//   3: See a letter, drag matching pictures from 6 (sortPics)
+//   4: Two-letter picture sort (sortPics)
+//   default: Mark as mastered (aim[card] = 2)
+//
+// DEPENDS ON: study_activities.js (sortWords, sortPics, chooseL2),
+//   study_utilities.js (playaudio, next, update, checkProgress),
+//   script.js (FYshuffle)
+//
+// NOTE: References globals `aim`, `update`, `checkProgress` that must be
+//   defined in the page's EJS template or another loaded script.
+////////////////////////////////////////////////////////////////////////////////
+
 const abc = [
   { "letter": "a", 
     "vocab": ["apple","animals","ant"],
@@ -137,6 +163,12 @@ const abc = [
     "pic": "qw",
     "sound": "w_sound"
   },
+  { "letter": "x", 
+    "vocab": ["xylophone","x-ray","fox"],
+    "otherLetters": ["s", "z"],
+    "pic": "cdgknstxyz",
+    "sound": "x_sound"
+  },
   { "letter": "y", 
     "vocab": ["yogurt","yo-yo","yarn"],
     "otherLetters": ["w", "e"],
@@ -155,15 +187,24 @@ const abc = [
 // This is only here to to make it easier to reference sounds that need
 // reinforcement after certain wrong answers. Reference to these sounds remains
 // with the main deck to be used in other activities. 
+// Quick lookup: letter → sound filename.
+// Duplicates data already in `abc[].sound` — exists for convenience when
+// handling wrong answers (need to look up by letter, not by card index).
 const sounds = {
   "a": "short_a", "b": "b_sound", "c": "k_sound", "d": "d_sound", "e": "short_e",
   "f": "f_sound", "g": "hard_g", "h": "h_sound", "i": "short_i", "j": "j_sound",
   "k": "k_sound", "l": "l_sound", "m": "m_sound", "n": "n_sound", "o": "short_o",
   "p": "p_sound", "q": "q_sound", "r": "r_sound", "s": "s_sound", "t": "t_sound",
-  "u": "short_u", "v": "v_sound", "w": "w_sound", "y": "hard_y", "z": "z_sound"
+  "u": "short_u", "v": "v_sound", "w": "w_sound", "x": "x_sound",
+  "y": "hard_y", "z": "z_sound"
 }
 
 
+// Main activity orchestrator. Selects activity type based on `rank` (0-4).
+// `card` is the index into the `abc` array.
+// Uses async/await to chain activity → feedback → next.
+// ERROR HANDLING: try/catch at the top level — on any error, logs and
+//   skips the card without marking it correct or incorrect.
 async function loadAnActivity(card, rank){
   try{
     console.log("card: ", card, "rank: ", rank);
@@ -311,8 +352,7 @@ async function loadAnActivity(card, rank){
     checkProgress();
   }
   catch(err){
-    console.log(err);
-    update(card, true);
+    console.error('loadAnActivity error:', err);
     checkProgress();
   }
 }

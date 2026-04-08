@@ -1,4 +1,4 @@
-<%- include('../../head') %>
+<%- include('../../head'); -%>
 
 <div class="d-flex" style="position:relative;">
   <%- include('../../menu/item_double'); -%>
@@ -7,7 +7,7 @@
     <i class="material-icons">arrow_forward</i>
   </button>
 
-  <button id="home" class="btn btn-sm btn-outline-secondary p-0" style="position:absolute;right:0;" onclick="location.href='/NH'">
+  <button id="home" class="btn btn-sm btn-outline-secondary p-0" style="position:absolute;right:0;" onclick="location.href='<%= query.teacher ? '/teachers/' + deckType : deckType === 'NH' ? '/NH' : '/' %>'">
     <i class="material-icons">home</i>
   </button>
 
@@ -31,10 +31,13 @@ document.title = `Double ${deckType}`;
 var lit = false;
 var unusedCards = [];
 var deck = <%- JSON.stringify(deck) %>;
+window.deck = deck;
 const query = <%- JSON.stringify(query) %>;
 var numOfItems = query.number ? parseInt(query.number) 
-                              : deck.length >= 18 ? 9 
                               : deck.length >= 8 ? 4 : 0;
+// Failsafe: clamp numOfItems to what the deck can support
+if (numOfItems == 9 && deck.length < 2 * 9 - 1) numOfItems = 4;
+if (numOfItems == 4 && deck.length < 2 * 4 - 1) numOfItems = 0;
 if (numOfItems == 0) {
   alert("Not enough items in this deck to play Double.");
   location.href='/NH';
@@ -44,6 +47,10 @@ if (numOfItems == 0) {
 const switchInput = document.getElementById('numberSwitch');
 const hiddenValue = document.getElementById('numberValue');
 if (switchInput && hiddenValue) {
+  updateDoubleSwitch();
+  // Sync switch to current numOfItems
+  if (numOfItems == 9 && !switchInput.disabled) switchInput.checked = true;
+
   function updateNumberFromSwitch() {
     numOfItems = switchInput.checked ? 9 : 4;
     hiddenValue.value = numOfItems;
@@ -102,6 +109,7 @@ function load2Cards(){
   }
 
   while (cards_B.length < numOfItems) {
+    if (thisHand.length === 0) break;
     let candidate = thisHand.pop();
     if (!cards_B.includes(candidate) && !cards_A.includes(candidate)) {
       cards_B.push( candidate );
@@ -125,4 +133,4 @@ load2Cards();
 });
 </script>
 
-<%- include('../../foot') %>
+<%- include('../../foot'); -%>

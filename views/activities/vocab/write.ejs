@@ -20,7 +20,7 @@
       <i class="material-icons">print</i>
     </button>
 
-    <button id="home" class="btn btn-sm btn-outline-secondary p-0" style="position:absolute;right:0;" onclick="location.href='/teachers/NH';">
+    <button id="home" class="btn btn-sm btn-outline-secondary p-0" style="position:absolute;right:0;" onclick="location.href='<%= query.teacher ? '/teachers/' + deckType : deckType === 'NH' ? '/NH' : '/' %>'">
       <i class="material-icons">home</i>
     </button>
 

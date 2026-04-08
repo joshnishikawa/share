@@ -1,3 +1,16 @@
+/**
+ * progress.css — Progress bars, radial pie chart, and confetti animation
+ * ────────────────────────────────────────────────────────────────────────
+ * Used by: study activities (via study_utilities.js progressPie/slammer),
+ *          progress.js, and any page showing study completion.
+ *
+ * Sections:
+ *   1. Bootstrap progress bar overrides
+ *   2. Radial progress pie (CSS-only pie chart via rotated half-circles)
+ *   3. Confetti burst animation (green circle scale-out on correct answer)
+ */
+
+/* 1. PROGRESS BAR OVERRIDES ─────────────────────────────────────────────── */
 /* PROGRESS BARS /////////////////////////////////////////////////////////////*/
 .progress {
   text-align:left;
@@ -6,6 +19,11 @@
 .progress p {position:absolute;}
 .progress-bar{z-index:2;}
 
+/* 2. RADIAL PROGRESS PIE ────────────────────────────────────────────────── */
+/* Technique: two half-circle divs rotated to reveal a green arc.
+ *  .right-half rotates 0-180° for 0-50%, then .left-half appears for 50-100%.
+ *  .left-half-mask hides the left half until needed.
+ *  .inner-circle sits on top to create the donut hole. */
 /* PROGRESS PIE //////////////////////////////////////////////////////////////*/
 .radial-progress-bar {
   position: relative;
@@ -52,6 +70,9 @@
   -webkit-box-shadow: inset 0 0.5rem 1rem rgba(0,0,0,0.15);
   box-shadow:         inset 0 0.5rem 1rem rgba(0,0,0,0.15);
 }
+/* 3. CONFETTI BURST ─────────────────────────────────────────────────────── */
+/* Green circle that scales from 0→1 and fades out — triggered by JS adding
+ * the .confetti class to a positioned element at the tap point. */
 /*////////////////////////////////////////////////////////////////////////////*/
 .confetti{
   z-index:999;

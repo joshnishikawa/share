@@ -1,7 +1,22 @@
-<%- include('../head.ejs') -%>
+<!--
+  students/letters.ejs — Letters activity menu page
+  ═══════════════════════════════════════════════
+  Activities: Haystack, Find Pairs, Alphabetical, Write (penmanship),
+  Soragaki ABC (external link), Letters & Sounds (SRS).
+  Each activity button contains a decorative inline preview.
+
+  AUDIT NOTES:
+    • progressPie selectors are manually re-initialized in <script> because
+      document.querySelector runs at parse time in progress.js and misses
+      these elements. This is a workaround for the bug noted in progress.js.
+    • SRS ranks array length (25) assumes 25 letters — but abc.js only has
+      25 letters too (missing 'x'). Consistent, but both are wrong if 26 is intended.
+    • External link to school.bunkei.co.jp has no rel="noopener" — minor.
+-->
+<%- include('../head') -%>
 
 <div id="menu-container" class="d-flex">
-  <%- include('navbar.ejs') -%>
+  <%- include('navbar') -%>
 
   <div class="container-fluid mt-3">
     <div class="row">
@@ -188,4 +203,4 @@ $(function(){
 });
 </script>
 
-<%- include('../foot.ejs') -%>
+<%- include('../foot') -%>

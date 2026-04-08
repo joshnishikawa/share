@@ -1,12 +1,19 @@
+<!--
+  students/NH.ejs — New Horizon vocabulary menu page
+  ══════════════════════════════════════════════
+  Layout: sidebar navbar + NH unit selector + activity menu (spell/type/double/slots)
+  + inline dictionary partial.
+  Sets window.deck and window.local for vocab activity forms.
+-->
 <%- include('../head') -%>
 
 <div id="menu-container" class="d-flex">
-  <%- include('navbar.ejs') -%>
+  <%- include('navbar') -%>
 
   <div class="container-fluid">
     <div class="row mb-3">
       <div class="col g-0">
-        <%- include('../menu/select_NH.ejs') -%>
+        <%- include('../menu/select_NH') -%>
       </div>
     </div>
 
@@ -18,21 +25,21 @@
         </div>
 
         <div class="menuitemwrapper">
-          <%- include('../menu/item_spell.ejs') -%>
+          <%- include('../menu/item_spell') -%>
         </div>
         <div class="menuitemwrapper">
-          <%- include('../menu/item_type.ejs') -%>
+          <%- include('../menu/item_type') -%>
         </div>
         <div class="menuitemwrapper">
-          <%- include('../menu/item_double.ejs') -%>
+          <%- include('../menu/item_double') -%>
         </div>
         <div class="menuitemwrapper">
-          <%- include('../menu/item_slots.ejs') -%>
+          <%- include('../menu/item_slots') -%>
         </div>
       </div>
 
       <div class="col-8">
-        <%- include('../dictionary.ejs') -%>
+        <%- include('../dictionary') -%>
       </div>
     </div>
   </div>
@@ -65,4 +72,4 @@ $(function(){
 });
 </script>
 
-<%- include('../foot.ejs') -%>
+<%- include('../foot') -%>

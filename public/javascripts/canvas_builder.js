@@ -1,3 +1,21 @@
+////////////////////////////////////////////////////////////////////////////////
+// canvas_builder.js — Reusable drag-and-drop canvas system.
+//
+// PATTERN: Constructor function (not ES6 class) using closure for private state.
+//   Public methods exposed via `this.methodName`. Uses Hammer.js for touch
+//   gestures (pinch/rotate/pan).
+//
+// STORAGE: savedCanvases[] in localStorage, each entry = { html, timestamp,
+//   thumbnail? }. Syncs to server via SyncManager when authenticated.
+//
+// ARCHITECTURE: CanvasBuilder handles items on canvas; CanvasManager (separate
+//   file) handles the modal UI for switching/cloning/deleting canvases.
+//
+// NOTE: Stores full innerHTML strings, which can be very large. Thumbnails
+//   are base64 JPEG data URLs stored alongside — this means localStorage
+//   can grow quite large (5-10MB limit varies by browser).
+////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Canvas Builder - Reusable drag-and-drop canvas system
  * Supports pinch/rotate, z-index management, delete-by-drag, and save/load
@@ -31,9 +49,12 @@ function CanvasBuilder(options) {
   let tapHandlerActive = false;
   const self = this; // Reference for passing to CanvasManager
   let syncManager = null; // SyncManager instance for server sync
+  let initialized = false;
 
   // Initialize
   this.init = function() {
+    if (initialized) return;
+    initialized = true;
     loadFromStorage();
     setupEventHandlers();
     setupMenuDragging();
@@ -70,10 +91,17 @@ function CanvasBuilder(options) {
     return data;
   }
 
-  // Load canvases from localStorage
+  // Load canvases from localStorage.
+  // Handles migration from old object-based format to new array format.
   function loadFromStorage() {
     if (localStorage.getItem(config.storageKey)) {
-      let data = JSON.parse(localStorage.getItem(config.storageKey));
+      let data;
+      try {
+        data = JSON.parse(localStorage.getItem(config.storageKey));
+      } catch (e) {
+        console.error('CanvasBuilder: Corrupted localStorage, resetting:', e);
+        data = null;
+      }
       
       // Migrate old format if needed
       data = migrateOldStorage(data);
@@ -121,7 +149,12 @@ function CanvasBuilder(options) {
     }
   }
 
-  // Generate thumbnail using Canvas API with async image loading
+  // Generate thumbnail using Canvas API with async image loading.
+  // Renders SVGs to an offscreen canvas at 300px width.
+  // NOTE: This is quite sophisticated — handles background images,
+  //       CSS transforms (rotation/scale), and SVG serialization.
+  //       Each object has a 500ms timeout to prevent hanging on
+  //       broken SVGs. Good defensive coding.
   async function generateThumbnailAsync() {
     try {
       const canvasElement = $(`#${config.canvasId}`);
@@ -277,26 +310,22 @@ function CanvasBuilder(options) {
       return '';
     }
   }
-  
-  // Synchronous wrapper for backward compatibility
-  function generateThumbnail() {
-    // Generate async and store result
-    generateThumbnailAsync().then(dataUrl => {
-      if (savedCanvases[currentCanvasIndex]) {
-        savedCanvases[currentCanvasIndex].thumbnail = dataUrl;
-        localStorage.setItem(config.storageKey, JSON.stringify(savedCanvases));
-      }
-    });
-    return ''; // Return empty initially, will be updated async
-  }
 
-  // Save current canvas to localStorage
-  function saveToStorage() {
-    savedCanvases[currentCanvasIndex].html = $(`#${config.canvasId}`).html();
-    savedCanvases[currentCanvasIndex].timestamp = Date.now();
-    // Generate thumbnail asynchronously - it will save when ready
-    generateThumbnail();
-    // Save immediately with current data (thumbnail will update async)
+  // Save current canvas HTML + timestamp to localStorage and sync.
+  // Generates thumbnail before saving so it's included on the first write.
+  async function saveToStorage() {
+    const indexToSave = currentCanvasIndex;
+    savedCanvases[indexToSave].html = $(`#${config.canvasId}`).html();
+    savedCanvases[indexToSave].timestamp = Date.now();
+    // Generate thumbnail and include it in this save
+    try {
+      const dataUrl = await generateThumbnailAsync();
+      if (savedCanvases[indexToSave]) {
+        savedCanvases[indexToSave].thumbnail = dataUrl;
+      }
+    } catch (e) {
+      // Thumbnail generation failed — save without it
+    }
     localStorage.setItem(config.storageKey, JSON.stringify(savedCanvases));
     // Sync to server if authenticated
     if (syncManager) {
@@ -304,7 +333,11 @@ function CanvasBuilder(options) {
     }
   }
 
-  // Setup event handlers
+  // Setup event handlers for canvas interactions.
+  //  - Delete key removes selected items
+  //  - Click/tap toggles selection and cycles z-index (tap = front/back)
+  //  - Click canvas background deselects all
+  //  - Context menu disabled (right-click prevention for classroom use)
   function setupEventHandlers() {
     // Open canvas manager modal
     $("#manageCanvases").on("click", function () {
@@ -368,7 +401,9 @@ function CanvasBuilder(options) {
     });
   }
 
-  // Setup menu dragging
+  // Setup menu dragging: creates a clone of menu items when dragged onto canvas.
+  // Uses direct touch/mouse events (not Hammer.js) for immediate response.
+  // Items are centered under the pointer and positioned absolutely on the canvas.
   function setupMenuDragging() {
     const menuElement = document.getElementById(config.menuContainerId);
     if (!menuElement) return;
@@ -434,6 +469,8 @@ function CanvasBuilder(options) {
         $(document).off('mouseup touchend', endHandler);
         activeClone = null;
         isDraggingFromMenu = false;
+        // Show drag handle on the newly placed shape
+        setSelected.call(clone[0], false);
         // Don't save immediately - allow for async color processing
         // Items that need color processing will call saveToStorage() themselves
         // For items without color processing, save after a brief delay
@@ -447,7 +484,8 @@ function CanvasBuilder(options) {
     });
   }
 
-  // Set item as selected
+  // Toggle selection on an item. Tap cycles z-index: front → back.
+  // Also manages drag handles for applicable shape types.
   function setSelected(reorderZIndex) {
     $(`.${config.canvasItemClass}`).removeClass("selected");
     $(this).addClass("selected");
@@ -496,7 +534,8 @@ function CanvasBuilder(options) {
     }
   }
 
-  // Utility functions
+  // --- Utility functions for CSS transform parsing ---
+
   function getRotationAngle(element) {
     const matrix = element.css('transform');
     if (matrix !== 'none') {
@@ -524,7 +563,8 @@ function CanvasBuilder(options) {
     return (delta + 180) % 360 - 180;
   }
 
-  // Make item draggable and pinchable
+  // Make item draggable (pan) and pinchable (scale/rotate) via Hammer.js.
+  // On pan end, items dragged back over the menu are deleted (drag-to-delete).
   function makeTouchable(item) {
     const mc = new Hammer(item[0]);
     let scale = 1;
@@ -617,7 +657,8 @@ function CanvasBuilder(options) {
     }
   }
 
-  // Public API methods for CanvasManager
+  // --- Public API (used by CanvasManager and page-level scripts) ---
+
   this.getCanvases = function() {
     return savedCanvases;
   };
@@ -626,13 +667,13 @@ function CanvasBuilder(options) {
     return currentCanvasIndex;
   };
 
-  this.switchToCanvas = function(index) {
-    saveToStorage(); // Save current before switching
+  this.switchToCanvas = async function(index) {
+    await saveToStorage(); // Save current before switching
     loadCanvas(index);
   };
 
-  this.addNewCanvas = function() {
-    saveToStorage();
+  this.addNewCanvas = async function() {
+    await saveToStorage();
     savedCanvases.push({ html: "", timestamp: Date.now() });
     currentCanvasIndex = savedCanvases.length - 1;
     localStorage.setItem(config.storageKey, JSON.stringify(savedCanvases));

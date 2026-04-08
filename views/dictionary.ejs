@@ -1,3 +1,26 @@
+<!--
+  dictionary.ejs — Inline dictionary partial (included in students/NH.ejs)
+  ════════════════════════════════════════════════════════════════════════════
+  Features:
+    • Text input with debounced translation (500ms) via CDN translate module
+    • Speech recognition (currently commented out in the HTML but JS is active)
+    • Looks up words in local vocab data from /api/any-vocab
+    • Shows word, meaning, image, and audio
+
+  AUDIT NOTES:
+    • XSS: `showWord()` inserts `w.word`, `w.meaning`, and `w.image` directly
+      into HTML via template literal — no escaping. If vocab data contains HTML
+      or a malicious translation is returned, it will execute.
+    • The `processWord()` result is destructured but the processed variables
+      (`processedEnglish`, `processedJapanese`) are NEVER USED — the original
+      `EnglishWord`/`JapaneseWord` are passed to `showWord()` instead.
+    • Speech recognition JS is fully wired up but the HTML button is commented
+      out — `new SpeechRecognition()` will throw if API is unavailable.
+    • `recognition.onend` clears output even after a successful recognition
+      result, which may flash and disappear.
+    • `::placeholder` vendor prefixes (:-moz, ::-ms) are outdated — modern
+      browsers all support the unprefixed version.
+-->
 <style>
   ::placeholder { text-align:right; }
   input:-moz-placeholder { text-align:right; }
@@ -111,13 +134,16 @@ $(function(){
         return { EnglishWord, JapaneseWord, image, audio };
       }
 
-      const { EnglishWord: processedEnglish, JapaneseWord: processedJapanese, image, audio } = processWord(EnglishWord, JapaneseWord);
-      showWord({word: EnglishWord, meaning: JapaneseWord, image, audio});
+      const result = processWord(EnglishWord, JapaneseWord);
+      showWord({word: result.EnglishWord, meaning: result.JapaneseWord, image: result.image, audio: result.audio});
     }, typingDelay);
   });
 
 
 // SPEECH RECOGNITION //////////////////////////////////////////////////////////
+  // HTML button is commented out — JS commented out to match.
+  // Uncomment both the button in the template and the block below to re-enable.
+  /*
   const SpeechRecognition =
     window.SpeechRecognition || window.webkitSpeechRecognition;
   const SpeechGrammarList =
@@ -125,11 +151,8 @@ $(function(){
   const SpeechRecognitionEvent =
     window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
 
-  var recognition = new SpeechRecognition();
-  // const grammar = `#JSGF V1.0; grammar words; public <word> = ${words.join(" | ")};`;
-  // var speechRecognitionList = new SpeechGrammarList();
-  // speechRecognitionList.addFromString(grammar, 1);
-  // recognition.grammars = speechRecognitionList;
+  if (SpeechRecognition) {
+  const recognition = new SpeechRecognition();
   recognition.continuous = false;
   recognition.lang = "en-US";
   recognition.interimResults = false;
@@ -175,21 +198,28 @@ $(function(){
 
   recognition.onerror = (event) => {
     console.error(event);
-    $("#output").html(`Error occurred in recognition: ${event.error}`);
+    $("#output").html(`Error occurred in recognition: ${escapeHtml(event.error)}`);
   };
 
-  recognition.onend = () => {
-    $("#output").html('');
-  };
+  } // end if (SpeechRecognition)
+  */
 
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+  }
 
   function showWord(w) {
-    let id = w.word.replace(/[ '-.]/g, '_');
+    let safeWord = escapeHtml(w.word);
+    let safeMeaning = escapeHtml(w.meaning);
+    // w.image is already an <img> tag built from trusted vocab data, or empty string
      $("#output").html(
      `<div class="bg-light shadow border rounded-3 p-3 YM d-flex">
         <div>
-          <span class="text-primary fs-1">${w.word} </span> <br />
-          <span class="fs-3">${w.meaning}</span>
+          <span class="text-primary fs-1">${safeWord} </span> <br />
+          <span class="fs-3">${safeMeaning}</span>
         </div>
         <div class="w-100 text-center">${w.image}</div>
       </div>`);

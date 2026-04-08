@@ -1,3 +1,21 @@
+////////////////////////////////////////////////////////////////////////////////
+// supplies_svg.js — School supplies SVG definitions (12 items, ~421KB).
+// Auto-generated from /public/image/colorable/*.svg by build_supply_ejs.js.
+//
+// Items: calendar, eraser, glue, marker, notebook, pen, pencil, pencilcase,
+//        ruler, scissors, sharpener, stapler
+//
+// Each key maps to a full inline SVG string (template literal).
+// These are used by the canvas builder for colorable school supply items.
+//
+// NOTE: At 421KB this is a significant payload for every page that loads it.
+//   Consider lazy-loading individual SVGs on demand instead of bundling all
+//   into a single JS constant. Alternatively, keep them as .svg files and
+//   fetch them when needed.
+//
+// REGENERATE: node build_supply_ejs.js
+////////////////////////////////////////////////////////////////////////////////
+
 // School supplies SVG definitions
 // Auto-generated from /public/image/colorable/*.svg
 const SUPPLIES_SVG = {

@@ -1,5 +1,17 @@
+////////////////////////////////////////////////////////////////////////////////
+// script.js — Global utility functions shared across all pages.
+//             Loaded by every view via head.ejs.
+//             NOTE: All functions are implicit globals (no const/let/var).
+////////////////////////////////////////////////////////////////////////////////
+
+// Replace a broken <img> with its alt text (used as an onerror fallback)
 altOnly = (img)=>{$(img).replaceWith(img.alt);}
 
+// Parse document.cookie into a key-value object.
+// BUG: Keys after the first will have a leading space because split(';')
+//      leaves the space before each subsequent cookie.  Should .trim() keys.
+// NOTE: js-cookie is already loaded via CDN in head.ejs — this could be
+//       replaced with Cookies.get() to avoid the bug and reduce custom code.
 getCookieObject = ()=>{
   let cookie = document.cookie;
   let cookieObject = {};
@@ -8,13 +20,15 @@ getCookieObject = ()=>{
     let cookieArray = cookie.split(';');
     for (let i = 0; i < cookieArray.length; i++){
       let cookiePair = cookieArray[i].split('=');
-      cookieObject[ cookiePair[0] ] = cookiePair[1];
+      cookieObject[ cookiePair[0].trim() ] = cookiePair[1];
     }
   }
   return cookieObject;
 }
 
 
+// Fisher-Yates shuffle (in-place). Returns the shuffled array.
+// Special-cases 2-element arrays with a coin flip.
 FYshuffle = (myArray) => {
   let l = myArray.length;
   if (l == 2){
@@ -23,9 +37,9 @@ FYshuffle = (myArray) => {
     }
   }
   else{ // do a proper Fisher Yates shuffle for more than 2 items
-    for (let i = l ; i > 0; i) {
-      var j = Math.floor(Math.random() * i--);
-      var k = myArray[i];
+    for (let i = l - 1; i > 0; i--) {
+      let j = Math.floor(Math.random() * (i + 1));
+      let k = myArray[i];
       myArray[i] = myArray[j];
       myArray[j] = k;
     }
@@ -34,45 +48,42 @@ FYshuffle = (myArray) => {
 }
 
 
-// apply the exact same shuffle to two arrays of the same length (in place)
+// Apply the exact same Fisher-Yates shuffle to two arrays in lockstep.
+// Returns [a, b].
 parallelShuffle = (a, b)=>{
-  var i, j, k, l;
-  for ( i = a.length -1; i > 0; i--) {
-    j = Math.floor(Math.random() * i)
+  for (let i = a.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
 
-    k = a[i]
-    a[i] = a[j]
-    a[j] = k
+    let k = a[i];
+    a[i] = a[j];
+    a[j] = k;
 
-    l = b[i]
-    b[i] = b[j]
-    b[j] = l
+    let l = b[i];
+    b[i] = b[j];
+    b[j] = l;
   }
+  return [a, b];
 }
 
+// Given a data object with .length (item count) and .even (boolean),
+// return the best-fit grid layout: how many items to show, Bootstrap colspan
+// for each cell, and row height (as vh percentage).
+// The cascade snaps down to the largest layout that fits the data.
+// Grid layout breakpoints: [minItems, colspan, rowheight].
+// Scanned top-down — first match where data.length >= threshold wins.
+// The 9-item entry is skipped when data.even is true.
+const gridLayouts = [
+  [36, 2, 15], [30, 2, 19], [24, 2, 24], [20, 3, 19],
+  [18, 2, 32], [16, 3, 24], [12, 3, 32], [9, 4, 32],
+  [8, 3, 49],  [6, 4, 49]
+];
+
 getGrid = (data) => {
-  let length = data.length;
-  let even = data.even;
-  if (length >= 36){
-    return {length:36, colspan:2, rowheight:15};
-  } else if (length >= 30){
-    return {length:30, colspan:2, rowheight:19};
-  } else if (length >= 24){
-    return {length:24, colspan:2, rowheight:24};
-  } else if (length >= 20){
-    return {length:20, colspan:3, rowheight:19};
-  } else if (length >= 18){
-    return {length:18, colspan:2, rowheight:32};
-  } else if (length >= 16){
-    return {length:16, colspan:3, rowheight:24};
-  } else if (length >= 12){
-    return {length:12, colspan:3, rowheight:32};
-  } else if (length >= 9 && !even){
-    return {length:9, colspan:4, rowheight:32};
-  } else if (length >= 8){
-    return {length:8, colspan:3, rowheight:49};
-  } else if (length >= 6){
-    return {length:6, colspan:4, rowheight:49};
+  for (let i = 0; i < gridLayouts.length; i++) {
+    let [len, colspan, rowheight] = gridLayouts[i];
+    if (data.length >= len && !(len === 9 && data.even)) {
+      return { length: len, colspan, rowheight };
+    }
   }
-  return {length:4, colspan:6, rowheight:49};
+  return { length: 4, colspan: 6, rowheight: 49 };
 }

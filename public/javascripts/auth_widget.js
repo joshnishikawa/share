@@ -1,3 +1,20 @@
+////////////////////////////////////////////////////////////////////////////////
+// auth_widget.js — Self-contained authentication UI widget.
+//
+// USAGE: Include this script, then call `new AuthWidget('elementId')`.
+//        The container element should have data-signin-text for i18n.
+//
+// PATTERN: This is the ONLY frontend file that uses a proper ES6 class
+//          with encapsulation, proper HTML escaping, and clean structure.
+//          It's a good model for how other UI components could be written.
+//
+// GOOD PRACTICES FOUND HERE:
+//   - escapeHtml() prevents XSS in user-provided data (name, profile_picture)
+//   - Explicit error handling in fetchUser()
+//   - Callback-based auth state notification (onAuthChange)
+//   - Clean window export with typeof check
+////////////////////////////////////////////////////////////////////////////////
+
 /**
  * AuthWidget - Displays sign-in button or user profile
  * Usage: new AuthWidget('elementId')
@@ -12,7 +29,9 @@ class AuthWidget {
 
     this.user = null;
     this.authenticated = false;
+    this._initComplete = false;
     this.onAuthChangeCallbacks = [];
+    // i18n: pull sign-in text from the container's data attribute (set by EJS)
     this.signInText = this.container.getAttribute('data-signin-text') || 'Sign in to sync';
 
     this.init();
@@ -23,23 +42,28 @@ class AuthWidget {
     this.render();
   }
 
+  // Fetch auth state from the server (/api/user endpoint).
+  // On failure, gracefully defaults to unauthenticated state.
   async fetchUser() {
     try {
       const response = await fetch('/api/user');
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
 
       this.authenticated = data.authenticated;
       this.user = data.user;
-
-      // Trigger callbacks when auth state changes
-      this.onAuthChangeCallbacks.forEach(callback => callback(this.authenticated, this.user));
     } catch (err) {
       console.error('Error fetching user:', err);
       this.authenticated = false;
       this.user = null;
     }
+    // Fire callbacks after fetch completes (success or failure)
+    this._initComplete = true;
+    this.onAuthChangeCallbacks.forEach(callback => callback(this.authenticated, this.user));
   }
 
+  // Render the appropriate UI: profile + logout link, or Google sign-in button.
+  // Uses inline SVGs (Google logo, logout icon) — no external icon dependency.
   render() {
     if (!this.container) return;
 
@@ -77,7 +101,8 @@ class AuthWidget {
     }
   }
 
-  // Public methods
+  // --- Public API ---
+
   isAuthenticated() {
     return this.authenticated;
   }
@@ -86,20 +111,27 @@ class AuthWidget {
     return this.user;
   }
 
+  // Register a callback for auth state changes. Called immediately if
+  // state is already known (avoids race conditions with late subscribers).
   onAuthChange(callback) {
     this.onAuthChangeCallbacks.push(callback);
-    // If already initialized, call immediately with current state
-    if (this.authenticated !== undefined) {
+    // If fetch already completed, call immediately with current state
+    if (this._initComplete) {
       callback(this.authenticated, this.user);
     }
   }
 
+  // Re-fetch auth state and re-render (e.g. after login/logout in another tab)
   async refresh() {
     await this.fetchUser();
     this.render();
   }
 
-  // Utility
+  // --- Utility ---
+
+  // Escape HTML entities to prevent XSS when inserting user-provided strings.
+  // NOTE: This is the ONLY place in the frontend that does HTML escaping.
+  //       All other template builders (study_utilities.js) insert values raw.
   escapeHtml(text) {
     if (!text) return '';
     const map = {
@@ -113,6 +145,7 @@ class AuthWidget {
   }
 }
 
+// Export to window for use from inline scripts and other files.
 if (typeof window !== 'undefined') {
   window.AuthWidget = AuthWidget;
 }
