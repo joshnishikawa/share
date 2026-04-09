@@ -1,16 +1,5 @@
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const mysql = require('mysql2/promise');
-
-// Create database connection pool
-const pool = mysql.createPool({
-  host: process.env.host || 'localhost',
-  user: process.env.user || 'root',
-  password: process.env.password || '',
-  database: process.env.database || 'EJ',
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
-});
+const pool = require('./db.js');
 
 module.exports = function(passport) {
   passport.use(new GoogleStrategy({

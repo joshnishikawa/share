@@ -1,12 +1,8 @@
 // uncomment the "app.use('/media', mediaRouter);" line in share.js to use
 const express = require('express');
 const router = express.Router();
-const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
-
-router.use(bodyParser.urlencoded({extended: true}));
-router.use(bodyParser.json());
 
 
 router.get('/', (req, res)=>{
@@ -14,7 +10,7 @@ router.get('/', (req, res)=>{
     res.render('labs/media');
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -38,7 +34,7 @@ router.get('/files', (req, res)=>{
     res.send({files, tags});
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -63,7 +59,7 @@ router.post('/addTags', (req, res)=>{
     res.send('success');
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -86,7 +82,7 @@ router.post('/removeTags', (req, res)=>{
     res.send('success');
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });

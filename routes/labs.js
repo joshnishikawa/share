@@ -3,9 +3,6 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 
-const bodyParser = require('body-parser');
-router.use(bodyParser.urlencoded({extended: true}));
-
 // EDIT SUBTITLES //////////////////////////////////////////////////////////////
 function convertSRTtoOBJ(subs){
   var subobj = {};
@@ -44,7 +41,7 @@ router.get('/editsubs', (req, res)=>{
     res.render('labs/editsubs', {ENsubobj, JAsubobj});
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -68,7 +65,7 @@ router.post('/editsubs', (req, res)=>{
     res.send('Saved');
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -76,12 +73,14 @@ router.post('/editsubs', (req, res)=>{
 
 router.get('/:activity', (req, res)=>{
   try{
+    const validActivities = ['snake', 'media', 'editsubs'];
     const activity = req.params.activity;
+    if (!validActivities.includes(activity)) return res.render('404');
     res.render('labs/' + activity);
   }
   catch(err){
-    res.send(err);
     console.error(err);
+    res.status(500).render('error');
   }
 });
 

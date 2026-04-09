@@ -1,14 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const vocabulary = require('../public/vocabulary.js');
-const creds = {
-  host: process.env.host,
-  user: process.env.user,
-  password: process.env.password,
-  database: process.env.database
-}
-const mysql = require('mysql2/promise');
-const db = mysql.createPool(creds);
+const db = require('../config/db.js');
 
 
 router.post('/:activity', async(req, res)=>{
@@ -56,7 +49,7 @@ router.post('/:activity', async(req, res)=>{
   }
   catch (err){
     if (err == '404') res.render('404');
-    else res.send(err);
+    else res.status(500).render('error');
     console.error(err);
   }
 });
@@ -65,6 +58,7 @@ router.post('/:activity', async(req, res)=>{
 router.get('/:activity/:id', async (req, res)=>{
   try{
     let activity = req.params.activity;
+    if (!['bingo','flash','grid','match','recall','reveal','type','spell','penmanship','printcards','double','write','keidoro'].includes(activity)) throw '404';
     let id = req.params.id;
     let query = req.query;
     let deck = [];
@@ -94,7 +88,7 @@ router.get('/:activity/:id', async (req, res)=>{
   }
   catch(err ){
     if (err == '404') res.render('404');
-    else res.send(err);
+    else res.status(500).render('error');
     console.error(err);
   }
 });

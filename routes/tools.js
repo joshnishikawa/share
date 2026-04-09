@@ -8,7 +8,7 @@ router.get('/richtext', (req, res)=>{
     res.render('tools/richtext');
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -19,7 +19,7 @@ router.get('/names', (req, res)=>{
     res.render('tools/names');
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -30,7 +30,7 @@ router.get('/lp', (req, res)=>{
     res.render('tools/lp');
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });

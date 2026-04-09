@@ -5,7 +5,7 @@ router.get('/', (req, res) => {
   try {
     res.render('activities/multiplayer/match/index');
   } catch (err) {
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });

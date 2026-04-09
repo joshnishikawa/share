@@ -41,6 +41,36 @@ const nouns = [
 
 const registerMultiplayerActivityEvents = require("./multiplayer/activities");
 
+// Input validation helpers
+function isStr(val, maxLen = 100) {
+  return typeof val === 'string' && val.length > 0 && val.length <= maxLen;
+}
+
+function sanitizePlayerData(data) {
+  if (!data || typeof data !== 'object') return null;
+  const clean = {};
+  if (isStr(data.id, 60)) clean.id = data.id;
+  else return null;
+  if (data.roomname !== undefined) {
+    if (isStr(data.roomname, 60)) clean.roomname = data.roomname;
+    else return null;
+  }
+  if (data.roomtype !== undefined) {
+    if (['public', 'private'].includes(data.roomtype)) clean.roomtype = data.roomtype;
+    else return null;
+  }
+  if (data.color !== undefined) {
+    if (isStr(data.color, 20) && /^#[0-9a-fA-F]{3,8}$/.test(data.color)) clean.color = data.color;
+    else clean.color = '#000000';
+  }
+  if (data.activity !== undefined) {
+    if (isStr(data.activity, 30)) clean.activity = data.activity;
+    else clean.activity = null;
+  }
+  if (data.number !== undefined) clean.number = data.number;
+  return clean;
+}
+
 
 
 const multiplayer = (io) => {
@@ -309,23 +339,29 @@ const multiplayer = (io) => {
     registerMultiplayerActivityEvents(io, socket);
 
     socket.on("join", function (data) {
+      if (!data || typeof data !== 'object') return;
       if (data.newRoom) {
-        leaveRoom(socket, data.player);
+        if (!isStr(data.newRoom, 60)) return;
+        const player = sanitizePlayerData(data.player);
+        if (!player) return;
+        leaveRoom(socket, player);
         if (Object.keys(privateRooms).includes(data.newRoom)) {
-          data.player.roomname = data.newRoom; // update the roomname
-          joinPrivateRoom(socket, data.player);
+          player.roomname = data.newRoom;
+          joinPrivateRoom(socket, player);
         } else if (Object.keys(publicRooms).includes(data.newRoom)) {
-          data.player.roomname = data.newRoom; // update the roomname
-          joinPublicRoom(socket, data.player);
+          player.roomname = data.newRoom;
+          joinPublicRoom(socket, player);
         } else {
-          data.player.roomname = data.newRoom; // update the roomname
-          joinPrivateRoom(socket, data.player);
+          player.roomname = data.newRoom;
+          joinPrivateRoom(socket, player);
         }
       } else {
-        if (data.roomtype === "public") {
-          joinPublicRoom(socket, data);
-        } else if (data.roomtype === "private") {
-          joinPrivateRoom(socket, data);
+        const clean = sanitizePlayerData(data);
+        if (!clean) return;
+        if (clean.roomtype === "public") {
+          joinPublicRoom(socket, clean);
+        } else if (clean.roomtype === "private") {
+          joinPrivateRoom(socket, clean);
         } else {
           socket.emit("joined", { message: "Invalid room type specified." });
         }
@@ -333,11 +369,14 @@ const multiplayer = (io) => {
     });
 
     socket.on("roomSearch", function (data) {
+      if (!isStr(data, 60)) return;
       const room = privateRooms[data] || publicRooms[data] || null;
       socket.emit("roomSearch", room);
     });
 
     socket.on("getName", function (data) {
+      if (!data || typeof data !== 'object' || !isStr(data.id, 60)) return;
+      if (data.roomname !== undefined && !isStr(data.roomname, 60)) return;
       let roomname = data.roomname;
       let room;
       let adj = adjectives[Math.floor(Math.random() * adjectives.length)];
@@ -376,6 +415,9 @@ const multiplayer = (io) => {
     });
 
     socket.on("setColor", function (data) {
+      if (!data || typeof data !== 'object') return;
+      if (!isStr(data.roomname, 60) || !isStr(data.id, 60)) return;
+      if (!isStr(data.color, 20) || !/^#[0-9a-fA-F]{3,8}$/.test(data.color)) return;
       let roomname = data.roomname;
       let room = publicRooms[roomname] || privateRooms[roomname];
 
@@ -393,11 +435,16 @@ const multiplayer = (io) => {
     });
 
     socket.on("leave", function (data) {
-      leaveRoom(socket, data);
+      const clean = sanitizePlayerData(data);
+      if (!clean) return;
+      leaveRoom(socket, clean);
       socket.emit("youLeft");
     });
 
     socket.on("chooseActivity", function (data) {
+      if (!data || typeof data !== 'object') return;
+      if (!isStr(data.roomname, 60) || !isStr(data.id, 60)) return;
+      if (data.activity !== undefined && !isStr(data.activity, 30)) return;
       let roomname = data.roomname;
       // Find the player in the room and update their activity
       let room = privateRooms[roomname] || publicRooms[roomname];

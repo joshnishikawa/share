@@ -1,14 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const vocabulary = require('../public/vocabulary.js');
-const creds = {
-  host: process.env.host,
-  user: process.env.user,
-  password: process.env.password,
-  database: process.env.database
-};
-const mysql = require('mysql2/promise');
-const db = mysql.createPool(creds);
+const db = require('../config/db.js');
+const { NH_colors, getNHVocab } = require('../config/nh_helpers.js');
 const text_decks = require('../public/javascripts/text_decks.json');
 
 
@@ -17,7 +11,7 @@ router.get('/', (req, res)=>{
     res.redirect('/teachers/NH');
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -28,7 +22,7 @@ router.get('/images', (req, res)=>{
     res.render('teachers/images');
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -46,7 +40,7 @@ router.get('/LT', async (req, res)=>{
     res.render('teachers/LT', {LT_vocab});
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -54,39 +48,11 @@ router.get('/LT', async (req, res)=>{
 
 router.get('/NH', async(req, res)=>{
   try{
-    var colors = {
-      "#ffa9a0" : ["8_9", "22_23"],   // red
-      "#ddefb7" : ["10_11", "24_25"], // green
-      "#cdaed2" : ["12_13", "34_35"], // purple
-      "#ffd3b5" : ["14_15", "26_27"], // orange
-      "#bfe0fa" : ["16_17", "28_29"], // blue
-      "#c4bd9a" : ["18_19", "30_31"], // olive
-      "#ffcbda" : ["20_21", "32_33"]  // pink
-    }
-
-    let rows = vocabulary.filter(item => item.book === 'NH');
-    let NH_vocab = {};
-    for (let row of rows){
-      if ( !NH_vocab[row.page] ) NH_vocab[row.page] = {};
-      if ( !NH_vocab[row.page][row.theme] ) NH_vocab[row.page][row.theme] = {};
-      NH_vocab[row.page][row.theme][row.word] = row.id;
-    }
-
-    NH_vocab['+'] = {};
-    for (let p in NH_vocab){
-      for (let t in NH_vocab[p]){
-        if (t.indexOf('+') > -1){ // try 'include'
-          let plus = NH_vocab[p][t];
-          delete NH_vocab[p][t];
-          NH_vocab['+'][t] = plus;
-        }
-      }
-    }
-
-    res.render('teachers/NH', {NH_vocab, colors});
+    let NH_vocab = await getNHVocab();
+    res.render('teachers/NH', {NH_vocab, colors: NH_colors});
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -97,7 +63,7 @@ router.get('/text', (req, res)=>{
     res.render('teachers/text', {text_decks});
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -126,7 +92,7 @@ router.get('/text', (req, res)=>{
 //     res.send('ok');
 //   }
 //   catch(err){
-//     res.send(err);
+//     res.status(500).render('error');
 //     console.error(err);
 //   }
 // });

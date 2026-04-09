@@ -6,7 +6,7 @@ router.get('/', (req, res)=>{
     res.render('students/things');
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -17,7 +17,7 @@ router.get('/shapes', (req, res)=>{
     res.render('activities/things/shapes');
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -28,7 +28,7 @@ router.get('/supplies', (req, res)=>{
     res.render('activities/things/supplies');
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -38,7 +38,7 @@ router.get('/room', (req, res)=>{
     res.render('activities/things/room');
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -46,12 +46,13 @@ router.get('/room', (req, res)=>{
 
 router.get('/dressup/:type', (req, res)=>{
   try{
-
+    const validTypes = ['boy', 'girl'];
+    if (!validTypes.includes(req.params.type)) return res.render('404');
     res.render(`activities/things/dressup_${req.params.type}.ejs`);
   }
   catch(err){
-    res.send(err);
     console.error(err);
+    res.status(500).render('error');
   }
 });
 

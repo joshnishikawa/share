@@ -1,18 +1,7 @@
 const express = require('express');
-const mysql = require('mysql2/promise');
 const rateLimit = require('express-rate-limit');
 const router = express.Router();
-
-// Create database connection pool
-const pool = mysql.createPool({
-  host: process.env.host || 'localhost',
-  user: process.env.user || 'root',
-  password: process.env.password || '',
-  database: process.env.database || 'EJ',
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
-});
+const pool = require('../config/db.js');
 
 // Rate limiter for sync endpoints (30 requests/minute per user)
 const syncLimiter = rateLimit({

@@ -2,33 +2,16 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
-const bodyParser = require('body-parser');
 const letters = require('./letters.js');
 const things = require('./things.js');
 const vocab = require('./vocab.js');
 const tools = require('./tools.js');
 const labs = require('./labs.js');
 const multiplayer = require('./multiplayer');
-const creds = {
-  host: process.env.host,
-  user: process.env.user,
-  password: process.env.password,
-  database: process.env.database
-}
-const mysql = require('mysql2/promise');
-const db = mysql.createPool(creds);
+const db = require('../config/db.js');
 const vocabulary = require('../public/vocabulary.js');
-const NH_colors = {
-  "#ffa9a0" : ["8_9", "22_23"],   // red
-  "#ddefb7" : ["10_11", "24_25"], // green
-  "#cdaed2" : ["12_13", "34_35"], // purple
-  "#ffd3b5" : ["14_15", "26_27"], // orange
-  "#bfe0fa" : ["16_17", "28_29"], // blue
-  "#c4bd9a" : ["18_19", "30_31"], // olive
-  "#ffcbda" : ["20_21", "32_33"]  // pink
-}
+const { NH_colors, getNHVocab } = require('../config/nh_helpers.js');
 
-router.use(bodyParser.urlencoded({extended: true}));
 router.use('/letters', letters);
 router.use('/things', things);
 router.use('/vocab', vocab);
@@ -37,35 +20,12 @@ router.use('/labs', labs);
 router.use('/multiplayer', multiplayer);
 
 
-async function getNHVocab(){
-  let rows = vocabulary.filter(item => item.book === 'NH');
-  let NH_vocab = {};
-  for (let row of rows){
-    if ( !NH_vocab[row.page] ) NH_vocab[row.page] = {};
-    if ( !NH_vocab[row.page][row.theme] ) NH_vocab[row.page][row.theme] = {};
-    NH_vocab[row.page][row.theme][row.word] = row.id;
-  }
-
-  NH_vocab['+'] = {};
-  for (let p in NH_vocab){
-    for (let t in NH_vocab[p]){
-      if (t.indexOf('+') > -1){ // try 'include'
-        let plus = NH_vocab[p][t];
-        delete NH_vocab[p][t];
-        NH_vocab['+'][t] = plus;
-      }
-    }
-  }
-  return NH_vocab;
-}
-
-
 router.get('/', (req, res)=>{
   try{
     res.redirect('/abc');
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -76,7 +36,7 @@ router.get('/LT1', (req, res)=>{
     res.sendFile(path.join(__dirname, '../public/LT1/index.html'));
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -87,7 +47,7 @@ router.get('/LT2', (req, res)=>{
     res.sendFile(path.join(__dirname, '../public/LT2/index.html'));
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -113,7 +73,7 @@ router.get('/api/any-vocab', async (req, res)=>{
     res.json(words);
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -147,7 +107,7 @@ router.get('/NH', async (req, res)=>{
     res.render('students/NH', {NH_vocab, NH_colors, teacher: false});
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -158,7 +118,7 @@ router.get('/slots', (req, res)=>{
     res.render('activities/slots');
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -166,7 +126,8 @@ router.get('/slots', (req, res)=>{
 
 router.get('/interview', (req, res)=>{
   try{
-    let book = req.query.book ?? 'brainbox';
+    const validBooks = ['brainbox', 'honto1', 'honto2', 'honto3'];
+    let book = validBooks.includes(req.query.book) ? req.query.book : 'brainbox';
     let page = req.query.page ?? 'airport.png';
 
     fs.readdir( path.join(__dirname, `../public/image/interview/${book}`), (err, pages)=>{
@@ -183,7 +144,7 @@ router.get('/shapes', (req, res)=>{ // moved to things
     res.redirect('/things/shapes');
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -194,7 +155,7 @@ router.get('/speech', (req, res)=>{
     res.render('activities/speech');
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -206,7 +167,7 @@ router.get('/speak_spell', (req, res)=>{
   }
   catch
   (err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -219,7 +180,7 @@ router.get('/New_Horizons', (req, res)=>{ // Because you borked it dude!
     res.redirect('/NH');
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -230,7 +191,7 @@ router.get('/abc', (req, res)=>{
     res.redirect('/letters');
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -249,7 +210,7 @@ router.post('/:activity', async(req, res)=>{
     }
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -267,7 +228,7 @@ router.get('/:activity/:id', async(req, res)=>{
     }
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });

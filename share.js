@@ -9,6 +9,7 @@ const multiplayer = require('./sockets/_MULTIPLAYER.js');
 multiplayer(socket_io);
 
 const createError = require('http-errors');
+const helmet = require('helmet');
 const logger = require('morgan');
 const path = require('path');
 const session = require('express-session');
@@ -32,11 +33,8 @@ const i18n = new I18n({
 });
 
 // Session store configuration
+const dbPool = require('./config/db.js');
 const sessionStore = new MySQLStore({
-  host: process.env.host || 'localhost',
-  user: process.env.user || 'root',
-  password: process.env.password || '',
-  database: process.env.database || 'EJ',
   createDatabaseTable: true,
   schema: {
     tableName: 'sessions',
@@ -46,7 +44,7 @@ const sessionStore = new MySQLStore({
       data: 'data'
     }
   }
-});
+}, dbPool);
 
 // Passport configuration
 require('./config/passport')(passport);
@@ -66,8 +64,12 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // PROCESS USER REQUESTS *IN ORDER* ////////////////////////////////////////////
+app.use(helmet({
+  contentSecurityPolicy: false, // Disabled — requires nonce-based CSP across all views
+  referrerPolicy: { policy: 'same-origin' } // Allow Referer on same-origin requests (needed for OAuth returnTo)
+}));
 app.use( logger('dev') );
-app.use( express.json({ limit: '50mb' }) );
+app.use( express.json({ limit: '5mb' }) );
 app.use( express.urlencoded({ extended: false }) );
 app.use(  express.static( path.join(__dirname, 'public'), {
   setHeaders: (res, filepath) => {

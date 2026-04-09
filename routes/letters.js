@@ -7,7 +7,7 @@ router.get('/', (req, res)=>{
     res.render('students/letters');
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -18,7 +18,7 @@ router.get('/pairs', (req, res)=>{
     res.render('activities/letters/pairs');
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -29,7 +29,7 @@ router.get('/haystack', (req, res)=>{
     res.render('activities/letters/haystack');
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -40,7 +40,7 @@ router.get('/alphabetical', (req, res)=>{
     res.render('activities/letters/alphabetical');
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -51,7 +51,7 @@ router.get('/penmanship', (req, res)=>{
     res.render('activities/letters/penmanship');
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
@@ -62,7 +62,7 @@ router.get('/SRS', (req, res)=>{
     res.render('activities/letters/SRS');
   }
   catch(err){
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });

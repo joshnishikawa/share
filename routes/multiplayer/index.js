@@ -17,7 +17,7 @@ router.get('/', (req, res) => {
   try {
     res.render('students/multiplayer', { activities: enabledActivities });
   } catch (err) {
-    res.send(err);
+    res.status(500).render('error');
     console.error(err);
   }
 });
