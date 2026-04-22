@@ -78,7 +78,7 @@
 	"clothes+": "衣類+",
 	"town+": "町+",
 	"club activites+": "部活動+",
-	"text": "英語または日本語の単語を','または'、'で区切る",
+	"textinput": "英語または日本語の単語を','または'、'で区切る",
 	"speech": "音声認識を保持する (英語のみ)",
 	"themes": "テーマ",
 	"list": "リスト",
@@ -139,5 +139,12 @@
 	"sound_on": "音声をONにしてください！",
 	"signInToSync": "同期",
 	"countries+": "countries+",
-	"lp_name": "lp_name"
+	"lp_name": "lp_name",
+	"manageCanvases": "キャンバスを管理",
+	"add": "追加",
+	"delete": "削除",
+  "addCommaSeparatedNames": "コンマ区切りの名前をここに追加してください。",
+  "images": "画像",
+  "text": "テキスト",
+  "nameTags": "名札"
 }

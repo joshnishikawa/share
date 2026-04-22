@@ -295,7 +295,7 @@
 	"jobs+": "jobs+",
 	"objects": "objects",
 	"objects+": "objects+",
-	"text": "Enter EN or JA separated by ',' or '、'",
+	"textinput": "Enter EN or JA separated by ',' or '、'",
 	"speech": "Hold for speech recognition (EN only)",
 	"save": "Save",
 	"list_name": "Enter deck name",
@@ -317,5 +317,12 @@
 	"typeNotSupported": "typeNotSupported",
 	"sound_on": "Make sure your sound is ON!",
 	"countries+": "countries+",
-	"signInToSync": "sync"
+	"signInToSync": "sync",
+	"manageCanvases": "Manage Canvases",
+	"add": "Add",
+	"delete": "Delete",
+  "addCommaSeparatedNames": "Add comma-separated names here.",
+  "images": "Images",
+  "text": "Text",
+  "nameTags": "Nametags"
 }

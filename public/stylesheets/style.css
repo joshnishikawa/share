@@ -33,6 +33,7 @@ body {
   text-align: right;
   font-weight: bold;
   writing-mode: vertical-lr;
+  text-orientation: sideways;
   transform: rotate(180deg);
   white-space: nowrap;
   padding: 0.5rem 0;
@@ -53,6 +54,7 @@ body {
   background-image: url("../image/lightBG.png");
   background-attachment: fixed;
   position:relative;
+  left:-1px; /* makes tab and page seamless */
   box-shadow: 3px 0px 3px rgba(0,0,0,.3);
   border-radius: 0 10px 10px 0;
   }

@@ -35,12 +35,14 @@ function CanvasManager(canvasBuilder) {
 
     const canvases = builder.getCanvases();
     const currentIndex = builder.getCurrentIndex();
+    const addText = modal.data('add-text') || 'Add';
+    const deleteText = modal.data('delete-text') || 'Delete';
 
     // Add button
     const addBtn = $(`
       <div class="canvas-grid-item canvas-action-btn ${canvases.length >= 10 ? 'disabled' : ''}" id="addCanvasBtn">
         <i class="material-icons" style="font-size:48px;color:green;">add_circle</i>
-        <div>Add</div>
+        <div>${addText}</div>
       </div>
     `);
     grid.append(addBtn);
@@ -49,7 +51,7 @@ function CanvasManager(canvasBuilder) {
     const deleteBtn = $(`
       <div class="canvas-grid-item canvas-action-btn" id="deleteCanvasBtn">
         <i class="material-icons" style="font-size:48px;color:red;">delete</i>
-        <div>Delete</div>
+        <div>${deleteText}</div>
       </div>
     `);
     grid.append(deleteBtn);

@@ -141,6 +141,7 @@ $(window).on('pageshow', function(){
     let list = [];
     let listName = $("#list_select").val();
     removeWords(window.local);
+    $('input[name="themes"]').prop('checked', false);
 
     if (listName){
       for (let item of lists[listName]) {
@@ -225,6 +226,8 @@ $(window).on('pageshow', function(){
       }
 
       $("#list_select option:selected").remove();
+      $("#list_select").prop('selectedIndex', 0);
+      $('input[name="themes"]').prop('checked', false);
     }
   }
 

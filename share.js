@@ -44,7 +44,7 @@ const sessionStore = new MySQLStore({
       data: 'data'
     }
   }
-}, dbPool);
+}, dbPool.pool); // .pool accesses the underlying non-promise pool
 
 // Passport configuration
 require('./config/passport')(passport);

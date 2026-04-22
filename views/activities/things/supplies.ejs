@@ -219,11 +219,11 @@
 
 <%- include('../../foot'); -%>
 
-<div class="modal fade" id="canvasManagerModal" tabindex="-1" aria-labelledby="canvasManagerModalLabel" aria-hidden="true">
+<div class="modal fade" id="canvasManagerModal" data-add-text="<%= __('add') %>" data-delete-text="<%= __('delete') %>" tabindex="-1" aria-labelledby="canvasManagerModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="canvasManagerModalLabel">Manage Canvases</h5>
+        <h5 class="modal-title" id="canvasManagerModalLabel"><%= __('manageCanvases') %></h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
