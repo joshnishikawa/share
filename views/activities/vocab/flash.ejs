@@ -54,6 +54,8 @@
 
     <%- include('../../menu/item_flash'); -%>
 
+    <%- include('../../menu/activity_select', { activity: 'flash' }); -%>
+
     <button id="home" class="btn btn-sm btn-outline-secondary p-0" style="position:absolute;right:0;" onclick="location.href='<%= query.teacher ? '/teachers/' + deckType : deckType === 'NH' ? '/NH' : '/' %>'">
       <i class="material-icons">home</i>
     </button>

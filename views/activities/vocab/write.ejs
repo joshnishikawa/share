@@ -16,7 +16,9 @@
 
     <%- include('../../menu/item_write'); -%>
 
-    <button id="print" class="btn btn-sm btn-outline-success border-0" onclick="window.print();">
+    <%- include('../../menu/activity_select', { activity: 'write' }); -%>
+
+    <button id="print" class="btn btn-sm btn-outline-success py-0 mx-3" onclick="window.print();">
       <i class="material-icons">print</i>
     </button>
 
@@ -39,8 +41,8 @@ $(function(){
   const deck = <%- JSON.stringify(deck) %>;
   const query = <%- JSON.stringify(query) %>;
   var L1 = (query.L1 == 'on' ? true : false);
-  var trace = (query.trace == 'on' ? true : false);
-  var write = (query.write == 'on' ? true : false);
+  var trace = query.trace !== undefined ? (query.trace == 'on' ? true : false) : true;
+  var write = query.write !== undefined ? (query.write == 'on' ? true : false) : true;
   $("#L1").prop('checked', L1);
   $("#trace").prop('checked', trace);
   $("#write").prop('checked', write);

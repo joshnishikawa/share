@@ -1,0 +1,68 @@
+<%
+  const currentAct = typeof activity !== 'undefined' ? activity : '';
+  const activities = [
+    { id: 'bingo', name: 'Bingo' },
+    { id: 'double', name: 'Double' },
+    { id: 'flash', name: 'Flash Cards' },
+    { id: 'grid', name: 'Grid' },
+    { id: 'keidoro', name: 'Keidoro' },
+    { id: 'match', name: 'Match' },
+    { id: 'printcards', name: 'Print Cards' },
+    { id: 'recall', name: 'Recall' },
+    { id: 'reveal', name: 'Reveal' },
+    { id: 'spell', name: 'Spell' },
+    { id: 'type', name: 'Type' },
+    { id: 'write', name: 'Write' }
+  ];
+  const safeDeck = typeof deck !== 'undefined' ? JSON.stringify(deck).replace(/'/g, "&#39;") : '[]';
+  const deckLength = typeof deck !== 'undefined' && deck ? deck.length : 0;
+%>
+<form class="vocab-activity-select-form d-inline-flex align-items-center mx-2" action="" method="POST" target="_blank">
+  <input type="hidden" name="deck" value='<%- safeDeck %>'>
+  <input type="hidden" name="deckType" value="nolink">
+  <input type="hidden" name="spaces" value="<%= deckLength %>">
+  <input type="hidden" name="text" value="true">
+  <input type="hidden" name="showtext" value="true">
+  <input type="hidden" name="backs" value="animals">
+  <input type="hidden" name="style" value="spotlight">
+  <input type="hidden" name="trace" value="on">
+  <input type="hidden" name="write" value="on">
+  <select class="form-select form-select-sm vocab-activity-select" style="width: auto; max-width: 180px;" aria-label="Switch vocabulary activity">
+    <option value="" selected disabled>Activity...</option>
+    <% activities.forEach(function(act) { %>
+      <option value="<%= act.id %>" <%= currentAct === act.id ? 'disabled' : '' %>>
+        <%= act.name %><%= currentAct === act.id ? ' (current)' : '' %>
+      </option>
+    <% }); %>
+  </select>
+</form>
+<script>
+if (typeof activitySelectInitialized === 'undefined') {
+  var activitySelectInitialized = true;
+  $(document).on('change', '.vocab-activity-select', function() {
+    var selectedActivity = $(this).val();
+    if (!selectedActivity) return;
+
+    var $form = $(this).closest('form');
+    $form.attr('action', '/vocab/' + selectedActivity);
+
+    var activeDeck = null;
+    if (typeof deck !== 'undefined' && Array.isArray(deck) && deck.length > 0) {
+      activeDeck = deck;
+    } else if (typeof window.deck !== 'undefined' && Array.isArray(window.deck) && window.deck.length > 0) {
+      activeDeck = window.deck;
+    } else if (typeof originalDeck !== 'undefined' && Array.isArray(originalDeck) && originalDeck.length > 0) {
+      activeDeck = originalDeck;
+    }
+
+    if (activeDeck) {
+      $form.find("input[name='deck']").val(JSON.stringify(activeDeck));
+      $form.find("input[name='spaces']").val(activeDeck.length);
+    }
+
+    $form.submit();
+
+    $(this).val('');
+  });
+}
+</script>
