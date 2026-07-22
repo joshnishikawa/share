@@ -1,9 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en-US" translate="no">
+
 <head>
   <title>English Jones</title>
-  
+
   <meta charset="utf-8">
   <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -18,118 +18,235 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Yusei+Magic&display=swap" rel="stylesheet">
 
+  <link rel="stylesheet" href="/stylesheets/universal.css">
   <link rel="stylesheet" href="/stylesheets/style.css">
   <link rel="stylesheet" href="/stylesheets/progress.css">
 </head>
 
-<body>
-
 <style>
-  html, body{ height:100% };
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+  }
 
-  #sheet {
+  body {
+    background-image: none !important;
+  }
+
+  @media print {
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+
+    #menucontainer,
+    .modal,
+    .d-print-none {
+      display: none !important;
+    }
+
+    .a4-page {
+      page-break-after: always;
+      break-after: page;
+      page-break-inside: avoid;
+      break-inside: avoid;
+      margin: 0 !important;
+      box-shadow: none !important;
+    }
+  }
+
+  .a4-page {
     width: 21cm;
     height: 29.7cm;
+    padding: 0.5cm;
+    margin: 0 auto 1cm auto;
+    box-sizing: border-box;
+    background: white;
+    overflow: hidden;
   }
-  body{background-image: none !important;}
 </style>
 
-
-
 <body>
-<div id="sheet" class="container-fluid d-flex flex-wrap text-center">
-</div>
+  <div id="menucontainer" class="bg-light border-bottom d-print-none">
+    <div class="d-flex align-items-center" style="position:relative;">
+      <div class="d-flex align-items-center me-3">
+        <i class="material-icons text-secondary point me-2" data-bs-toggle="modal" data-bs-target="#info_modal"
+          style="cursor:pointer;">info</i>
+        <strong class="text-primary fs-5">WEEKLY SCHEDULE</strong>
+      </div>
+
+      <button id="print" class="btn btn-sm btn-outline-success py-0 mx-3" onclick="window.print();">
+        <i class="material-icons">print</i>
+      </button>
+
+      <button id="home" class="btn btn-sm btn-outline-secondary p-0" style="position:absolute;right:0;"
+        onclick="location.href='/'" aria-label="Home">
+        <i class="material-icons">home</i>
+      </button>
+    </div>
+  </div>
+
+  <div id="info_modal" class="modal fade d-print-none" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Weekly Schedule</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>An activity for practicing weekdays and interests. These cards can be used in various ways.</p>
+
+          <strong>Basic Group Practice</strong>
+          <ol>
+            <li>Get into groups of 4 or 5.</li>
+            <li>Give each student a card with a schedule.</li>
+            <li>Display one of the weekdays.</li>
+            <li>Each student in the group should take a turn saying, eg. "I play piano on Wednesday."</li>
+            <li>Other students should listen and help out.</li>
+          </ol>
+
+          <strong>Basic Pair Practice</strong>
+          <ol>
+            <li>Give each student a card.</li>
+            <li>Display one of the weekdays.</li>
+            <li>Students pair up and take turns saying, eg. "I play soccer on Tuesday."</li>
+            <li>Students should then trade cards so that they can practice saying different activities.</li>
+          </ol>
+
+          <strong>Match Up</strong>
+          <ol>
+            <li>Give each student a card.</li>
+            <li>Display one of the weekdays.</li>
+            <li>Students should remember the activity shown on their card for that weekday.</li>
+            <li>Then, leaving their schedule face-down on their desks, students should
+              pair up and take turns asking, and answering, eg. "What do you do on Friday?"</li>
+            <li>Rather than trading cards, each student is now looking for another student who does the sam activity on
+              that weekday.</li>
+            <li>When they find such a student, they should report to the teacher.</li>
+          </ol>
+
+          <em>*Only print enough pages for each student to get one card. The number of pages you print will be the
+            number
+            of students in the class who have the same activity for any given weekday.
+            If you print a larger set of cards to use in a smaller class, just make sure you use them in groups of 6
+            indicated by a small period appearing at the bottom left of the same weekday.</em>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="sheet" class="container-fluid p-0 text-center">
+  </div>
 
 
 
-<script>
-$(function(){
-  const images = {
-    "study English" : "/image/NH/subjects_English.png",
-    "play soccer" : "/image/NH/club_soccer_team.png",
-    "play baseball" : "/image/NH/club_baseball_team.png",
-    "play guitar" : "/image/NH/play_playing_the_guitar.png",
-    "watch TV" : "/image/NH/daily_watch_TV.png",
-    "cook" : "/image/NH/club_cooking_club.png",
-    "play basketball" : "/image/NH/club_basketball_team.png",
-    "swim" : "/image/NH/school_events_swimming_meet.png",
-    "play piano" : "/image/NH/play_playing_the_piano.png",
-    "dance" : "/image/NH/club_dance_team.png",
-    "skateboard" : "/image/NH/sports_skateboarding.png",
-    "play games" : "/image/NH/play_playing_video_games.png"
-  };
+  <script>
+    $(function () {
+      const images = {
+        "study English": "/image/NH/subjects_English.png",
+        "play soccer": "/image/NH/club_soccer_team.png",
+        "play baseball": "/image/NH/club_baseball_team.png",
+        "play guitar": "/image/NH/play_playing_the_guitar.png",
+        "watch TV": "/image/NH/daily_watch_TV.png",
+        "cook": "/image/NH/club_cooking_club.png",
+        "play basketball": "/image/NH/club_basketball_team.png",
+        "swim": "/image/NH/school_events_swimming_meet.png",
+        "play piano": "/image/NH/play_playing_the_piano.png",
+        "dance": "/image/NH/club_dance_team.png",
+        "skateboard": "/image/NH/sports_skateboarding.png",
+        "play games": "/image/NH/play_playing_video_games.png"
+      };
 
-  const schedule = [
-    ["study English","play games","study English","watch TV","play soccer","swim","play basketball"],
-    ["play soccer","watch TV","play baseball","swim","play basketball","cook","study English"],
-    ["play baseball","cook","play piano","play games","study English","skateboard","play guitar"],
-    ["play basketball","swim","play basketball","dance","play guitar","watch TV","play piano"],
-    ["play guitar","dance","play soccer","skateboard","play piano","cook","play baseball"],
-    ["play piano","skateboard","play guitar","cook","play baseball","dance","play soccer"],
-    ["study English","skateboard","play soccer","dance","study English","cook","play basketball"],
-    ["play soccer","play games","play guitar","skateboard","play guitar","skateboard","study English"],
-    ["play baseball","watch TV","study English","cook","play piano","watch TV","play guitar"],
-    ["play basketball","cook","play baseball","watch TV","play baseball","cook","play piano"],
-    ["play guitar","swim","play piano","swim","play soccer","dance","play baseball"],
-    ["play piano","dance","play basketball","play games","play basketball","swim","play soccer"],
-    ["study English","skateboard","play basketball","swim","play baseball","watch TV","study English"],
-    ["play soccer","play games","play soccer","play games","play soccer","cook","play guitar"],
-    ["play baseball","watch TV","play guitar","dance","play basketball","dance","play piano"],
-    ["play basketball","cook","study English","skateboard","study English","swim","play baseball"],
-    ["play guitar","swim","play baseball","cook","play guitar","cook","play soccer"],
-    ["play piano","dance","play piano","watch TV","play piano","skateboard","play basketball"],
-    ["play soccer","skateboard","play basketball","watch TV","play guitar","swim","play piano"],
-    ["play baseball","play games","play soccer","swim","play piano","cook","play baseball"],
-    ["play basketball","watch TV","play guitar","play games","play baseball","skateboard","play soccer"],
-    ["play guitar","cook","study English","dance","play soccer","watch TV","play basketball"],
-    ["play piano","swim","play baseball","skateboard","play basketball","cook","study English"],
-    ["study English","dance","play piano","cook","study English","dance","play guitar"],
-    ["play basketball","play games","play basketball","watch TV","study English","cook","play basketball"],
-    ["play guitar","watch TV","play soccer","swim","play guitar","dance","study English"],
-    ["play piano","cook","play guitar","play games","play piano","swim","play guitar"],
-    ["study English","swim","study English","dance","play baseball","cook","play piano"],
-    ["play soccer","dance","play baseball","skateboard","play soccer","skateboard","play baseball"],
-    ["play baseball","skateboard","play piano","cook","play basketball","watch TV","play soccer"],
-    ["study English","cook","play soccer","watch TV","study English","watch TV","play baseball"],
-    ["play soccer","swim","play guitar","swim","play guitar","cook","play soccer"],
-    ["play baseball","dance","study English","play games","play piano","dance","play basketball"],
-    ["play basketball","skateboard","play baseball","dance","play baseball","swim","study English"],
-    ["play guitar","play games","play piano","skateboard","play soccer","cook","play guitar"],
-    ["play piano","watch TV","play basketball","cook","play basketball","skateboard","play piano"],
-    ["play guitar","skateboard","study English","swim","study English","watch TV","play piano"],
-    ["play piano","play games","play baseball","play games","play guitar","cook","play baseball"],
-    ["study English","watch TV","play piano","dance","play piano","dance","play soccer"],
-    ["play soccer","cook","play basketball","skateboard","play baseball","swim","play basketball"],
-    ["play baseball","swim","play soccer","cook","play soccer","cook","study English"],
-    ["play basketball","dance","play guitar","watch TV","play basketball","skateboard","play guitar"]
-  ];
+      const schedule = [
+        ["study English", "play games", "study English", "watch TV", "play soccer", "swim", "play basketball"],
+        ["play soccer", "watch TV", "play baseball", "swim", "play basketball", "cook", "study English"],
+        ["play baseball", "cook", "play piano", "play games", "study English", "skateboard", "play guitar"],
+        ["play basketball", "swim", "play basketball", "dance", "play guitar", "watch TV", "play piano"],
+        ["play guitar", "dance", "play soccer", "skateboard", "play piano", "cook", "play baseball"],
+        ["play piano", "skateboard", "play guitar", "cook", "play baseball", "dance", "play soccer"],
+        ["study English", "skateboard", "play soccer", "dance", "study English", "cook", "play basketball"],
+        ["play soccer", "play games", "play guitar", "skateboard", "play guitar", "skateboard", "study English"],
+        ["play baseball", "watch TV", "study English", "cook", "play piano", "watch TV", "play guitar"],
+        ["play basketball", "cook", "play baseball", "watch TV", "play baseball", "cook", "play piano"],
+        ["play guitar", "swim", "play piano", "swim", "play soccer", "dance", "play baseball"],
+        ["play piano", "dance", "play basketball", "play games", "play basketball", "swim", "play soccer"],
+        ["study English", "skateboard", "play basketball", "swim", "play baseball", "watch TV", "study English"],
+        ["play soccer", "play games", "play soccer", "play games", "play soccer", "cook", "play guitar"],
+        ["play baseball", "watch TV", "play guitar", "dance", "play basketball", "dance", "play piano"],
+        ["play basketball", "cook", "study English", "skateboard", "study English", "swim", "play baseball"],
+        ["play guitar", "swim", "play baseball", "cook", "play guitar", "cook", "play soccer"],
+        ["play piano", "dance", "play piano", "watch TV", "play piano", "skateboard", "play basketball"],
+        ["play soccer", "skateboard", "play basketball", "watch TV", "play guitar", "swim", "play piano"],
+        ["play baseball", "play games", "play soccer", "swim", "play piano", "cook", "play baseball"],
+        ["play basketball", "watch TV", "play guitar", "play games", "play baseball", "skateboard", "play soccer"],
+        ["play guitar", "cook", "study English", "dance", "play soccer", "watch TV", "play basketball"],
+        ["play piano", "swim", "play baseball", "skateboard", "play basketball", "cook", "study English"],
+        ["study English", "dance", "play piano", "cook", "study English", "dance", "play guitar"],
+        ["play basketball", "play games", "play basketball", "watch TV", "study English", "cook", "play basketball"],
+        ["play guitar", "watch TV", "play soccer", "swim", "play guitar", "dance", "study English"],
+        ["play piano", "cook", "play guitar", "play games", "play piano", "swim", "play guitar"],
+        ["study English", "swim", "study English", "dance", "play baseball", "cook", "play piano"],
+        ["play soccer", "dance", "play baseball", "skateboard", "play soccer", "skateboard", "play baseball"],
+        ["play baseball", "skateboard", "play piano", "cook", "play basketball", "watch TV", "play soccer"],
+        ["study English", "cook", "play soccer", "watch TV", "study English", "watch TV", "play baseball"],
+        ["play soccer", "swim", "play guitar", "swim", "play guitar", "cook", "play soccer"],
+        ["play baseball", "dance", "study English", "play games", "play piano", "dance", "play basketball"],
+        ["play basketball", "skateboard", "play baseball", "dance", "play baseball", "swim", "study English"],
+        ["play guitar", "play games", "play piano", "skateboard", "play soccer", "cook", "play guitar"],
+        ["play piano", "watch TV", "play basketball", "cook", "play basketball", "skateboard", "play piano"],
+        ["play guitar", "skateboard", "study English", "swim", "study English", "watch TV", "play piano"],
+        ["play piano", "play games", "play baseball", "play games", "play guitar", "cook", "play baseball"],
+        ["study English", "watch TV", "play piano", "dance", "play piano", "dance", "play soccer"],
+        ["play soccer", "cook", "play basketball", "skateboard", "play baseball", "swim", "play basketball"],
+        ["play baseball", "swim", "play soccer", "cook", "play soccer", "cook", "study English"],
+        ["play basketball", "dance", "play guitar", "watch TV", "play basketball", "skateboard", "play guitar"]
+      ];
 
-  const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  let count = 0;
-  let point = 0;
+      const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+      let count = 0;
+      let point = 0;
+      let pageHtml = '';
+      let rowCountInPage = 0;
 
-  for (let w of schedule){
-    let str = `<div class="row mb-3">`;
-    for (let a = 0; a < w.length; a++){
-      let name = w[a];
-      let img = `<img class="img-fluid" src="${images[name]}" alt="${name}" title="${name}">`;
-      str += 
-        `<div class="col border" style="width:14%;min-height:100%;position:relative;">
-          <div class="border-bottom YM w-100 text-large">${weekdays[a]}</div>
-          ${point==a?`<div style="position:absolute;bottom:0;left:0;">.</div>`:``}
-          ${img}${name}
+      for (let i = 0; i < schedule.length; i++) {
+        if (rowCountInPage === 0) {
+          pageHtml += `<div class="a4-page">`;
+        }
+
+        let w = schedule[i];
+        let str = `<div class="row mb-2 flex-nowrap" style="height:4.4cm;">`;
+        for (let a = 0; a < w.length; a++) {
+          let name = w[a];
+          let img = `<img class="img-fluid" src="${images[name]}" alt="${name}" title="${name}" style="max-height:2.4cm;object-fit:contain;">`;
+          str +=
+            `<div class="col border p-1 d-flex flex-column align-items-center justify-content-between" style="width:14%;position:relative;overflow:hidden;">
+          <div class="border-bottom YM w-100 h6 mb-1 fw-bold text-truncate">${weekdays[a]}</div>
+          ${point == a ? `<div style="position:absolute;bottom:0;left:2px;font-size:10px;">.</div>` : ``}
+          ${img}<div class="small text-truncate w-100">${name}</div>
         </div>`;
-    }
-    str += `</div>`;
-    $("#sheet").append(str);
-    count = count == 5 ? 0 : count+1;
-    point = count == 0 ? point+1 : point;
-  }
+        }
+        str += `</div>`;
+        pageHtml += str;
+
+        rowCountInPage++;
+        count = count == 5 ? 0 : count + 1;
+        point = count == 0 ? point + 1 : point;
+
+        if (rowCountInPage === 6 || i === schedule.length - 1) {
+          pageHtml += `</div>`;
+          rowCountInPage = 0;
+        }
+      }
+
+      $("#sheet").append(pageHtml);
 
 
-});  
-</script>
-<script src="/javascripts/script.js"></script>
+    });  
+  </script>
+  <script src="/javascripts/script.js"></script>
 
 </body>
+
 </html>

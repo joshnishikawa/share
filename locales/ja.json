@@ -118,6 +118,12 @@
 		"slots": {
 			"1": "練習したいタブを選んでください。",
 			"2": "「SPIN」ボタンをクリックして次のフレーズを表示してください。"
+		},
+		"speech": {
+			"start": "Start",
+			"stop": "Stop",
+			"instruction": "<strong>Start</strong>をタップし、色を英語で言ってみましょう：",
+			"unsupported": "このブラウザでは音声認識がサポートされていません。Google Chrome または Microsoft Edge をお試しください。"
 		}
 	},
 	"navbar": {

@@ -88,6 +88,12 @@
 		"slots": {
 			"1": "Choose the tab for what you want to practice.",
 			"2": "Click the 'SPIN' button for the next phrase."
+		},
+		"speech": {
+			"start": "Start",
+			"stop": "Stop",
+			"instruction": "Tap <strong>Start</strong> then say a color to change the background color:",
+			"unsupported": "Speech recognition is not supported in this browser. Please try Google Chrome or Microsoft Edge."
 		}
 	},
 	"navbar": {
