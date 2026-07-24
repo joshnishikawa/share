@@ -1,10 +1,7 @@
 <div class="d-flex YM">
   <div class="d-flex me-3">
     <i class="material-icons text-secondary point" data-bs-toggle="modal" data-bs-target="#type_modal">info</i>
-    <div class="rounded-3 alert-primary text-center fs-5" style="width:30px;height:30px;">t</div>
-    <div class="rounded-3 alert-primary text-center fs-5" style="width:30px;height:30px;">y</div>
-    <div class="rounded-3 alert-primary text-center fs-5" style="width:30px;height:30px;">p</div>
-    <div class="rounded-3 alert-primary text-center fs-5" style="width:30px;height:30px;">_</div>
+    <div class="type-title d-flex"></div>
   </div>
 
   <form id="typeForm" action="/vocab/type" method="POST" class="menuitem d-flex justify-content-end w-100">
@@ -20,25 +17,21 @@
     <div class="modal-content">
 
       <div class="modal-header">
-        <div class="modal-title d-flex YM">
-          <div class="spell rounded-3 alert-primary text-center">t</div>
-          <div class="spell rounded-3 alert-primary text-center">y</div>
-          <div class="spell rounded-3 alert-primary text-center">p</div>
-          <div class="spell rounded-3 alert-primary text-center">_</div>
+        <div class="modal-title type-title d-flex YM">
         </div>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
         <p><%- __('activity.type.1') %></p>
-          <hr>
+        <hr>
         <p><%- __('activity.type.2') %></p>
-          <div class="d-flex YM">
-            <div class="spell rounded-3 alert-primary text-center">t</div>
-            <div class="spell rounded-3 alert-primary text-center">y</div>
-            <div class="spell rounded-3 alert-danger text-center">q</div>
-            <div class="spell rounded-3 alert-primary text-center">_</div>
-          </div>
-          <hr/>
+        <div class="d-flex YM">
+          <div class="spell rounded-3 alert-primary text-center">t</div>
+          <div class="spell rounded-3 alert-primary text-center">y</div>
+          <div class="spell rounded-3 alert-danger text-center">q</div>
+          <div class="spell rounded-3 alert-primary text-center">_</div>
+        </div>
+        <hr />
         <p><%- __('activity.type.3') %></p>
         <ul>
           <li><%- __('activity.type.typed') %> </li>
@@ -50,3 +43,13 @@
     </div>
   </div>
 </div>
+
+
+<script>
+  $(".type-title").html(`
+    <div class="rounded-3 alert-primary text-center fs-5" style="width:30px;height:30px;">t</div>
+    <div class="rounded-3 alert-primary text-center fs-5" style="width:30px;height:30px;">y</div>
+    <div class="rounded-3 alert-primary text-center fs-5" style="width:30px;height:30px;">p</div>
+    <div class="rounded-3 alert-primary text-center fs-5" style="width:30px;height:30px;">_</div>
+  `);
+</script>

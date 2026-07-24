@@ -3,8 +3,7 @@
     <i class="material-icons text-secondary point me-1" data-bs-toggle="modal" data-bs-target="#keidoro_modal">
       info
     </i>
-    <strong class="text-primary fs-5 me-1 text-nowrap">
-      KEID<span style="display: inline-block; transform: translateY(-2px); margin: 0 -5px;">💰</span>RO</strong>
+    <div class="keidoro-title"></div>
   </div>
 
   <form id="keidoro" action="/vocab/keidoro" method="POST" class="menuitem d-flex justify-content-end w-100">
@@ -23,11 +22,11 @@
     <div class="modal-content">
 
       <div class="modal-header">
-        <h3 class="modal-title">Keidoro</h3>
+        <h3 class="modal-title keidoro-title"></h3>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <p>A cooperative card-flipping game based on Keidoro (Cops and Robbers).
+        <p>A cooperative card-flipping game.
           Have students, pairs or groups take turns calling out the items on
           cards. The teacher flips the cards to reveal hidden loot and special
           characters. At some point a robber will appear and steal all the loot.</p>
@@ -114,3 +113,10 @@
     </div>
   </div>
 </div>
+
+<script>
+  $(".keidoro-title").html(`
+    <strong class="text-primary fs-5 me-1 text-nowrap">
+      KEID<span style="display: inline-block; transform: translateY(-2px); margin: 0 -5px;">💰</span>RO</strong>
+  `);
+</script>

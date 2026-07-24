@@ -1,20 +1,65 @@
+<style>
+  .custom-switch {
+    position: relative;
+    display: inline-block;
+    width: 38px;
+    height: 22px;
+    vertical-align: middle;
+    margin: 0 6px;
+  }
+
+  .custom-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .custom-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #0d6efd;
+    border-radius: 22px;
+    transition: background 0.2s;
+  }
+
+  .custom-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 2px;
+    bottom: 2px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  }
+
+  .custom-switch input:checked+.custom-slider:before {
+    transform: translateX(16px);
+  }
+
+  .custom-switch.disabled .custom-slider {
+    background: #adb5bd;
+    cursor: not-allowed;
+  }
+
+  .custom-switch.disabled input {
+    pointer-events: none;
+  }
+</style>
 <div class="rounded-3 d-flex">
   <div class="d-flex me-3">
     <i class="material-icons text-secondary point" data-bs-toggle="modal" data-bs-target="#double_modal">
       info
     </i>
-    <strong class="text-primary fs-5">D</strong>
 
-    <div class="alert alert-primary border border-primary p-0 my-auto" style="height:21px;width:21px;">
-      <div class="alert alert-warning border border-warning p-0 rounded-1" style="height:9px;width:9px;margin:5px;">
-      </div>
-    </div>
-    <div class="alert alert-primary border border-primary p-0 my-auto" style="height:21px;width:21px;">
-      <div class="alert alert-warning border border-warning p-0 rounded-bottom rounded-0 mx-auto"
-        style="height:9px;width:9px;top:-1px;"></div>
-    </div>
+    <div class="double-title d-flex"></div>
 
-    <strong class="text-primary fs-5 pe-2">BLE</strong>
   </div>
 
 
@@ -33,104 +78,6 @@
     </div>
 
     <button type="submit" class="btn btn-sm btn-primary YM" style="height:100%;">Start</button>
-    <script>
-      // Set switch based on query string
-      (function () {
-        const params = new URLSearchParams(window.location.search);
-        const num = params.get('number');
-        const switchInput = document.getElementById('numberSwitch');
-        const hiddenValue = document.getElementById('numberValue');
-        if (num === '4') {
-          switchInput.checked = false;
-          hiddenValue.value = '4';
-        } else if (num === '9') {
-          switchInput.checked = true;
-          hiddenValue.value = '9';
-        }
-      })();
-    </script>
-    <style>
-      .custom-switch {
-        position: relative;
-        display: inline-block;
-        width: 38px;
-        height: 22px;
-        vertical-align: middle;
-        margin: 0 6px;
-      }
-
-      .custom-switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-      }
-
-      .custom-slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: #0d6efd;
-        border-radius: 22px;
-        transition: background 0.2s;
-      }
-
-      .custom-slider:before {
-        position: absolute;
-        content: "";
-        height: 18px;
-        width: 18px;
-        left: 2px;
-        bottom: 2px;
-        background: #fff;
-        border-radius: 50%;
-        transition: transform 0.2s;
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
-      }
-
-      .custom-switch input:checked+.custom-slider:before {
-        transform: translateX(16px);
-      }
-
-      .custom-switch.disabled .custom-slider {
-        background: #adb5bd;
-        cursor: not-allowed;
-      }
-
-      .custom-switch.disabled input {
-        pointer-events: none;
-      }
-    </style>
-    <script>
-      // Custom switch: left=4, right=9
-      const switchInput = document.getElementById('numberSwitch');
-      const hiddenValue = document.getElementById('numberValue');
-      const switchLabel = document.getElementById('switchLabel');
-      function updateNumberValue() {
-        hiddenValue.value = switchInput.checked ? '9' : '4';
-      }
-      switchInput.addEventListener('change', updateNumberValue);
-      updateNumberValue();
-
-      // Enable/disable the 9-toggle based on deck size
-      window.updateDoubleSwitch = function () {
-        var d = window.deck || [];
-        if (d.length < 2 * 9 - 1) {
-          switchInput.disabled = true;
-          switchInput.checked = false;
-          switchLabel.classList.add('disabled');
-          switchLabel.title = 'Too few items';
-          updateNumberValue();
-        } else {
-          switchInput.disabled = false;
-          switchLabel.classList.remove('disabled');
-          switchLabel.title = '';
-        }
-      };
-      updateDoubleSwitch();
-    </script>
   </form>
 
 </div>
@@ -140,7 +87,7 @@
     <div class="modal-content">
 
       <div class="modal-header">
-        <h3 class="modal-title">DOUBLE</h3>
+        <h3 class="modal-title double-title d-flex"></h3>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
@@ -157,5 +104,60 @@
   </div>
 </div>
 
+<script>
+  // Set switch based on query string
+  (function () {
+    const params = new URLSearchParams(window.location.search);
+    const num = params.get('number');
+    const switchInput = document.getElementById('numberSwitch');
+    const hiddenValue = document.getElementById('numberValue');
+    if (num === '4') {
+      switchInput.checked = false;
+      hiddenValue.value = '4';
+    } else if (num === '9') {
+      switchInput.checked = true;
+      hiddenValue.value = '9';
+    }
+  })();
+  // Custom switch: left=4, right=9
+  const switchInput = document.getElementById('numberSwitch');
+  const hiddenValue = document.getElementById('numberValue');
+  const switchLabel = document.getElementById('switchLabel');
 
+  $(".double-title").html(`
+    <strong class="text-primary fs-5">D</strong>
+
+    <div class="alert alert-primary border border-primary p-0 my-auto" style="height:21px;width:21px;">
+      <div class="alert alert-warning border border-warning p-0 rounded-1" style="height:9px;width:9px;margin:5px;">
+      </div>
+    </div>
+    <div class="alert alert-primary border border-primary p-0 my-auto" style="height:21px;width:21px;">
+      <div class="alert alert-warning border border-warning p-0 rounded-bottom rounded-0 mx-auto"
+        style="height:9px;width:9px;top:-1px;"></div>
+    </div>
+
+    <strong class="text-primary fs-5 pe-2">BLE</strong>`);
+
+  function updateNumberValue() {
+    hiddenValue.value = switchInput.checked ? '9' : '4';
+  }
+  switchInput.addEventListener('change', updateNumberValue);
+  updateNumberValue();
+
+  // Enable/disable the 9-toggle based on deck size
+  window.updateDoubleSwitch = function () {
+    var d = window.deck || [];
+    if (d.length < 2 * 9 - 1) {
+      switchInput.disabled = true;
+      switchInput.checked = false;
+      switchLabel.classList.add('disabled');
+      switchLabel.title = 'Too few items';
+      updateNumberValue();
+    } else {
+      switchInput.disabled = false;
+      switchLabel.classList.remove('disabled');
+      switchLabel.title = '';
+    }
+  };
+  updateDoubleSwitch();
 </script>

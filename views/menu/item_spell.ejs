@@ -3,12 +3,7 @@
     <i class="material-icons text-secondary point" data-bs-toggle="modal" data-bs-target="#spell_modal">
       info
     </i>
-
-    <div class="rounded-3 bg-secondary text-white text-center fs-5" style="width:30px;height:30px;">s</div>
-    <div class="rounded-3 bg-primary text-white text-center fs-5" style="width:30px;height:30px;">p</div>
-    <div class="rounded-3 bg-warning text-white text-center fs-5" style="width:30px;height:30px;">e</div>
-    <div class="rounded-3 bg-primary text-white text-center fs-5" style="width:30px;height:30px;">l</div>
-    <div class="rounded-3 bg-secondary text-white text-center fs-5" style="width:30px;height:30px;">l</div>
+    <div class="d-flex YM spell-title"></div>
   </div>
 
   <form id="spellForm" action="/vocab/spell" method="POST" class="menuitem d-flex justify-content-end w-100">
@@ -18,71 +13,62 @@
   </form>
 </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <div id="spell_modal" class="modal fade">
   <div class="modal-dialog">
     <div class="modal-content">
 
       <div class="modal-header">
-        <div class="modal-title d-flex YM">
-          <div class="spell rounded-3 bg-secondary text-white text-center">s</div>
-          <div class="spell rounded-3 bg-primary text-white text-center">p</div>
-          <div class="spell rounded-3 bg-warning text-white text-center">e</div>
-          <div class="spell rounded-3 bg-primary text-white text-center">l</div>
-          <div class="spell rounded-3 bg-secondary text-white text-center">l</div>
+        <div class="modal-title spell-title d-flex YM">
         </div>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
         <p><%- __('activity.spell.1') %></p>
         <p><%- __('activity.spell.2') %></p>
-        <span class="btn btn-primary" style="width:80px;">Blue</span> <%- __('activity.spell.blue') %><br/>
-        <span class="btn btn-warning" style="width:80px;">Yellow</span> <%- __('activity.spell.yellow') %><br/>
-        <span class="btn btn-secondary" style="width:80px;">Gray</span> <%- __('activity.spell.gray') %>
-        <hr/>
+        <span class="btn btn-primary" style="width:80px;">Blue</span> <%- __('activity.spell.blue') %><br />
+          <span class="btn btn-warning" style="width:80px;">Yellow</span> <%- __('activity.spell.yellow') %><br />
+            <span class="btn btn-secondary" style="width:80px;">Gray</span> <%- __('activity.spell.gray') %>
+              <hr />
 
-        <p><%- __('activity.spell.3') %></p>
-        <div class="d-flex YM">
-          <div class="spell rounded-3 bg-secondary text-white text-center">s</div>
-          <div class="spell rounded-3 bg-primary text-white text-center">p</div>
-          <div class="spell rounded-3 bg-warning text-white text-center">e</div>
-          <div class="spell rounded-3 bg-primary text-white text-center">l</div>
-          <div class="spell rounded-3 bg-secondary text-white text-center">l</div>
-        </div>
-        <div class="d-flex YM">
-          <div class="spell rounded-3 alert-primary text-center">a</div>
-          <div class="spell rounded-3 alert-primary text-center">p</div>
-          <div class="spell rounded-3 alert-primary text-center">p</div>
-          <div class="spell rounded-3 alert-primary text-center">l</div>
-          <div class="spell rounded-3 alert-primary text-center">e</div>
-        </div>
+              <p><%- __('activity.spell.3') %></p>
+              <div class="d-flex YM">
+                <div class="spell rounded-3 bg-secondary text-white text-center">s</div>
+                <div class="spell rounded-3 bg-primary text-white text-center">p</div>
+                <div class="spell rounded-3 bg-warning text-white text-center">e</div>
+                <div class="spell rounded-3 bg-primary text-white text-center">l</div>
+                <div class="spell rounded-3 bg-secondary text-white text-center">l</div>
+              </div>
+              <div class="d-flex YM">
+                <div class="spell rounded-3 alert-primary text-center">a</div>
+                <div class="spell rounded-3 alert-primary text-center">p</div>
+                <div class="spell rounded-3 alert-primary text-center">p</div>
+                <div class="spell rounded-3 alert-primary text-center">l</div>
+                <div class="spell rounded-3 alert-primary text-center">e</div>
+              </div>
 
-        <div class="d-flex flex-wrap mt-5 YM">
-          <div class="spell rounded-3 bg-primary text-white text-center p-3" style="font-size:3em;">apple</div>
+              <div class="d-flex flex-wrap mt-5 YM">
+                <div class="spell rounded-3 bg-primary text-white text-center p-3" style="font-size:3em;">apple</div>
 
-          <div class="spell rounded-3 bg-success text-white text-center p-3" style="font-size:3em;">
-            <i class="material-icons">arrow_forward</i>
-          </div>
-        </div>
+                <div class="spell rounded-3 bg-success text-white text-center p-3" style="font-size:3em;">
+                  <i class="material-icons">arrow_forward</i>
+                </div>
+              </div>
 
-        <p><%- __('activity.spell.4') %></p>
+              <p><%- __('activity.spell.4') %></p>
 
-    </div>
+      </div>
     </div>
   </div>
 </div>
+
+<script>
+  $(function () {
+    $(".spell-title").html(`
+    <div class="rounded-3 bg-secondary text-white text-center fs-5" style="width:30px;height:30px;">s</div>
+    <div class="rounded-3 bg-primary text-white text-center fs-5" style="width:30px;height:30px;">p</div>
+    <div class="rounded-3 bg-warning text-white text-center fs-5" style="width:30px;height:30px;">e</div>
+    <div class="rounded-3 bg-primary text-white text-center fs-5" style="width:30px;height:30px;">l</div>
+    <div class="rounded-3 bg-secondary text-white text-center fs-5" style="width:30px;height:30px;">l</div>
+    `)
+  });
+</script>
