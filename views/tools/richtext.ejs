@@ -29,8 +29,8 @@
       </div>
       <div class="modal-body">
         <p>This is a simple rich text editor. There are many rich-text editors
-          out there. This one just allows you to SAVE the text as an html file 
-          or COPY the html to the clipboard.
+          out there. This one just allows you to SAVE the text as an html file, 
+          LOAD a saved html file, or COPY the html to the clipboard.
         </p>
       </div>
     </div>
@@ -49,30 +49,6 @@
 
 $(function(){
   $(`#rt-tab`).addClass("active");
-
-  $('#save').click(function(){
-    var title = $("#postRichText input[name=title]").val() || Date.now();
-    var group = $("#postRichText select[name=group] option:selected").text() || "";
-    var html = `
-<!DOCTYPE html>
-<html lang="en-US">
-<head>
-  <title>${title}</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="keywords" content="${group}">
-</head>
-<body>
-${formatHTML(editor.root.innerHTML)}
-</body>
-</html>`;
-    var blob = new Blob([html], {type: "text/html;charset=utf-8"});
-    saveAs(blob, `${title}.html`);
-  });
-
-  $("#copy").on('click', ()=>{
-    navigator.clipboard.writeText( formatHTML(editor.root.innerHTML) );
-  });
 
 // QUILL CONFIGURATION /////////////////////////////////////////////////////////
   const Image = Quill.import('formats/image');
@@ -165,12 +141,92 @@ ${formatHTML(editor.root.innerHTML)}
     theme: 'snow'
   });
 
+  $(".ql-toolbar").addClass("d-flex flex-wrap align-items-center sticky-top bg-light");
   $(".ql-toolbar").append(`
-      <div  style="position:absolute;top:5px;right:5px;">
+      <div class="ms-auto d-flex gap-1 py-1" style="flex-shrink:0;">
+        <input type="file" id="load-file" accept=".html,.htm,text/html" style="display:none">
+        <div id="load" class="btn btn-sm btn-outline-primary">LOAD</div>
         <div id="save" class="btn btn-sm btn-outline-primary">SAVE</div>
         <div id="copy" class="btn btn-sm btn-outline-primary">COPY</div>
       </div>`);
-  $(".ql-toolbar").addClass("sticky-top bg-light");
+
+  $(document).on('click', '#load', function(){
+    $('#load-file').click();
+  });
+
+  $(document).on('change', '#load-file', function(e){
+    var file = e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(evt) {
+      var contents = evt.target.result;
+      var parser = new DOMParser();
+      var doc = parser.parseFromString(contents, 'text/html');
+
+      // Sanitize against XSS: remove script/iframe/object elements and on* event attributes
+      if (doc.body) {
+        doc.querySelectorAll('script, iframe, object, embed').forEach(function(el){ el.remove(); });
+        doc.querySelectorAll('*').forEach(function(el){
+          for (var i = el.attributes.length - 1; i >= 0; i--) {
+            var attr = el.attributes[i];
+            if (attr.name.toLowerCase().startsWith('on') || (attr.value && attr.value.toLowerCase().trim().startsWith('javascript:'))) {
+              el.removeAttribute(attr.name);
+            }
+          }
+        });
+      }
+
+      var html = doc.body ? doc.body.innerHTML : contents;
+      var title = doc.title;
+      if (title && $("#postRichText input[name=title]").length) {
+        $("#postRichText input[name=title]").val(title);
+      }
+      if (editor.clipboard && typeof editor.clipboard.dangerouslyPasteHTML === 'function') {
+        editor.setText('');
+        editor.clipboard.dangerouslyPasteHTML(0, html);
+      } else if (typeof editor.pasteHTML === 'function') {
+        editor.pasteHTML(html);
+      } else {
+        editor.root.innerHTML = html;
+      }
+      $('#load-file').val('');
+    };
+    reader.readAsText(file);
+  });
+
+  $(document).on('click', '#save', function(){
+    var title = $("#postRichText input[name=title]").val() || Date.now();
+    var group = $("#postRichText select[name=group] option:selected").text() || "";
+    var html = `
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <title>${title}</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="keywords" content="${group}">
+</head>
+<body>
+${formatHTML(editor.root.innerHTML)}
+</body>
+</html>`;
+    var blob = new Blob([html], {type: "text/html;charset=utf-8"});
+    if (typeof saveAs === 'function') {
+      saveAs(blob, `${title}.html`);
+    } else {
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${title}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+    }
+  });
+
+  $(document).on('click', '#copy', function(){
+    navigator.clipboard.writeText( formatHTML(editor.root.innerHTML) );
+  });
 
 });
 </script>

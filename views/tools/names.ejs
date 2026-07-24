@@ -1,131 +1,166 @@
 <%- include('../head'); -%>
-<style>
-  * {
-    box-sizing: border-box;
-  }
-  @page {
-    size: A4;
-    margin: 0;
-  }
-
-  @media print {
-    body{
-      background-image: none !important;
+  <style>
+    * {
+      box-sizing: border-box;
     }
 
-    #toolbar, #list, #sidenavbar {
-      display: none !important;
-    }
-
-    html, body {
-      height: 100%;
+    @page {
+      size: A4;
       margin: 0;
-      padding: 0;
     }
 
-    #menu-container,
-    #menu-container > .w-100,
-    #sheet {
-      height: 100%;
+    @media print {
+      body {
+        background-image: none !important;
+      }
+
+      #toolbar,
+      #list,
+      #sidenavbar {
+        display: none !important;
+      }
+
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      #menu-container,
+      #menu-container>.w-100,
+      #sheet {
+        height: 100%;
+      }
+
+      #menu-container {
+        display: block;
+      }
+
+      .sheet {
+        visibility: visible !important;
+        width: 180mm;
+        height: 265mm;
+        font-size: 180px;
+        line-height: 160px;
+        margin: 16mm auto;
+        overflow: hidden;
+        page-break-after: always;
+        align-content: flex-start !important;
+      }
     }
-
-    #menu-container {
-      display: block;
-    }
-
-    .sheet {
-      visibility: visible !important;
-      width: 180mm;
-      height: 265mm;
-      font-size: 180px;
-      line-height: 160px;
-      margin: 16mm auto;
-      overflow: hidden;
-      page-break-after: always;
-      align-content: flex-start !important;
-    }
-  }
-</style>
+  </style>
 
 
-<body>
+  <body>
 
-<div id="menu-container" class="d-flex">
-  <%- include('../teachers/navbar') -%>
+    <div id="menu-container" class="d-flex">
+      <%- include('../teachers/navbar') -%>
 
-  <div class="w-100">
-    <div id="toolbar"><!-- to hide the entire menu when printing -->
-      <div id="menu" class="d-flex">
-        <button id="print" class="btn btn-sm btn-outline-success py-0 mx-3">
-          <i class="material-icons">print</i>
-        </button>
+        <div class="w-100">
+          <div id="toolbar"><!-- to hide the entire menu when printing -->
+            <div id="menu" class="d-flex">
+              <button class="btn btn-sm btn-outline-secondary border-0 ms-3" data-bs-toggle="modal"
+                data-bs-target="#names_modal">
+                <i class="material-icons">info</i>
+              </button>
+              <button id="print" class="btn btn-sm btn-outline-success py-0">
+                <i class="material-icons">print</i>
+              </button>
+            </div>
+          </div>
 
+          <div id="list" class="p-5">
+            <textarea class="form-control p-5 alert-secondary" rows="10"
+              placeholder="<%= __('addCommaSeparatedNames') %>"></textarea>
+          </div>
+
+          <div id="sheet" class="d-flex flex-wrap justify-content-center YM text-center" style="visibility:hidden;">
+          </div>
+        </div>
+    </div>
+
+    <div id="names_modal" class="modal fade">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+          <div class="modal-header">
+            <h3 class="modal-title">
+              <%= __('nameTags') %>
+            </h3>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <p><%- __('nametags.p1') %></p>
+            <p><%- __('nametags.p2') %></p>
+            <div class="text-center mb-3">
+              <%- __('nametags.ex1') %>
+            </div>
+            <p><%- __('nametags.p3') %></p>
+            <div class="text-center mb-3">
+              <%- __('nametags.ex2') %>
+            </div>
+            <p><%- __('nametags.p4') %></p>
+          </div>
+        </div>
       </div>
     </div>
-    
-    <div id="list" class="p-5">
-      <textarea class="form-control p-5 alert-secondary" rows="10" placeholder="<%= __('addCommaSeparatedNames') %>"></textarea>
-    </div>
 
-    <div id="sheet" class="d-flex flex-wrap justify-content-center YM text-center" style="visibility:hidden;"></div>
-  </div>
-</div>
+    <script>
+      $(function () {
+        $(`#names-tab`).addClass("active");
 
-<script>
-$(function(){
-  $(`#names-tab`).addClass("active");
+        let names = [];
 
-  let names = [];
+        $("#list").on('input', () => {
+          $("#sheet").empty();
+          names = $("#list textarea").val().split(',').filter(n => n.trim());
 
-  $("#list").on('input', ()=>{
-    $("#sheet").empty();
-    names = $("#list textarea").val().split(',').filter(n => n.trim());
+          const tagsPerSheet = 10;
+          const numSheets = Math.ceil(names.length / tagsPerSheet);
 
-    const tagsPerSheet = 10;
-    const numSheets = Math.ceil(names.length / tagsPerSheet);
+          for (let sheetNum = 0; sheetNum < numSheets; sheetNum++) {
+            const $newSheet = $(`<div class="sheet d-flex flex-wrap YM text-center"></div>`);
 
-    for (let sheetNum = 0; sheetNum < numSheets; sheetNum++) {
-      const $newSheet = $(`<div class="sheet d-flex flex-wrap YM text-center"></div>`);
+            const startIdx = sheetNum * tagsPerSheet;
+            const endIdx = Math.min(startIdx + tagsPerSheet, names.length);
 
-      const startIdx = sheetNum * tagsPerSheet;
-      const endIdx = Math.min(startIdx + tagsPerSheet, names.length);
-
-      for (let i = startIdx; i < endIdx; i++) {
-        $newSheet.append(`
+            for (let i = startIdx; i < endIdx; i++) {
+              $newSheet.append(`
           <div class="tag border" style="height:20%;width:50%;">
             <div class="name"><span>${names[i].trim()}</span></div>
           </div>`);
-      }
+            }
 
-      $("#sheet").append($newSheet);
-    }
-  });
+            $("#sheet").append($newSheet);
+          }
+        });
 
 
-  var mediaQueryList = window.matchMedia('print');
-  mediaQueryList.addListener(function(mql) {
-    if (mql.matches) {
-      // The user is starting to print or is opening the print preview
-      $(".name span").each(function(){
-        let namewidth = $(this).width();
-        let tagwidth = $(this).parent().width();
-        let ratio = tagwidth < namewidth ? tagwidth / namewidth : 1;
-        $(this).parent().css({"transform": `scaleX(${ratio})`, "transform-origin": "left"});
+        var mediaQueryList = window.matchMedia('print');
+        mediaQueryList.addListener(function (mql) {
+          if (mql.matches) {
+            // The user is starting to print or is opening the print preview
+            $(".name span").each(function () {
+              let namewidth = $(this).width();
+              let tagwidth = $(this).parent().width();
+              let ratio = tagwidth < namewidth ? tagwidth / namewidth : 1;
+              $(this).parent().css({ "transform": `scaleX(${ratio})`, "transform-origin": "left" });
+            });
+          } else {
+            // The user has finished printing or has closed the print preview
+            $(".name span").each(function () {
+              $(this).parent().css({ "transform": `scaleX(1)`, "transform-origin": "left" });
+            });
+          }
+        });
+
+        $("#print").on('click', () => {
+          window.print();
+        });
+
       });
-    } else {
-      // The user has finished printing or has closed the print preview
-      $(".name span").each(function(){
-        $(this).parent().css({"transform": `scaleX(1)`, "transform-origin": "left"});
-      });
-    }
-  });
 
-  $("#print").on('click', ()=>{
-    window.print();
-  });
+    </script>
 
-});
-
-</script>
-  
-<%- include('../foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->
+    <%- include('../foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->

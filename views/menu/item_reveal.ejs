@@ -3,7 +3,7 @@
     <i class="material-icons text-secondary point" data-bs-toggle="modal" data-bs-target="#reveal_modal">
       info
     </i>
-    <strong class="text-primary fs-5">REVEAL</strong>
+    <strong class="text-primary fs-5">REVEAL&nbsp;🔦</strong>
   </div>
 
   <form id="reveal" action="/vocab/reveal" method="POST" class="menuitem justify-content-end w-100">
@@ -24,7 +24,7 @@
 
 
 <div id="reveal_modal" class="modal fade">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
 
       <div class="modal-header">
@@ -32,29 +32,223 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <p>Here are several ways you can slowly reveal an image. Choose a set of 
+        <p>Here are several ways you can slowly reveal an image. Choose a set of
           images and a style (Spotlight, Fog, Pixels). Then click START.
         </p>
-        <hr/>
-        <p><strong>Spotlight:</strong> The screen is dark except for a small 
-          circle of light at the mouse pointer. The light will slowly get larger 
-          as you move the pointer. Try to avoid anything that will give the
-          image away too quickly.</p>
-        <p><strong>Fog:</strong> The image will not be visible at first. Press 
-          &rarr; and something will slowly appear out of the fog. You can tap 
-          the &rarr; key as slowly as you like or hold it down.</p>
-        <p><strong>Pixels:</strong> There will be only large pixels on the
-          screen. Press &rarr; and the pixels will get smaller and smaller
-          until the image is revealed.</p>
-          <hr/>
-          <p>When someone thinks they know what the image is, they say 'stop' 
-            and says the word or any piece of target language - 
-          <br/><strong>"I (don't) like <span class="text-primary">tomatoes</span>."</strong>
-          <br/><strong>"I study <span class="text-primary">English</span> on 
-          Wednesday."</strong>
-          <br/>
-          Get as many answers as possible even if it's the 
-          same answer (The more winners, the better!) If working in groups, have 
+
+        <style>
+          .reveal-card-preview {
+            height: 110px;
+            overflow: hidden;
+            user-select: none;
+            background-color: #ffffff;
+          }
+
+          .reveal-fog-demo {
+            filter: blur(9px);
+            transition: filter 0.3s ease;
+            cursor: pointer;
+          }
+
+          .reveal-fog-demo:hover {
+            filter: blur(1.5px);
+          }
+
+          /* Pixel banana grids */
+          .pixel-grid {
+            display: grid;
+            user-select: none;
+          }
+
+          .pixel-grid-coarse {
+            grid-template-columns: repeat(4, 20px);
+            grid-template-rows: repeat(4, 20px);
+            gap: 0;
+          }
+
+          .pixel-grid-fine {
+            display: none;
+            grid-template-columns: repeat(7, 12px);
+            grid-template-rows: repeat(7, 12px);
+            gap: 0;
+          }
+
+          .reveal-card-preview:hover .pixel-grid-coarse {
+            display: none !important;
+          }
+
+          .reveal-card-preview:hover .pixel-grid-fine {
+            display: grid !important;
+          }
+
+          .px-empty {
+            background-color: transparent;
+          }
+
+          .px-stem {
+            background-color: #713f12;
+          }
+
+          .px-yellow {
+            background-color: #facc15;
+          }
+
+          .px-yellow-light {
+            background-color: #fef08a;
+          }
+
+          .px-yellow-dark {
+            background-color: #eab308;
+          }
+
+          .px-tip {
+            background-color: #451a03;
+          }
+        </style>
+
+        <div class="row g-3 my-2">
+          <!-- Spotlight Card -->
+          <div class="col-md-4">
+            <div class="card h-100 shadow-sm border">
+              <div class="card-header bg-light fw-bold py-2 d-flex align-items-center justify-content-between">
+                <span>Spotlight</span>
+              </div>
+              <div class="card-body p-3 d-flex flex-column">
+                <div
+                  class="reveal-card-preview rounded mb-2 position-relative border d-flex align-items-center justify-content-center bg-white"
+                  onmousemove="const r=this.getBoundingClientRect(); this.querySelector('.spotlight-mask').style.background=`radial-gradient(circle at ${event.clientX-r.left}px ${event.clientY-r.top}px, transparent 20px, #000000 45px)`;"
+                  onmouseleave="this.querySelector('.spotlight-mask').style.background='radial-gradient(circle at 50% 50%, transparent 20px, #000000 45px)';">
+                  <img src="/image/LT/fruit_banana.jpg" alt="Banana Spotlight"
+                    style="height: 100%; width: 100%; object-fit: contain; padding: 10px;">
+                  <div class="spotlight-mask position-absolute top-0 start-0 w-100 h-100 rounded"
+                    style="background: radial-gradient(circle at 50% 50%, transparent 20px, #000000 45px); pointer-events: none;">
+                  </div>
+                </div>
+                <p class="card-text small text-muted mb-0">
+                  The screen is dark except for a circle of light at your cursor. The light slowly grows as you move.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fog Card -->
+          <div class="col-md-4">
+            <div class="card h-100 shadow-sm border">
+              <div class="card-header bg-light fw-bold py-2 d-flex align-items-center justify-content-between">
+                <span>Fog</span>
+              </div>
+              <div class="card-body p-3 d-flex flex-column">
+                <div
+                  class="reveal-card-preview rounded mb-2 position-relative border d-flex align-items-center justify-content-center bg-white">
+                  <img src="/image/LT/fruit_banana.jpg" alt="Banana Fog" class="reveal-fog-demo"
+                    style="height: 100%; width: 100%; object-fit: contain; padding: 10px;">
+                </div>
+                <p class="card-text small text-muted mb-0">
+                  Starts heavily blurred. Hover over the image or press <kbd>&rarr;</kbd> to clear the fog.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pixels Card -->
+          <div class="col-md-4">
+            <div class="card h-100 shadow-sm border">
+              <div class="card-header bg-light fw-bold py-2 d-flex align-items-center justify-content-between">
+                <span>Pixels</span>
+              </div>
+              <div class="card-body p-3 d-flex flex-column">
+                <div
+                  class="reveal-card-preview rounded mb-2 position-relative border d-flex align-items-center justify-content-center bg-white">
+                  <!-- Coarse 4x4 Pixel Banana (Extremely Pixelated) -->
+                  <div class="pixel-grid pixel-grid-coarse">
+                    <div class="px-empty"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-stem"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-yellow"></div>
+                    <div class="px-yellow"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-yellow"></div>
+                    <div class="px-yellow"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-yellow-dark"></div>
+                    <div class="px-yellow"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-empty"></div>
+                  </div>
+
+                  <!-- Fine 7x7 Pixel Banana (Very Pixelated - shown on hover) -->
+                  <div class="pixel-grid pixel-grid-fine">
+                    <div class="px-empty"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-stem"></div>
+                    <div class="px-stem"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-yellow-light"></div>
+                    <div class="px-yellow"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-yellow-light"></div>
+                    <div class="px-yellow"></div>
+                    <div class="px-yellow-dark"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-yellow-light"></div>
+                    <div class="px-yellow"></div>
+                    <div class="px-yellow-dark"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-yellow-light"></div>
+                    <div class="px-yellow"></div>
+                    <div class="px-yellow-dark"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-yellow-dark"></div>
+                    <div class="px-yellow-dark"></div>
+                    <div class="px-tip"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-tip"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-empty"></div>
+                    <div class="px-empty"></div>
+                  </div>
+                </div>
+                <p class="card-text small text-muted mb-0">
+                  Starts with large pixel blocks. Press <kbd>&rarr;</kbd> to increase resolution until fully revealed.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr />
+        <p>When someone thinks they know what the image is, they say 'stop'
+          and says the word or any piece of target language -
+          <br /><strong>"I (don't) like <span class="text-primary">tomatoes</span>."</strong>
+          <br /><strong>"I study <span class="text-primary">English</span> on
+            Wednesday."</strong>
+          <br />
+          Get as many answers as possible even if it's the
+          same answer (The more winners, the better!) If working in groups, have
           them tell the rest of their group members so they can say it together.
           Reveal, rejoice and repeat by hitting <kbd>Enter</kbd> for the next image!
         </p>

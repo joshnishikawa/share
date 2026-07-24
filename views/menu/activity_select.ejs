@@ -55,6 +55,12 @@ if (typeof activitySelectInitialized === 'undefined') {
       activeDeck = originalDeck;
     }
 
+    if (selectedActivity === 'double' && (!activeDeck || activeDeck.length < 7)) {
+      alert("Not enough items in this deck to play Double.");
+      $(this).val('');
+      return;
+    }
+
     if (activeDeck) {
       $form.find("input[name='deck']").val(JSON.stringify(activeDeck));
       $form.find("input[name='spaces']").val(activeDeck.length);

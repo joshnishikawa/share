@@ -75,7 +75,7 @@
             </div>
 
             <div class="col-10">
-              <div id="myName" class="fs-3" style="text-shadow:0px 0px 2px #555"></div>
+              <div id="myName" class="fs-3 text-break" style="text-shadow:0px 0px 2px #555"></div>
               <div class="d-flex justify-content-between mb-1">
                 <button id="getName" class="btn btn-sm btn-outline-primary px-1 py-0">Change Name</button>
                 <input id="color" class="form-control form-control-sm p-0 mx-1" type="color" aria-label="Player color picker" title="Choose your player color">
@@ -151,8 +151,17 @@
 
 <script>
 // VARIABLES ////////////////////////////////////////////////////////////////////
+  const adjectives = ["Agile", "Brave", "Cunning", "Daring", "Eager", "Fearless", "Gentle", "Happy", "Kind", "Lively", "Mighty", "Nimble", "Playful", "Quick", "Rapid", "Swift", "Bold", "Charming", "Curious", "Diligent", "Epic", "Funky", "Radiant", "Wise", "Wild", "Fierce", "Vibrant"];
+  const nouns = ["Ninja", "Penguin", "Pirate", "Dragon", "Unicorn", "Robot", "Wizard", "Alien", "Monster", "Shark", "Eagle", "Cheetah", "Fox", "Panther", "Wolf", "Tiger", "Bear", "Owl", "Phoenix", "Dolphin", "Knight", "Samurai", "Viking", "Ghost", "Titan", "Ranger", "Falcon"];
+
+  function generateRandomName() {
+    const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+    const noun = nouns[Math.floor(Math.random() * nouns.length)];
+    return `${adj} ${noun}`;
+  }
+
   let room = {};
-  let player = {id: null, color: "#cccccc", roomname: null, roomtype: "private", closed: false, number: 1, activity: null};
+  let player = {id: generateRandomName(), color: "#0d6efd", roomname: null, roomtype: "private", closed: false, number: 1, activity: null};
   const socket = io();
   let currentActivity = null;
   let timer;
@@ -160,13 +169,47 @@
   // Escape HTML to prevent XSS when inserting user-controlled data into the DOM
   function escapeHtml(str) {
     const div = document.createElement('div');
-    div.appendChild(document.createTextNode(str));
+    div.appendChild(document.createTextNode(str || ''));
     return div.innerHTML;
   }
 
   // Sanitize CSS color values — only allow valid hex colors
   function sanitizeColor(color) {
-    return /^#[0-9a-fA-F]{3,6}$/.test(color) ? color : '#cccccc';
+    if (!color || typeof color !== 'string') return '#0d6efd';
+    const trimmed = color.trim();
+    if (/^#[0-9a-fA-F]{3}$/.test(trimmed)) {
+      return '#' + trimmed[1] + trimmed[1] + trimmed[2] + trimmed[2] + trimmed[3] + trimmed[3];
+    }
+    return /^#[0-9a-fA-F]{6}$/.test(trimmed) ? trimmed : '#0d6efd';
+  }
+
+  // Safely load and validate stored player data from localStorage; clear if corrupted
+  function loadStoredPlayer() {
+    try {
+      const raw = localStorage.getItem('player');
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== 'object') {
+        localStorage.removeItem('player');
+        return null;
+      }
+      if (!parsed.id || typeof parsed.id !== 'string' || !parsed.id.trim()) {
+        localStorage.removeItem('player');
+        return null;
+      }
+      return {
+        id: parsed.id.trim(),
+        color: sanitizeColor(parsed.color),
+        roomname: typeof parsed.roomname === 'string' ? parsed.roomname : null,
+        roomtype: ['public', 'private'].includes(parsed.roomtype) ? parsed.roomtype : 'private',
+        closed: Boolean(parsed.closed),
+        number: typeof parsed.number === 'number' ? parsed.number : 1,
+        activity: typeof parsed.activity === 'string' ? parsed.activity : null
+      };
+    } catch (e) {
+      try { localStorage.removeItem('player'); } catch (err) {}
+      return null;
+    }
   }
   
   // Initialize global variables for NH vocabulary only if they don't exist
@@ -202,8 +245,20 @@
   }
 
 $(function(){
-  // localStorage.removeItem('player'); // DEBUG: so I don't have to clear my iPhone cache
   $("#multiplayer-tab").addClass("active");
+
+  // Load and validate player data from localStorage, auto-purging leftover corrupt data
+  const stored = loadStoredPlayer();
+  if (stored) {
+    player = stored;
+  } else {
+    try { localStorage.setItem('player', JSON.stringify(player)); } catch (e) {}
+  }
+
+  // Render pawn, color, and player ID immediately on DOM ready
+  $("#myPawn").html(getPawn(player.color));
+  $("#color").val(player.color);
+  $("#myName").text(player.id).css('color', player.color);
 
   $(".menuitem").on('submit', function(e){
     e.preventDefault();
@@ -219,62 +274,61 @@ $(function(){
 
 // FUNCTIONS ////////////////////////////////////////////////////////////////////
   function updatePlayerList(data){
-    // Cache DOM elements to avoid repeated queries
     const $group = $("#group");
     const $leaveGroup = $("#leaveGroup");
     const $otherPlayers = $("#otherPlayers");
     const $activities = $(".activity");
     
+    if (!data || !Array.isArray(data)) return;
+
     if (data.length != 1 || player.roomtype == "public") {
-      $group.removeClass("d-flex").addClass("d-none");
+      $group.hide().removeClass("d-flex").addClass("d-none");
       $leaveGroup.show();
     }
     else {
-      $group.removeClass("d-none").addClass("d-flex");
+      $group.show().removeClass("d-none").addClass("d-flex");
       $leaveGroup.hide();
     }
 
-    // Clear old content once
     $otherPlayers.empty();
     $activities.find(".pawn").remove();
 
-    // Build HTML string instead of multiple DOM manipulations
     let otherPlayersHTML = '';
 
     for (let i = 0; i < data.length; i++) {
       const p = data[i];
-      if (p.id == player.id){
+      const safeColor = sanitizeColor(p.color);
+      const safeId = escapeHtml(p.id);
+
+      if (p.id == player.id || (player.number && p.number == player.number)){
+        player.id = p.id;
+        player.color = safeColor;
         $("#myPawn").html(getPawn(player.color));
-        $("#myName").text(p.id);
-        $("#myName").css('color', player.color);
+        $("#myName").text(p.id).css('color', player.color);
         $("#color").val(player.color);
         localStorage.setItem('player', JSON.stringify(player));
       }
       else {
-        const safeId = escapeHtml(p.id);
-        const safeColor = sanitizeColor(p.color);
         otherPlayersHTML += `
-          <div class="row bg-light border border-primary rounded-3">
+          <div class="row bg-light border border-primary rounded-3 my-1">
             <div class="col-2">
               <div class="pawn${p.number} text-center my-1" style="margin:auto;width:24px;"></div>
             </div>
             <div class="col-10">
-              <div id="name${p.number}" class="fs-4" style="color: ${safeColor};text-shadow:0px 0px 2px #555;">${safeId}</div>
+              <div id="name${p.number}" class="fs-4 text-break" style="color: ${safeColor};text-shadow:0px 0px 2px #555;">${safeId}</div>
             </div>
           </div>
         `;
       }
     }
     
-    // Single DOM update for other players
     if (otherPlayersHTML) {
       $otherPlayers.html(otherPlayersHTML);
     }
     
-    // Set colors and pawns after DOM is updated
     for (let i = 0; i < data.length; i++) {
       const p = data[i];
-      if (p.id != player.id) {
+      if (p.id != player.id && p.number != player.number) {
         setColor(p.number, p.color);
       }
       if (p.activity) {
@@ -284,16 +338,17 @@ $(function(){
   }
 
   function getPawn(color) {
-    const shadow = reduceBrightness(color, 20);
+    const safeColor = sanitizeColor(color);
+    const shadow = reduceBrightness(safeColor, 20);
     const def = shadow.replace("#", "");
     return '<svg class="img-fluid pawn" width="64" height="128" viewBox="0 0 64 128" xmlns="http://www.w3.org/2000/svg">' +
       '<!-- Body of the pawn -->' +
-      '<path transform="matrix(0.78482373,0,0,0.3410327,-40.6,58)" d="m 54.796244,189.05536 c -12.062025,-20.89204 13.56978,-65.28763 37.693831,-65.28763 24.124055,0 49.755855,44.39559 37.693825,65.28763 -12.06202,20.89204 -63.325631,20.89204 -75.387656,0 z" fill="' + color + '" />' +
+      '<path transform="matrix(0.78482373,0,0,0.3410327,-40.6,58)" d="m 54.796244,189.05536 c -12.062025,-20.89204 13.56978,-65.28763 37.693831,-65.28763 24.124055,0 49.755855,44.39559 37.693825,65.28763 -12.06202,20.89204 -63.325631,20.89204 -75.387656,0 z" fill="' + safeColor + '" />' +
       '<path transform="matrix(0.78482373,0,0,0.3410327,-40.6,58)" d="m 54.796244,189.05536 c -12.062025,-20.89204 13.56978,-65.28763 37.693831,-65.28763 24.124055,0 49.755855,44.39559 37.693825,65.28763 -12.06202,20.89204 -63.325631,20.89204 -75.387656,0 z" fill="url(#' + def + '1)" />' +
-      '<path transform="matrix(0.45050681,0,0,0.62867557,3.2,35)" d="m 105,121.60049 c -11.851854,8.65104 -69.62828,8.77896 -81.518324,0.1805 C 11.591632,113.18252 -6.3839294,58.273407 -1.8805296,44.308232 2.6228701,30.343057 49.289789,-3.7205685 63.963086,-3.7530573 78.636384,-3.785546 125.45369,30.071092 130.01888,44.016188 134.58408,57.961284 116.85185,112.94946 105,121.60049 Z" fill="' + color + '" />' +
+      '<path transform="matrix(0.45050681,0,0,0.62867557,3.2,35)" d="m 105,121.60049 c -11.851854,8.65104 -69.62828,8.77896 -81.518324,0.1805 C 11.591632,113.18252 -6.3839294,58.273407 -1.8805296,44.308232 2.6228701,30.343057 49.289789,-3.7205685 63.963086,-3.7530573 78.636384,-3.785546 125.45369,30.071092 130.01888,44.016188 134.58408,57.961284 116.85185,112.94946 105,121.60049 Z" fill="' + safeColor + '" />' +
       '<path transform="matrix(0.45050681,0,0,0.62867557,3.2,35)" d="m 105,121.60049 c -11.851854,8.65104 -69.62828,8.77896 -81.518324,0.1805 C 11.591632,113.18252 -6.3839294,58.273407 -1.8805296,44.308232 2.6228701,30.343057 49.289789,-3.7205685 63.963086,-3.7530573 78.636384,-3.785546 125.45369,30.071092 130.01888,44.016188 134.58408,57.961284 116.85185,112.94946 105,121.60049 Z" fill="url(#' + def + '1)" />' +
       '<!-- Head of the pawn -->' +
-      '<circle cx="32" cy="22" r="22" fill="' + color + '" />' +
+      '<circle cx="32" cy="22" r="22" fill="' + safeColor + '" />' +
       '<circle cx="32" cy="22" r="22" fill="url(#' + def + '2)" />' +
       '<!-- Shading gradients -->' +
       '<defs>' +
@@ -310,13 +365,13 @@ $(function(){
   }
 
   function reduceBrightness(hex, percent) {
-    const num = parseInt(hex.replace("#", ""), 16),
+    const cleanHex = sanitizeColor(hex);
+    const num = parseInt(cleanHex.replace("#", ""), 16),
         amt = Math.round(2.55 * percent),
-        R = (num >> 16) - amt,
-        G = (num >> 8 & 0x00FF) - amt,
-        B = (num & 0x0000FF) - amt;
-    const returnme = "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 + (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 + (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
-    return returnme;
+        R = Math.max(0, Math.min(255, (num >> 16) - amt)),
+        G = Math.max(0, Math.min(255, (num >> 8 & 0x00FF) - amt)),
+        B = Math.max(0, Math.min(255, (num & 0x0000FF) - amt));
+    return "#" + (0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1);
   }
 
   function getName() {
@@ -326,6 +381,9 @@ $(function(){
       function onSetName(data) {
         if (data.id) {
           player.id = data.id;
+          $("#myName").text(data.id).css('color', player.color);
+          $("#myPawn").html(getPawn(player.color));
+          localStorage.setItem('player', JSON.stringify(player));
           socket.off('setName', onSetName);
           resolve();
         } else {
@@ -340,25 +398,26 @@ $(function(){
   }
 
   function setColor(number, color) {
+    const safeColor = sanitizeColor(color);
     if (number == player.number){
-      player.color = color;
+      player.color = safeColor;
       localStorage.setItem('player', JSON.stringify(player));
-      $("#myPawn").html(getPawn(color));
-      $("#myName").css('color', color);
-      $("#color").val(color);
+      $("#myPawn").html(getPawn(safeColor));
+      $("#myName").css('color', safeColor);
+      $("#color").val(safeColor);
       
       // Update activity pawn if player has selected an activity
       if (player.activity) {
         $(".activity .pawn").filter(function() {
           return $(this).closest("#" + player.activity).length > 0;
-        }).html(getPawn(color));
+        }).html(getPawn(safeColor));
       }
       
       socket.emit('setColor', player);
     }
     else {
-      $(".pawn" + number).html(getPawn(color));
-      $("#name" + number).css('color', color);
+      $(".pawn" + number).html(getPawn(safeColor));
+      $("#name" + number).css('color', safeColor);
     }
   }
 
@@ -457,12 +516,7 @@ $(function(){
 
 // SOCKET EVENTS ///////////////////////////////////////////////////////////////
   socket.on('connect', function(){
-    let stored_player;
-    try {
-      stored_player = JSON.parse(localStorage.getItem('player'));
-    } catch (e) {
-      stored_player = null;
-    }
+    const stored_player = loadStoredPlayer();
     
     if (!stored_player) {
       getName().then(function() {
@@ -470,6 +524,8 @@ $(function(){
       });
     } else {
       player = stored_player;
+      $("#myName").text(player.id).css('color', player.color);
+      $("#myPawn").html(getPawn(player.color));
       socket.emit('join', player);
     }
   });
@@ -504,7 +560,7 @@ $(function(){
     if (data.number == player.number) {
       player.id = data.id;
       localStorage.setItem('player', JSON.stringify(player));
-      $("#myName").text(data.id);
+      $("#myName").text(data.id).css('color', player.color);
     }
     else {
       $("#name" + data.number).text(data.id);

@@ -7,6 +7,10 @@ audio samples for all static vocab
 ////////// IDEAS FOR STUDENT ACTIVITIES ////////////////////////////////////////
 Get the spoken picture dictionary working
 
+Sight Words: Show a written word. User selects the meaning from 3 images.
+
+Flash Typing: Flash a word. The user types it after it disappears.
+
 find the given word among a group of like words
 
 Find all letters that (sound like 'p', have a descender, are tall, etc.)

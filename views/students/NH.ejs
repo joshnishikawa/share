@@ -61,6 +61,9 @@ $(function(){
     if (!window.deck || window.deck.length == 0) {
       alert("<%- __('pleaseSelect') %>");
     }
+    else if (e.target.id === 'doubleForm' && window.deck.length < 7) {
+      alert("Not enough items in this deck to play Double.");
+    }
     else {
       $(e.target).find("input[name='deck']").val(JSON.stringify(window.deck));
       $(e.target).find("input[name='deckType']").val(deckType);

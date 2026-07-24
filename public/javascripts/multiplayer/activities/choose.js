@@ -29,7 +29,6 @@
   let recognition = null;        // SpeechRecognition instance
   let speechSupported = false;   // Whether the browser supports Web Speech API
   let isListening = false;       // Whether recognition.start() is active
-  let autoListen = true;         // Auto-start listening (persisted in localStorage)
   let listenersAttached = false; // Guard to prevent double-attaching socket listeners
 
   /* ── Helpers ── */
@@ -79,31 +78,40 @@
     $('#choose-status').text(text);
   }
 
-  /** Enable/disable the speak button and optionally change its label. */
+  /** Enable/disable the speak/listen buttons and update mic animation states. */
   function setSpeakButtonState(enabled, label) {
-    const $btn = $('#choose-speak-btn');
-    if (!$btn.length) return;
-    $btn.prop('disabled', !enabled);
-    $btn.text(label || 'Tap To Speak');
+    const $listenBtn = $('#choose-listen-btn, #choose-speak-btn');
+    const $stopBtn = $('#choose-stop-btn');
+
+    if (isListening) {
+      $listenBtn.addClass('mic-listening btn-success').removeClass('btn-outline-success').prop('disabled', true);
+      $stopBtn.prop('disabled', false).addClass('btn-danger').removeClass('btn-secondary');
+    } else {
+      $listenBtn.removeClass('mic-listening').prop('disabled', !enabled);
+      $stopBtn.prop('disabled', true).removeClass('btn-danger').addClass('btn-secondary');
+    }
+
+    if (label !== undefined && label !== null) {
+      $('#choose-heard').text(label);
+    }
   }
 
   /* ── Speech Recognition lifecycle ── */
 
-  /** Start the speech recognizer (chooser-only, guarded). */
+  /** Start the speech recognizer (chooser-only, user-initiated). */
   function beginListening() {
     if (!isChooser()) return;
     if (selectedWord) return;          // Already chose — no more listening
     if (!speechSupported || !recognition) return;
     if (isListening) return;           // Prevent double-start
 
-    $('#choose-heard').text('Listening...');
-    setSpeakButtonState(false, 'Listening...');
     isListening = true;
+    setSpeakButtonState(true, 'Listening...');
     try {
       recognition.start();
     } catch (e) {
       isListening = false;
-      setSpeakButtonState(true, 'Tap To Speak');
+      setSpeakButtonState(true, '');
     }
   }
 
@@ -112,13 +120,15 @@
   }
 
   function stopListening() {
-    if (recognition && isListening) {
+    isListening = false;
+    if (recognition) {
       try {
         recognition.stop();
       } catch (e) {
         // no-op
       }
     }
+    setSpeakButtonState(true, '');
   }
 
   /**
@@ -130,10 +140,12 @@
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       speechSupported = false;
-      setSpeakButtonState(false, 'Speech Not Supported');
+      $('#choose-unsupportedAlert').show();
+      $('#choose-listen-btn, #choose-stop-btn, #choose-speak-btn').prop('disabled', true);
       return;
     }
 
+    $('#choose-unsupportedAlert').hide();
     speechSupported = true;
     recognition = new SpeechRecognition();
     recognition.continuous = false;
@@ -170,17 +182,24 @@
     };
 
     recognition.onend = function() {
-      isListening = false;
-      if (isChooser() && !selectedWord) {
-        setSpeakButtonState(true, 'Tap To Speak');
+      // Only restart if the user explicitly clicked Start and has not clicked Stop/selected word
+      if (isListening && isChooser() && !selectedWord) {
+        try {
+          recognition.start();
+        } catch (e) {
+          isListening = false;
+          setSpeakButtonState(true, '');
+        }
+      } else {
+        isListening = false;
+        setSpeakButtonState(true, '');
       }
     };
 
-    recognition.onerror = function() {
+    recognition.onerror = function(event) {
       isListening = false;
-      if (isChooser() && !selectedWord) {
-        setSpeakButtonState(true, 'Tap To Speak');
-      }
+      console.error("Speech recognition error:", event ? event.error : "unknown");
+      setSpeakButtonState(true, '');
     };
   }
 
@@ -191,22 +210,22 @@
       clearInterval(slideshowTimer);
       slideshowTimer = null;
     }
+    $('#choose-slideshow-container .choose-slide-img').addClass('d-none');
   }
 
-  /** Cycle through round images every 220 ms so guesser sees all of them. */
+  /** Cycle through pre-rendered round images locally without sending HTTP GET requests. */
   function startSlideshow() {
     stopSlideshow();
-    if (!roundItems.length) return;
+    const $slides = $('#choose-slideshow-container .choose-slide-img');
+    if (!$slides.length) return;
 
     slideshowIndex = 0;
-    $('#choose-selected-preview')
-      .attr('src', '/image/LT/' + roundItems[0].image)
-      .removeClass('d-none');
+    $slides.eq(0).removeClass('d-none');
 
     slideshowTimer = setInterval(function() {
-      if (!roundItems.length) return;
-      slideshowIndex = (slideshowIndex + 1) % roundItems.length;
-      $('#choose-selected-preview').attr('src', '/image/LT/' + roundItems[slideshowIndex].image);
+      $slides.eq(slideshowIndex).addClass('d-none');
+      slideshowIndex = (slideshowIndex + 1) % $slides.length;
+      $slides.eq(slideshowIndex).removeClass('d-none');
     }, 220);
   }
 
@@ -219,10 +238,7 @@
       if (selectedWord) {
         setSpeakButtonState(false, 'Word Selected');
       } else if (speechSupported) {
-        setSpeakButtonState(true, 'Tap To Speak');
-        if (autoListen) {
-          beginListening();
-        }
+        setSpeakButtonState(true, '');
       }
     } else {
       stopListening();
@@ -233,10 +249,13 @@
 
   /** Clean up all DOM handlers and socket listeners for this activity. */
   function teardown(socket) {
-    if (!listenersAttached) return;
     stopSlideshow();
     stopListening();
-    $('#choose-speak-btn').off('click');
+    if (recognition) {
+      try { recognition.abort(); } catch (e) {}
+    }
+    if (!listenersAttached) return;
+    $('#choose-listen-btn, #choose-stop-btn, #choose-speak-btn').off('click');
     socket.off('choose/waiting');
     socket.off('choose/roundstart');
     socket.off('choose/imageselected');
@@ -253,6 +272,7 @@
     selectedWord = word;
     const imageName = getImageForWord(word);
     stopSlideshow();
+    stopListening();
 
     $('#choose-images img').addClass('thumb').hide();
     $('#choose-images img').filter(function() {
@@ -279,9 +299,11 @@
   function renderBoard() {
     const $images = $('#choose-images');
     const $words = $('#choose-words');
+    const $slideshowContainer = $('#choose-slideshow-container');
 
     $images.empty();
     $words.empty();
+    $slideshowContainer.empty();
     $('#choose-selected-preview').addClass('d-none').attr('src', '');
 
     setRoleView();
@@ -305,10 +327,23 @@
       img.on('click', function() {
         if (!isChooser()) return;
         if (selectedWord) return;
-        setStatus('Use Tap To Speak and say a word.');
+        setStatus('Use Start button and say a word.');
       });
 
       $images.append(img);
+
+      // Pre-render slideshow images into DOM so cycling triggers zero HTTP GET requests
+      const slideImg = $('<img>', {
+        src: '/image/LT/' + item.image,
+        class: 'img-fluid choose-slide-img d-none',
+        alt: item.word,
+      });
+      slideImg.on('error', function() {
+        if (typeof altOnly === 'function') {
+          altOnly(this);
+        }
+      });
+      $slideshowContainer.append(slideImg);
 
       const word = $('<div>', {
         class: 'col-4 choose-word py-1',
@@ -336,11 +371,8 @@
     if (isChooser()) {
       $('#choose-words .choose-word').addClass('choose-word-disabled');
       if (speechSupported) {
-        setStatus('Your turn: tap speak and say a word.');
-        setSpeakButtonState(true, 'Tap To Speak');
-        if (autoListen) {
-          beginListening();
-        }
+        setStatus('Your turn: tap Start to speak.');
+        setSpeakButtonState(true, '');
       } else {
         setStatus('Speech recognition unavailable on this device/browser.');
         setSpeakButtonState(false, 'Speech Not Supported');
@@ -379,30 +411,16 @@
     $('#choose-words').empty();
     $('#choose-heard').text('');
 
-    // Restore user preference for auto-listening (defaults to true)
-    const storedAutoListen = localStorage.getItem('chooseAutoListen');
-    autoListen = storedAutoListen === null ? true : storedAutoListen === '1';
-    $('#choose-auto-listen').prop('checked', autoListen);
-
     setStatus('Waiting for all players to load Choose...');
 
     initializeSpeech();
 
-    $('#choose-speak-btn').off('click').on('click', function() {
+    $('#choose-listen-btn, #choose-speak-btn').off('click').on('click', function() {
       beginListening();
     });
 
-    $('#choose-auto-listen').off('change').on('change', function() {
-      autoListen = $(this).is(':checked');
-      localStorage.setItem('chooseAutoListen', autoListen ? '1' : '0');
-
-      if (!autoListen && isListening) {
-        stopListening();
-      }
-
-      if (autoListen && isChooser() && !selectedWord) {
-        beginListening();
-      }
+    $('#choose-stop-btn').off('click').on('click', function() {
+      stopListening();
     });
 
     /* ── Socket event handlers ── */

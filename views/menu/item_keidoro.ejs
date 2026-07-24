@@ -1,9 +1,10 @@
 <div class="rounded-3 d-flex">
-  <div class="d-flex me-3">
-    <i class="material-icons text-secondary point" data-bs-toggle="modal" data-bs-target="#match_modal">
+  <div class="d-flex align-items-center me-3">
+    <i class="material-icons text-secondary point me-1" data-bs-toggle="modal" data-bs-target="#keidoro_modal">
       info
     </i>
-    <strong class="text-primary fs-5">KEIDORO</strong>
+    <strong class="text-primary fs-5 me-1 text-nowrap">
+      KEID<span style="display: inline-block; transform: translateY(-2px); margin: 0 -5px;">💰</span>RO</strong>
   </div>
 
   <form id="keidoro" action="/vocab/keidoro" method="POST" class="menuitem d-flex justify-content-end w-100">
@@ -13,20 +14,102 @@
 
     <button type="submit" class="btn btn-sm btn-primary">Start</button>
   </form>
-  
+
 </div>
 
 
 <div id="keidoro_modal" class="modal fade">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
-    
+
       <div class="modal-header">
         <h3 class="modal-title">Keidoro</h3>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <p></p>
+        <p>A cooperative card-flipping game based on Keidoro (Cops and Robbers).
+          Have students, pairs or groups take turns calling out the items on
+          cards. The teacher flips the cards to reveal hidden loot and special
+          characters. At some point a robber will appear and steal all the loot.</p>
+
+        <div class="alert alert-info py-2">
+          <strong>Objective:</strong>
+          Students practice vocabulary while working together as a class to
+          Catch the Thief and defuse the Bomb to win!
+        </div>
+
+        <h5 class="mt-4 mb-3"><strong>Special Cards & Game Items:</strong></h5>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="card h-100 shadow-sm border bg-light">
+              <div class="card-body d-flex align-items-center">
+                <img src="/image/keidoro/cop.png" alt="Cop" class="me-3 rounded flex-shrink-0"
+                  style="width: 56px; height: 56px; object-fit: contain;">
+                <div>
+                  <h6 class="card-title fw-bold mb-1">Cop</h6>
+                  <p class="card-text small mb-0">Searches for the Thief! Once flipped, you get 5 search attempts.
+                    Flipping loot cards consumes search attempts.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="card h-100 shadow-sm border bg-light">
+              <div class="card-body d-flex align-items-center">
+                <img src="/image/keidoro/thief.png" alt="Thief" class="me-3 rounded flex-shrink-0"
+                  style="width: 56px; height: 56px; object-fit: contain;">
+                <div>
+                  <h6 class="card-title fw-bold mb-1">Thief</h6>
+                  <p class="card-text small mb-0">If flipped while the Cop is active, the Cop catches the Thief. If
+                    search attempts run out, the Thief escapes with the loot!</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="card h-100 shadow-sm border bg-light">
+              <div class="card-body d-flex align-items-center">
+                <img src="/image/keidoro/bomb.png" alt="Bomb" class="me-3 rounded flex-shrink-0"
+                  style="width: 56px; height: 56px; object-fit: contain;">
+                <div>
+                  <h6 class="card-title fw-bold mb-1">Bomb</h6>
+                  <p class="card-text small mb-0">Starts a 4-flip countdown timer when revealed. If the next card
+                    flipped after timer reaches 0 is loot, the bomb explodes!</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="card h-100 shadow-sm border bg-light">
+              <div class="card-body d-flex align-items-center">
+                <img src="/image/keidoro/bombsquad.png" alt="Bomb Squad" class="me-3 rounded flex-shrink-0"
+                  style="width: 56px; height: 56px; object-fit: contain;">
+                <div>
+                  <h6 class="card-title fw-bold mb-1">Bomb Squad</h6>
+                  <p class="card-text small mb-0">Immediately defuses an armed Bomb when flipped.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <div class="card shadow-sm border bg-light">
+              <div class="card-body d-flex align-items-center">
+                <img src="/image/keidoro/treasure.png" alt="Loot" class="me-3 rounded flex-shrink-0"
+                  style="width: 56px; height: 56px; object-fit: contain;">
+                <div>
+                  <h6 class="card-title fw-bold mb-1">Loot Cards</h6>
+                  <p class="card-text small mb-0">Cards contain hidden loot such as gold, treasure, and cash. Collect as
+                    much as possible without letting the Thief escape or the Bomb explode!</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>

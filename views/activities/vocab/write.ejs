@@ -1,91 +1,93 @@
 <%- include('../../head'); -%>
-<style>
-  @media print {
-    #menucontainer {
-      display: none;
+  <style>
+    @media print {
+      #menucontainer {
+        display: none;
+      }
+
+      body {
+        background-image: none !important;
+      }
     }
-    body{
-      background-image: none !important;
-    }
-  }
-</style>
+  </style>
 
-<body>
-<div id="menucontainer">
-  <div class="d-flex" style="position:relative;">
+  <body>
+    <div id="menucontainer">
+      <div class="d-flex" style="position:relative;">
 
-    <%- include('../../menu/item_write'); -%>
+        <%- include('../../menu/item_write'); -%>
 
-    <%- include('../../menu/activity_select', { activity: 'write' }); -%>
+          <%- include('../../menu/activity_select', { activity: 'write' }); -%>
 
-    <button id="print" class="btn btn-sm btn-outline-success py-0 mx-3" onclick="window.print();">
-      <i class="material-icons">print</i>
-    </button>
+            <button id="print" class="btn btn-sm btn-outline-success py-0 mx-3" onclick="window.print();">
+              <i class="material-icons">print</i>
+            </button>
 
-    <button id="home" class="btn btn-sm btn-outline-secondary p-0" style="position:absolute;right:0;" onclick="location.href='<%= query.teacher ? '/teachers/' + deckType : deckType === 'NH' ? '/NH' : '/' %>'">
-      <i class="material-icons">home</i>
-    </button>
+            <button id="home" class="btn btn-sm btn-outline-secondary p-0" style="position:absolute;right:0;"
+              onclick="location.href='<%= query.teacher ? '/teachers/' + deckType : deckType === 'NH' ? '/NH' : '/' %>'">
+              <i class="material-icons">home</i>
+            </button>
 
-  </div>
-</div>
+      </div>
+    </div>
 
-<div id="content" class="container-fluid fs-1"></div>
+    <div id="content" class="container-fluid fs-1"></div>
 
 
-<script>
-$(function(){
-  $("form button[type=submit]").hide(); // Hide the submit button in the form
-  const deckType = '<%- deckType %>';
-  document.title = `Write`;
+    <script>
+      $(function () {
+        $("form button[type=submit]").hide(); // Hide the submit button in the form
+        const deckType = '<%- deckType %>';
+        document.title = `Write`;
 
-  const deck = <%- JSON.stringify(deck) %>;
-  const query = <%- JSON.stringify(query) %>;
-  var L1 = (query.L1 == 'on' ? true : false);
-  var trace = query.trace !== undefined ? (query.trace == 'on' ? true : false) : true;
-  var write = query.write !== undefined ? (query.write == 'on' ? true : false) : true;
-  $("#L1").prop('checked', L1);
-  $("#trace").prop('checked', trace);
-  $("#write").prop('checked', write);
+        const deck = <%- JSON.stringify(deck) %>;
+        const query = <%- JSON.stringify(query) %>;
+        var L1 = (query.L1 == 'on' ? true : false);
+        var trace = query.trace !== undefined ? (query.trace == 'on' ? true : false) : true;
+        var write = query.write !== undefined ? (query.write == 'on' ? true : false) : true;
+        $("#L1").prop('checked', L1);
+        $("#trace").prop('checked', trace);
+        $("#write").prop('checked', write);
 
-  for (let i of deck){
-    let row = 
-    `<div class="d-flex flex-nowrap px-5 pb-4">
+        for (let i of deck) {
+          let row =
+            `<div class="d-flex flex-nowrap px-5 pb-4">
       <div class="L1 NH text-nowrap" style="display:none;">${i.meaning}</div>
       <div class="trace NHdot text-nowrap" style="display:none;"">|||${i.word}</div>
       <div class="write NHline flex-shrink-1 overflow-hidden" style="display:none;">
-        ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||</div>
+        ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||</div>
     </div>`;
 
-    $("#content").append(row);
-  }
+          $("#content").append(row);
+        }
 
-  if (L1) $(".L1").show();
-  if (trace) $(".trace").show();
-  if (write)$(".write").show();
+        if (L1) $(".L1").show();
+        if (trace) $(".trace").show();
+        if (write) $(".write").show();
 
-  $("#L1").change(function(){
-    if(this.checked){
-      $(".L1").show();
-    } else {
-      $(".L1").hide();
-    }
-  });
-  $("#trace").change(function(){
-    if(this.checked){
-      $(".trace").show();
-    } else {
-      $(".trace").hide();
-    }
-  });
-  $("#write").change(function(){
-    if(this.checked){
-      $(".write").show();
-    } else {
-      $(".write").hide();
-    }
-  });
-});
-</script>
+        $("#L1").change(function () {
+          if (this.checked) {
+            $(".L1").show();
+          } else {
+            $(".L1").hide();
+          }
+        });
+        $("#trace").change(function () {
+          if (this.checked) {
+            $(".trace").show();
+          } else {
+            $(".trace").hide();
+          }
+        });
+        $("#write").change(function () {
+          if (this.checked) {
+            $(".write").show();
+          } else {
+            $(".write").hide();
+          }
+        });
+      });
+    </script>
 
 
-<%- include('../../foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->
+    <%- include('../../foot'); -%><!-- FOOT INCLUDES SCRIPTS AND </body> -->

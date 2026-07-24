@@ -14,7 +14,7 @@
     cursor: pointer;
   }
 
-  #choose-selected-preview {
+  .choose-slide-img, #choose-selected-preview {
     max-width: 220px;
     max-height: 220px;
     border-radius: 12px;
@@ -70,40 +70,66 @@
     line-height: 1.35;
   }
 
-  #choose-speak-btn {
-    min-width: 180px;
+  #choose-listen-btn, #choose-stop-btn {
+    min-width: 130px;
   }
 
   #choose-heard {
     min-height: 1.5rem;
     font-size: 1rem;
   }
+
+  .mic-listening {
+    animation: mic-pulse 1.5s infinite;
+    box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+  }
+
+  @keyframes mic-pulse {
+    0% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+    }
+    70% {
+      transform: scale(1.05);
+      box-shadow: 0 0 0 15px rgba(40, 167, 69, 0);
+    }
+    100% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+    }
+  }
 </style>
 
 <div class="container">
+  <div id="choose-unsupportedAlert" class="alert alert-warning text-center mx-auto my-2" style="max-width:500px; display:none;">
+    <i class="material-icons align-middle">warning</i>
+    <span class="align-middle ms-1">Speech recognition is not supported in this browser. Please try Google Chrome or Microsoft Edge.</span>
+  </div>
+
   <div class="row">
     <div id="choose-status" class="col-12 text-center text-primary fw-bold mb-2"></div>
   </div>
 
   <div class="row" id="choose-chooser-panel">
-    <div class="col-12 text-center mb-2">
-      <button id="choose-speak-btn" class="btn btn-primary" type="button">Tap To Speak</button>
-      <div class="form-check form-switch d-inline-flex align-items-center ms-3">
-        <input class="form-check-input" type="checkbox" id="choose-auto-listen">
-        <label class="form-check-label ms-2" for="choose-auto-listen">Auto-listen</label>
-      </div>
-      <div id="choose-heard" class="text-secondary mt-2"></div>
+    <div class="col-12 text-center mb-3">
+      <button id="choose-listen-btn" class="btn btn-lg btn-success me-2 px-4 shadow" type="button">
+        <i class="material-icons align-middle">record_voice_over</i>
+        <span class="align-middle ms-1">Start</span>
+      </button>
+      <button id="choose-stop-btn" class="btn btn-lg btn-secondary px-4 shadow" type="button" disabled>
+        <i class="material-icons align-middle">stop</i>
+        <span class="align-middle ms-1">Stop</span>
+      </button>
+      <div id="choose-heard" class="text-secondary mt-2 fw-semibold"></div>
     </div>
-    <div class="col-12 text-center fw-bold text-secondary mb-2">Images</div>
     <div id="choose-images" class="col-12 d-flex flex-wrap justify-content-center"></div>
   </div>
 
   <div class="row d-none" id="choose-guesser-panel">
-    <div class="col-12 text-center fw-bold text-secondary mb-1">Selected Image</div>
     <div class="col-12 text-center mb-2">
+      <div id="choose-slideshow-container" class="d-flex justify-content-center align-items-center mx-auto mb-2"></div>
       <img id="choose-selected-preview" class="img-fluid d-none" alt="selected image">
     </div>
-    <div class="col-12 text-center fw-bold text-secondary mb-2">Words</div>
     <div id="choose-words" class="col-12 d-flex flex-wrap justify-content-center"></div>
   </div>
 </div>

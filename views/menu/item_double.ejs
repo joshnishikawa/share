@@ -6,10 +6,12 @@
     <strong class="text-primary fs-5">D</strong>
 
     <div class="alert alert-primary border border-primary p-0 my-auto" style="height:21px;width:21px;">
-      <div class="alert alert-warning border border-warning p-0 rounded-1" style="height:9px;width:9px;margin:5px;"></div>
+      <div class="alert alert-warning border border-warning p-0 rounded-1" style="height:9px;width:9px;margin:5px;">
+      </div>
     </div>
     <div class="alert alert-primary border border-primary p-0 my-auto" style="height:21px;width:21px;">
-      <div class="alert alert-warning border border-warning p-0 rounded-bottom rounded-0 mx-auto" style="height:9px;width:9px;top:-1px;"></div>
+      <div class="alert alert-warning border border-warning p-0 rounded-bottom rounded-0 mx-auto"
+        style="height:9px;width:9px;top:-1px;"></div>
     </div>
 
     <strong class="text-primary fs-5 pe-2">BLE</strong>
@@ -33,7 +35,7 @@
     <button type="submit" class="btn btn-sm btn-primary YM" style="height:100%;">Start</button>
     <script>
       // Set switch based on query string
-      (function() {
+      (function () {
         const params = new URLSearchParams(window.location.search);
         const num = params.get('number');
         const switchInput = document.getElementById('numberSwitch');
@@ -56,19 +58,25 @@
         vertical-align: middle;
         margin: 0 6px;
       }
+
       .custom-switch input {
         opacity: 0;
         width: 0;
         height: 0;
       }
+
       .custom-slider {
         position: absolute;
         cursor: pointer;
-        top: 0; left: 0; right: 0; bottom: 0;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
         background: #0d6efd;
         border-radius: 22px;
         transition: background 0.2s;
       }
+
       .custom-slider:before {
         position: absolute;
         content: "";
@@ -79,15 +87,18 @@
         background: #fff;
         border-radius: 50%;
         transition: transform 0.2s;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
       }
-      .custom-switch input:checked + .custom-slider:before {
+
+      .custom-switch input:checked+.custom-slider:before {
         transform: translateX(16px);
       }
+
       .custom-switch.disabled .custom-slider {
         background: #adb5bd;
         cursor: not-allowed;
       }
+
       .custom-switch.disabled input {
         pointer-events: none;
       }
@@ -104,7 +115,7 @@
       updateNumberValue();
 
       // Enable/disable the 9-toggle based on deck size
-      window.updateDoubleSwitch = function() {
+      window.updateDoubleSwitch = function () {
         var d = window.deck || [];
         if (d.length < 2 * 9 - 1) {
           switchInput.disabled = true;
@@ -127,17 +138,20 @@
 <div id="double_modal" class="modal fade">
   <div class="modal-dialog">
     <div class="modal-content">
-    
+
       <div class="modal-header">
         <h3 class="modal-title">DOUBLE</h3>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <p>An activity bases on the concept of Dobble (Spot It). Although not 
-          as awesome as the original, it's awesome in its own way!</p>
-        <p> As soon as anyone calls out the match, you push <kbd>Space</kbd> or
-          <kbd>&rarr;</kbd>. When the matching cards have a yellow background, 
-          the whole class repeats.</p>
+        <p>An activity based on the concept of Dobble (Spot It). Although not
+          as mathematically inspired as the original, it works for any number of
+          at items (at least 7 items total to have 4-items per card or at least
+          17 items total to have 9 items per card.</p>
+        <p>As soon as anyone calls out the match, you push <kbd>Space</kbd> or
+          <kbd>&rarr;</kbd>. When the matching cards have a yellow background,
+          the whole class repeats. Don't keep score. Just keep moving.
+        </p>
       </div>
     </div>
   </div>

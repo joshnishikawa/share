@@ -51,23 +51,23 @@ function sanitizePlayerData(data) {
   const clean = {};
   if (isStr(data.id, 60)) clean.id = data.id;
   else return null;
-  if (data.roomname !== undefined) {
+  if (data.roomname !== undefined && data.roomname !== null) {
     if (isStr(data.roomname, 60)) clean.roomname = data.roomname;
     else return null;
   }
-  if (data.roomtype !== undefined) {
+  if (data.roomtype !== undefined && data.roomtype !== null) {
     if (['public', 'private'].includes(data.roomtype)) clean.roomtype = data.roomtype;
     else return null;
   }
-  if (data.color !== undefined) {
+  if (data.color !== undefined && data.color !== null) {
     if (isStr(data.color, 20) && /^#[0-9a-fA-F]{3,8}$/.test(data.color)) clean.color = data.color;
-    else clean.color = '#000000';
+    else clean.color = '#0d6efd';
   }
-  if (data.activity !== undefined) {
+  if (data.activity !== undefined && data.activity !== null) {
     if (isStr(data.activity, 30)) clean.activity = data.activity;
     else clean.activity = null;
   }
-  if (data.number !== undefined) clean.number = data.number;
+  if (data.number !== undefined && data.number !== null) clean.number = data.number;
   return clean;
 }
 
