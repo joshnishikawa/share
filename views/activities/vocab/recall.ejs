@@ -175,6 +175,7 @@ $(function(){
     if (e.key == "Space"){
       e.preventDefault();
     }
+    if (e.key == "Enter") $("#start:visible").click();
     if (e.key == "/"){
       e.preventDefault();
       if (slash) return;

@@ -29,7 +29,7 @@
   <input type="hidden" name="trace" value="on">
   <input type="hidden" name="write" value="on">
   <select class="form-select form-select-sm vocab-activity-select" style="width: auto; max-width: 180px;" aria-label="Switch vocabulary activity">
-    <option value="" selected disabled>Activity...</option>
+    <option value="" selected disabled>Change Activity...</option>
     <% activities.forEach(function(act) { %>
       <option value="<%= act.id %>" <%= currentAct === act.id ? 'disabled' : '' %>>
         <%= act.name %><%= currentAct === act.id ? ' (current)' : '' %>

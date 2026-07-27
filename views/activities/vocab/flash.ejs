@@ -201,6 +201,7 @@ $(function(){
         }
         break;
       case "ArrowRight":
+      case " ":
         if (card < deck.length - 1) {
           card += 1;
           let content = deckType == 'text' ? deck[card].word 
