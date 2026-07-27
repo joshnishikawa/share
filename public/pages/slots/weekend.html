@@ -1,223 +1,395 @@
 <style>
-  #adj, #went, #ate, #saw, #enjoyed{
-    height:4rem;
+  #adj,
+  #went,
+  #ate,
+  #saw,
+  #enjoyed {
+    height: 2.6rem;
     overflow: hidden;
+    display: inline-block;
+    vertical-align: middle;
+    min-width: 160px;
+    line-height: 2.6rem;
   }
-  .inshade{
-    box-shadow: 
-    rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset, 
-    rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;
+
+  .inshade {
+    box-shadow:
+      rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset,
+      rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;
+  }
+
+  .slot-sentence-col {
+    font-size: 1.15rem;
+    font-weight: 500;
+  }
+
+  .form-check-input {
+    cursor: pointer;
+  }
+
+  .form-check-label {
+    cursor: pointer;
+  }
+
+  .slot-reel-item {
+    line-height: 2.6rem;
+  }
+
+  .combo-svg-wrapper {
+    overflow: visible !important;
+    padding: 0 4px;
+  }
+
+  .combo-svg-wrapper svg {
+    height: 36px;
+    width: auto;
+    display: inline-block;
+    vertical-align: middle;
+    overflow: visible !important;
+  }
+
+  .combo-svg-wrapper path {
+    transition: stroke 0.3s ease, filter 0.3s ease;
+  }
+
+  .combo-active {
+    stroke: #00ff66 !important;
+    filter: drop-shadow(0 0 6px rgba(0, 255, 102, 0.95));
+  }
+
+  .you-win-badge {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #00ff66 !important;
+    text-shadow: 0 0 8px rgba(0, 255, 102, 0.8), 0 0 16px rgba(0, 255, 102, 0.5);
+    display: inline-block;
+    vertical-align: middle;
   }
 </style>
 
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-1">
-      <div id="SPIN" class="btn btn-lg btn-success">SPIN</div>
+<div class="container-fluid py-1">
+  <!-- Game Control & Score Bar -->
+  <div class="d-flex flex-wrap align-items-center justify-content-between mb-2 pb-1 border-bottom">
+    <div class="d-flex align-items-center me-3">
+      <button id="SPIN" class="btn btn-lg btn-success fw-bold me-2 shadow-sm px-4 disabled" disabled>
+        <i class="material-icons align-middle me-1 fs-5">casino</i> SPIN
+      </button>
+      <button id="RESET_GAME" class="btn btn-lg btn-outline-secondary fw-bold me-3 shadow-sm px-4">
+        <i class="material-icons align-middle me-1 fs-5">refresh</i> Reset
+      </button>
     </div>
-    <div class="col-11">
-      <div class="container YM fs-1">
 
-        <div class="row mb-2">
-          <div class="col-4" style="text-align: right;">It was </div>
-          <div id="adj" class="col-4 text-center inshade border rounded-3 bg-light"></div>
-          <div class="col-4">.</div>
-        </div>
-      
-        <div class="row mb-2">
-          <div class="col-4" style="text-align:right;">I went to</div>
-          <div id="went" class="col-4 text-center inshade border rounded-3 bg-light"></div>
-          <div class="col-4">.</div>
-        </div>
-      
-        <div class="row mb-2">
-          <div class="col-4" style="text-align:right;">I saw</div>
-          <div id="saw" class="col-4 text-center inshade border rounded-3 bg-light"></div>
-          <div class="col-4">.</div>
-        </div>
-      
-        <div class="row mb-2">
-          <div class="col-4" style="text-align:right;">I ate</div>
-          <div id="ate" class="col-4 text-center inshade border rounded-3 bg-light"></div>
-          <div class="col-4">.</div>
-        </div>
-      
-        <div class="row">
-          <div class="col-4" style="text-align:right;">I enjoyed</div>
-          <div id="enjoyed" class="col-4 text-center inshade border rounded-3 bg-light"></div>
-          <div class="col-4">.</div>
-        </div>
+    <div class="text-center flex-grow-1">
+      <span id="you-win-text" class="fw-bold fs-4 text-success d-none align-middle">🎉 You Win!</span>
+    </div>
 
+    <div class="d-flex align-items-center gap-3 fs-6">
+      <div class="fs-3">Score: <strong class="text-success" id="score-checks">0</strong></div>
+      <div id="combo-container" class="combo-svg-wrapper d-inline-flex align-items-center me-2">
+        <svg width="514.26389mm" height="157.86459mm" viewBox="-20 -20 514.26389 157.86459" version="1.1" id="svg5"
+          style="overflow: visible;" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+          <defs id="defs2" />
+          <path
+            style="fill:none;stroke:#646464;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;stroke-dasharray:none;paint-order:markers fill stroke;stroke-opacity:1;"
+            id="quintuple"
+            d="m 430.23366,65.850688 c -25.35843,94.639042 85.15281,5.148803 -12.69047,10.276559 -97.84327,5.127742 21.41688,82.576183 -13.69514,-8.893745 -35.11201,-91.469919 -71.91645,45.886098 4.2264,-15.773171 76.14287,-61.659271 -65.86366,-54.2170217 16.30723,-0.854617 82.17087,53.362396 31.21045,-79.394061 5.85198,15.244974 z" />
+          <path
+            style="fill:none;stroke:#646464;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;stroke-dasharray:none;paint-order:markers fill stroke;stroke-opacity:1;"
+            id="quadruple"
+            d="m 308.22931,48.390189 c 1.26133,90.697891 80.15769,9.576168 -10.54019,10.837493 -90.6979,1.26133 -9.57616,80.157698 -10.83749,-10.540195 -1.26133,-90.697882 -80.15771,-9.576168 10.54018,-10.837496 90.69789,-1.261328 9.57618,-80.157684 10.8375,10.540198 z" />
+          <path id="triple"
+            style="fill:none;stroke:#646464;stroke-width:14.7238;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;paint-order:markers fill stroke;stroke-opacity:1;"
+            transform="matrix(0.04335842,-0.67778481,0.67778481,0.04335842,143.62034,167.69794)"
+            d="M 180.00002,50 C 93.397475,-36.602541 55.358999,105.35898 173.66027,73.660254 291.96154,41.961525 188.03849,-61.961524 156.33976,56.339746 124.64103,174.64102 266.60256,136.60254 180.00002,50 Z" />
+          <path
+            d="m 105.31409,57.86459 c 15.98401,2.550742 26.21508,8.130625 30.73619,16.717051 a 19.40796,19.40796 0 1 1 -34.3457,18.084452 C 97.183469,84.079674 98.372329,72.486705 105.31409,57.86459 Z m 0,0 C 89.330099,55.313848 79.099029,49.734004 74.577929,41.147579 A 19.40796,19.40796 0 1 1 108.92363,23.063123 c 4.52112,8.586428 3.33223,20.179348 -3.60954,34.801467 z"
+            id="double" style="fill:none;stroke:#646464;stroke-width:10;stroke-dasharray:none;stroke-opacity:1;" />
+          <path id="single"
+            style="fill:none;stroke:#646464;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;paint-order:markers fill stroke;stroke-opacity:1;"
+            d="M 65.628174,82.550499 A 30.314087,30.314087 0 0 1 35.314087,112.86459 30.314087,30.314087 0 0 1 5,82.550499 30.314087,30.314087 0 0 1 35.314087,52.236412 30.314087,30.314087 0 0 1 65.628174,82.550499 Z" />
+        </svg>
       </div>
     </div>
   </div>
+
+  <!-- Row 1: Adjective -->
+  <div class="row align-items-center py-0">
+    <div class="col-6 slot-sentence-col d-flex align-items-center justify-content-end YM fs-1">
+      <span class="me-2">It was</span>
+      <div id="adj" class="inshade border rounded-3 bg-light text-center px-2"></div>
+      <span class="ms-1">.</span>
+    </div>
+    <div class="col-6">
+      <div id="group-adj" class="d-flex flex-wrap align-items-center"></div>
+    </div>
+  </div>
+  <hr class="my-1">
+
+  <!-- Row 2: Place -->
+  <div class="row align-items-center py-0">
+    <div class="col-6 slot-sentence-col d-flex align-items-center justify-content-end YM fs-1">
+      <span class="me-2">I went to</span>
+      <div id="went" class="inshade border rounded-3 bg-light text-center px-2"></div>
+      <span class="ms-1">.</span>
+    </div>
+    <div class="col-6">
+      <div id="group-went" class="d-flex flex-wrap align-items-center"></div>
+    </div>
+  </div>
+  <hr class="my-1">
+
+  <!-- Row 3: Sight -->
+  <div class="row align-items-center py-0">
+    <div class="col-6 slot-sentence-col d-flex align-items-center justify-content-end YM fs-1">
+      <span class="me-2">I saw</span>
+      <div id="saw" class="inshade border rounded-3 bg-light text-center px-2"></div>
+      <span class="ms-1">.</span>
+    </div>
+    <div class="col-6">
+      <div id="group-saw" class="d-flex flex-wrap align-items-center"></div>
+    </div>
+  </div>
+  <hr class="my-1">
+
+  <!-- Row 4: Food -->
+  <div class="row align-items-center py-0">
+    <div class="col-6 slot-sentence-col d-flex align-items-center justify-content-end YM fs-1">
+      <span class="me-2">I ate</span>
+      <div id="ate" class="inshade border rounded-3 bg-light text-center px-2"></div>
+      <span class="ms-1">.</span>
+    </div>
+    <div class="col-6">
+      <div id="group-ate" class="d-flex flex-wrap align-items-center"></div>
+    </div>
+  </div>
+  <hr class="my-1">
+
+  <!-- Row 5: Activity -->
+  <div class="row align-items-center py-0">
+    <div class="col-6 slot-sentence-col d-flex align-items-center justify-content-end YM fs-1">
+      <span class="me-2">I enjoyed</span>
+      <div id="enjoyed" class="inshade border rounded-3 bg-light text-center px-2"></div>
+      <span class="ms-1">.</span>
+    </div>
+    <div class="col-6">
+      <div id="group-enjoyed" class="d-flex flex-wrap align-items-center"></div>
+    </div>
+  </div>
+  <hr class="my-1">
 </div>
 
-
-
-
 <script>
-$(function(){
-  $(".item").removeClass("active disabled");
-  $("#weekend").addClass("active disabled");
-  $("#SPIN").on('click', function(){
-    runit();
+  $(function () {
+    $(".item").removeClass("active disabled");
+    $("#weekend").addClass("active disabled");
+
+    const ORIGINAL_DATA = {
+      adj: ["great", "amazing", "fantastic", "wonderful", "interesting", "exciting", "fun", "fine", "good", "busy"],
+      went: ["the beach", "the park", "the zoo", "the museum", "the library", "the store", "the aquarium", "a party", "a concert", "the amusement park"],
+      saw: ["my friend", "a deer", "my grandmother", "a movie", "a game", "my cousin", "a parade", "a concert", "a play", "my teacher"],
+      ate: ["a hotdog", "a hamburger", "a pizza", "a sandwich", "a salad", "a taco", "a burrito", "a cookie", "a cake", "a pie"],
+      enjoyed: ["playing games", "watching a movie", "playing sports", "reading a book", "listening to music", "dancing", "singing", "drawing", "painting", "writing"]
+    };
+
+    const COMBO_MAP = {
+      1: "single",
+      2: "double",
+      3: "triple",
+      4: "quadruple",
+      5: "quintuple"
+    };
+
+    let pools = {};
+    let statusMap = {};
+    let totalGreenChecks = 0;
+    let achievedCombos = new Set();
+
+    function toId(str) {
+      return str.replace(/ /g, '');
+    }
+
+    function populateSlotReels() {
+      $("#adj, #went, #saw, #ate, #enjoyed").empty();
+      for (let catKey in ORIGINAL_DATA) {
+        let slotElemId = "#" + catKey;
+        $(slotElemId).append(`<div id="${catKey}_empty" class="fs-3 text-center YM slot-reel-item">&nbsp;</div>`);
+        for (let item of ORIGINAL_DATA[catKey]) {
+          let itemId = catKey + "_" + toId(item);
+          $(slotElemId).append(`<div id="${itemId}" class="fs-3 text-center YM slot-reel-item">${item}</div>`);
+        }
+      }
+    }
+
+    function updateSpinButtonState() {
+      let allPoolsEmpty = true;
+      let allSelected = true;
+
+      for (let catKey in ORIGINAL_DATA) {
+        if (pools[catKey] && pools[catKey].length > 0) {
+          allPoolsEmpty = false;
+          let selected = $(`input[name="predict_${catKey}"]:checked`).val();
+          if (!selected) {
+            allSelected = false;
+          }
+        }
+      }
+
+      if (allPoolsEmpty) {
+        $("#SPIN").addClass("disabled").prop("disabled", true);
+        $("#RESET_GAME").removeClass("btn-outline-secondary").addClass("btn-success");
+        return;
+      }
+
+      if (allSelected) {
+        $("#SPIN").removeClass("disabled").prop("disabled", false);
+      } else {
+        $("#SPIN").addClass("disabled").prop("disabled", true);
+      }
+    }
+
+    function initGame() {
+      pools = {
+        adj: ORIGINAL_DATA.adj.slice(),
+        went: ORIGINAL_DATA.went.slice(),
+        saw: ORIGINAL_DATA.saw.slice(),
+        ate: ORIGINAL_DATA.ate.slice(),
+        enjoyed: ORIGINAL_DATA.enjoyed.slice()
+      };
+
+      statusMap = {};
+      for (let catKey in ORIGINAL_DATA) {
+        statusMap[catKey] = {};
+        for (let item of ORIGINAL_DATA[catKey]) {
+          statusMap[catKey][item] = 'active';
+        }
+        $("#" + catKey).scrollTop(0);
+      }
+
+      totalGreenChecks = 0;
+      achievedCombos.clear();
+
+      $("#score-checks").text(0);
+      $("#you-win-text").addClass("d-none");
+
+      // Reset Reset button to outline secondary
+      $("#RESET_GAME").removeClass("btn-success").addClass("btn-outline-secondary");
+
+      // Reset Combo SVG paths to gray stroke
+      $("#single, #double, #triple, #quadruple, #quintuple")
+        .removeClass("combo-active")
+        .css("stroke", "#646464")
+        .attr("stroke", "#646464");
+
+      renderAllOptionGroups(true);
+      updateSpinButtonState();
+    }
+
+    function renderAllOptionGroups(clearChecked = false) {
+      for (let catKey in ORIGINAL_DATA) {
+        renderOptionGroup(catKey, clearChecked);
+      }
+    }
+
+    function renderOptionGroup(catKey, clearChecked = false) {
+      let groupContainer = $("#group-" + catKey);
+      let currentlyChecked = clearChecked ? null : groupContainer.find(`input[name="predict_${catKey}"]:checked`).val();
+
+      groupContainer.empty();
+
+      let items = ORIGINAL_DATA[catKey];
+
+      items.forEach((item) => {
+        let st = statusMap[catKey][item];
+        let sanitizedId = `radio_${catKey}_${toId(item)}`;
+
+        if (st === 'active') {
+          let isChecked = (!clearChecked && currentlyChecked === item) ? 'checked' : '';
+          let radioHtml = `
+          <div class="form-check form-check-inline me-2 my-0">
+            <input class="form-check-input" type="radio" name="predict_${catKey}" id="${sanitizedId}" value="${item}" ${isChecked}>
+            <label class="form-check-label text-dark fs-6" for="${sanitizedId}">${item}</label>
+          </div>
+        `;
+          groupContainer.append(radioHtml);
+        } else if (st === 'green_check') {
+          let badgeHtml = `
+          <span class="text-success fw-bold me-2 my-0 d-inline-flex align-items-center fs-6">
+            <i class="material-icons fs-6 me-1">check_circle</i> ${item}
+          </span>
+        `;
+          groupContainer.append(badgeHtml);
+        }
+      });
+    }
+
+    function runit() {
+      let roundHits = 0;
+
+      for (let catKey in ORIGINAL_DATA) {
+        let pool = pools[catKey];
+        if (pool.length === 0) continue;
+
+        let selectedItem = $(`input[name="predict_${catKey}"]:checked`).val();
+
+        let randIndex = Math.floor(Math.random() * pool.length);
+        let hitItem = pool[randIndex];
+
+        pool.splice(randIndex, 1);
+
+        if (selectedItem === hitItem) {
+          statusMap[catKey][hitItem] = 'green_check';
+          totalGreenChecks++;
+          roundHits++;
+
+          // Clear field (slot box) for items we get hits on
+          $("#" + catKey).scrollTop(0);
+        } else {
+          statusMap[catKey][hitItem] = 'removed';
+          spinit(catKey, catKey + '_' + toId(hitItem));
+        }
+
+        renderOptionGroup(catKey);
+      }
+
+      // Light up corresponding combo SVG path and award combo bonus value when first unlocked
+      if (COMBO_MAP[roundHits]) {
+        let comboPathId = COMBO_MAP[roundHits];
+        if (!achievedCombos.has(comboPathId)) {
+          achievedCombos.add(comboPathId);
+          $("#" + comboPathId)
+            .addClass("combo-active")
+            .css("stroke", "#00ff66")
+            .attr("stroke", "#00ff66");
+
+          // Award bonus equal to the value of the combo (single: +1, double: +2, triple: +3, quadruple: +4, quintuple: +5)
+          totalGreenChecks += roundHits;
+
+          // Check if all 5 combos have been achieved!
+          if (achievedCombos.size === 5) {
+            $("#you-win-text").removeClass("d-none");
+          }
+        }
+      }
+
+      $("#score-checks").text(totalGreenChecks);
+
+      updateSpinButtonState();
+    }
+
+    $(document).on('change', 'input[type="radio"]', function () {
+      updateSpinButtonState();
+    });
+
+    $("#SPIN").on('click', function () {
+      if ($(this).hasClass("disabled")) return;
+      runit();
+    });
+
+    $("#RESET_GAME").on('click', function () {
+      initGame();
+    });
+
+    populateSlotReels();
+    initGame();
   });
-
-  const ADJ = [
-    "great",
-    "amazing",
-    "fantastic",
-    "wonderful",
-    "interesting",
-    "exciting",
-    "fun",
-  ];
-  var adj = ADJ.slice();
-
-
-  const PLACES = [
-    "the beach",
-    "the park",
-    "the zoo",
-    "the museum",
-    "the library",
-    "the store",
-    "the aquarium",
-    "a party",
-    "a concert"
-  ];
-  var places = PLACES.slice();
-
-
-  const SIGHTS = [
-    "my friend",
-    "a deer",
-    "my grandmother",
-    "a movie",
-    "a game",
-    "my cousin",
-    "a parade",
-    "a concert",
-    "a play",
-    "my teacher"
-  ];
-  var sights = SIGHTS.slice();
-
-
-  const FOODS = [
-    "a hotdog",
-    "a hamburger",
-    "a pizza",
-    "a sandwich",
-    "a salad",
-    "a taco",
-    "a burrito",
-    "a cookie",
-    "a cake",
-    "a pie"
-  ];
-  var foods = FOODS.slice();
-
-
-  const ACTIVITIES = [
-    "playing games",
-    "watching a movie",
-    "playing sports",
-    "reading a book",
-    "listening to music",
-    "dancing",
-    "singing",
-    "drawing",
-    "painting",
-    "writing"
-  ];
-  var activities = ACTIVITIES.slice();
-
-
-  for (let a of ADJ){
-    $("#adj").append(`<div id="${a}" class="fs-1">${a}</div>`);
-  }
-  for (let place of PLACES){
-    $("#went").append(`<div id="${place.replace(/ /g, '')}" class="fs-1">${place}</div>`);
-  }
-  for (let sight of SIGHTS){
-    $("#saw").append(`<div id="${sight.replace(/ /g, '')}" class="fs-1">${sight}</div>`);
-  }
-  for (let food of FOODS){
-    $("#ate").append(`<div id="${food.replace(/ /g, '')}" class="fs-1">${food}</div>`);
-  }
-  for (let activity of ACTIVITIES){
-    $("#enjoyed").append(`<div id="${activity.replace(/ /g, '')}" class="fs-1">${activity}</div>`);
-  }
-
-
-  runit = ()=>{
-    getAdj();
-    getPlace();
-    getSight();
-    getFood();
-    getActivity();
-  }
-
-
-  function getAdj(){
-    if (adj.length == 0){
-      adj = ADJ.slice();
-    }
-    let a = adj[Math.floor(Math.random() * adj.length)];
-    adj.splice(adj.indexOf(a), 1);
-    let id = a.replace(/ /g, '');
-    spinit("adj", id);
-    return a;
-  }
-
-
-  function getPlace(){
-    if (places.length == 0){
-      places = PLACES.slice();
-    }
-    let place = places[Math.floor(Math.random() * places.length)];
-    places.splice(places.indexOf(place), 1);
-    let id = place.replace(/ /g, '');
-    spinit("went", id);
-    return place;
-  }
-
-  function getSight(){
-    if (sights.length == 0){
-      sights = SIGHTS.slice();
-    }
-    let sight = sights[Math.floor(Math.random() * sights.length)];
-    sights.splice(sights.indexOf(sight), 1);
-    let id = sight.replace(/ /g, '');
-    spinit("saw", id);
-    return sight;
-  }
-
-  function getFood(){
-    if (foods.length == 0){
-      foods = FOODS.slice();
-    }
-    let food = foods[Math.floor(Math.random() * foods.length)];
-    foods.splice(foods.indexOf(food), 1);
-    let id = food.replace(/ /g, '');
-    spinit("ate", id);
-    return food;
-  }
-
-  function getActivity(){
-    if (activities.length == 0){
-      activities = ACTIVITIES.slice();
-    }
-    let activity = activities[Math.floor(Math.random() * activities.length)];
-    activities.splice(activities.indexOf(activity), 1);
-    let id = activity.replace(/ /g, '');
-    spinit("enjoyed", id);
-    return activity;
-  }
-
-  runit();
-
-});
 </script>
