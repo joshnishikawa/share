@@ -65,22 +65,69 @@
     display: inline-block;
     vertical-align: middle;
   }
+
+  /* Active Field & Speech Recognition Highlights */
+  .slot-field-active {
+    border: 2.5px solid #0d6efd !important;
+    box-shadow: 0 0 12px rgba(13, 110, 253, 0.6), inset 0 0 6px rgba(13, 110, 253, 0.2) !important;
+    transform: scale(1.02);
+    transition: all 0.25s ease-in-out;
+  }
+
+  .slot-row {
+    cursor: pointer;
+    transition: background-color 0.25s ease, box-shadow 0.25s ease;
+    border-radius: 8px;
+    padding: 4px 6px;
+  }
+
+  .slot-row:hover {
+    background-color: rgba(13, 110, 253, 0.03);
+  }
+
+  .slot-row-active {
+    background-color: rgba(13, 110, 253, 0.06);
+    border-left: 4px solid #0d6efd;
+  }
+
+  .mic-listening {
+    animation: mic-pulse 1.4s infinite;
+  }
+
+  @keyframes mic-pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+    }
+  }
+
+  .speech-badge {
+    transition: all 0.3s ease;
+  }
 </style>
 
 <div class="container-fluid py-1">
   <!-- Game Control & Score Bar -->
-  <div class="d-flex flex-wrap align-items-center justify-content-between mb-2 pb-1 border-bottom">
-    <div class="d-flex align-items-center me-3">
+  <div class="d-flex flex-wrap align-items-center justify-content-between mb-2 pb-1 border-bottom gap-2">
+    <div class="d-flex align-items-center me-2">
       <button id="SPIN" class="btn btn-lg btn-success fw-bold me-2 shadow-sm px-4 disabled" disabled>
         <i class="material-icons align-middle me-1 fs-5">casino</i> SPIN
       </button>
-      <button id="RESET_GAME" class="btn btn-lg btn-outline-secondary fw-bold me-3 shadow-sm px-4">
+      <button id="RESET_GAME" class="btn btn-lg btn-outline-secondary fw-bold me-2 shadow-sm px-3">
         <i class="material-icons align-middle me-1 fs-5">refresh</i> Reset
+      </button>
+      <button id="MIC_TOGGLE" class="btn btn-lg btn-outline-primary fw-bold shadow-sm px-3 me-2" title="Toggle Speech Recognition">
+        <i class="material-icons align-middle me-1 fs-5" id="mic-icon">mic</i> <span id="mic-btn-text">Start Mic</span>
       </button>
     </div>
 
-    <div class="text-center flex-grow-1">
-      <span id="you-win-text" class="fw-bold fs-4 text-success d-none align-middle">🎉 You Win!</span>
+    <div class="text-center flex-grow-1 d-flex align-items-center justify-content-center gap-2">
+      <span id="you-win-text" class="fw-bold fs-4 text-success d-none align-middle ms-2">🎉 You Win!</span>
     </div>
 
     <div class="d-flex align-items-center gap-3 fs-6">
@@ -112,8 +159,12 @@
     </div>
   </div>
 
+  <div id="speech-unsupported-alert" class="alert alert-warning alert-dismissible fade show my-2 d-none" role="alert">
+    <i class="material-icons align-middle me-1">warning</i> Web Speech API is not supported in this browser. You can still play by clicking the options.
+  </div>
+
   <!-- Row 1: Adjective -->
-  <div class="row align-items-center py-0">
+  <div class="row align-items-center py-1 slot-row" data-catkey="adj">
     <div class="col-6 slot-sentence-col d-flex align-items-center justify-content-end YM fs-1">
       <span class="me-2">It was</span>
       <div id="adj" class="inshade border rounded-3 bg-light text-center px-2"></div>
@@ -126,7 +177,7 @@
   <hr class="my-1">
 
   <!-- Row 2: Place -->
-  <div class="row align-items-center py-0">
+  <div class="row align-items-center py-1 slot-row" data-catkey="went">
     <div class="col-6 slot-sentence-col d-flex align-items-center justify-content-end YM fs-1">
       <span class="me-2">I went to</span>
       <div id="went" class="inshade border rounded-3 bg-light text-center px-2"></div>
@@ -139,7 +190,7 @@
   <hr class="my-1">
 
   <!-- Row 3: Sight -->
-  <div class="row align-items-center py-0">
+  <div class="row align-items-center py-1 slot-row" data-catkey="saw">
     <div class="col-6 slot-sentence-col d-flex align-items-center justify-content-end YM fs-1">
       <span class="me-2">I saw</span>
       <div id="saw" class="inshade border rounded-3 bg-light text-center px-2"></div>
@@ -152,7 +203,7 @@
   <hr class="my-1">
 
   <!-- Row 4: Food -->
-  <div class="row align-items-center py-0">
+  <div class="row align-items-center py-1 slot-row" data-catkey="ate">
     <div class="col-6 slot-sentence-col d-flex align-items-center justify-content-end YM fs-1">
       <span class="me-2">I ate</span>
       <div id="ate" class="inshade border rounded-3 bg-light text-center px-2"></div>
@@ -165,7 +216,7 @@
   <hr class="my-1">
 
   <!-- Row 5: Activity -->
-  <div class="row align-items-center py-0">
+  <div class="row align-items-center py-1 slot-row" data-catkey="enjoyed">
     <div class="col-6 slot-sentence-col d-flex align-items-center justify-content-end YM fs-1">
       <span class="me-2">I enjoyed</span>
       <div id="enjoyed" class="inshade border rounded-3 bg-light text-center px-2"></div>
@@ -204,8 +255,191 @@
     let totalGreenChecks = 0;
     let achievedCombos = new Set();
 
+    let activeCatKey = 'adj';
+    let recognition = null;
+    let isListening = false;
+    let speechSupported = false;
+
     function toId(str) {
       return str.replace(/ /g, '');
+    }
+
+    function normalizeText(text) {
+      return (text || '').toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
+    }
+
+    function clearAllHighlights() {
+      activeCatKey = null;
+      $('.slot-row').removeClass('slot-row-active');
+      $('#adj, #went, #saw, #ate, #enjoyed').removeClass('slot-field-active');
+    }
+
+    function setActiveCategory(catKey) {
+      clearAllHighlights();
+      // Fields should ONLY be highlighted when the mic is listening
+      if (!isListening) return;
+      if (!catKey || !ORIGINAL_DATA[catKey]) return;
+
+      // Do not highlight if this field already has a selection
+      let selected = $(`input[name="predict_${catKey}"]:checked`).val();
+      if (selected) return;
+
+      activeCatKey = catKey;
+      $(`.slot-row[data-catkey="${catKey}"]`).addClass('slot-row-active');
+      $('#' + catKey).addClass('slot-field-active');
+    }
+
+    function autoAdvanceActiveCategory() {
+      if (!isListening) {
+        clearAllHighlights();
+        return;
+      }
+      // Find first category in order that still has active pool items and no prediction selected yet
+      for (let key in ORIGINAL_DATA) {
+        if (pools[key] && pools[key].length > 0) {
+          let selected = $(`input[name="predict_${key}"]:checked`).val();
+          if (!selected) {
+            setActiveCategory(key);
+            return;
+          }
+        }
+      }
+      // If all fields have a prediction selected, clear all highlights
+      clearAllHighlights();
+    }
+
+    function matchSpokenOption(transcript) {
+      const spoken = normalizeText(transcript);
+      if (!spoken) return null;
+
+      function checkCategory(catKey) {
+        if (!pools[catKey] || pools[catKey].length === 0) return null;
+        let selected = $(`input[name="predict_${catKey}"]:checked`).val();
+        if (selected) return null; // Already selected
+
+        let items = ORIGINAL_DATA[catKey];
+        for (let item of items) {
+          if (statusMap[catKey][item] !== 'active') continue;
+          let normItem = normalizeText(item);
+          // Check exact match or phrase containment
+          if (spoken === normItem || spoken.includes(normItem) || normItem.includes(spoken)) {
+            return { catKey, item };
+          }
+        }
+        return null;
+      }
+
+      // Priority 1: Check active focused category
+      if (activeCatKey) {
+        let match = checkCategory(activeCatKey);
+        if (match) return match;
+      }
+
+      // Priority 2: Check all other unselected active categories
+      for (let catKey in ORIGINAL_DATA) {
+        if (catKey === activeCatKey) continue;
+        let match = checkCategory(catKey);
+        if (match) return match;
+      }
+
+      return null;
+    }
+
+    function initSpeechRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        speechSupported = false;
+        $("#speech-unsupported-alert").removeClass("d-none");
+        $("#MIC_TOGGLE").prop("disabled", true).addClass("disabled");
+        return;
+      }
+
+      speechSupported = true;
+      recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+      recognition.maxAlternatives = 3;
+
+      recognition.onstart = function () {
+        isListening = true;
+        $("#MIC_TOGGLE").removeClass("btn-outline-primary").addClass("btn-danger mic-listening");
+        $("#mic-icon").text("mic");
+        $("#mic-btn-text").text("Stop Mic");
+        autoAdvanceActiveCategory();
+      };
+
+      recognition.onend = function () {
+        if (isListening) {
+          try {
+            recognition.start();
+          } catch (e) {
+            isListening = false;
+            resetMicUI();
+          }
+        } else {
+          resetMicUI();
+        }
+      };
+
+      recognition.onerror = function (event) {
+        if (event.error === 'no-speech') return;
+        if (event.error === 'not-allowed') {
+          isListening = false;
+          resetMicUI();
+        }
+      };
+
+      recognition.onresult = function (event) {
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          if (event.results[i].isFinal) {
+            let altCount = event.results[i].length;
+            let matched = null;
+            let heardText = "";
+
+            for (let j = 0; j < altCount; j++) {
+              heardText = event.results[i][j].transcript;
+              let norm = normalizeText(heardText);
+
+              // Check if user spoke "spin"
+              if (norm === 'spin' || norm.includes('spin')) {
+                if (!$("#SPIN").hasClass("disabled")) {
+                  runit();
+                  return;
+                }
+              }
+
+              matched = matchSpokenOption(heardText);
+              if (matched) break;
+            }
+
+            if (matched) {
+              let { catKey, item } = matched;
+              let radioId = `#radio_${catKey}_${toId(item)}`;
+              $(radioId).prop("checked", true).trigger("change");
+              let isAllSelected = updateSpinButtonState();
+              autoAdvanceActiveCategory();
+
+              // Auto spin once all fields have a value after speech is recognized
+              if (isAllSelected) {
+                setTimeout(function () {
+                  if (!$("#SPIN").hasClass("disabled")) {
+                    runit();
+                  }
+                }, 400);
+              }
+            }
+          }
+        }
+      };
+    }
+
+    function resetMicUI() {
+      isListening = false;
+      $("#MIC_TOGGLE").removeClass("btn-danger mic-listening").addClass("btn-outline-primary");
+      $("#mic-icon").text("mic");
+      $("#mic-btn-text").text("Start Mic");
+      clearAllHighlights();
     }
 
     function populateSlotReels() {
@@ -237,13 +471,15 @@
       if (allPoolsEmpty) {
         $("#SPIN").addClass("disabled").prop("disabled", true);
         $("#RESET_GAME").removeClass("btn-outline-secondary").addClass("btn-success");
-        return;
+        return false;
       }
 
       if (allSelected) {
         $("#SPIN").removeClass("disabled").prop("disabled", false);
+        return true;
       } else {
         $("#SPIN").addClass("disabled").prop("disabled", true);
+        return false;
       }
     }
 
@@ -282,6 +518,7 @@
 
       renderAllOptionGroups(true);
       updateSpinButtonState();
+      autoAdvanceActiveCategory();
     }
 
     function renderAllOptionGroups(clearChecked = false) {
@@ -374,10 +611,39 @@
       $("#score-checks").text(totalGreenChecks);
 
       updateSpinButtonState();
+      autoAdvanceActiveCategory();
     }
 
+    // Set active field on row click
+    $(document).on('click', '.slot-row', function () {
+      let catKey = $(this).data('catkey');
+      if (catKey && isListening) {
+        setActiveCategory(catKey);
+      }
+    });
+
     $(document).on('change', 'input[type="radio"]', function () {
+      let catKey = $(this).attr('name').replace('predict_', '');
       updateSpinButtonState();
+      autoAdvanceActiveCategory();
+    });
+
+    $("#MIC_TOGGLE").on('click', function () {
+      if (!speechSupported || !recognition) return;
+      if (isListening) {
+        isListening = false;
+        try {
+          recognition.stop();
+        } catch (e) {}
+        resetMicUI();
+      } else {
+        try {
+          recognition.start();
+        } catch (e) {
+          isListening = false;
+          resetMicUI();
+        }
+      }
     });
 
     $("#SPIN").on('click', function () {
@@ -391,5 +657,6 @@
 
     populateSlotReels();
     initGame();
+    initSpeechRecognition();
   });
 </script>

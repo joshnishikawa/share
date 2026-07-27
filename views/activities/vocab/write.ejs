@@ -17,16 +17,18 @@
 
         <%- include('../../menu/item_write'); -%>
 
-          <%- include('../../menu/activity_select', { activity: 'write' }); -%>
 
-            <button id="print" class="btn btn-sm btn-outline-success py-0 mx-3" onclick="window.print();">
-              <i class="material-icons">print</i>
-            </button>
+          <button id="print" class="btn btn-sm btn-outline-success py-0 mx-3" onclick="window.print();">
+            <i class="material-icons">print</i>
+          </button>
 
-            <button id="home" class="btn btn-sm btn-outline-secondary p-0" style="position:absolute;right:0;"
-              onclick="location.href='<%= query.teacher ? '/teachers/' + deckType : deckType === 'NH' ? '/NH' : '/' %>'">
-              <i class="material-icons">home</i>
-            </button>
+          <div style="position:absolute;right:0;">
+            <%- include('../../menu/activity_select', { activity: 'write' }); -%>
+              <button id="home" class="btn btn-sm btn-outline-secondary p-0"
+                onclick="location.href='<%= query.teacher ? '/teachers/' + deckType : deckType === 'NH' ? '/NH' : '/' %>'">
+                <i class="material-icons">home</i>
+              </button>
+          </div>
 
       </div>
     </div>
@@ -43,8 +45,9 @@
         const deck = <%- JSON.stringify(deck) %>;
         const query = <%- JSON.stringify(query) %>;
         var L1 = (query.L1 == 'on' ? true : false);
-        var trace = query.trace !== undefined ? (query.trace == 'on' ? true : false) : true;
-        var write = query.write !== undefined ? (query.write == 'on' ? true : false) : true;
+        const allUndefined = query.L1 === undefined && query.trace === undefined && query.write === undefined;
+        var trace = allUndefined ? true : (query.trace == 'on' ? true : false);
+        var write = allUndefined ? true : (query.write == 'on' ? true : false);
         $("#L1").prop('checked', L1);
         $("#trace").prop('checked', trace);
         $("#write").prop('checked', write);

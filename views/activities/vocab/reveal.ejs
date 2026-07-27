@@ -55,11 +55,13 @@
 
   <%- include('../../menu/item_reveal'); -%>
 
-  <%- include('../../menu/activity_select', { activity: 'reveal' }); -%>
+  <div style="position:absolute;right:0;">
+    <%- include('../../menu/activity_select', { activity: 'reveal' }); -%>
 
-    <button id="home" class="btn btn-sm btn-outline-secondary p-0" style="position:absolute;right:0;" onclick="location.href='<%= query.teacher ? '/teachers/' + deckType : deckType === 'NH' ? '/NH' : '/' %>'">
+    <button id="home" class="btn btn-sm btn-outline-secondary p-0" onclick="location.href='<%= query.teacher ? '/teachers/' + deckType : deckType === 'NH' ? '/NH' : '/' %>'">
       <i class="material-icons">home</i>
     </button>
+  </div>
 
 </div>
 

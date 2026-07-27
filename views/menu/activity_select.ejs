@@ -53,6 +53,11 @@ if (typeof activitySelectInitialized === 'undefined') {
       activeDeck = window.deck;
     } else if (typeof originalDeck !== 'undefined' && Array.isArray(originalDeck) && originalDeck.length > 0) {
       activeDeck = originalDeck;
+    } else {
+      var hiddenDeckVal = $form.find("input[name='deck']").val();
+      if (hiddenDeckVal) {
+        try { activeDeck = JSON.parse(hiddenDeckVal); } catch(e) {}
+      }
     }
 
     if (selectedActivity === 'double' && (!activeDeck || activeDeck.length < 7)) {
