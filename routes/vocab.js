@@ -55,7 +55,13 @@ router.post('/:activity', async(req, res)=>{
 });
 
 
+router.get('/:activity', (req, res) => {
+  res.render('404');
+});
+
+
 router.get('/:activity/:id', async (req, res)=>{
+
   try{
     let activity = req.params.activity;
     if (!['bingo','flash','grid','match','recall','reveal','type','spell','penmanship','printcards','double','write','keidoro'].includes(activity)) throw '404';

@@ -16,10 +16,11 @@
   ];
   const safeDeck = typeof deck !== 'undefined' ? JSON.stringify(deck).replace(/'/g, "&#39;") : '[]';
   const deckLength = typeof deck !== 'undefined' && deck ? deck.length : 0;
+  const safedeckType = typeof deckType !== 'undefined' ? deckType : 'nolink';
 %>
 <form class="vocab-activity-select-form d-inline-flex align-items-center mx-2" action="" method="POST" target="_blank">
   <input type="hidden" name="deck" value='<%- safeDeck %>'>
-  <input type="hidden" name="deckType" value="nolink">
+  <input type="hidden" name="deckType" value="<%= safedeckType %>">
   <input type="hidden" name="spaces" value="<%= deckLength %>">
   <input type="hidden" name="text" value="true">
   <input type="hidden" name="showtext" value="true">
@@ -67,7 +68,12 @@ if (typeof activitySelectInitialized === 'undefined') {
     }
 
     if (activeDeck) {
-      $form.find("input[name='deck']").val(JSON.stringify(activeDeck));
+      var deckType = $form.find("input[name='deckType']").val();
+      // vocabulary-type decks store IDs in the DB; text/images store full objects
+      var deckToSubmit = (deckType !== 'text' && deckType !== 'images' && deckType !== 'nolink')
+        ? activeDeck.map(function(item) { return item.id; })
+        : activeDeck;
+      $form.find("input[name='deck']").val(JSON.stringify(deckToSubmit));
       $form.find("input[name='spaces']").val(activeDeck.length);
     }
 

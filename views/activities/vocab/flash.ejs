@@ -114,7 +114,7 @@ $(function(){
     else {
       $("#order").prop('checked', false);
     }
-    history.replaceState(null, '', `?order=${order}&showtext=${showtext}`);
+    history.replaceState(null, '', order ? `?order=${order}&showtext=${showtext}` : `?showtext=${showtext}`);
   }
 
 
@@ -127,7 +127,7 @@ $(function(){
       $("#showtext").prop('checked', false);
       $("#text").html("");
     }
-    history.replaceState(null, '', `?order=${order}&showtext=${showtext}`);
+    history.replaceState(null, '', order ? `?order=${order}&showtext=${showtext}` : `?showtext=${showtext}`);
   }
 
 
