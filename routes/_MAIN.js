@@ -152,7 +152,7 @@ router.get('/shapes', (req, res)=>{ // moved to things
 
 router.get('/speech', (req, res)=>{
   try{
-    res.render('activities/speech');
+    res.redirect('/things/colors');
   }
   catch(err){
     res.status(500).render('error');

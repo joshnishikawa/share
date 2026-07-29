@@ -84,8 +84,14 @@ $(function(){
 
 // PREPARE THE DISPLAY /////////////////////////////////////////////////////////
   for (let i of deck){ $('#display').append( getContent(i) ); }
+  fitText('#display > div');
 
   deck = FYshuffle(deck);
+
+  function showSlide() {
+    $("#currentSlide").html( getSlide(deck[index]) );
+    fitText('#currentSlide > div');
+  }
 
   $("#start").on('click', ()=>{
     if ($("#slides").is(":hidden")) {
@@ -93,7 +99,7 @@ $(function(){
       $("#start i").text('check_circle');
       $("#start").attr('aria-label', 'Check');
       $("#slides").show();
-      $("#currentSlide").html( getSlide(deck[index]) );
+      showSlide();
     } else {
       $("#slides").hide();
       $("#start i").text('play_arrow');
@@ -101,21 +107,27 @@ $(function(){
       for (let i=0; i<=index; i++){
         $('#display').append( getContent(deck[i]) );
       }
+      fitText('#display > div');
     }
   });
 
   $("#prev").on('click', ()=>{
     if (index > 0) {
       index--;
-      $("#currentSlide").html( getSlide(deck[index]) );
+      showSlide();
     }
   });
 
   $("#next").on('click', ()=>{
     if (index < deck.length-1) {
       index++;
-      $("#currentSlide").html( getSlide(deck[index]) );
+      showSlide();
     }
+  });
+
+  $(window).on('resize', ()=>{
+    fitText('#display > div');
+    fitText('#currentSlide > div');
   });
 
   $(document).off('keydown').on('keydown', (e)=>{

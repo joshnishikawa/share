@@ -1,11 +1,6 @@
 <%- include('../head') %>
+
 <style>
-  #gameCanvas {
-    background-color: #d4edda;
-    border: 3px solid #28a745;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-  }
   .mic-listening {
     animation: mic-pulse 1.5s infinite;
     box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
@@ -26,55 +21,51 @@
   }
 </style>
 
-<body>
-
-  <div class="d-flex align-items-center" style="position:relative;">
-    <div class="d-flex align-items-center me-3">
-      <i class="material-icons text-secondary point me-2" data-bs-toggle="modal" data-bs-target="#myModal" style="cursor:pointer;">info</i>
-      <strong class="text-primary fs-5">SNAKE</strong>
-    </div>
-    <button id="home" class="btn btn-sm btn-outline-secondary p-0" style="position:absolute;right:0;" onclick="location.href='/'" aria-label="Home">
-      <i class="material-icons">home</i>
-    </button>
+<div class="d-flex justify-content-between">
+  <div class="d-flex align-items-center me-3">
+    <i class="material-icons text-secondary point me-2" data-bs-toggle="modal" data-bs-target="#myModal" style="cursor:pointer;" title="Voice Commands Info">info</i>
+    <strong class="text-primary fs-5">SNAKE GAME</strong>
   </div>
-
-  <div id="unsupportedAlert" class="alert alert-warning text-center mx-auto my-3" style="max-width:500px; display:none;">
-    <i class="material-icons align-middle">warning</i>
-    Speech recognition is not supported in this browser. Please try Google Chrome or Microsoft Edge.
-  </div>
-
-  <div class="text-center pt-3">
-    <div class="mb-3">
-      <button id="listen" class="btn btn-lg btn-success me-2 px-4 shadow">
-        <i class="material-icons align-middle">record_voice_over</i>
-        <span class="align-middle ms-1">Start</span>
-      </button>
-      <button id="stop" class="btn btn-lg btn-secondary px-4 shadow" disabled>
-        <i class="material-icons align-middle">stop</i>
-        <span class="align-middle ms-1">Stop</span>
-      </button>
-    </div>
-  </div>
-
-<div class="container text-center my-3">
-  <canvas id="gameCanvas" width="600" height="450" class="mx-auto"></canvas>
+  <button id="home" class="btn btn-sm btn-outline-secondary p-0" onclick="location.href='/'" aria-label="Home">
+    <i class="material-icons">home</i>
+  </button>
 </div>
 
-<!-- Modal for voice commands list -->
+<div id="unsupportedAlert" class="alert alert-warning text-center mx-auto my-2" style="max-width:500px; display:none;">
+  <i class="material-icons align-middle me-1">warning</i>
+  Speech recognition is not supported in this browser. Please try Google Chrome or Microsoft Edge.
+</div>
+
+<div class="text-center pt-3">
+  <div class="mb-3">
+    <button id="listen" class="btn btn-lg btn-success me-2 px-4 shadow">
+      <i class="material-icons align-middle">record_voice_over</i>
+      <span class="align-middle ms-1">Start Voice</span>
+    </button>
+    <button id="stop" class="btn btn-lg btn-secondary px-4 shadow" disabled>
+      <i class="material-icons align-middle">stop</i>
+      <span class="align-middle ms-1">Stop Voice</span>
+    </button>
+  </div>
+</div>
+
+<div class="container text-center my-2">
+  <canvas id="gameCanvas" width="600" height="450" class="alert-success mx-auto"></canvas>
+</div>
+
+<!-- modal for the voice commands list -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Snake Voice Commands</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <h5 class="modal-title" id="exampleModalLabel">Snake Game Voice Commands</h5>
       </div>
       <div class="modal-body">
-        <p class="mb-2">Say any of the following voice commands to control the snake:</p>
-        <ul class="list-group list-group-flush text-start">
-          <li class="list-group-item"><strong>"Turn left"</strong> or <strong>"Left"</strong> — Turns snake left</li>
-          <li class="list-group-item"><strong>"Turn right"</strong> or <strong>"Right"</strong> — Turns snake right</li>
-          <li class="list-group-item"><strong>"Go straight"</strong> or <strong>"Straight"</strong> / <strong>"Forward"</strong> — Moves snake 1 block forward</li>
-          <li class="list-group-item"><strong>"Restart"</strong> or <strong>"Reset"</strong> — Resets the game</li>
+        <ul>
+          <li><strong>"Turn left"</strong> or <strong>"Left"</strong></li>
+          <li><strong>"Turn right"</strong> or <strong>"Right"</strong></li>
+          <li><strong>"Go straight"</strong> or <strong>"Straight"</strong></li>
+          <li><strong>"Restart"</strong> or <strong>"Reset"</strong></li>
         </ul>
       </div>
       <div class="modal-footer">
@@ -84,15 +75,14 @@
   </div>
 </div>
 
-<!-- Modal for game over / messages -->
+<!-- modal for displaying messages -->
 <div class="modal fade" id="messageModal" tabindex="-1" role="dialog" aria-labelledby="messageModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="messageModalLabel">Game Over</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <h5 class="modal-title" id="messageModalLabel">Message</h5>
       </div>
-      <div class="modal-body fs-4 text-center" id="messageModalBody">
+      <div class="modal-body" id="messageModalBody">
       </div>
       <div class="modal-footer">
         <button id="playAgain" type="button" class="btn btn-primary" data-bs-dismiss="modal">Play Again!</button>
@@ -117,9 +107,17 @@
   var food = {};
   var direction = 'up';
   var previousDirection = '';
-  var isListening = false;
+
+  const vocab = ["turn left", "left", "turn right", "right", "go straight", "straight", "go straight two blocks", "restart", "reset"];
+  const synonyms = {
+    "write": "right",
+    "strait": "straight",
+    "forward": "go straight",
+    "ahead": "go straight"
+  };
 
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const SpeechGrammarList = window.SpeechGrammarList || window.webkitSpeechGrammarList;
 
   if (!SpeechRecognition) {
     $("#unsupportedAlert").show();
@@ -128,11 +126,17 @@
 
   const recognition = SpeechRecognition ? new SpeechRecognition() : null;
   if (recognition) {
+    const grammar = `#JSGF V1.0; grammar commands; public <commands> = ${vocab.join(" | ")};`;
+    const speechRecognitionList = new SpeechGrammarList();
+    speechRecognitionList.addFromString(grammar, 1);
+    recognition.grammars = speechRecognitionList;
     recognition.continuous = true;
     recognition.interimResults = true;
     recognition.lang = "en-US";
     recognition.maxAlternatives = 1;
   }
+
+  var isListening = false;
 
   function startListening() {
     if (!recognition) return;
@@ -160,6 +164,7 @@ $(function () {
   reset();
 
   $("#listen").on('click', () => {
+    $("#myModal").modal('hide');
     startListening();
   });
 
@@ -172,20 +177,33 @@ $(function () {
   });
 
   $(document).off('keydown').on('keydown', function(event) {
-    if (event.key === 'q') {
+    const key = event.key;
+    if (key === 'q' || key === 'Q' || key === 'r' || key === 'R') {
       reset();
       return;
     }
-    else if (    (event.key === 'ArrowUp' && previousDirection != 'down')
-              || (event.key === 'ArrowDown' && previousDirection != 'up')   
-              || (event.key === 'ArrowLeft' && previousDirection != 'right')
-              || (event.key === 'ArrowRight' && previousDirection != 'left') ) {
-      direction = event.key.replace('Arrow', '').toLowerCase();
-      gameLoop();
+
+    let targetDir = null;
+    if (key === 'ArrowUp' || key === 'w' || key === 'W') targetDir = 'up';
+    else if (key === 'ArrowDown' || key === 's' || key === 'S') targetDir = 'down';
+    else if (key === 'ArrowLeft' || key === 'a' || key === 'A') targetDir = 'left';
+    else if (key === 'ArrowRight' || key === 'd' || key === 'D') targetDir = 'right';
+
+    if (targetDir) {
+      event.preventDefault();
+      const isOpposite = (targetDir === 'up' && previousDirection === 'down') ||
+                         (targetDir === 'down' && previousDirection === 'up') ||
+                         (targetDir === 'left' && previousDirection === 'right') ||
+                         (targetDir === 'right' && previousDirection === 'left');
+      if (!isOpposite) {
+        direction = targetDir;
+        gameLoop();
+      }
     }
-    else return;
   });
 });
+
+  let lastProcessedIndex = -1;
 
   if (recognition) {
     recognition.onresult = (event) => {
@@ -194,32 +212,30 @@ $(function () {
 
       for (let i = event.resultIndex; i < event.results.length; ++i) {
         const transcriptChunk = event.results[i][0].transcript;
-        const confidence = event.results[i][0].confidence;
-        
         if (event.results[i].isFinal) {
           finalTranscript += transcriptChunk;
-          console.log(`[Speech Result Final] "${transcriptChunk}" (Confidence: ${confidence.toFixed(2)})`);
         } else {
           interimTranscript += transcriptChunk;
-          console.log(`[Speech Result Interim] "${transcriptChunk}"`);
         }
-      }
 
-      const spokenText = (finalTranscript || interimTranscript).toLowerCase().trim();
-      if (!spokenText) return;
+        if (event.results[i].isFinal && i > lastProcessedIndex) {
+          lastProcessedIndex = i;
+          const spokenText = transcriptChunk.toLowerCase().trim();
+          console.log(`[Speech Result Final] "${spokenText}"`);
 
-      if (/\b(turn left|left)\b/i.test(spokenText)) {
-        console.log(`Command matched: TURN LEFT from "${spokenText}"`);
-        turnLeft();
-      } else if (/\b(turn right|right)\b/i.test(spokenText)) {
-        console.log(`Command matched: TURN RIGHT from "${spokenText}"`);
-        turnRight();
-      } else if (/\b(go straight|straight|forward)\b/i.test(spokenText)) {
-        console.log(`Command matched: GO STRAIGHT from "${spokenText}"`);
-        goStraight();
-      } else if (/\b(restart|reset|start over|play again)\b/i.test(spokenText)) {
-        console.log(`Command matched: RESTART from "${spokenText}"`);
-        reset();
+          if (/\b(turn left|left)\b/i.test(spokenText)) {
+            turnLeft();
+          } else if (/\b(turn right|right|write)\b/i.test(spokenText)) {
+            turnRight();
+          } else if (/\b(go straight two blocks)\b/i.test(spokenText)) {
+            goStraight();
+            goStraight();
+          } else if (/\b(go straight|straight|strait|forward|ahead)\b/i.test(spokenText)) {
+            goStraight();
+          } else if (/\b(restart|reset|start over)\b/i.test(spokenText)) {
+            reset();
+          }
+        }
       }
     };
 
@@ -239,9 +255,12 @@ $(function () {
       console.error(`Speech recognition error: ${event.error}`);
       if (event.error === "not-allowed") {
         stopListening();
+      } else if (event.error === "no-speech") {
+        console.log("No speech detected during window.");
       }
     };
   }
+
 
   function getFoodPosition(s) {
     let index = positions.indexOf(s);
@@ -286,6 +305,7 @@ $(function () {
     let availablePositions = [];
     let isOnSnake;
 
+    // get positions that are not on the snake
     for (let i = 0; i < positions.length; i++) {
       isOnSnake = false;
       for (let j = 0; j < snake.length; j++) {
@@ -302,7 +322,7 @@ $(function () {
 
   function drawModule() {
     return {
-      bodySnake: function(part, nextPart) { 
+      bodySnake: function(part, nextPart) { // TODO: x and y should indicate direction when passed to this function and other values should be adjusted accordingly 
         context.fillStyle = 'green';
         let x = part.x;
         let y = part.y;
@@ -311,6 +331,7 @@ $(function () {
         
         if (nextD){
           if (d === 'up' && nextD === 'right' || d === 'left' && nextD === 'down') {
+            // draw a square with a rounded bottom right corner
             context.beginPath();
             context.moveTo(x+10, y+gridSize-10);
             context.lineTo(x+10, y+10);
@@ -318,6 +339,7 @@ $(function () {
             context.arcTo(x+gridSize-10, y+gridSize-10, x+10, y+gridSize-10, 50);
             context.fill();
           } else if (d === 'up' && nextD === 'left' || d === 'right' && nextD === 'down') {
+            // draw a square with a rounded bottom left corner
             context.beginPath();
             context.moveTo(x+10, y+10);
             context.lineTo(x+gridSize-10, y+10);
@@ -325,6 +347,7 @@ $(function () {
             context.arcTo(x+10, y+gridSize-10, x+10, y+10, 50);
             context.fill();
           } else if (d === 'down' && nextD === 'right' || d === 'left' && nextD === 'up') {
+            // draw a square with a rounded top right corner
             context.beginPath();
             context.moveTo(x+10, y+10);
             context.lineTo(x+10, y+gridSize-10);
@@ -332,6 +355,7 @@ $(function () {
             context.arcTo(x+gridSize-10, y+10, x+10, y+10, 50);
             context.fill();
           } else if (d === 'down' && nextD === 'left' || d === 'right' && nextD === 'up') {
+            // draw a square with a rounded top left corner
             context.beginPath();
             context.moveTo(x+10, y+gridSize-10);
             context.lineTo(x+gridSize-10, y+gridSize-10);
@@ -347,17 +371,18 @@ $(function () {
           context.fillRect(x+10, y+10, gridSize-20, gridSize-20);
         }
 
+
         switch (d) {
           case 'up':
             context.fillRect(x+10, y-10, gridSize-20, 20);
             break;
-          case 'down':
+            case 'down':
             context.fillRect(x+10, y+gridSize-10, gridSize-20, 20);
             break;
           case 'left':
             context.fillRect(x-10, y+10, 20, gridSize-20);
             break;
-          case 'right':
+            case 'right':
             context.fillRect(x+gridSize-10, y+10, 20, gridSize-20);
             break;
           default:
@@ -404,62 +429,69 @@ $(function () {
         context.fillStyle = 'black';
         switch (d) {
           case 'up':
+            // draw a rounded trapezoid pointing up
             context.beginPath();
-            context.moveTo(x + 10, y + gridSize - 10);
-            context.lineTo(x + 10, y + (gridSize / 2));
-            context.arcTo(x + (gridSize / 2) - 20, y + 10, x + (gridSize / 2), y + 10, 20);
-            context.arcTo(x + (gridSize / 2) + 20, y + 10, x + gridSize - 10, y + (gridSize / 2), 20);
-            context.lineTo(x + gridSize - 10, y + (gridSize / 2));
-            context.lineTo(x + gridSize - 10, y + gridSize - 10);
-            context.lineTo(x + 10, y + gridSize - 10);
+            context.moveTo(x + 10, y + gridSize - 10); // Bottom left corner
+            context.lineTo(x + 10, y + (gridSize / 2)); // Left side
+            context.arcTo(x + (gridSize / 2) - 20, y + 10, x + (gridSize / 2), y + 10, 20); // Top left corner
+            context.arcTo(x + (gridSize / 2) + 20, y + 10, x + gridSize - 10, y + (gridSize / 2), 20); // Top side
+            context.lineTo(x + gridSize - 10, y + (gridSize / 2)); // Right side
+            context.lineTo(x + gridSize - 10, y + gridSize - 10); // Bottom right corner
+            context.lineTo(x + 10, y + gridSize - 10); // Bottom side
             context.closePath();
             context.fill();
             break;
           case 'down':
+            // draw a rounded trapezoid pointing down
             context.beginPath();
-            context.moveTo(x + 10, y + 10);
-            context.lineTo(x + 10, y + (gridSize / 2));
-            context.arcTo(x + (gridSize / 2) - 20, y + gridSize - 10, x + (gridSize / 2), y + gridSize - 10, 20);
-            context.arcTo(x + (gridSize / 2) + 20, y + gridSize - 10, x + gridSize - 10, y + (gridSize / 2), 20);
-            context.lineTo(x + gridSize - 10, y + (gridSize / 2));
-            context.lineTo(x + gridSize - 10, y + 10);
-            context.lineTo(x + 10, y + 10);
+            context.moveTo(x + 10, y + 10); // Top left corner
+            context.lineTo(x + 10, y + (gridSize / 2)); // Left side
+            context.arcTo(x + (gridSize / 2) - 20, y + gridSize - 10, x + (gridSize / 2), y + gridSize - 10, 20); // Bottom left corner
+            context.arcTo(x + (gridSize / 2) + 20, y + gridSize - 10, x + gridSize - 10, y + (gridSize / 2), 20); // Bottom side
+            context.lineTo(x + gridSize - 10, y + (gridSize / 2)); // Right side
+            context.lineTo(x + gridSize - 10, y + 10); // Top right corner
+            context.lineTo(x + 10, y + 10); // Top side
             context.closePath();
             context.fill();
             break;
           case 'left':
+            // draw a rounded trapezoid pointing left
             context.beginPath();
-            context.moveTo(x + gridSize - 10, y + 10);
-            context.lineTo(x + (gridSize / 2), y + 10);
-            context.arcTo(x + 10, y + (gridSize / 2) - 20, x + 10, y + (gridSize / 2), 20);
-            context.arcTo(x + 10, y + (gridSize / 2) + 20, x + (gridSize / 2), y + gridSize - 10, 20);
-            context.lineTo(x + (gridSize / 2), y + gridSize - 10);
-            context.lineTo(x + gridSize - 10, y + gridSize - 10);
+            context.moveTo(x + gridSize - 10, y + 10); // Top right corner
+            context.lineTo(x + (gridSize / 2), y + 10); // Top side
+            context.arcTo(x + 10, y + (gridSize / 2) - 20, x + 10, y + (gridSize / 2), 20); // Top left corner
+            context.arcTo(x + 10, y + (gridSize / 2) + 20, x + (gridSize / 2), y + gridSize - 10, 20); // Left side
+            context.lineTo(x + (gridSize / 2), y + gridSize - 10); // Bottom side
+            context.lineTo(x + gridSize - 10, y + gridSize - 10); // Bottom right corner
             context.closePath();
             context.fill();
             break;
           case 'right':
+            // draw a rounded trapezoid pointing right
             context.beginPath();
-            context.moveTo(x + 10, y + 10);
-            context.lineTo(x + (gridSize / 2), y + 10);
-            context.arcTo(x + gridSize - 10, y + (gridSize / 2) - 20, x + gridSize - 10, y + (gridSize / 2), 20);
-            context.arcTo(x + gridSize - 10, y + (gridSize / 2) + 20, x + (gridSize / 2), y + gridSize - 10, 20);
-            context.lineTo(x + (gridSize / 2), y + gridSize - 10);
-            context.lineTo(x + 10, y + gridSize - 10);
+            context.moveTo(x + 10, y + 10); // Top left corner
+            context.lineTo(x + (gridSize / 2), y + 10); // Top side
+            context.arcTo(x + gridSize - 10, y + (gridSize / 2) - 20, x + gridSize - 10, y + (gridSize / 2), 20); // Top right corner
+            context.arcTo(x + gridSize - 10, y + (gridSize / 2) + 20, x + (gridSize / 2), y + gridSize - 10, 20); // Right side
+            context.lineTo(x + (gridSize / 2), y + gridSize - 10); // Bottom side
+            context.lineTo(x + 10, y + gridSize - 10); // Bottom left corner
             context.closePath();
             context.fill();
             break;
           default:
+            // draw a rounded trapezoid pointing up
             context.beginPath();
-            context.moveTo(x + 10, y + gridSize - 10);
-            context.lineTo(x + 10, y + (gridSize / 2));
-            context.arcTo(x + (gridSize / 2) - 20, y + 10, x + (gridSize / 2), y + 10, 20);
-            context.arcTo(x + (gridSize / 2) + 20, y + 10, x + gridSize - 10, y + (gridSize / 2), 20);
-            context.lineTo(x + gridSize - 10, y + (gridSize / 2));
-            context.lineTo(x + gridSize - 10, y + gridSize - 10);
-            context.lineTo(x + 10, y + gridSize - 10);
+            context.moveTo(x + 10, y + gridSize - 10); // Bottom left corner
+            context.lineTo(x + 10, y + (gridSize / 2)); // Left side
+            context.arcTo(x + (gridSize / 2) - 20, y + 10, x + (gridSize / 2), y + 10, 20); // Top left corner
+            context.arcTo(x + (gridSize / 2) + 20, y + 10, x + gridSize - 10, y + (gridSize / 2), 20); // Top side
+            context.lineTo(x + gridSize - 10, y + (gridSize / 2)); // Right side
+            context.lineTo(x + gridSize - 10, y + gridSize - 10); // Bottom right corner
+            context.lineTo(x + 10, y + gridSize - 10); // Bottom side
             context.closePath();
             context.fill();
+            break;
+
             break;
         }
       },
@@ -469,8 +501,9 @@ $(function () {
         let d = part.dir;
         context.fillStyle = 'green';
 
-        context.save();
+        context.save(); // Save the current canvas state
 
+        // Rotate the path to match the direction
         if (d === 'down') {
           context.translate(x + gridSize / 2, y + gridSize / 2);
           context.rotate(Math.PI);
@@ -486,26 +519,29 @@ $(function () {
         }
 
         if (d === nextD) {
+          // draw a straight tail
           context.beginPath();
-          context.moveTo(x + 10, y-10);
-          context.arcTo(x + 10, y + (gridSize / 2), x + (gridSize / 2), y + gridSize, gridSize/2);
-          context.lineTo(x + (gridSize / 2), y + gridSize);
-          context.arcTo(x + gridSize - 10, y + (gridSize / 2), x + gridSize - 10, y - 10, gridSize/2);
-          context.lineTo(x + gridSize - 10, y - 10);
-          context.lineTo(x + 10, y - 10);
+          context.moveTo(x + 10, y-10); // Top left corner
+          context.arcTo(x + 10, y + (gridSize / 2), x + (gridSize / 2), y + gridSize, gridSize/2); // Bottom left corner
+          context.lineTo(x + (gridSize / 2), y + gridSize); // Bottom side
+          context.arcTo(x + gridSize - 10, y + (gridSize / 2), x + gridSize - 10, y - 10, gridSize/2); // Bottom side
+          context.lineTo(x + gridSize - 10, y - 10); // Top side
+          context.lineTo(x + 10, y - 10); // Right side
           context.closePath();
           context.fill();
+
         }
         else if (    (d === 'up' && nextD === 'left')
                   || (d === 'left' && nextD === 'down') 
                   || (d === 'down' && nextD === 'right')
                   || (d === 'right' && nextD === 'up') ){
+          // draw a tail curving to the right
           context.beginPath();
-          context.moveTo(x + 10, y-10);
-          context.arcTo(x + 10, y + gridSize, x + gridSize, y + gridSize, gridSize/2);
+          context.moveTo(x + 10, y-10); // Top left corner
+          context.arcTo(x + 10, y + gridSize, x + gridSize, y + gridSize, gridSize/2); // Bottom left corner
           context.lineTo(x + gridSize, y + gridSize)
           context.bezierCurveTo(x + (gridSize / 2), y + (gridSize / 2), x + gridSize - 10, y + gridSize/3, x + gridSize - 10, y - 10)
-          context.lineTo(x + 10, y-10);
+          context.lineTo(x + 10, y-10); // Top side
           context.closePath();
           context.fill();
         }
@@ -513,30 +549,35 @@ $(function () {
                   || (d === 'right' && nextD === 'down')
                   || (d === 'down' && nextD === 'left')
                   || (d === 'left' && nextD === 'up') ){
+          // draw a tail curving to the left
           context.beginPath();
-          context.moveTo(x + gridSize - 10, y - 10);
-          context.arcTo(x + gridSize - 10, y + gridSize, x + 10, y + gridSize, gridSize/2);
+          context.moveTo(x + gridSize - 10, y - 10); // Top right corner
+          context.arcTo(x + gridSize - 10, y + gridSize, x + 10, y + gridSize, gridSize/2); // Bottom right corner
           context.lineTo(x + 10, y + gridSize)
           context.bezierCurveTo(x + (gridSize / 2), y + (gridSize / 2), x + 10, y + gridSize/3, x + 10, y - 10)
-          context.lineTo(x + gridSize - 10, y - 10);
+          context.lineTo(x + gridSize - 10, y - 10); // Top side
           context.closePath();
           context.fill();
         }
 
-        context.restore();
+        context.restore(); // Restore the canvas state
+
       },
       pizza: function(x, y) {
-        context.fillStyle = '#bb9966';
+        // Draw pizza crust
+        context.fillStyle = '#bb9966'; // Light brown color for crust
         context.beginPath();
         context.arc(x + gridSize / 2, y + gridSize / 2, gridSize / 2 - 10, 0, Math.PI * 2);
         context.fill();
         
-        context.fillStyle = '#FF4433';
+        // Draw sauce
+        context.fillStyle = '#FF4433'; // Tomato sauce color
         context.beginPath();
         context.arc(x + gridSize / 2, y + gridSize / 2, gridSize / 2 - 20, 0, Math.PI * 2);
         context.fill();
 
-        context.fillStyle = '#8B0000';
+        // Draw toppings (pepperoni)
+        context.fillStyle = '#8B0000'; // Pepperoni color
         context.beginPath();
         context.arc(x+gridSize*0.2, y+gridSize*0.5, 10, 0, Math.PI * 2);
         context.fill();
@@ -564,6 +605,7 @@ $(function () {
         context.beginPath();
         context.arc(x+gridSize*0.8, y+gridSize*0.4, 10, 0, Math.PI * 2);
         context.fill();
+
       }
     };
   }
@@ -591,29 +633,38 @@ $(function () {
     gameLoop();
   }
 
+  function render(tailDir) {
+    context.clearRect(0, 0, canvas.width, canvas.height); //clear canvas
+    for (var i = 1; i < snake.length-1; i++) {
+      drawModule().bodySnake(snake[i], snake[i+1]);
+    }
+    if (snake.length > 1) drawModule().tailSnake(snake[snake.length-1], tailDir || snake[snake.length-1].dir);
+    drawModule().headSnake(snake[0]);
+    if (food) drawModule().pizza(food.x, food.y);
+  }
+
   function reset() {
-    direction = '';
-    previousDirection = '';
-    snake = [ positions[Math.floor(Math.random() * positions.length)] ];
-    food = getFoodPosition(snake[0]);
-    gameLoop();
+    direction = 'up';
+    previousDirection = 'up';
+    snake = [ { x: 150, y: 300, dir: 'up' } ];
+    food = getRandomGridPosition();
+    render('up');
   }
 
   function gameLoop() {
-    context.clearRect(0, 0, canvas.width, canvas.height);
     let message = '';
     let head = { x: snake[0].x, y: snake[0].y, dir: direction};
     let tailDir = '';
     previousDirection = direction;
 
-    snake[0].dir = previousDirection;
+    snake[0].dir = previousDirection; // update direction of segment following head
     if (direction === 'up') head.y = snake[0].y - gridSize;
     if (direction === 'down') head.y = snake[0].y + gridSize;
     if (direction === 'left') head.x = snake[0].x - gridSize;
     if (direction === 'right') head.x = snake[0].x + gridSize;
     snake.unshift(head);
 
-    if (head.x === food.x && head.y === food.y ){
+    if (head.x === food.x && head.y === food.y ){ // snake eats = yummy  
       tailDir = snake[snake.length-1].dir;
       food = getRandomGridPosition();
       if (!food){
@@ -624,6 +675,7 @@ $(function () {
       tailDir = snake.pop().dir;
     }
 
+    // CHECK FOR COLLISION
     for (var i = 1; i < snake.length; i++) {
       if (head.x === snake[i].x && head.y === snake[i].y) {
         message = 'You bit yourself!';
@@ -634,19 +686,16 @@ $(function () {
     if (   head.x < 0 
         || head.x >= canvas.width 
         || head.y < 0 
-        || head.y >= canvas.height){
+        || head.y >= canvas.height){ // snake hits wall = dead
       message = 'You died!';
     }
 
-    for (var i = 1; i < snake.length-1; i++) {
-      drawModule().bodySnake(snake[i], snake[i+1]);
-    }
-    if (snake.length > 1) drawModule().tailSnake(snake[snake.length-1], tailDir);
-    drawModule().headSnake(snake[0]);
-    if (food)drawModule().pizza(food.x, food.y);
+    // DRAW THE SNAKE
+    render(tailDir);
 
+    // DISPLAY MESSAGE
     if (message) {
-      setTimeout(function() {
+      setTimeout(function() { //delay alert so snake is drawn before alert shows
           $('#messageModalBody').text(message);
           $('#messageModal').modal('show').on('shown.bs.modal', () => {
             $('#playAgain').focus();
@@ -658,5 +707,7 @@ $(function () {
       }, 100);
     }
   }
+
+
 </script>
 <%- include('../foot') %>

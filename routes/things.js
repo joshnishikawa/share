@@ -23,6 +23,17 @@ router.get('/shapes', (req, res)=>{
 });
 
 
+router.get('/colors', (req, res)=>{
+  try{
+    res.render('activities/things/colors');
+  }
+  catch(err){
+    res.status(500).render('error');
+    console.error(err);
+  }
+});
+
+
 router.get('/supplies', (req, res)=>{
   try{
     res.render('activities/things/supplies');
