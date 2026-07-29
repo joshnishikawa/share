@@ -1,12 +1,14 @@
-FIXME: Recall field should stay focused.
-FIXME: Two-word vocab should appear before space 
-FIXME: Words should shrink to fit.
+FIX RECALL: 
+  Flip while mouse held.
+  No text select.
+  Field should stay focused. 
+  Two-word vocab should appear before space. 
+  Words should shrink to fit.
 
-audio samples for all static vocab
-
-////////// IDEAS FOR STUDENT ACTIVITIES ////////////////////////////////////////
+Get audio samples for all static vocab
 Get the spoken picture dictionary working
 
+////////// IDEAS FOR STUDENT ACTIVITIES ////////////////////////////////////////
 Sight Words: Show a written word. User selects the meaning from 3 images.
 
 Flash Typing: Flash a word. The user types it after it disappears.

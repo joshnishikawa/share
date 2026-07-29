@@ -42,15 +42,17 @@
       <div id="controls" class="col d-flex justify-content-center">
         <div class="d-flex align-items-center">
           <select id="timeLimit" class="form-select form-select-lg" aria-label="time limit">
-            <option value="10">10 seconds</option>
-            <option value="30">30 seconds</option>
-            <option value="60" selected>1 minute</option>
-            <option value="90">90 seconds</option>
+            <option value="0" selected>No Limit</option>
+            <option value="60">1 minute</option>
             <option value="120">2 minutes</option>
             <option value="180">3 minutes</option>
             <option value="240">4 minutes</option>
             <option value="300">5 minutes</option>
           </select>
+          <div class="form-check ms-3 mb-0 text-start">
+            <input type="checkbox" id="fade" class="form-check-input" value="fade" style="cursor: pointer;" checked>
+            <label class="form-check-label fs-5" for="fade" style="cursor: pointer;">Fade</label>
+          </div>
           <button id="start" aria-label="next" class="btn btn-lg btn-success ms-3" autofocus>
             START
           </button>
@@ -89,6 +91,7 @@ $(function(){
   // PREPARE THE DECK //////////////////////////////////////////////////////////
   const originalDeck = <%- JSON.stringify(deck) %>;
   var deck = originalDeck.slice();
+  var wordOpacity = 100;
   let timeLimit = 0; // seconds
   var finished = false;
   var starttime = 0;
@@ -105,8 +108,9 @@ $(function(){
                   "Z","X","C","V","B","N","M"];
 
   start = () =>{
+    fade = $("#fade").is(":checked");
     timeLimit = parseInt($("#timeLimit").val());
-    starttime = new Date();
+    starttime = timeLimit > 0 ? new Date() : null;
     finished = false;
     score = 0;
     misses = 0;
@@ -115,20 +119,27 @@ $(function(){
     deck = originalDeck.slice();
     FYshuffle(deck);
     resetAnswer();
-    requestAnimationFrame(updateAnimation);
+    $("#timer").empty();
+    if (timeLimit > 0) {
+      requestAnimationFrame(updateAnimation);
+    }
     $("#info").hide();
     $("#content").show();
   }
 
   showResults = ()=>{
-    let elapsedTime = Math.round( (new Date() - starttime) / 1000 );
-    let wpm = Math.round(60 * score / elapsedTime);
+    let speedHtml = '';
+    if (timeLimit > 0 && starttime) {
+      let elapsedTime = Math.round( (new Date() - starttime) / 1000 );
+      let wpm = elapsedTime > 0 ? Math.round(60 * score / elapsedTime) : 0;
+      speedHtml = `<div class="fs-5">Speed : ${wpm} wpm</div>`;
+    }
 
     $("#result").html(`
       <div class="fs-1">Words Typed : ${score}</div><hr/>
       <div class="fs-3">Mistakes : ${misses}</div>
       <div class="fs-5">Accuracy : ${Math.round(100 * totalLetters / (totalLetters + misses)) || 100}%</div>
-      <div class="fs-5">Speed : ${wpm} wpm</div>`).show();
+      ${speedHtml}`).show();
     $("#content").hide();
     $("#info").show();
     $("#start").focus();
@@ -136,12 +147,13 @@ $(function(){
 
 
   updateAnimation = ()=> {
+    if (timeLimit <= 0) return;
     if (!finished && new Date() - starttime < timeLimit * 1000) {
       let time = timeLimit - Math.floor((new Date() - starttime) / 1000).toString();
       $("#timer").html(`<span class="display-3">${time}</span><br/>seconds left`);
       requestAnimationFrame(updateAnimation); // Keep the animation going
     } 
-    else {
+    else if (!finished) {
       finished = true;
       showResults();
     }
@@ -149,10 +161,8 @@ $(function(){
 
 
   resetAnswer = ()=>{
-    if (finished){
-      finished = false;
-      requestAnimationFrame(updateAnimation);
-    }
+    wordOpacity = 100;
+    $("#display").css("opacity",wordOpacity/100);
 
     place = 0;
     guess = '';
@@ -209,6 +219,11 @@ $(function(){
   let fired = false;
 
   backspace = ()=>{
+    if (wordOpacity < 100){
+      wordOpacity = Math.max(1,wordOpacity*3);
+      $("#display").css("opacity",wordOpacity/100);
+    }
+
     if(place > 0){
       place--;
       guess = guess.slice(0, -1);
@@ -221,6 +236,11 @@ $(function(){
     if (e.key === ' ') e.preventDefault();
 
     if(e.key.length == 1 && e.key !== fired && letters.includes(e.key)){
+      if (wordOpacity > 0){
+        wordOpacity = Math.floor(wordOpacity/3);
+        $("#display").css("opacity",wordOpacity/100);
+      }
+
       if (finished) return;
       fired = e.key;
       if (place < item.word.length){
