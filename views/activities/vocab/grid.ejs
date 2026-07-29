@@ -47,7 +47,7 @@
       <div style="position:absolute;right:0;">
         <%- include('../../menu/activity_select', { activity: 'grid' }); -%>
 
-        <button id="home" class="btn btn-sm btn-outline-secondary p-0" onclick="location.href='<%= query.teacher ? '/teachers/' + deckType : deckType === 'NH' ? '/NH' : '/' %>'">
+        <button id="home" class="btn btn-sm btn-outline-secondary p-0" onclick="location.href='<%= query.teacher || (deckType !== 'NH' && deckType !== 'nolink') ? '/teachers/' + deckType : (deckType === 'NH' ? '/NH' : '/') %>'">
           <i class="material-icons">home</i>
         </button>
       </div>
@@ -111,13 +111,40 @@ $(function(){
     return 0;
   }
 
-  setGrid = ()=>{
+  var workingdeck = [];
+
+  const updateWorkingDeckEdits = () => {
+    $('#grid [contenteditable]').each(function() {
+      const idx = $(this).data('index');
+      if (idx !== undefined && workingdeck[idx]) {
+        workingdeck[idx].word = $(this).text().trim();
+      }
+    });
+  };
+
+  $(document).on('input blur', '#grid [contenteditable]', function() {
+    const idx = $(this).data('index');
+    if (idx !== undefined && workingdeck[idx]) {
+      workingdeck[idx].word = $(this).text().trim();
+    }
+  });
+
+  setGrid = (isShuffle = false)=>{
     spaces = parseInt($("#numCards").val());
-    deck = FYshuffle(deck); // Shuffle first so cards duped/omitted are random.
-    let workingdeck = FYshuffle(deck); 
-    while (workingdeck.length < spaces) workingdeck = workingdeck.concat(deck);
-    if (workingdeck.length > spaces) workingdeck = workingdeck.slice(0, spaces);
-    workingdeck = FYshuffle(workingdeck); // shuffle so order doesn't repeat
+
+    if (isShuffle && workingdeck.length > 0) {
+      updateWorkingDeckEdits();
+      workingdeck = FYshuffle(workingdeck);
+    } else {
+      let sourceDeck = deck.map(item => ({ ...item }));
+      sourceDeck = FYshuffle(sourceDeck);
+      workingdeck = FYshuffle(sourceDeck); 
+      while (workingdeck.length < spaces) {
+        workingdeck = workingdeck.concat(deck.map(item => ({ ...item })));
+      }
+      if (workingdeck.length > spaces) workingdeck = workingdeck.slice(0, spaces);
+      workingdeck = FYshuffle(workingdeck); // shuffle so order doesn't repeat
+    }
 
     let cols = getCols(workingdeck.length);
     while (workingdeck.length % cols != 0) workingdeck.pop(); // reduce to a multiple of cols
@@ -126,12 +153,12 @@ $(function(){
     let html = '<div class="border-top border-end d-flex flex-wrap justify-content-center">';
     for (let i = 0; i < workingdeck.length; i++){
       if ( !workingdeck[i].image ) {
-        let fs = 7 - workingdeck[i].word.length;
+        let fs = Math.max(1, 7 - workingdeck[i].word.length);
         html += 
         `<div class="space border-start border-bottom text-center pt-3" 
               style="position:relative;width:${colspan}vw;height:${colspan}vw;">
 
-            <div class="text-center YM w-100" style="position:absolute;top:50%;transform:translateY(-50%);font-size:${fs}rem;" contenteditable="true">
+            <div class="text-center YM w-100" style="position:absolute;top:50%;transform:translateY(-50%);font-size:${fs}rem;" contenteditable="true" data-index="${i}">
               ${workingdeck[i].word}
             </div>
           </div>`;
@@ -145,7 +172,7 @@ $(function(){
                 style="max-height:75%;max-width:75%;"
                 onerror="altOnly(this)">
 
-            <div class="txt text-center YM w-100 position-absolute bottom-0 mb-1" style="display:none;" contenteditable="true">
+            <div class="txt text-center YM w-100 position-absolute bottom-0 mb-1" style="display:none;" contenteditable="true" data-index="${i}">
               ${workingdeck[i].word}
             </div>
 
@@ -162,9 +189,8 @@ $(function(){
     history.replaceState(null, '', `?spaces=${spaces}&showtext=${showtext}`);
   }
 
-  $("#shuffle").on('click', ()=>{ // BUG: edited content reverts on shuffle
-    deck = FYshuffle(deck);
-    setGrid();
+  $("#shuffle").on('click', ()=>{
+    setGrid(true);
   });
 
   $("#showtext").on('change', ()=>{

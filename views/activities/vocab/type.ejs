@@ -19,7 +19,7 @@
   <div style="position:absolute;right:0;">
     <%- include('../../menu/activity_select', { activity: 'type' }); -%>
 
-    <button id="home" class="btn btn-sm btn-outline-secondary p-0" onclick="location.href='<%= query.teacher ? '/teachers/' + deckType : deckType === 'NH' ? '/NH' : '/' %>'">
+    <button id="home" class="btn btn-sm btn-outline-secondary p-0" onclick="location.href='<%= query.teacher || (deckType !== 'NH' && deckType !== 'nolink') ? '/teachers/' + deckType : (deckType === 'NH' ? '/NH' : '/') %>'">
       <i class="material-icons">home</i>
     </button>
   </div>
@@ -41,6 +41,10 @@
       <div id="result" class="col" style="display:none;"></div>
       <div id="controls" class="col d-flex justify-content-center">
         <div class="d-flex align-items-center">
+          <div class="form-check me-3 mb-0 text-start">
+            <input type="checkbox" id="fade" class="form-check-input" value="fade" style="cursor: pointer;" checked>
+            <label class="form-check-label fs-5" for="fade" style="cursor: pointer;">Fade</label>
+          </div>
           <select id="timeLimit" class="form-select form-select-lg" aria-label="time limit">
             <option value="0" selected>No Limit</option>
             <option value="60">1 minute</option>
@@ -49,10 +53,6 @@
             <option value="240">4 minutes</option>
             <option value="300">5 minutes</option>
           </select>
-          <div class="form-check ms-3 mb-0 text-start">
-            <input type="checkbox" id="fade" class="form-check-input" value="fade" style="cursor: pointer;" checked>
-            <label class="form-check-label fs-5" for="fade" style="cursor: pointer;">Fade</label>
-          </div>
           <button id="start" aria-label="next" class="btn btn-lg btn-success ms-3" autofocus>
             START
           </button>
@@ -62,7 +62,7 @@
     </div>
   </div>
 
-  <div id="content" class="container" style="display:none;">
+  <div id="content" class="container" style="display:none;user-select: none;">
   
     <div class="row g-0">
       <div id="remaining" class="col-1 text-primary display-5 YM"></div>

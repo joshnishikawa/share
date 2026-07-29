@@ -1,27 +1,18 @@
-FIX RECALL: 
-  Flip while mouse held.
-  No text select.
-  Field should stay focused. 
-  Two-word vocab should appear before space. 
-  Words should shrink to fit.
-
 Get audio samples for all static vocab
 Get the spoken picture dictionary working
+
+////////// IDEAS FOR VOCABULARY ACTIVITIES /////////////////////////////////////
+code an activity format to practice dialogs
+labelled diagrams for: clothes, body, school, kitchen, tools, maps, around town
 
 ////////// IDEAS FOR STUDENT ACTIVITIES ////////////////////////////////////////
 Sight Words: Show a written word. User selects the meaning from 3 images.
 
-Flash Typing: Flash a word. The user types it after it disappears.
-
 find the given word among a group of like words
 
-Find all letters that (sound like 'p', have a descender, are tall, etc.)
 Phonics: Click to listen. Drag into groups.
-Put letter parts together like a puzzle?
-See English and Romaji, type the English version.
 Sentences: Listen to the sentence. Click each word to listen. Drag the words into order.
 Speaking Slots: Pull the lever to make a sentence with random parts. Say the sentence to continue.
-
 
 ////////// IDEAS FOR TEACHER ACTIVITIES ////////////////////////////////////////
 Crack the code: Teacher adds a number and says it. Ss enter the same number to continue.
@@ -65,8 +56,6 @@ Time Bomb: Pause for 3 seconds = die. Don't finish in 1 minute = die. Three stri
   Read an English sentence. Type the sentence with the indicated change.
   Read a question and type the (indicated) answer.
 
-  Listen to a sentence and look at a picture. Correct the sentence with a spoken response.
-
   Listen to or read a sentence/question. Select the correct response.
 
   Listen to the sentence/question. Give a spoken response.
@@ -91,8 +80,3 @@ Time Bomb: Pause for 3 seconds = die. Don't finish in 1 minute = die. Three stri
   3rd person (like - likes, wish - wishes, have - has)
   comparative (tall - taller, large - larger, early - earlier, beautiful - more beautiful, good - better)
   superlative "
-
-////////// IDEAS FOR VOCABULARY ACTIVITIES /////////////////////////////////////
-code an activity format to practice dialogs
-free listening exercises: words / phrases / sentences, listen and write then check
-labelled diagrams for: clothes, body, school, kitchen, tools, maps, around town

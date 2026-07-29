@@ -2,17 +2,6 @@
 
 <style>
   #display div{ width: 16%;}
-
-  #grid img{
-    position:absolute;
-    margin: auto;
-    left: 0;
-    right: 0;
-    text-align: center;
-    max-width:90%;
-    max-height:90%;
-  }
-
 </style>
 
 <body>
@@ -44,7 +33,7 @@
 
       <%- include('../../menu/activity_select', { activity: 'recall' }); -%>
 
-      <button id="home" class="btn btn-sm btn-outline-secondary p-0" onclick="location.href='<%= query.teacher ? '/teachers/' + deckType : deckType === 'NH' ? '/NH' : '/' %>'">
+      <button id="home" class="btn btn-sm btn-outline-secondary p-0" onclick="location.href='<%= query.teacher || (deckType !== 'NH' && deckType !== 'nolink') ? '/teachers/' + deckType : (deckType === 'NH' ? '/NH' : '/') %>'">
         <i class="material-icons">home</i>
       </button>
     </div>
@@ -54,7 +43,7 @@
   <div style="min-height:100vh;">
     <div id="display" class="col d-flex flex-wrap justify-content-center text-center"></div>
     <div id="gridContainer" style="display:none;">
-      <div id="grid" class="d-flex flex-wrap"></div>
+      <div id="grid" class="d-flex flex-wrap" style="user-select: none;"></div>
     </div>
   </div>
 
@@ -86,6 +75,7 @@ $(function(){
   for (let i of deck){
     $('#display').append(getContent(i));
   }
+  fitText('#display > div');
 
 
 // PREPARE THE GRID ////////////////////////////////////////////////////////////
@@ -125,12 +115,8 @@ $(function(){
       cards.splice(rand, 1);
     }
     for (let i of flipped){
-      $(i).addClass('flipped').removeClass('flip').off('mousedown');
+      $(i).addClass('flipped').removeClass('flip');
     }
-
-    $(".flip").on('dblclick', function(){
-      $(this).addClass('flipped').removeClass('flip').off('mousedown');
-    });
 
     $("#gridContainer").show();
   }
@@ -138,6 +124,11 @@ $(function(){
 
   $("#start").on('click', play);
   $("#replay").on('click', play);
+
+
+  $(document).on('dblclick', '.flip', function(){
+    $(this).addClass('flipped').removeClass('flip');
+  });
 
 
   $("#searchInput").on('keyup', function(e){
@@ -153,18 +144,19 @@ $(function(){
     }
     else{
       $(".flip").removeClass('border');
-      $(".flip-back").html('&nbsp;');
+      $(".flip-back").html('&nbsp;').css('font-size', '');
 
       let input = $(this).val();
       if (input == ""){return;}
       let matches = deck.filter((v)=>{
-        let spaceMatch = v.word.includes(' ') && input.includes(' ') || !v.word.includes(' ') && !input.includes(' ');
-        return v.word.startsWith(input) && spaceMatch;
+        return v.word.startsWith(input);
       });
       for (let i of matches){
         let id = i.word.replace(/[ ()']/g, '_');
+        let $back = $(`#${id} > .flip > .flip-card > .flip-back`);
+        $back.html(input);
+        fitText($back);
         $(`#${id} > .flip`).addClass('border');
-        $(`#${id} > .flip > .flip-card > .flip-back`).html(input);
       }
     }
   });
@@ -198,9 +190,14 @@ $(function(){
   });
 
 
-  $(".flip").on('mousedown', function(){
-    $(this).toggleClass('flipped').on('mouseup', function(){
-      $(this).removeClass('flipped').off('mouseup');
+  $(document).on('mousedown', '.flip', function(e){
+    e.preventDefault();
+    let $card = $(this);
+    $card.addClass('flipped');
+    $(document).one('mouseup', function(){
+      if ($card.hasClass('flip')) {
+        $card.removeClass('flipped');
+      }
     });
   });
 

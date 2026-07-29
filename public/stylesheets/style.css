@@ -123,6 +123,8 @@ body {
   width: 100%;
   height: 100%;
   backface-visibility: hidden;
+  font-weight: bold;
+  -webkit-text-stroke: 1px black;
 }
 
 .flip-front {
@@ -135,6 +137,33 @@ body {
   backface-visibility: hidden;
   transform: rotateY(180deg); /* because it starts face-down */
 }
+
+.flip-front img {
+  position: absolute;
+  margin: auto;
+  left: 0;
+  right: 0;
+  top: 0;
+  text-align: center;
+  max-width: 90%;
+  max-height: 90%;
+}
+
+.container.flip {
+  container-type: size;
+}
+
+.flip, .flip-card, .flip-front, .flip-back {
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.flip:focus, .flip-card:focus, .flip-front:focus, .flip-back:focus,
+.flip:focus-visible, .flip-card:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 
 /* 7. MENU ITEM WRAPPER ────────────────────────────────────────────────────── */
 .menuitemwrapper {

@@ -87,3 +87,31 @@ getGrid = (data) => {
   }
   return { length: 4, colspan: 6, rowheight: 49 };
 }
+
+
+// Automatically shrink text inside an element until it fits without breaking words
+fitText = (element, minFontSize = 10) => {
+  $(element).each(function() {
+    let el = this;
+    $(el).css('font-size', ''); // Reset inline font-size to get computed default
+    let fontSize = parseFloat(window.getComputedStyle(el).fontSize) || 32;
+
+    // Do not break words mid-word while scaling
+    el.style.wordBreak = 'normal';
+    el.style.overflowWrap = 'normal';
+    el.style.whiteSpace = 'normal';
+
+    while (fontSize > minFontSize && (el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth)) {
+      fontSize -= 1;
+      el.style.fontSize = fontSize + 'px';
+    }
+
+    // Safety fallback: if it still overflows at minFontSize, allow word breaking
+    if (el.scrollWidth > el.clientWidth || el.scrollHeight > el.clientHeight) {
+      el.style.overflowWrap = 'break-word';
+      el.style.wordBreak = 'break-word';
+    }
+  });
+}
+
+

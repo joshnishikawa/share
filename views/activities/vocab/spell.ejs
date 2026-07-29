@@ -19,7 +19,7 @@
   <div style="position:absolute;right:0;">
     <%- include('../../menu/activity_select', { activity: 'spell' }); -%>
 
-    <button id="home" class="btn btn-sm btn-outline-secondary p-0" onclick="location.href='<%= query.teacher ? '/teachers/' + deckType : deckType === 'NH' ? '/NH' : '/' %>'">
+    <button id="home" class="btn btn-sm btn-outline-secondary p-0" onclick="location.href='<%= query.teacher || (deckType !== 'NH' && deckType !== 'nolink') ? '/teachers/' + deckType : (deckType === 'NH' ? '/NH' : '/') %>'">
       <i class="material-icons">home</i>
     </button>
   </div>
@@ -50,7 +50,7 @@
 </div>
 
 
-<div id="content" class="container g-0" style="display:none;">
+<div id="content" class="container g-0" style="display:none;user-select: none;">
   
   <div class="row g-0">
     <div id="remaining" class="col-1 text-primary display-5 YM">42</div>

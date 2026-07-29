@@ -17,10 +17,15 @@
   const safeDeck = typeof deck !== 'undefined' ? JSON.stringify(deck).replace(/'/g, "&#39;") : '[]';
   const deckLength = typeof deck !== 'undefined' && deck ? deck.length : 0;
   const safedeckType = typeof deckType !== 'undefined' ? deckType : 'nolink';
+  const isTeacher = (typeof query !== 'undefined' && query && query.teacher) || (typeof teacher !== 'undefined' && teacher);
+  const teacherVal = (typeof query !== 'undefined' && query && query.teacher) ? query.teacher : '1';
 %>
 <form class="vocab-activity-select-form d-inline-flex align-items-center mx-2" action="" method="POST" target="_blank">
   <input type="hidden" name="deck" value='<%- safeDeck %>'>
   <input type="hidden" name="deckType" value="<%= safedeckType %>">
+  <% if (isTeacher) { %>
+    <input type="hidden" name="teacher" value="<%= teacherVal %>">
+  <% } %>
   <input type="hidden" name="spaces" value="<%= deckLength %>">
   <input type="hidden" name="text" value="true">
   <input type="hidden" name="showtext" value="true">
