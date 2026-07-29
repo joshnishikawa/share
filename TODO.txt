@@ -1,18 +1,17 @@
 Get audio samples for all static vocab
 Get the spoken picture dictionary working
-
-////////// IDEAS FOR VOCABULARY ACTIVITIES /////////////////////////////////////
 code an activity format to practice dialogs
 labelled diagrams for: clothes, body, school, kitchen, tools, maps, around town
 
 ////////// IDEAS FOR STUDENT ACTIVITIES ////////////////////////////////////////
-Sight Words: Show a written word. User selects the meaning from 3 images.
 
-find the given word among a group of like words
+Sight Words: Show a written word. User selects the meaning from 3 images.
+             OR find the given word among a group of like words
 
 Phonics: Click to listen. Drag into groups.
 Sentences: Listen to the sentence. Click each word to listen. Drag the words into order.
 Speaking Slots: Pull the lever to make a sentence with random parts. Say the sentence to continue.
+
 
 ////////// IDEAS FOR TEACHER ACTIVITIES ////////////////////////////////////////
 Crack the code: Teacher adds a number and says it. Ss enter the same number to continue.
@@ -28,6 +27,7 @@ Time Bomb: Pause for 3 seconds = die. Don't finish in 1 minute = die. Three stri
 
   if bg-warning is displayed 3 times, bg-danger. press enter to review and try again.
   if they get to the end of the deck, bg-success!
+
 
 // LONG TERM GOALS /////////////////////////////////////////////////////////////
   FUNCTIONS THAT CAN BE SELECTED FROM AN API FOR USE IN TEACHING GRAMMAR.
