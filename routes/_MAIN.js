@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const createError = require('http-errors');
 const fs = require('fs');
 const path = require('path');
 const letters = require('./letters.js');
@@ -11,6 +12,7 @@ const multiplayer = require('./multiplayer');
 const db = require('../config/db.js');
 const vocabulary = require('../public/vocabulary.js');
 const { NH_colors, getNHVocab } = require('../config/nh_helpers.js');
+const { getSRSCard } = require('../config/srs_cards.js');
 
 router.use('/letters', letters);
 router.use('/things', things);
@@ -18,6 +20,24 @@ router.use('/vocab', vocab);
 router.use('/tools', tools);
 router.use('/labs', labs);
 router.use('/multiplayer', multiplayer);
+
+
+router.get('/SRS/loadcard', (req, res) => {
+  try {
+    let set = req.query.set;
+    let cardIndex = parseInt(req.query.card, 10);
+    if (isNaN(cardIndex)) cardIndex = 0;
+
+    let cardData = getSRSCard(set, cardIndex);
+    if (!cardData) {
+      return res.status(404).json({ error: 'Card not found' });
+    }
+    res.json(cardData);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 
 
 router.get('/', (req, res)=>{
@@ -216,7 +236,7 @@ router.post('/:activity', async(req, res)=>{
 });
 
 
-router.get('/:activity/:id', async(req, res)=>{
+router.get('/:activity/:id', async(req, res, next)=>{
   try{
     console.log(req.params.activity);
     if ( ["bingo", "flash", "grid", "match", "recall", "reveal", "type", "spell", "penmanship", "printcards", "double", "write"].includes(req.params.activity) ){
@@ -224,12 +244,11 @@ router.get('/:activity/:id', async(req, res)=>{
     }
     else {
       console.log('404 redirect failed for activity:', req.params.activity);
-      throw '404';
+      return next(createError(404));
     }
   }
   catch(err){
-    res.status(500).render('error');
-    console.error(err);
+    next(err);
   }
 });
 

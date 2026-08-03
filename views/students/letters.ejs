@@ -9,7 +9,7 @@
     • progressPie selectors are manually re-initialized in <script> because
       document.querySelector runs at parse time in progress.js and misses
       these elements. This is a workaround for the bug noted in progress.js.
-    • SRS ranks array length (25) assumes 25 letters — but abc.js only has
+    • SRS ranks array length (25) assumes 25 letters — but SRS/SRS_abc.js only has
       25 letters too (missing 'x'). Consistent, but both are wrong if 26 is intended.
     • External link to school.bunkei.co.jp has no rel="noopener" — minor.
 -->
@@ -22,7 +22,7 @@
         <div class="row">
 
           <div class="col-sm mb-1">
-            <a href="letters/haystack" class="btn btn-light border border-3 border-primary shadow w-100 h-100 YM">
+            <a href="/letters/haystack" class="btn btn-light border border-3 border-primary shadow w-100 h-100 YM">
               <h5>Haystack</h5>
               <div class="container text-center">
                 <div class="row">
@@ -74,7 +74,7 @@
           </div>
 
           <div class="col-sm mb-1">
-            <a href="letters/pairs" class="btn btn-light border border-3 border-primary shadow w-100 h-100 YM">
+            <a href="/letters/pairs" class="btn btn-light border border-3 border-primary shadow w-100 h-100 YM">
               <h5>Find Pairs</h5>
               <div class="container text-center">
                 <div class="row">
@@ -162,7 +162,7 @@
           </div>
 
           <div class="col-sm mb-1">
-            <a href="letters/alphabetical" class="btn btn-light border border-3 border-primary shadow w-100 h-100 YM">
+            <a href="/letters/alphabetical" class="btn btn-light border border-3 border-primary shadow w-100 h-100 YM">
               <h5>Alphabetical</h5>
               <div class="d-flex display-1">
                 <div style="width:20%;">l</div>
@@ -179,7 +179,7 @@
         </div>
         <div class="row">
           <div class="col-sm mb-1">
-            <a href="letters/penmanship" class="btn btn-light border border-3 border-primary shadow w-100 h-100 YM">
+            <a href="/letters/penmanship" class="btn btn-light border border-3 border-primary shadow w-100 h-100 YM">
               <h5>Write</h5>
               <div class="penmanship shadow w-25 mx-auto">
                 <img src="/image/abc/f.gif" class="img-fluid" alt="f" onerror="altOnly(this)">
@@ -194,8 +194,17 @@
             </a>
           </div>
 
-
           <div class="col-sm mb-1">
+            <a href="https://altivities.earthiverse.ca/abcrace/" target="blank"
+              class="btn btn-light border border-3 border-success shadow w-100 h-100 YM">
+              <img src="/image/ABCrace.png" class="img-fluid w-50" alt="abc race" onerror="altOnly(this)">
+            </a>
+          </div>
+
+        </div>
+        <hr>
+        <div class="row">
+          <div class="col-sm-4 mb-1">
             <div class="text-center bg-light border border-3 border-primary rounded-3 shadow w-100 h-100 YM">
               <h5>Letters and Sounds</h5>
               <span class="text-danger"><%- __('sound_on') %></span>
@@ -225,17 +234,129 @@
             </div>
           </div>
 
-        </div>
-        <div class="row">
-          <div class="col-sm">
-            <a href="https://altivities.earthiverse.ca/abcrace/" target="blank"
-              class="btn btn-light border border-3 border-success shadow w-100 h-100 YM">
-              <img src="/image/ABCrace.png" class="img-fluid w-50" alt="abc race" onerror="altOnly(this)">
-            </a>
+<!--
+          <div class="row">
+
+          <div class="col-sm mb-1">
+            <div class="text-center bg-light border border-3 border-primary rounded-3 shadow w-100 h-100 YM">
+              <h5>3-Letter Words</h5>
+              <span class="text-danger"><%- __('sound_on') %></span>
+              <div class="d-flex justify-content-around p-3">
+
+                <i class="material-icons text-success"
+                  style="font-size:4rem;text-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important">
+                  record_voice_over
+                </i>
+
+                <div class="pt-2">
+                  <div id="progress3L" class="radial-progress-bar shadow">
+                    <div class="right-half"></div>
+                    <div class="left-half-mask"></div>
+                    <div class="left-half"></div>
+                    <div class="inner-circle bg-light" style="background-image: none !important;"></div>
+                  </div>
+                </div>
+
+                <button id="startSRS3L" class="btn material-icons text-primary"
+                  style="font-size:4rem;text-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;">
+                  forward
+                </button>
+
+                <button id="resetSRS3L" class="btn btn-danger" style="display:none;">Reset</button>
+              </div>
+            </div>
           </div>
-          <div class="col-sm"></div>
-          <div class="col-sm"></div>
-        </div>
+
+          <div class="col-sm mb-1">
+            <div class="text-center bg-light border border-3 border-primary rounded-3 shadow w-100 h-100 YM">
+              <h5>Blends</h5>
+              <span class="text-danger"><%- __('sound_on') %></span>
+              <div class="d-flex justify-content-around p-3">
+
+                <i class="material-icons text-success"
+                  style="font-size:4rem;text-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important">
+                  record_voice_over
+                </i>
+
+                <div class="pt-2">
+                  <div id="progressBlends" class="radial-progress-bar shadow">
+                    <div class="right-half"></div>
+                    <div class="left-half-mask"></div>
+                    <div class="left-half"></div>
+                    <div class="inner-circle bg-light" style="background-image: none !important;"></div>
+                  </div>
+                </div>
+
+                <button id="startSRSBlends" class="btn material-icons text-primary"
+                  style="font-size:4rem;text-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;">
+                  forward
+                </button>
+
+                <button id="resetSRSBlends" class="btn btn-danger" style="display:none;">Reset</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 mb-1">
+            <div class="text-center bg-light border border-3 border-primary rounded-3 shadow w-100 h-100 YM">
+              <h5>Friendly H</h5>
+              <span class="text-danger"><%- __('sound_on') %></span>
+              <div class="d-flex justify-content-around p-3">
+
+                <i class="material-icons text-success"
+                  style="font-size:4rem;text-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important">
+                  record_voice_over
+                </i>
+
+                <div class="pt-2">
+                  <div id="progressH" class="radial-progress-bar shadow">
+                    <div class="right-half"></div>
+                    <div class="left-half-mask"></div>
+                    <div class="left-half"></div>
+                    <div class="inner-circle bg-light" style="background-image: none !important;"></div>
+                  </div>
+                </div>
+
+                <button id="startSRSH" class="btn material-icons text-primary"
+                  style="font-size:4rem;text-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;">
+                  forward
+                </button>
+
+                <button id="resetSRSH" class="btn btn-danger" style="display:none;">Reset</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-4 mb-1">
+            <div class="text-center bg-light border border-3 border-primary rounded-3 shadow w-100 h-100 YM">
+              <h5>Magic E</h5>
+              <span class="text-danger"><%- __('sound_on') %></span>
+              <div class="d-flex justify-content-around p-3">
+
+                <i class="material-icons text-success"
+                  style="font-size:4rem;text-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important">
+                  record_voice_over
+                </i>
+
+                <div class="pt-2">
+                  <div id="progressE" class="radial-progress-bar shadow">
+                    <div class="right-half"></div>
+                    <div class="left-half-mask"></div>
+                    <div class="left-half"></div>
+                    <div class="inner-circle bg-light" style="background-image: none !important;"></div>
+                  </div>
+                </div>
+
+                <button id="startSRSE" class="btn material-icons text-primary"
+                  style="font-size:4rem;text-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;">
+                  forward
+                </button>
+
+                <button id="resetSRSE" class="btn btn-danger" style="display:none;">Reset</button>
+              </div>
+            </div>
+          </div>
+
+        </div>  -->
       </div>
 
   </div>
@@ -247,28 +368,104 @@
     $(function () {
       $(`#letters-tab`).addClass("active");
 
-      // Initialize progressPie selectors
-      progressPie.leftHalf = document.querySelector(".left-half");
-      progressPie.rightHalf = document.querySelector(".right-half");
-
       let ranks = JSON.parse(localStorage.getItem('abc_SRS'))
         || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
-      // get sum of ranks and update progress display
-      let percent = progressToPercent(ranks, ranks.length * 5);
+      // get sum of ranks and update progress display for Letters & Sounds
+      let percent = progressToPercent(ranks, ranks.length * 5, "#progress");
 
       if (percent >= 100) {
-        $("#startSRS").prop('disabled', true);
+        $("#startSRS").hide();
         $("#resetSRS").show();
       }
 
 
       $("#startSRS").on('click', () => {
-        window.location.href = "letters/SRS";
+        window.location.href = "/letters/SRS_abc";
       });
 
       $("#resetSRS").on('click', () => {
         localStorage.removeItem('abc_SRS');
+        window.location.reload();
+      });
+
+      let ranksBlends = JSON.parse(localStorage.getItem('bl_SRS'))
+        || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+      // get sum of ranks and update progress display for Blends & Sounds
+      let percentBlends = progressToPercent(ranksBlends, ranksBlends.length * 5, "#progressBlends");
+
+      if (percentBlends >= 100) {
+        $("#startSRSBlends").hide();
+        $("#resetSRSBlends").show();
+      }
+
+      $("#startSRSBlends").on('click', () => {
+        window.location.href = "/letters/SRS_bl";
+      });
+
+      $("#resetSRSBlends").on('click', () => {
+        localStorage.removeItem('bl_SRS');
+        window.location.reload();
+      });
+
+      let ranks3L = JSON.parse(localStorage.getItem('3L_SRS'))
+        || Array(60).fill(0);
+
+      // get sum of ranks and update progress display for 3-Letter Words
+      let percent3L = progressToPercent(ranks3L, ranks3L.length * 5, "#progress3L");
+
+      if (percent3L >= 100) {
+        $("#startSRS3L").hide();
+        $("#resetSRS3L").show();
+      }
+
+      $("#startSRS3L").on('click', () => {
+        window.location.href = "/letters/SRS_3L";
+      });
+
+      $("#resetSRS3L").on('click', () => {
+        localStorage.removeItem('3L_SRS');
+        window.location.reload();
+      });
+
+      let ranksH = JSON.parse(localStorage.getItem('h_SRS'))
+        || Array(24).fill(0);
+
+      // get sum of ranks and update progress display for Friendly H
+      let percentH = progressToPercent(ranksH, ranksH.length * 5, "#progressH");
+
+      if (percentH >= 100) {
+        $("#startSRSH").hide();
+        $("#resetSRSH").show();
+      }
+
+      $("#startSRSH").on('click', () => {
+        window.location.href = "/letters/SRS_h";
+      });
+
+      $("#resetSRSH").on('click', () => {
+        localStorage.removeItem('h_SRS');
+        window.location.reload();
+      });
+
+      let ranksE = JSON.parse(localStorage.getItem('e_SRS'))
+        || Array(24).fill(0);
+
+      // get sum of ranks and update progress display for Magic E
+      let percentE = progressToPercent(ranksE, ranksE.length * 5, "#progressE");
+
+      if (percentE >= 100) {
+        $("#startSRSE").hide();
+        $("#resetSRSE").show();
+      }
+
+      $("#startSRSE").on('click', () => {
+        window.location.href = "/letters/SRS_e";
+      });
+
+      $("#resetSRSE").on('click', () => {
+        localStorage.removeItem('e_SRS');
         window.location.reload();
       });
 

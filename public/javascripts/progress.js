@@ -16,10 +16,10 @@
 // RADIAL PROGRESS BAR /////////////////////////////////////////////////////////
 // Sum up progress array values, calculate percent of goal, update the pie.
 // NOTE: Also calls progressPie.progress() as a side effect — not a pure function.
-progressToPercent = (prog, goal) => {
+progressToPercent = (prog, goal, container) => {
   prog = prog.reduce((a,b)=>a+b,0);
   let percent = Math.round( prog / goal * 100 );
-  progressPie.progress(percent);
+  progressPie.progress(percent, container);
   return percent;
 }
 
@@ -29,20 +29,30 @@ progressPie = {
   rightHalf: null,
 };
 
-progressPie.progress = function (percent) {
-  if (!this.leftHalf) this.leftHalf = document.querySelector(".left-half");
-  if (!this.rightHalf) this.rightHalf = document.querySelector(".right-half");
-  if (!this.leftHalf || !this.rightHalf) return;
+progressPie.progress = function (percent, container) {
+  let leftHalf, rightHalf;
+  if (container) {
+    let el = typeof container === 'string' ? document.querySelector(container) : container;
+    leftHalf = el ? el.querySelector(".left-half") : null;
+    rightHalf = el ? el.querySelector(".right-half") : null;
+  } else {
+    if (!this.leftHalf) this.leftHalf = document.querySelector(".left-half");
+    if (!this.rightHalf) this.rightHalf = document.querySelector(".right-half");
+    leftHalf = this.leftHalf;
+    rightHalf = this.rightHalf;
+  }
+
+  if (!leftHalf || !rightHalf) return;
   percent = Math.min(Math.max(0, percent), 100);
   if (percent <= 50) {
-      this.leftHalf.style.visibility = "hidden";
-      this.leftHalf.style.transform = "rotate(180deg)";
-      this.rightHalf.style.transform = "rotate(" + (percent*3.6) + "deg)";
+      leftHalf.style.visibility = "hidden";
+      leftHalf.style.transform = "rotate(180deg)";
+      rightHalf.style.transform = "rotate(" + (percent*3.6) + "deg)";
   } 
   else {
-      this.leftHalf.style.visibility = "visible";
-      this.leftHalf.style.transform = "rotate(" + (percent*3.6) + "deg)";
-      this.rightHalf.style.transform = "rotate(180deg)";
+      leftHalf.style.visibility = "visible";
+      leftHalf.style.transform = "rotate(" + (percent*3.6) + "deg)";
+      rightHalf.style.transform = "rotate(180deg)";
   }
 }
 

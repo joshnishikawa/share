@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// abc.js — ABC / phonics letter-learning data and activity orchestrator.
+// SRS_abc.js — ABC / phonics letter-learning data and activity orchestrator.
 //
 // STRUCTURE:
 //   1. `abc` array — 26 letter objects with vocab, distractor letters,

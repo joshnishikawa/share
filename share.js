@@ -118,7 +118,7 @@ app.use( i18n.init );
 app.use('/auth', authRouter);
 app.use('/api', apiRouter);
 app.use('/teachers', TRouter);
-// app.use('/media', mediaRouter);
+app.use('/media', mediaRouter);
 app.use('/', mainRouter);
 
 app.use( (req, res, next)=> { next(createError(404)); });

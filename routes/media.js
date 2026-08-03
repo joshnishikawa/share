@@ -147,4 +147,30 @@ function getNeedleList(needleType, needle){
 
 
 
+router.get('/findAudio', (req, res) => {
+  try {
+    let file = req.query.file;
+    if (!file) return res.send('');
+
+    const dirs = ['words', 'sounds', 'letters', 'phrases', 'sentences', 'uploads'];
+    const extensions = ['.mp3', '.wav', '.m4a', ''];
+
+    for (let d of dirs) {
+      for (let ext of extensions) {
+        let relativePath = `/audio/${d}/${file}${ext}`;
+        let fullPath = path.join(__dirname, `../public${relativePath}`);
+        if (fs.existsSync(fullPath)) {
+          return res.send(relativePath);
+        }
+      }
+    }
+
+    res.send('');
+  } catch (err) {
+    console.error(err);
+    res.send('');
+  }
+});
+
+
 module.exports = router;
