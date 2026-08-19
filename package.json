@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "nodemon share.js"
+    "start": "nodemon share.js",
+    "test": "jest"
   },
   "keywords": [],
   "author": "Josh Nishikawa",
@@ -25,5 +26,9 @@
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "socket.io": "^4.7.2"
+  },
+  "devDependencies": {
+    "jest": "^30.4.2",
+    "supertest": "^7.2.2"
   }
 }

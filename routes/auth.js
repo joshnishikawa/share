@@ -14,7 +14,8 @@ router.get('/google', function(req, res, next) {
       const refererUrl = new URL(referer);
 
       // Security: Only allow redirects to same domain
-      if (refererUrl.hostname === req.hostname) {
+      const requestHost = req.hostname || req.headers.host;
+      if (refererUrl.hostname === requestHost) {
         returnTo = refererUrl.pathname + refererUrl.search + refererUrl.hash;
       } else {
         console.warn('Rejected cross-domain redirect attempt:', refererUrl.hostname);
@@ -73,7 +74,8 @@ router.get('/logout', function(req, res, next) {
       const refererUrl = new URL(referer);
 
       // Security: Only allow redirects to same domain
-      if (refererUrl.hostname === req.hostname) {
+      const requestHost = req.hostname || req.headers.host;
+      if (refererUrl.hostname === requestHost) {
         redirectTo = refererUrl.pathname + refererUrl.search + refererUrl.hash;
       } else {
         console.warn('Rejected cross-domain redirect attempt:', refererUrl.hostname);

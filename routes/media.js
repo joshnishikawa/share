@@ -5,14 +5,15 @@ const fs = require('fs');
 const path = require('path');
 
 
-router.get('/', (req, res)=>{
-  try{
-    res.render('labs/media');
-  }
-  catch(err){
-    res.status(500).render('error');
-    console.error(err);
-  }
+router.get('/', (req, res, next)=>{
+  throw new Error('Forced Sync Error'); // DIAGNOSTIC: Force a synchronous error
+  res.render('labs/media', (err, html) => {
+    if (err) {
+      console.error(err); // Log the error
+      return res.status(500).send('Forced render error'); // DIRECTLY SEND 500 for testing
+    }
+    res.send(html); // If successful, send the rendered HTML
+  });
 });
 
 

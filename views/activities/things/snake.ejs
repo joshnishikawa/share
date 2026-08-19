@@ -1,4 +1,4 @@
-<%- include('../head') %>
+<%- include('../../head') %>
 
 <style>
   .mic-listening {
@@ -47,6 +47,7 @@
       <span class="align-middle ms-1">Stop Voice</span>
     </button>
   </div>
+  <div id="speechTranscript" class="text-muted small fw-bold" style="min-height: 24px;"></div>
 </div>
 
 <div class="container text-center my-2">
@@ -65,6 +66,8 @@
           <li><strong>"Turn left"</strong> or <strong>"Left"</strong></li>
           <li><strong>"Turn right"</strong> or <strong>"Right"</strong></li>
           <li><strong>"Go straight"</strong> or <strong>"Straight"</strong></li>
+          <li><strong>"Go straight two blocks"</strong></li>
+          <li><strong>"Up"</strong>, <strong>"Down"</strong>, <strong>"Go left"</strong>, <strong>"Go right"</strong></li>
           <li><strong>"Restart"</strong> or <strong>"Reset"</strong></li>
         </ul>
       </div>
@@ -108,13 +111,7 @@
   var direction = 'up';
   var previousDirection = '';
 
-  const vocab = ["turn left", "left", "turn right", "right", "go straight", "straight", "go straight two blocks", "restart", "reset"];
-  const synonyms = {
-    "write": "right",
-    "strait": "straight",
-    "forward": "go straight",
-    "ahead": "go straight"
-  };
+  const vocab = ["turn left", "left", "turn right", "right", "go straight", "straight", "go straight two blocks", "up", "down", "go up", "go down", "go left", "go right", "restart", "reset"];
 
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   const SpeechGrammarList = window.SpeechGrammarList || window.webkitSpeechGrammarList;
@@ -126,10 +123,16 @@
 
   const recognition = SpeechRecognition ? new SpeechRecognition() : null;
   if (recognition) {
-    const grammar = `#JSGF V1.0; grammar commands; public <commands> = ${vocab.join(" | ")};`;
-    const speechRecognitionList = new SpeechGrammarList();
-    speechRecognitionList.addFromString(grammar, 1);
-    recognition.grammars = speechRecognitionList;
+    if (SpeechGrammarList) {
+      try {
+        const grammar = `#JSGF V1.0; grammar commands; public <commands> = ${vocab.join(" | ")};`;
+        const speechRecognitionList = new SpeechGrammarList();
+        speechRecognitionList.addFromString(grammar, 1);
+        recognition.grammars = speechRecognitionList;
+      } catch (e) {
+        console.warn("SpeechGrammarList not supported or failed:", e);
+      }
+    }
     recognition.continuous = true;
     recognition.interimResults = true;
     recognition.lang = "en-US";
@@ -137,15 +140,20 @@
   }
 
   var isListening = false;
+  var isGameOver = false;
+  var lastCommandTime = 0;
+  const processedResults = {};
 
   function startListening() {
     if (!recognition) return;
     isListening = true;
+    for (let k in processedResults) delete processedResults[k];
     try {
       recognition.start();
     } catch (e) {}
     $("#listen").addClass("mic-listening btn-success").removeClass("btn-outline-success").prop("disabled", true);
     $("#stop").prop("disabled", false).addClass("btn-danger").removeClass("btn-secondary");
+    $("#speechTranscript").text("Listening for voice commands...").removeClass("text-danger").addClass("text-muted");
     console.log("Speech recognition started.");
   }
 
@@ -157,7 +165,20 @@
     } catch (e) {}
     $("#listen").removeClass("mic-listening").prop("disabled", false);
     $("#stop").prop("disabled", true).removeClass("btn-danger").addClass("btn-secondary");
+    $("#speechTranscript").text("Voice controls stopped.");
     console.log("Speech recognition stopped.");
+  }
+
+  function setDirection(targetDir) {
+    if (!targetDir || isGameOver) return;
+    const isOpposite = (targetDir === 'up' && previousDirection === 'down') ||
+                       (targetDir === 'down' && previousDirection === 'up') ||
+                       (targetDir === 'left' && previousDirection === 'right') ||
+                       (targetDir === 'right' && previousDirection === 'left');
+    if (!isOpposite) {
+      direction = targetDir;
+      gameLoop();
+    }
   }
 
 $(function () {
@@ -176,6 +197,11 @@ $(function () {
     $("#messageModal").modal('hide');
   });
 
+  $("#playAgain").on('click', () => {
+    reset();
+    $("#messageModal").modal('hide');
+  });
+
   $(document).off('keydown').on('keydown', function(event) {
     const key = event.key;
     if (key === 'q' || key === 'Q' || key === 'r' || key === 'R') {
@@ -191,50 +217,74 @@ $(function () {
 
     if (targetDir) {
       event.preventDefault();
-      const isOpposite = (targetDir === 'up' && previousDirection === 'down') ||
-                         (targetDir === 'down' && previousDirection === 'up') ||
-                         (targetDir === 'left' && previousDirection === 'right') ||
-                         (targetDir === 'right' && previousDirection === 'left');
-      if (!isOpposite) {
-        direction = targetDir;
-        gameLoop();
-      }
+      setDirection(targetDir);
     }
   });
 });
 
-  let lastProcessedIndex = -1;
-
   if (recognition) {
     recognition.onresult = (event) => {
-      let interimTranscript = '';
-      let finalTranscript = '';
-
       for (let i = event.resultIndex; i < event.results.length; ++i) {
-        const transcriptChunk = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
-          finalTranscript += transcriptChunk;
-        } else {
-          interimTranscript += transcriptChunk;
+        const res = event.results[i];
+        const transcriptChunk = res[0].transcript;
+        const spokenText = transcriptChunk.toLowerCase().trim();
+
+        if (spokenText) {
+          $("#speechTranscript").text(`Heard: "${spokenText}"`);
         }
 
-        if (event.results[i].isFinal && i > lastProcessedIndex) {
-          lastProcessedIndex = i;
-          const spokenText = transcriptChunk.toLowerCase().trim();
-          console.log(`[Speech Result Final] "${spokenText}"`);
+        // Only process finalized results to avoid double-executing commands on interim speech
+        if (!res.isFinal) continue;
+        if (processedResults[i]) continue;
 
-          if (/\b(turn left|left)\b/i.test(spokenText)) {
-            turnLeft();
-          } else if (/\b(turn right|right|write)\b/i.test(spokenText)) {
-            turnRight();
-          } else if (/\b(go straight two blocks)\b/i.test(spokenText)) {
-            goStraight();
-            goStraight();
-          } else if (/\b(go straight|straight|strait|forward|ahead)\b/i.test(spokenText)) {
-            goStraight();
-          } else if (/\b(restart|reset|start over)\b/i.test(spokenText)) {
-            reset();
-          }
+        const now = Date.now();
+        if (now - lastCommandTime < 250) {
+          processedResults[i] = true;
+          continue;
+        }
+
+        let matched = false;
+
+        if (/\b(restart|reset|start over)\b/i.test(spokenText)) {
+          reset();
+          matched = true;
+        } else if (/\b(go straight (two|2) blocks|(straight|two|2) blocks|go straight (two|2))\b/i.test(spokenText)) {
+          goStraight();
+          goStraight();
+          matched = true;
+        } else if (/\b(go straight|straight|strait|forward|ahead)\b/i.test(spokenText)) {
+          goStraight();
+          matched = true;
+        } else if (/\b(turn left)\b/i.test(spokenText)) {
+          turnLeft();
+          matched = true;
+        } else if (/\b(turn right|turn write)\b/i.test(spokenText)) {
+          turnRight();
+          matched = true;
+        } else if (/\b(go up|move up|up)\b/i.test(spokenText)) {
+          setDirection('up');
+          matched = true;
+        } else if (/\b(go down|move down|down)\b/i.test(spokenText)) {
+          setDirection('down');
+          matched = true;
+        } else if (/\b(go left|move left)\b/i.test(spokenText)) {
+          setDirection('left');
+          matched = true;
+        } else if (/\b(go right|move right)\b/i.test(spokenText)) {
+          setDirection('right');
+          matched = true;
+        } else if (/\b(left)\b/i.test(spokenText)) {
+          turnLeft();
+          matched = true;
+        } else if (/\b(right|write)\b/i.test(spokenText)) {
+          turnRight();
+          matched = true;
+        }
+
+        if (matched) {
+          lastCommandTime = Date.now();
+          processedResults[i] = true;
+          if (i > 10) delete processedResults[i - 10];
         }
       }
     };
@@ -242,10 +292,14 @@ $(function () {
     recognition.onend = () => {
       console.log("Speech recognition onend event fired.");
       if (isListening) {
-        try {
-          recognition.start();
-          console.log("Speech recognition auto-restarted after browser silence timeout.");
-        } catch (e) {}
+        setTimeout(() => {
+          if (isListening) {
+            try {
+              recognition.start();
+              console.log("Speech recognition auto-restarted.");
+            } catch (e) {}
+          }
+        }, 200);
       } else {
         stopListening();
       }
@@ -253,8 +307,9 @@ $(function () {
 
     recognition.onerror = (event) => {
       console.error(`Speech recognition error: ${event.error}`);
-      if (event.error === "not-allowed") {
+      if (event.error === "not-allowed" || event.error === "service-not-allowed") {
         stopListening();
+        $("#speechTranscript").text("Microphone access was denied.").addClass("text-danger");
       } else if (event.error === "no-speech") {
         console.log("No speech detected during window.");
       }
@@ -611,6 +666,7 @@ $(function () {
   }
 
   function turnLeft() {
+    if (isGameOver) return;
     if (previousDirection === 'up') direction = 'left';
     else if (previousDirection === 'down') direction = 'right';
     else if (previousDirection === 'left') direction = 'down';
@@ -620,6 +676,7 @@ $(function () {
   }
 
   function turnRight() {
+    if (isGameOver) return;
     if (previousDirection === 'up') direction = 'right';
     else if (previousDirection === 'down') direction = 'left';
     else if (previousDirection === 'left') direction = 'up';
@@ -629,6 +686,7 @@ $(function () {
   }
 
   function goStraight() {
+    if (isGameOver) return;
     previousDirection = direction;
     gameLoop();
   }
@@ -644,6 +702,7 @@ $(function () {
   }
 
   function reset() {
+    isGameOver = false;
     direction = 'up';
     previousDirection = 'up';
     snake = [ { x: 150, y: 300, dir: 'up' } ];
@@ -695,14 +754,11 @@ $(function () {
 
     // DISPLAY MESSAGE
     if (message) {
+      isGameOver = true;
       setTimeout(function() { //delay alert so snake is drawn before alert shows
           $('#messageModalBody').text(message);
           $('#messageModal').modal('show').on('shown.bs.modal', () => {
             $('#playAgain').focus();
-          });
-          $('#playAgain').on('click', function() {
-            reset();
-            $('#messageModal').modal('hide');
           });
       }, 100);
     }
@@ -710,4 +766,4 @@ $(function () {
 
 
 </script>
-<%- include('../foot') %>
+<%- include('../../foot') %>

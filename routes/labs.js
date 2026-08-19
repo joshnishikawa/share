@@ -75,7 +75,7 @@ router.get('/:activity', (req, res)=>{
   try{
     const validActivities = ['snake', 'media', 'editsubs'];
     const activity = req.params.activity;
-    if (!validActivities.includes(activity)) return res.render('404');
+    if (!validActivities.includes(activity)) return res.status(404).render('404');
     res.render('labs/' + activity);
   }
   catch(err){
@@ -85,4 +85,4 @@ router.get('/:activity', (req, res)=>{
 });
 
 
-module.exports = router;
+module.exports = { router, convertSRTtoOBJ, convertOBJtoSRT };

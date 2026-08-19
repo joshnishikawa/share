@@ -18,7 +18,7 @@ router.use('/letters', letters);
 router.use('/things', things);
 router.use('/vocab', vocab);
 router.use('/tools', tools);
-router.use('/labs', labs);
+router.use('/labs', labs.router);
 router.use('/multiplayer', multiplayer);
 
 

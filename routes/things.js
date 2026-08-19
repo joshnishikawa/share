@@ -12,49 +12,6 @@ router.get('/', (req, res)=>{
 });
 
 
-router.get('/shapes', (req, res)=>{
-  try{
-    res.render('activities/things/shapes');
-  }
-  catch(err){
-    res.status(500).render('error');
-    console.error(err);
-  }
-});
-
-
-router.get('/colors', (req, res)=>{
-  try{
-    res.render('activities/things/colors');
-  }
-  catch(err){
-    res.status(500).render('error');
-    console.error(err);
-  }
-});
-
-
-router.get('/supplies', (req, res)=>{
-  try{
-    res.render('activities/things/supplies');
-  }
-  catch(err){
-    res.status(500).render('error');
-    console.error(err);
-  }
-});
-
-router.get('/room', (req, res)=>{
-  try{
-    res.render('activities/things/room');
-  }
-  catch(err){
-    res.status(500).render('error');
-    console.error(err);
-  }
-});
-
-
 router.get('/dressup/:type', (req, res)=>{
   try{
     const validTypes = ['boy', 'girl'];
@@ -67,5 +24,19 @@ router.get('/dressup/:type', (req, res)=>{
   }
 });
 
+
+router.get('/:activity', (req, res)=>{
+  try{
+    if ( !["room", "shapes", "colors", "supplies", "snake"].includes(req.params.activity) ){
+      throw '404';
+    }
+
+    res.render(`activities/things/${req.params.activity}`);
+  }
+  catch(err){
+    res.status(500).render('error');
+    console.error(err);
+  }
+});
 
 module.exports = router;
