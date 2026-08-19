@@ -10,7 +10,6 @@ const tools = require('./tools.js');
 const labs = require('./labs.js');
 const multiplayer = require('./multiplayer');
 const db = require('../config/db.js');
-const vocabulary = require('../public/vocabulary.js');
 const { NH_colors, getNHVocab } = require('../config/nh_helpers.js');
 const { getSRSCard } = require('../config/srs_cards.js');
 
@@ -73,52 +72,6 @@ router.get('/LT2', (req, res)=>{
 });
 
 
-router.get('/api/any-vocab', async (req, res)=>{
-  try{
-    // get array of words from vocabulary table
-    let words = {};
-    var rows;
-    var deck = req.query.deck ? JSON.parse(req.query.deck) : [];
-    if (req.query.deck) {
-      rows = vocabulary.filter(item => deck.includes(item.id));
-    }
-    else {
-      // parse everything from vocabulary table
-      rows = vocabulary;
-    }
-
-    for (let row of rows){
-      words[row.word] = {meaning: row.meaning, image: row.image, audio: row.audio};
-    }
-    res.json(words);
-  }
-  catch(err){
-    res.status(500).render('error');
-    console.error(err);
-  }
-});
-
-
-// API endpoint to get NH vocabulary and colors data
-router.get('/api/nh-vocab', async (req, res) => {
-  try {
-    let NH_vocab = await getNHVocab();
-
-    let translations = {};
-    for (let p in NH_vocab){
-      for (let t in NH_vocab[p]){
-        let translatedTheme = req.__(t);
-        translations[t] = translatedTheme;
-      }
-    }
-
-    res.json({ NH_vocab, NH_colors, translations });
-  }
-  catch(err){
-    res.status(500).json({ error: err.message });
-    console.error(err);
-  }
-});
 
 
 router.get('/NH', async (req, res)=>{

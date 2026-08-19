@@ -184,9 +184,10 @@ const chooseEvents = (io, socket) => {
       }
 
       moveChooserToNext(state);
-      setTimeout(() => {
+      const nextRoundTimer = setTimeout(() => {
         emitRoundStart(io, data.roomname, state);
       }, 1500);
+      if (nextRoundTimer.unref) nextRoundTimer.unref();
     }
   });
 

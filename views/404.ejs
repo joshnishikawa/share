@@ -1,14 +1,8 @@
 <!--
   404.ejs — Custom "Not Found" page with a Wordle-style guessing game
   ════════════════════════════════════════════════════════════════════
-  The user guesses the phrase "not found" letter by letter with keyboard input.
+  The user guesses the phrase "not found" letter by letter with keyboard or touch input.
   Color coding: green = correct position, yellow = wrong position, gray = not in word.
-
-  AUDIT NOTES:
-    • `start` and `submitAnswer` are implicit globals (arrow functions without let/const).
-    • `fired` is used to debounce key repeat — works but unconventional.
-    • No mobile/touch input — keyboard only (no on-screen keyboard).
-    • $(window).on('keydown') is never unbound — stays after the game ends.
 -->
 <%- include('head'); -%>
 
@@ -19,34 +13,53 @@
         <div class="display-1 YM">404</div>
         Your treasure was here!
       </div>
-      
     </div>
     <div class="row">
-      
-      <div class="col-sm-3">
-        <img src="/image/svg/treasuremap.svg" alt="Where is it?" class="img-fluid"/>
+      <div class="col-md-3 text-center mb-3">
+        <img src="/image/svg/treasuremap.svg" alt="Where is it?" class="img-fluid" style="max-height: 220px;"/>
       </div>
-      <div class="col-sm-9 YM">
+      <div class="col-md-9 YM">
         <div id="guess" class="d-flex flex-wrap mb-1"></div>
-        <div class="d-flex">
+        <div class="d-flex mb-3">
           <div id="answer" class="d-flex flex-wrap"></div>
         </div>
-      </div>
 
+        <!-- On-screen Keyboard for mobile & touch users -->
+        <div id="keyboard" class="mt-2" style="max-width: 580px;">
+          <div class="d-flex justify-content-center mb-1">
+            <% ['q','w','e','r','t','y','u','i','o','p'].forEach(function(k){ %>
+              <button type="button" class="btn btn-outline-primary m-1 px-2 py-2 fw-bold text-uppercase key-btn" data-value="<%= k %>" style="min-width: 38px; min-height: 44px;"><%= k %></button>
+            <% }); %>
+          </div>
+          <div class="d-flex justify-content-center mb-1">
+            <% ['a','s','d','f','g','h','j','k','l'].forEach(function(k){ %>
+              <button type="button" class="btn btn-outline-primary m-1 px-2 py-2 fw-bold text-uppercase key-btn" data-value="<%= k %>" style="min-width: 38px; min-height: 44px;"><%= k %></button>
+            <% }); %>
+          </div>
+          <div class="d-flex justify-content-center mb-1">
+            <button type="button" class="btn btn-outline-primary m-1 px-2 py-2 fw-bold key-btn" data-key="Enter" style="min-width: 60px; min-height: 44px;">ENTER</button>
+            <% ['z','x','c','v','b','n','m'].forEach(function(k){ %>
+              <button type="button" class="btn btn-outline-primary m-1 px-2 py-2 fw-bold text-uppercase key-btn" data-value="<%= k %>" style="min-width: 38px; min-height: 44px;"><%= k %></button>
+            <% }); %>
+            <button type="button" class="btn btn-outline-primary m-1 px-2 py-2 fw-bold key-btn" data-key="Backspace" style="min-width: 50px; min-height: 44px;">⌫</button>
+          </div>
+          <div class="d-flex justify-content-center mb-1">
+            <button type="button" class="btn btn-outline-primary m-1 px-4 py-2 fw-bold key-btn" data-value="_" data-key=" " style="min-width: 160px; min-height: 44px;">SPACE</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-
 
 <script>
 $(function(){
 
 // PREPARE THE DECK ////////////////////////////////////////////////////////////
-  var word = 'not found';
-  var place = 0;
-  var guess = '';
-  var correct = false;
+  const word = 'not found';
+  let place = 0;
+  let guess = '';
+  let correct = false;
   let fired = false;
-  let guessnum = 0;
 
   const start = () =>{
     $("#answer").html(`<div class="word d-flex"></div>`);
@@ -59,10 +72,28 @@ $(function(){
 
       if (wordwrap) $("#answer").append(`<div class="word d-flex"></div>`);
     } 
-  }
+  };
 
+  const handleInputChar = (ch) => {
+    if (correct) return;
+    if (place < word.length) {
+      $("#place" + place).html(ch == ' ' ? '&nbsp;' : ch);
+      place++;
+      guess += ch;
+    }
+  };
 
-  const submitAnswer = async ()=>{
+  const handleBackspace = () => {
+    if (correct) return;
+    if (place > 0) {
+      place--;
+      guess = guess.slice(0, -1);
+      $("#place" + place).text('_');
+    }
+  };
+
+  const submitAnswer = async () => {
+    if (correct) return;
     if (guess === word){
       for (let i = 0; i < word.length; i++){
         $(`[data-value=${word[i] == ' ' ? '_' : word[i]}]`)
@@ -74,15 +105,15 @@ $(function(){
 
       correct = true;
       $(window).off('keydown keyup');
+      $(".key-btn").prop('disabled', true);
     }
     else {
       await $("#guess").append(`<div class="word d-flex"></div>`);
-      let remaining = []; // keep track of letters not yet guessed
+      let remaining = [];
 
       for(let i = 0; i < word.length; i++){
-        let wordwrap = word[i] == ' ' ? true : false;
-        let l = guess[i] == ' ' ? '_' : guess[i]; // for data-value
-        let d = guess[i] == ' ' ? '&nbsp;' : guess[i]; // for display
+        let l = guess[i] == ' ' ? '_' : guess[i];
+        let d = guess[i] == ' ' ? '&nbsp;' : guess[i];
 
         if(guess[i] === word[i]){
           $("#guess .word:last-child").append(`<div class="btn btn-lg bg-primary text-white" 
@@ -105,14 +136,11 @@ $(function(){
             .removeClass('bg-warning text-body')
             .addClass('bg-secondary text-white');
         }
-
-        // if (wordwrap) $("#guess").append(`<div class="word d-flex"></div>`);
       }
-
 
       $("#guess .bg-warning").each(function(){
         let l = $(this).text();
-        let d = l == '\xa0' ? ' ' : l; //&nbsp; is \xa0 in javascript
+        let d = l == '\xa0' ? ' ' : l;
 
         if ( !remaining.includes(d) ){
           $(this).removeClass('bg-warning text-body').addClass('bg-secondary text-white');
@@ -126,27 +154,19 @@ $(function(){
       place = 0;
       $(".place").text('_');
     }
-  }
+  };
 
-
+  // Keyboard events
   $(window).on('keydown', function(e){
     if (e.key === fired && e.key !== ' ') return;
     if (e.key === ' ') e.preventDefault();
 
     if(e.key.length == 1 && e.key !== fired && /[ a-zA-Z]/.test(e.key) ){
       fired = e.key;
-      if(place < word.length){
-        $("#place"+place ).html(e.key);
-        place++;
-        guess += e.key;
-      }
+      handleInputChar(e.key.toLowerCase());
     }
     else if(e.key == 'Backspace'){
-      if(place > 0){
-        place--;
-        guess = guess.slice(0, -1);
-        $("#place"+place).text('_');
-      }
+      handleBackspace();
     }
     else if(e.key == 'Enter'){
       e.preventDefault();
@@ -158,10 +178,26 @@ $(function(){
     fired = false;
   });
 
+  // Touch / Click button events for on-screen keyboard
+  $(document).on('click', '.key-btn', function(e) {
+    e.preventDefault();
+    const key = $(this).data('key');
+    const val = $(this).data('value');
+
+    if (key === 'Enter') {
+      if (place === word.length) submitAnswer();
+    } else if (key === 'Backspace') {
+      handleBackspace();
+    } else if (key === ' ' || val === '_') {
+      handleInputChar(' ');
+    } else if (val) {
+      handleInputChar(val.toLowerCase());
+    }
+  });
+
   start();
 
 });
 </script>
 
-
-<%- include('foot'); -%> <!-- FOOT INCLUDES SCRIPTS AND </body> -->
+<%- include('foot'); -%>

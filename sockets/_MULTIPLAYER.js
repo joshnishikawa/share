@@ -118,7 +118,8 @@ const multiplayer = (io) => {
   }
 
   // Run cleanup every 5 minutes
-  setInterval(cleanupDuplicatePlayers, 5 * 60 * 1000);
+  const cleanupInterval = setInterval(cleanupDuplicatePlayers, 5 * 60 * 1000);
+  if (cleanupInterval.unref) cleanupInterval.unref();
 
   function openPublicRoom(data) {
     let available = getAvailableRooms();

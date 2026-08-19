@@ -66,7 +66,7 @@ describe('Media Router', () => {
     });
 
     test('should return 500 on render error', async () => {
-      renderError = true; // Force the first app.render call to throw an error
+      renderErrorForFirstCall = true; // Force the first app.render call to throw an error
       const response = await request(app).get('/');
       expect(response.status).toBe(500);
       expect(response.text).toBe('Forced render error'); // Expect the error message from the middleware

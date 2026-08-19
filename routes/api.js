@@ -2,6 +2,8 @@ const express = require('express');
 const rateLimit = require('express-rate-limit');
 const router = express.Router();
 const pool = require('../config/db.js');
+const vocabulary = require('../public/vocabulary.js');
+const { NH_colors, getNHVocab } = require('../config/nh_helpers.js');
 
 // Rate limiter for sync endpoints (30 requests/minute per user)
 const syncLimiter = rateLimit({
@@ -235,4 +237,47 @@ router.post('/preferences/:key', requireAuth, express.json(), async function(req
   }
 });
 
+// GET /api/any-vocab - Get vocabulary dictionary, optionally filtered by deck IDs
+router.get('/any-vocab', async (req, res) => {
+  try {
+    let words = {};
+    let rows;
+    let deck = req.query.deck ? JSON.parse(req.query.deck) : [];
+    if (req.query.deck) {
+      rows = vocabulary.filter(item => deck.includes(item.id));
+    } else {
+      rows = vocabulary;
+    }
+
+    for (let row of rows) {
+      words[row.word] = { meaning: row.meaning, image: row.image, audio: row.audio };
+    }
+    res.json(words);
+  } catch (err) {
+    res.status(500).render('error');
+    console.error(err);
+  }
+});
+
+// GET /api/nh-vocab - Get NH vocabulary and colors data with translations
+router.get('/nh-vocab', async (req, res) => {
+  try {
+    let NH_vocab = await getNHVocab();
+
+    let translations = {};
+    for (let p in NH_vocab) {
+      for (let t in NH_vocab[p]) {
+        let translatedTheme = typeof req.__ === 'function' ? req.__(t) : t;
+        translations[t] = translatedTheme;
+      }
+    }
+
+    res.json({ NH_vocab, NH_colors, translations });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+    console.error(err);
+  }
+});
+
 module.exports = router;
+
