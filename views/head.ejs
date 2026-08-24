@@ -2,7 +2,7 @@
   head.ejs — HTML shell loaded by every page (via include('head'))
   ════════════════════════════════════════════════════════════════════
   CDN dependencies loaded here (all pages pay this cost):
-    • Bootstrap 5.1.3 CSS + JS bundle
+    • Bootstrap 5.3.3 CSS + JS bundle
     • jQuery 3.5.1
     • Material Icons + Outlined
     • Yusei Magic Google Font
@@ -18,7 +18,6 @@
     • No CSP <meta> or nonce on scripts — all inline <script> blocks work but
       there's no Content Security Policy protection.
     • No <body> tag — each page view must open its own <body>.
-    • Bootstrap 5.1.3 is ~2 major versions behind (current is 5.3.x).
 -->
 <!DOCTYPE html>
 <html lang="en-US" translate="no">
@@ -42,6 +41,14 @@
   <link rel="stylesheet" href="/stylesheets/dragula.css">
   <link rel="stylesheet" href="/fonts/customIcons.css">
   <link rel="stylesheet" href="/stylesheets/style.css">
+  <style>
+    /* Bootstrap 5.3 compatibility: allow standalone .alert-* classes without base .alert */
+    [class*="alert-"]:not(.alert) {
+      color: var(--bs-alert-color);
+      background-color: var(--bs-alert-bg);
+      border-color: var(--bs-alert-border-color);
+    }
+  </style>
 </head>
 
 <body>
