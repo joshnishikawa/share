@@ -144,9 +144,24 @@
   var lastCommandTime = 0;
   const processedResults = {};
 
+  const commandPatterns = [
+    { regex: /\b(restart|reset|start over)\b/i, action: () => reset() },
+    { regex: /\b(go straight (two|2) blocks|(straight|two|2) blocks|go straight (two|2))\b/i, action: () => { goStraight(); goStraight(); } },
+    { regex: /\b(go straight|straight|strait|forward|ahead)\b/i, action: () => goStraight() },
+    { regex: /\b(turn left)\b/i, action: () => turnLeft() },
+    { regex: /\b(turn right|turn write)\b/i, action: () => turnRight() },
+    { regex: /\b(go up|move up|up)\b/i, action: () => setDirection('up') },
+    { regex: /\b(go down|move down|down)\b/i, action: () => setDirection('down') },
+    { regex: /\b(go left|move left)\b/i, action: () => setDirection('left') },
+    { regex: /\b(go right|move right)\b/i, action: () => setDirection('right') },
+    { regex: /\b(left)\b/i, action: () => turnLeft() },
+    { regex: /\b(right|write)\b/i, action: () => turnRight() }
+  ];
+
   function startListening() {
     if (!recognition) return;
     isListening = true;
+    lastCommandTime = 0;
     for (let k in processedResults) delete processedResults[k];
     try {
       recognition.start();
@@ -233,52 +248,18 @@ $(function () {
           $("#speechTranscript").text(`Heard: "${spokenText}"`);
         }
 
-        // Only process finalized results to avoid double-executing commands on interim speech
-        if (!res.isFinal) continue;
         if (processedResults[i]) continue;
 
         const now = Date.now();
-        if (now - lastCommandTime < 250) {
-          processedResults[i] = true;
-          continue;
-        }
+        if (now - lastCommandTime < 300) continue;
 
         let matched = false;
-
-        if (/\b(restart|reset|start over)\b/i.test(spokenText)) {
-          reset();
-          matched = true;
-        } else if (/\b(go straight (two|2) blocks|(straight|two|2) blocks|go straight (two|2))\b/i.test(spokenText)) {
-          goStraight();
-          goStraight();
-          matched = true;
-        } else if (/\b(go straight|straight|strait|forward|ahead)\b/i.test(spokenText)) {
-          goStraight();
-          matched = true;
-        } else if (/\b(turn left)\b/i.test(spokenText)) {
-          turnLeft();
-          matched = true;
-        } else if (/\b(turn right|turn write)\b/i.test(spokenText)) {
-          turnRight();
-          matched = true;
-        } else if (/\b(go up|move up|up)\b/i.test(spokenText)) {
-          setDirection('up');
-          matched = true;
-        } else if (/\b(go down|move down|down)\b/i.test(spokenText)) {
-          setDirection('down');
-          matched = true;
-        } else if (/\b(go left|move left)\b/i.test(spokenText)) {
-          setDirection('left');
-          matched = true;
-        } else if (/\b(go right|move right)\b/i.test(spokenText)) {
-          setDirection('right');
-          matched = true;
-        } else if (/\b(left)\b/i.test(spokenText)) {
-          turnLeft();
-          matched = true;
-        } else if (/\b(right|write)\b/i.test(spokenText)) {
-          turnRight();
-          matched = true;
+        for (const pattern of commandPatterns) {
+          if (pattern.regex.test(spokenText)) {
+            pattern.action();
+            matched = true;
+            break;
+          }
         }
 
         if (matched) {

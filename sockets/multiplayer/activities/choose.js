@@ -112,7 +112,20 @@ const chooseEvents = (io, socket) => {
       number: Number(data.playerNumber),
     });
 
-    maybeStart(io, data.roomname, state);
+    if (state.started) {
+      socket.emit('choose/roundstart', {
+        items: state.items,
+        chooserNumber: state.chooserNumber,
+      });
+      if (state.selectedWord) {
+        socket.emit('choose/imageselected', {
+          word: state.selectedWord,
+          chooserNumber: state.chooserNumber,
+        });
+      }
+    } else {
+      maybeStart(io, data.roomname, state);
+    }
   });
 
   socket.on('choose/selectimg', function(data) {

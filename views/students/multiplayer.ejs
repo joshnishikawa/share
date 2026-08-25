@@ -37,6 +37,19 @@
     display: inline-block;
   }
 
+  .activity .host-pawn {
+    width: 24px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .activity .host-pawn .pawn {
+    width: 24px;
+    height: 16px;
+  }
+
   #activityExit {
     width: 34px;
     height: 34px;
@@ -75,7 +88,12 @@
             </div>
 
             <div class="col-10">
-              <div id="myName" class="fs-3 text-break" style="text-shadow:0px 0px 2px #555"></div>
+              <div class="d-flex align-items-center justify-content-between">
+                <div id="myName" class="fs-3 text-break" style="text-shadow:0px 0px 2px #555"></div>
+                <span id="hostBadge" class="small badge bg-warning text-dark d-none px-1" style="font-size: 0.75rem;" title="You are the Table Host" aria-label="Table Host">
+                  Host
+                </span>
+              </div>
               <div class="d-flex justify-content-between mb-1">
                 <button id="getName" class="btn btn-sm btn-outline-primary px-1 py-0">Change Name</button>
                 <input id="color" class="form-control form-control-sm p-0 mx-1" type="color" aria-label="Player color picker" title="Choose your player color">
@@ -118,18 +136,57 @@
       </div> 
 
       <div id="activityColumn" class="col-sm-8">
-        <div class="d-flex justify-content-end mb-2">
-          <button id="activityExit" class="btn btn-sm btn-outline-danger d-none" title="Leave activity" aria-label="Leave activity">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <div class="d-flex align-items-center gap-2">
+            <span id="activityHostBadge" class="small badge bg-warning text-dark d-none px-1" style="font-size: 0.75rem;" title="You are the Table Host" aria-label="Table Host">
+              Host
+            </span>
+            <div id="activityRoomName" class="fs-5 fw-bold text-primary"></div>
+          </div>
+          <button id="activityExit" class="btn btn-sm btn-outline-danger d-none ms-auto" title="Leave activity" aria-label="Leave activity">
             <i class="material-icons" style="font-size:16px;">logout</i>
           </button>
         </div>
 
         <div id="activityMenu">
-          <% activities.forEach(function(activity){ %>
-            <button class="btn btn-outline-primary activity d-flex justify-content-between w-100" id="<%= activity.id %>" title="<%= activity.label %> activity" aria-label="<%= activity.label %> activity">
-              <%= activity.label %>
-            </button>
-          <% }); %>
+          <div id="standardActivities" style="display:none;"> <!-- UNCOMMENT WHEN THESE ACTIVITIES ARE READY -->
+            <% activities.filter(a => a.group !== 'host').forEach(function(activity){ %>
+              <button class="btn btn-outline-primary activity d-flex justify-content-between align-items-center w-100 mb-2" id="<%= activity.id %>" data-group="standard" title="<%= activity.label %> activity" aria-label="<%= activity.label %> activity">
+                <span class="activity-left d-flex align-items-center gap-2">
+                  <span class="host-pawn"></span>
+                  <span class="activity-label"><%= activity.label %></span>
+                </span>
+                <span class="activity-pawns d-flex align-items-center"></span>
+              </button>
+            <% }); %>
+            <hr />
+          </div>
+          
+          <div id="hostActivities" class="d-none">
+            <div id="hostActivitiesHeader" class="small text-muted fw-bold mb-2">Host Activities</div>
+            <% activities.filter(a => a.group === 'host').forEach(function(activity){ %>
+              <div class="d-flex align-items-center gap-2 mb-2 host-activity-row" id="row-<%= activity.id %>">
+                <button class="btn btn-outline-primary activity d-flex justify-content-between align-items-center flex-grow-1" id="<%= activity.id %>" data-group="host" title="<%= activity.label %> activity" aria-label="<%= activity.label %> activity">
+                  <span class="activity-left d-flex align-items-center gap-2">
+                    <span class="host-pawn"></span>
+                    <span class="activity-label">
+                      <%= activity.label %>
+                      <span class="activity-count badge bg-secondary ms-1">0</span>
+                    </span>
+                  </span>
+                  <span class="activity-pawns d-flex align-items-center"></span>
+                </button>
+                <button class="btn btn-success start-activity-btn d-none" data-activity="<%= activity.id %>" title="Start <%= activity.label %>" aria-label="Start <%= activity.label %>">
+                  Start
+                </button>
+              </div>
+              <% if (activity.id === 'popquiz') { %>
+                <div id="popquiz-config" class="d-none mb-3">
+                  <textarea id="popquiz-questions" class="form-control form-control-sm font-monospace" rows="4" placeholder="Put answers to multiple-choice questions here separated by commas&#10;apples, bananas, pears&#10;red, yellow, green, blue&#10;..."></textarea>
+                </div>
+              <% } %>
+            <% }); %>
+          </div>
         </div>
 
         <div id="activityContent" class="mt-2"></div>
@@ -279,9 +336,21 @@ $(function(){
     const $otherPlayers = $("#otherPlayers");
     const $activities = $(".activity");
     
-    if (!data || !Array.isArray(data)) return;
+    if (!data) return;
+    const playersList = Array.isArray(data) ? data : (data.players || []);
+    const hostSelected = (data && data.selectedHostActivity !== undefined) ? data.selectedHostActivity : (room ? room.selectedHostActivity : null);
 
-    if (data.length != 1 || player.roomtype == "public") {
+    if (room) {
+      room.players = playersList;
+      room.selectedHostActivity = hostSelected;
+      if (room.players && room.players.length > 0) {
+        if (!room.hostId || !room.players.some(p => p.id === room.hostId)) {
+          room.hostId = room.players[0].id;
+        }
+      }
+    }
+
+    if (playersList.length != 1 || player.roomtype == "public") {
       $group.hide().removeClass("d-flex").addClass("d-none");
       $leaveGroup.show();
     }
@@ -291,12 +360,14 @@ $(function(){
     }
 
     $otherPlayers.empty();
+    $(".host-pawn").empty();
+    $(".activity-pawns").empty();
     $activities.find(".pawn").remove();
 
     let otherPlayersHTML = '';
 
-    for (let i = 0; i < data.length; i++) {
-      const p = data[i];
+    for (let i = 0; i < playersList.length; i++) {
+      const p = playersList[i];
       const safeColor = sanitizeColor(p.color);
       const safeId = escapeHtml(p.id);
 
@@ -326,13 +397,94 @@ $(function(){
       $otherPlayers.html(otherPlayersHTML);
     }
     
-    for (let i = 0; i < data.length; i++) {
-      const p = data[i];
+    // Count player selections per activity (excluding host) and place pawns
+    const hostId = room ? room.hostId : null;
+    const activityCounts = {};
+    for (let i = 0; i < playersList.length; i++) {
+      const p = playersList[i];
       if (p.id != player.id && p.number != player.number) {
         setColor(p.number, p.color);
       }
       if (p.activity) {
-        $(`#${p.activity}`).append(getPawn(p.color));
+        const isHostPlayer = (p.id === hostId);
+        if (isHostPlayer) {
+          // Host's pawn appears at the left of the menu item
+          $(`#${p.activity} .host-pawn`).html(getPawn(p.color));
+        } else {
+          // Other players appear on the right and increment selection count
+          activityCounts[p.activity] = (activityCounts[p.activity] || 0) + 1;
+          const $target = $(`#${p.activity}`);
+          const $targetPawns = $target.find(".activity-pawns");
+          if ($targetPawns.length) {
+            $targetPawns.append(getPawn(p.color));
+          } else {
+            $target.append(getPawn(p.color));
+          }
+        }
+      }
+    }
+
+    $(".activity").each(function() {
+      const actId = $(this).attr("id");
+      const count = activityCounts[actId] || 0;
+      $(this).find(".activity-count").text(count);
+    });
+
+    const isHost = Boolean(room && room.hostId && player.id === room.hostId);
+
+    // Toggle host indicator for the local player only
+    if (isHost) {
+      $("#hostBadge").removeClass("d-none");
+      if (currentActivity) {
+        $("#activityHostBadge").removeClass("d-none");
+      }
+    } else {
+      $("#hostBadge").addClass("d-none");
+      $("#activityHostBadge").addClass("d-none");
+    }
+
+    // Activity visibility management
+    if (isHost) {
+      $("#standardActivities").removeClass("d-none");
+      $("#hostActivities").removeClass("d-none");
+      $("#hostActivitiesHeader").removeClass("d-none");
+      $(".host-activity-row").removeClass("d-none");
+
+      // Show/hide Start button and config textarea based on host's selection
+      $(".start-activity-btn").each(function() {
+        const actId = $(this).data("activity");
+        if (player.activity === actId) {
+          $(this).removeClass("d-none");
+        } else {
+          $(this).addClass("d-none");
+        }
+      });
+
+      if (player.activity === 'popquiz') {
+        $("#popquiz-config").removeClass("d-none");
+      } else {
+        $("#popquiz-config").addClass("d-none");
+      }
+    } else {
+      // Non-host players:
+      $(".start-activity-btn").addClass("d-none");
+      $("#popquiz-config").addClass("d-none");
+      if (room && room.selectedHostActivity) {
+        // Only show the host-selected activity
+        $("#standardActivities").addClass("d-none");
+        $("#hostActivities").removeClass("d-none");
+        $("#hostActivitiesHeader").addClass("d-none");
+        $(".host-activity-row").each(function() {
+          if ($(this).attr("id") === `row-${room.selectedHostActivity}`) {
+            $(this).removeClass("d-none");
+          } else {
+            $(this).addClass("d-none");
+          }
+        });
+      } else {
+        // Show standard activities, hide host activities
+        $("#standardActivities").removeClass("d-none");
+        $("#hostActivities").addClass("d-none");
       }
     }
   }
@@ -435,7 +587,7 @@ $(function(){
       currentActivity = activity;
       enterActivityMode();
       if (window.multiplayerActivities && window.multiplayerActivities[activity] && typeof window.multiplayerActivities[activity].mount === "function") {
-        window.multiplayerActivities[activity].mount({ socket: socket, player: player, room: room });
+        window.multiplayerActivities[activity].mount({ socket: socket, player: player, room: room, questions: window.popquizQuestions });
       }
     });
   }
@@ -447,6 +599,13 @@ $(function(){
     $("#activityMenu").addClass("d-none");
     $("#activityColumn").removeClass("col-sm-8").addClass("col-12");
     $("#activityExit").removeClass("d-none");
+    $("#activityRoomName").text(player.roomname || (room && room.roomname) || "");
+    const isHost = Boolean(room && room.hostId && player.id === room.hostId);
+    if (isHost) {
+      $("#activityHostBadge").removeClass("d-none");
+    } else {
+      $("#activityHostBadge").addClass("d-none");
+    }
   }
 
   function exitActivityMode() {
@@ -458,6 +617,8 @@ $(function(){
     $("#studentSideMenu").removeClass("d-none");
     $("#activityContent").empty();
     $("#activityExit").addClass("d-none");
+    $("#activityHostBadge").addClass("d-none");
+    $("#activityRoomName").empty();
     $("#activityColumn").removeClass("col-12").addClass("col-sm-8");
     $("#activityMenu").removeClass("d-none");
     $("#lobbyColumn").removeClass("d-none");
@@ -508,10 +669,65 @@ $(function(){
     socket.emit('leave', player);
   });
 
-  $(".activity").on("click", function () {
+  $(document).on("click", ".activity", function () {
     const activity = $(this).attr("id");
-    player.activity = activity;
+    if (player.activity === activity) {
+      player.activity = null;
+    } else {
+      player.activity = activity;
+    }
     socket.emit("chooseActivity", player);
+  });
+
+  $(document).on("input change", "#popquiz-questions", function () {
+    const rawText = $(this).val() ? $(this).val().trim() : '';
+    let questions = null;
+    if (rawText) {
+      questions = rawText.split('\n')
+        .map(function(line) {
+          return line.split(',').map(function(item) { return item.trim(); }).filter(Boolean);
+        })
+        .filter(function(arr) { return arr.length > 0; });
+    }
+    if (questions && questions.length > 0) {
+      window.popquizQuestions = questions;
+      socket.emit("popquiz/updateQuestions", {
+        roomname: player.roomname,
+        id: player.id,
+        questions: questions,
+      });
+    }
+  });
+
+  $(document).on("click", ".start-activity-btn", function (e) {
+    e.stopPropagation();
+    const activity = $(this).data("activity");
+    let questions = null;
+
+    if (activity === 'popquiz') {
+      const rawText = $("#popquiz-questions").val() ? $("#popquiz-questions").val().trim() : '';
+      if (rawText) {
+        questions = rawText.split('\n')
+          .map(function(line) {
+            return line.split(',').map(function(item) { return item.trim(); }).filter(Boolean);
+          })
+          .filter(function(arr) { return arr.length > 0; });
+      }
+      if (!questions || questions.length === 0) {
+        questions = [
+          ['apples', 'bananas', 'pears'],
+          ['red', 'yellow', 'green', 'blue'],
+        ];
+      }
+      window.popquizQuestions = questions;
+    }
+
+    socket.emit("startActivity", {
+      roomname: player.roomname,
+      id: player.id,
+      activity: activity,
+      questions: questions,
+    });
   });
 
 // SOCKET EVENTS ///////////////////////////////////////////////////////////////
@@ -546,6 +762,7 @@ $(function(){
     localStorage.setItem('player', JSON.stringify(player));
     $("#room").text(player.roomname);
     $("#roomname").text(player.roomname);
+    $("#activityRoomName").text(player.roomname);
     updatePlayerList(room.players);
     if (room.activity) {
       player.activity = room.activity;
@@ -557,10 +774,29 @@ $(function(){
 
 
   socket.on('setName', function(data){
+    if (room && room.players) {
+      const target = room.players.find(p => p.number == data.number);
+      if (target) {
+        if (room.hostId === target.id) {
+          room.hostId = data.id;
+        }
+        target.id = data.id;
+      }
+    }
     if (data.number == player.number) {
       player.id = data.id;
       localStorage.setItem('player', JSON.stringify(player));
       $("#myName").text(data.id).css('color', player.color);
+      const isHost = Boolean(room && room.hostId && player.id === room.hostId);
+      if (isHost) {
+        $("#hostBadge").removeClass("d-none");
+        if (currentActivity) {
+          $("#activityHostBadge").removeClass("d-none");
+        }
+      } else {
+        $("#hostBadge").addClass("d-none");
+        $("#activityHostBadge").addClass("d-none");
+      }
     }
     else {
       $("#name" + data.number).text(data.id);
@@ -602,6 +838,8 @@ $(function(){
     player.activity = null; // reset the activity
     
     // Clear UI elements
+    $("#hostBadge").addClass("d-none");
+    $("#activityRoomName").empty();
     $("#otherPlayers").empty();
     $(".activity").find(".pawn").remove();
     $("#foundplayers").empty();
@@ -653,7 +891,11 @@ $(function(){
   });
 
   socket.on('loadActivity', function(data){
-    loadActivity(data);
+    const activity = (typeof data === 'object' && data) ? data.activity : data;
+    if (typeof data === 'object' && data && data.questions) {
+      window.popquizQuestions = data.questions;
+    }
+    loadActivity(activity);
   });
 
   socket.on('returnToLobby', function(data){

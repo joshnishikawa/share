@@ -1,0 +1,194 @@
+<style>
+  #popquiz-arena {
+    min-height: 520px;
+    position: relative;
+    user-select: none;
+  }
+
+  /* Overlay layer for smooth pawn transitions across the whole arena */
+  #popquiz-pawn-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 20;
+  }
+
+  .popquiz-choice-card {
+    background: #ffffff;
+    border: 3px solid #cbd5e1;
+    border-radius: 18px;
+    padding: 1.75rem 1rem;
+    min-height: 140px;
+    height: 140px;
+    cursor: pointer;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: visible;
+  }
+
+  .popquiz-choice-card:hover {
+    transform: translateY(-2px);
+    border-color: #3b82f6;
+    box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.15);
+  }
+
+  .popquiz-choice-selected {
+    border-color: #2563eb;
+    background: #eff6ff;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+  }
+
+  .popquiz-choice-correct {
+    border-color: #16a34a !important;
+    background: #f0fdf4 !important;
+    box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.35) !important;
+    animation: popquiz-correct-pulse 1s ease-in-out infinite alternate;
+  }
+
+  .popquiz-choice-incorrect {
+    border-color: #dc2626 !important;
+    background: #fef2f2 !important;
+    opacity: 0.65;
+  }
+
+  .popquiz-choice-text {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1e293b;
+    text-align: center;
+    word-break: break-word;
+    user-select: none;
+  }
+
+  /* Smooth gliding pawn token */
+  .popquiz-pawn-token {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 44px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+    pointer-events: none;
+    z-index: 25;
+  }
+
+  .popquiz-token-score {
+    font-size: 0.75rem;
+    font-weight: 800;
+    background: #1e293b;
+    color: #ffffff;
+    padding: 1px 7px;
+    border-radius: 12px;
+    margin-bottom: 2px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    white-space: nowrap;
+  }
+
+  .popquiz-token-score.score-plus {
+    background: #16a34a;
+    animation: popquiz-score-bounce 0.6s ease;
+  }
+
+  .popquiz-token-pawn {
+    width: 32px;
+    height: 64px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  }
+
+  .popquiz-token-initials {
+    font-size: 0.85rem;
+    font-weight: 800;
+    text-align: center;
+    margin-top: 1px;
+    text-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+  }
+
+  #popquiz-staging-dock {
+    min-height: 80px;
+    height: 80px;
+  }
+
+  .popquiz-podium-card {
+    background: #ffffff;
+    border: 3px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  }
+
+  .popquiz-winner-card {
+    border-color: #eab308;
+    background: linear-gradient(180deg, #fefce8 0%, #ffffff 100%);
+    transform: scale(1.05);
+  }
+
+  @keyframes popquiz-correct-pulse {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.02); }
+  }
+
+  @keyframes popquiz-score-bounce {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.4); }
+    100% { transform: scale(1); }
+  }
+</style>
+
+<div class="container py-2" id="popquiz-arena">
+  <!-- Dynamic Absolute Pawn Layer -->
+  <div id="popquiz-pawn-layer"></div>
+
+  <!-- Game Round Screen -->
+  <div id="popquiz-game-screen">
+    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+      <div>
+        <span class="badge bg-primary fs-6 px-3 py-2" id="popquiz-round-badge">Question 1</span>
+      </div>
+      <div id="popquiz-status" class="fs-5 fw-bold text-secondary text-center flex-grow-1 mx-2">
+        Tap your answer!
+      </div>
+      <div id="popquiz-host-indicator" class="badge bg-warning text-dark d-none px-2 py-1">
+        Host: Tap correct answer to grade
+      </div>
+    </div>
+
+    <!-- Answer Choices Grid (Fixed shape/size) -->
+    <div id="popquiz-choices-container" class="row g-3 justify-content-center mb-4">
+      <!-- Dynamic choice cards -->
+    </div>
+
+    <!-- Players Staging Dock (Unlabeled and unoutlined) -->
+    <div class="mt-4">
+      <div id="popquiz-staging-dock" class="d-flex justify-content-center align-items-center"></div>
+    </div>
+  </div>
+
+  <!-- Winner / Game Over Screen -->
+  <div id="popquiz-gameover-screen" class="d-none text-center py-4">
+    <div class="mb-4">
+      <h2 class="display-5 fw-extrabold text-primary mb-1">🏆 Quiz Finished!</h2>
+      <p class="text-muted fs-5">Highest scoring player(s):</p>
+    </div>
+
+    <div id="popquiz-winners-container" class="row justify-content-center g-4 mb-5">
+      <!-- Winner pawns rendered here -->
+    </div>
+
+    <div class="d-flex justify-content-center gap-3">
+      <button id="popquiz-finish-btn" class="btn btn-lg btn-primary px-5 shadow">
+        Return to Lobby
+      </button>
+    </div>
+  </div>
+</div>

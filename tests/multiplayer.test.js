@@ -52,6 +52,12 @@ describe('Multiplayer Router', () => {
     expect(app.render).toHaveBeenCalledWith('activities/multiplayer/match/index', expect.any(Object), expect.any(Function));
   });
 
+  test('GET /multiplayer/popquiz should render popquiz index', async () => {
+    const response = await request(app).get('/multiplayer/popquiz');
+    expect(response.status).toBe(200);
+    expect(app.render).toHaveBeenCalledWith('activities/multiplayer/popquiz/index', expect.any(Object), expect.any(Function));
+  });
+
   test('should handle render errors by returning 500 and error view', async () => {
     renderError = true;
     const response = await request(app).get('/multiplayer');

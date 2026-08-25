@@ -4,11 +4,13 @@ const activities = require('../../config/multiplayer_activities.js');
 const choose = require('./choose.js');
 const race = require('./race.js');
 const match = require('./match.js');
+const popquiz = require('./popquiz.js');
 
 const activityRoutes = {
   choose,
   race,
   match,
+  popquiz,
 };
 
 const enabledActivities = activities.filter((activity) => activity.enabled);
