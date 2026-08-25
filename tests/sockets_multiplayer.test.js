@@ -628,6 +628,50 @@ describe('Multiplayer Sockets Integration', () => {
     });
   });
 
+  test('host selects activity but has not started: refresh does not auto-start activity', (done) => {
+    clientSocket1.emit('join', {
+      id: 'HostPreStart',
+      roomtype: 'private',
+      color: '#ff0000',
+    });
+
+    clientSocket1.on('joined', ({ room }) => {
+      const roomname = room.roomname;
+
+      // Host chooses Pop Quiz (selects it in menu, but has NOT started it)
+      clientSocket1.emit('chooseActivity', {
+        roomname,
+        id: 'HostPreStart',
+        activity: 'popquiz',
+      });
+
+      clientSocket1.on('activityChosen', () => {
+        // Host simulates refresh by disconnecting and reconnecting
+        clientSocket1.disconnect();
+
+        const newHostSocket = Client(`http://localhost:${serverPort}`);
+        newHostSocket.on('connect', () => {
+          newHostSocket.emit('join', {
+            id: 'HostPreStart',
+            roomtype: 'public',
+            roomname: roomname,
+            number: 1,
+            color: '#ff0000',
+            activity: 'popquiz',
+          });
+        });
+
+        newHostSocket.on('joined', (rejoinData) => {
+          expect(rejoinData.room.roomname).toBe(roomname);
+          // Activity must NOT be marked running because host never clicked Start
+          expect(rejoinData.room.activity).toBeNull();
+          newHostSocket.disconnect();
+          done();
+        });
+      });
+    });
+  });
+
   test('refresh on gameover: player reconnecting on winners screen receives gameover state again', (done) => {
     clientSocket1.emit('join', {
       id: 'HostPodium',
@@ -758,5 +802,276 @@ describe('Multiplayer Sockets Integration', () => {
       });
     });
   });
+
+  test('solitary host selecting an activity creates public room and broadcasts publicRoomsList', (done) => {
+    clientSocket1.emit('join', {
+      id: 'SolitaryHost',
+      roomtype: 'private',
+      color: '#0d6efd',
+    });
+
+    clientSocket1.on('joined', ({ room }) => {
+      const roomname = room.roomname;
+      clientSocket2 = Client(`http://localhost:${serverPort}`);
+
+      clientSocket2.on('connect', () => {
+        clientSocket2.on('publicRoomsList', (publicRooms) => {
+          const found = publicRooms.find((r) => r.roomname === roomname);
+          if (found) {
+            expect(found.activity).toBe('race');
+            expect(found.playerCount).toBe(1);
+            expect(found.hostId).toBe('SolitaryHost');
+            done();
+          }
+        });
+
+        // Host selects race while alone in room
+        clientSocket1.emit('chooseActivity', {
+          roomname,
+          id: 'SolitaryHost',
+          activity: 'race',
+        });
+      });
+    });
+  });
+
+  test('solitary host deselecting activity reverts room to private and updates publicRoomsList', (done) => {
+    clientSocket1.emit('join', {
+      id: 'ToggleHost',
+      roomtype: 'private',
+      color: '#0d6efd',
+    });
+
+    clientSocket1.on('joined', ({ room }) => {
+      const roomname = room.roomname;
+      clientSocket2 = Client(`http://localhost:${serverPort}`);
+
+      clientSocket2.on('connect', () => {
+        let wasPublic = false;
+
+        clientSocket2.on('publicRoomsList', (publicRooms) => {
+          const found = publicRooms.find((r) => r.roomname === roomname);
+          if (found && !wasPublic) {
+            wasPublic = true;
+            // Now deselect the activity
+            clientSocket1.emit('chooseActivity', {
+              roomname,
+              id: 'ToggleHost',
+              activity: null,
+            });
+          } else if (wasPublic && !found) {
+            // Room successfully removed from publicRoomsList
+            done();
+          }
+        });
+
+        // Host selects choose activity
+        clientSocket1.emit('chooseActivity', {
+          roomname,
+          id: 'ToggleHost',
+          activity: 'choose',
+        });
+      });
+    });
+  });
+
+  test('host activity does not start on consensus when multiple players select it', (done) => {
+    clientSocket1.emit('join', {
+      id: 'NoConsensusHost',
+      roomtype: 'private',
+      color: '#ff0000',
+    });
+
+    clientSocket1.on('joined', ({ room }) => {
+      const roomname = room.roomname;
+      clientSocket2 = Client(`http://localhost:${serverPort}`);
+
+      clientSocket2.on('connect', () => {
+        clientSocket2.emit('join', {
+          id: 'NoConsensusGuest',
+          roomtype: 'private',
+          roomname: roomname,
+          color: '#00ff00',
+        });
+      });
+
+      clientSocket2.on('joined', () => {
+        let loadActivityCalled = false;
+        clientSocket2.on('loadActivity', () => {
+          loadActivityCalled = true;
+        });
+
+        clientSocket2.on('activityChosen', (data) => {
+          expect(data.selectedHostActivity).toBe('popquiz');
+
+          // Wait 150ms to ensure loadActivity was NOT triggered on consensus
+          setTimeout(() => {
+            expect(loadActivityCalled).toBe(false);
+            done();
+          }, 150);
+        });
+
+        // Host selects popquiz
+        clientSocket1.emit('chooseActivity', {
+          roomname,
+          id: 'NoConsensusHost',
+          activity: 'popquiz',
+        });
+
+        // Guest also selects popquiz
+        clientSocket2.emit('chooseActivity', {
+          roomname,
+          id: 'NoConsensusGuest',
+          activity: 'popquiz',
+        });
+      });
+    });
+  });
+
+  describe('Inactivity Auto-Cleanup', () => {
+    let customServer, customIo, customPort;
+    let customClient1, customClient2;
+
+    beforeAll((done) => {
+      customServer = http.createServer();
+      customIo = new Server(customServer);
+      // Initialize multiplayer with a short inactivity timeout for testing
+      multiplayer(customIo, { inactivityTimeout: 200, cleanupInterval: 50 });
+
+      customServer.listen(() => {
+        customPort = customServer.address().port;
+        done();
+      });
+    });
+
+    afterAll((done) => {
+      if (customClient1 && customClient1.connected) customClient1.disconnect();
+      if (customClient2 && customClient2.connected) customClient2.disconnect();
+      customIo.close(done);
+    });
+
+    afterEach(() => {
+      if (customClient1 && customClient1.connected) customClient1.disconnect();
+      if (customClient2 && customClient2.connected) customClient2.disconnect();
+    });
+
+    test('inactive private room emits roomExpired and cleans up after inactivity timeout', (done) => {
+      customClient1 = Client(`http://localhost:${customPort}`);
+      customClient1.on('connect', () => {
+        customClient1.emit('join', {
+          id: 'InactivePlayer',
+          roomtype: 'private',
+          color: '#123456',
+        });
+      });
+
+      customClient1.on('joined', ({ room }) => {
+        const roomname = room.roomname;
+        expect(roomname).toBeDefined();
+
+        customClient1.on('roomExpired', (data) => {
+          expect(data.roomname).toBe(roomname);
+          expect(data.message).toContain('inactivity');
+
+          // Verify the room no longer exists in search
+          customClient1.emit('roomSearch', roomname);
+          customClient1.on('roomSearch', (found) => {
+            expect(found).toBeNull();
+            done();
+          });
+        });
+      });
+    });
+
+    test('inactive public room emits roomExpired and broadcasts updated public rooms list', (done) => {
+      customClient1 = Client(`http://localhost:${customPort}`);
+      customClient1.on('connect', () => {
+        customClient1.emit('join', {
+          id: 'PubInactiveHost',
+          roomtype: 'private',
+          color: '#abcdef',
+        });
+      });
+
+      customClient1.on('joined', ({ room }) => {
+        const roomname = room.roomname;
+
+        // Host selects activity making the room public
+        customClient1.emit('chooseActivity', {
+          roomname,
+          id: 'PubInactiveHost',
+          activity: 'popquiz',
+        });
+
+        customClient1.on('roomOpened', () => {
+          // Listen for room expiration and updated public rooms list
+          let roomExpiredReceived = false;
+          let publicListUpdated = false;
+
+          customClient1.on('roomExpired', (data) => {
+            expect(data.roomname).toBe(roomname);
+            roomExpiredReceived = true;
+            if (roomExpiredReceived && publicListUpdated) done();
+          });
+
+          customClient1.on('publicRoomsList', (roomsList) => {
+            const hasRoom = roomsList.some((r) => r.roomname === roomname);
+            if (roomExpiredReceived && !hasRoom) {
+              publicListUpdated = true;
+              done();
+            } else if (!hasRoom && roomExpiredReceived) {
+              publicListUpdated = true;
+              done();
+            }
+          });
+        });
+      });
+    });
+
+    test('room activity resets inactivity timer and delays expiration', (done) => {
+      customClient1 = Client(`http://localhost:${customPort}`);
+      customClient1.on('connect', () => {
+        customClient1.emit('join', {
+          id: 'ActivePlayer',
+          roomtype: 'private',
+          color: '#333333',
+        });
+      });
+
+      customClient1.on('joined', ({ room }) => {
+        const roomname = room.roomname;
+        let expiredEarly = false;
+
+        customClient1.on('roomExpired', () => {
+          expiredEarly = true;
+        });
+
+        // Send activity at 100ms (before 200ms timeout)
+        setTimeout(() => {
+          customClient1.emit('setColor', {
+            roomname,
+            id: 'ActivePlayer',
+            color: '#444444',
+          });
+        }, 100);
+
+        // Send another activity at 220ms (which is > 200ms from start, but < 200ms from last activity)
+        setTimeout(() => {
+          expect(expiredEarly).toBe(false);
+          customClient1.emit('getName', {
+            roomname,
+            id: 'ActivePlayer',
+          });
+        }, 220);
+
+        // At 300ms, the room should still be alive because of the touch at 220ms
+        setTimeout(() => {
+          expect(expiredEarly).toBe(false);
+          done();
+        }, 300);
+      });
+    });
+  });
 });
+
 

@@ -77,10 +77,12 @@ function sanitizePlayerData(data) {
 
 
 
-const multiplayer = (io) => {
+const multiplayer = (io, options = {}) => {
   const rooms = require("../rooms.json");
   var publicRooms = {};
   var privateRooms = {};
+  const INACTIVITY_TIMEOUT = (options && typeof options.inactivityTimeout === 'number') ? options.inactivityTimeout : 10 * 60 * 1000;
+  const CLEANUP_INTERVAL = (options && typeof options.cleanupInterval === 'number') ? options.cleanupInterval : 60 * 1000;
 
   // Helper function to get available rooms efficiently
   function getAvailableRooms() {
@@ -89,6 +91,66 @@ const multiplayer = (io) => {
       ...Object.keys(privateRooms),
     ]);
     return rooms.filter((room) => !usedRooms.has(room));
+  }
+
+  function getPublicRoomsList() {
+    return Object.values(publicRooms)
+      .filter((r) => {
+        if (!r || !r.open || !r.players || r.players.length === 0) return false;
+        const isHostAct = Boolean(
+          (r.activity && hostActivityIds.has(r.activity)) ||
+          (r.selectedHostActivity && hostActivityIds.has(r.selectedHostActivity)) ||
+          (r.players[0] && r.players[0].activity && hostActivityIds.has(r.players[0].activity))
+        );
+        if (isHostAct) return true;
+        return r.players.length < 4;
+      })
+      .map((r) => {
+        const isHostAct = Boolean(
+          (r.activity && hostActivityIds.has(r.activity)) ||
+          (r.selectedHostActivity && hostActivityIds.has(r.selectedHostActivity)) ||
+          (r.players[0] && r.players[0].activity && hostActivityIds.has(r.players[0].activity))
+        );
+        return {
+          roomname: r.roomname,
+          activity: r.activity || r.selectedHostActivity || (r.players[0] ? r.players[0].activity : null),
+          isHostActivity: isHostAct,
+          playerCount: r.players.length,
+          hostId: r.hostId,
+          players: r.players.map((p) => ({
+            id: p.id,
+            color: p.color,
+            number: p.number,
+          })),
+        };
+      });
+  }
+
+  function broadcastPublicRooms() {
+    io.emit("publicRoomsList", getPublicRoomsList());
+  }
+
+  function touchRoom(roomname) {
+    if (!roomname) return;
+    const room = publicRooms[roomname] || privateRooms[roomname];
+    if (room) {
+      room.lastActive = Date.now();
+    }
+  }
+
+  function clearActivityRoomStates(roomname) {
+    try {
+      const popquiz = require("./multiplayer/activities/popquiz");
+      if (popquiz && typeof popquiz.clearPopquizState === "function") {
+        popquiz.clearPopquizState(roomname);
+      }
+      const choose = require("./multiplayer/activities/choose");
+      if (choose && typeof choose.clearChooseState === "function") {
+        choose.clearChooseState(roomname);
+      }
+    } catch (e) {
+      // ignore
+    }
   }
 
   // Helper function to remove duplicate players by ID from a room
@@ -112,17 +174,67 @@ const multiplayer = (io) => {
   function cleanupDuplicatePlayers() {
     // Clean up public rooms
     Object.keys(publicRooms).forEach((roomname) => {
-      removeDuplicatePlayers(publicRooms[roomname]);
+      if (publicRooms[roomname]) {
+        removeDuplicatePlayers(publicRooms[roomname]);
+      }
     });
 
     // Clean up private rooms
     Object.keys(privateRooms).forEach((roomname) => {
-      removeDuplicatePlayers(privateRooms[roomname]);
+      if (privateRooms[roomname]) {
+        removeDuplicatePlayers(privateRooms[roomname]);
+      }
     });
   }
 
-  // Run cleanup every 5 minutes
-  const cleanupInterval = setInterval(cleanupDuplicatePlayers, 5 * 60 * 1000);
+  // Auto-remove rooms after 10 minutes of inactivity
+  function cleanupInactiveRooms(customNow) {
+    const now = customNow || Date.now();
+    let publicRoomsChanged = false;
+
+    // Check public rooms
+    Object.keys(publicRooms).forEach((roomname) => {
+      const room = publicRooms[roomname];
+      if (!room) return;
+      const lastActive = room.lastActive || room.date || 0;
+      if (now - lastActive >= INACTIVITY_TIMEOUT) {
+        io.to(roomname).emit("roomExpired", {
+          roomname,
+          message: "This group was closed due to 10 minutes of inactivity.",
+        });
+        clearActivityRoomStates(roomname);
+        delete publicRooms[roomname];
+        publicRoomsChanged = true;
+      }
+    });
+
+    // Check private rooms
+    Object.keys(privateRooms).forEach((roomname) => {
+      const room = privateRooms[roomname];
+      if (!room) return;
+      const lastActive = room.lastActive || room.date || 0;
+      if (now - lastActive >= INACTIVITY_TIMEOUT) {
+        io.to(roomname).emit("roomExpired", {
+          roomname,
+          message: "This group was closed due to 10 minutes of inactivity.",
+        });
+        clearActivityRoomStates(roomname);
+        delete privateRooms[roomname];
+      }
+    });
+
+    if (publicRoomsChanged) {
+      broadcastPublicRooms();
+    }
+  }
+
+  function runCleanup() {
+    cleanupDuplicatePlayers();
+    cleanupInactiveRooms();
+  }
+
+  // Run cleanup every minute
+  const cleanupInterval = setInterval(runCleanup, CLEANUP_INTERVAL);
   if (cleanupInterval.unref) cleanupInterval.unref();
 
   function openPublicRoom(data) {
@@ -137,13 +249,15 @@ const multiplayer = (io) => {
         roomname,
         roomtype: "public",
         hostId: data.id,
-        selectedHostActivity: null,
-        activity: data.activity,
+        selectedHostActivity: (data.activity && hostActivityIds.has(data.activity)) ? data.activity : null,
+        activity: null,
         players: [data],
         open: true,
         turn: 1, // set the turn to player 1
         date,
+        lastActive: date,
       };
+      broadcastPublicRooms();
       return roomname;
     }
   }
@@ -167,18 +281,23 @@ const multiplayer = (io) => {
         players: [data],
         turn: 1,
         date,
+        lastActive: date,
       };
       return roomname;
     }
   }
 
   function closePublicRoom(roomname) {
+    clearActivityRoomStates(roomname);
     delete publicRooms[roomname];
+    broadcastPublicRooms();
   }
 
   function closePrivateRoom(roomname) {
+    clearActivityRoomStates(roomname);
     delete privateRooms[roomname];
   }
+
 
   function joinPrivateRoom(socket, data) {
     data.roomtype = "private"; // Ensure roomtype is set to private
@@ -204,21 +323,27 @@ const multiplayer = (io) => {
             message:
               "Sorry, this room is closed and your name is not on the list.",
           });
-        } else if (room.players.length < 4) {
-          socket.join(roomname);
-
-          // set the player number to the next available number
-          let playerNum = 1;
-          let playerNums = room.players.map((x) => x.number);
-          while (playerNums.includes(playerNum)) playerNum++;
-          data.number = playerNum;
-          data.roomname = roomname; // Ensure roomname is updated
-          room.players.push(data);
-          socket.emit("joined", { room, playerNum });
-          socket.broadcast.to(roomname).emit("playerJoined", room.players);
-          return roomname; // return the roomname for further use
         } else {
-          socket.emit("joined", { message: "Sorry, this room is full." });
+          const isHostAct = Boolean(
+            (room.activity && hostActivityIds.has(room.activity)) ||
+            (room.selectedHostActivity && hostActivityIds.has(room.selectedHostActivity))
+          );
+          if (isHostAct || room.players.length < 4) {
+            socket.join(roomname);
+
+            // set the player number to the next available number
+            let playerNum = 1;
+            let playerNums = room.players.map((x) => x.number);
+            while (playerNums.includes(playerNum)) playerNum++;
+            data.number = playerNum;
+            data.roomname = roomname; // Ensure roomname is updated
+            room.players.push(data);
+            socket.emit("joined", { room, playerNum });
+            socket.broadcast.to(roomname).emit("playerJoined", room.players);
+            return roomname; // return the roomname for further use
+          } else {
+            socket.emit("joined", { message: "Sorry, this room is full." });
+          }
         }
       } else {
         // Player found, update existing player data instead of adding duplicate
@@ -238,6 +363,7 @@ const multiplayer = (io) => {
   }
 
   function joinPublicRoom(socket, data) {
+    data.roomtype = "public"; // Ensure roomtype is set to public
     let roomname =
       data.roomname && Object.keys(publicRooms).includes(data.roomname)
         ? data.roomname
@@ -260,8 +386,12 @@ const multiplayer = (io) => {
       }
 
       if (existingPlayerIndex === -1) {
-        // Player not found, add new player
-        if (room.players.length < 4) {
+        const isHostAct = Boolean(
+          (room.activity && hostActivityIds.has(room.activity)) ||
+          (room.selectedHostActivity && hostActivityIds.has(room.selectedHostActivity))
+        );
+        // Player not found, add new player (host activities do not have a 4 player limit)
+        if (isHostAct || room.players.length < 4) {
           // set the player number to the next available number
           let playerNums = room.players.map((x) => x.number);
           let playerNum = 1;
@@ -273,6 +403,7 @@ const multiplayer = (io) => {
           socket.emit("joined", { room, playerNum });
           // broadcast to all sockets in the room except the sender
           socket.broadcast.to(roomname).emit("playerJoined", room.players);
+          broadcastPublicRooms();
           return roomname; // return the roomname for further use
         } else
           socket.emit("joined", {
@@ -290,6 +421,7 @@ const multiplayer = (io) => {
         socket.emit("joined", { room, playerNum });
         // broadcast to all sockets in the room except the sender
         socket.broadcast.to(roomname).emit("playerJoined", room.players);
+        broadcastPublicRooms();
         return roomname; // return the roomname for further use
       }
     }
@@ -303,20 +435,41 @@ const multiplayer = (io) => {
 
     socket.leave(data.roomname);
 
-    if (roomtype === "public") {
+    if (roomtype === "public" || publicRooms[roomname]) {
       if (publicRooms[roomname]) {
         room = publicRooms[roomname];
         room.players = room.players.filter((player) => player.id !== id);
         if (room.players.length === 0) {
           closePublicRoom(roomname);
+        } else if (room.players.length === 1) {
+          if (room.hostId === id) {
+            room.hostId = room.players[0].id;
+          }
+          if (!room.players[0].activity) {
+            room.roomtype = "private";
+            room.activity = null;
+            room.selectedHostActivity = null;
+            privateRooms[roomname] = room;
+            delete publicRooms[roomname];
+            io.to(roomname).emit("roomClosed", {
+              players: room.players,
+              roomtype: "private",
+              selectedHostActivity: null,
+            });
+            broadcastPublicRooms();
+          } else {
+            io.to(roomname).emit("playerLeft", room.players);
+            broadcastPublicRooms();
+          }
         } else {
           if (room.hostId === id) {
             room.hostId = room.players[0].id;
           }
           io.to(roomname).emit("playerLeft", room.players);
+          broadcastPublicRooms();
         }
       }
-    } else if (roomtype === "private") {
+    } else if (roomtype === "private" || privateRooms[roomname]) {
       if (privateRooms[roomname]) {
         room = privateRooms[roomname];
         room.players = room.players.filter((player) => player.id !== id);
@@ -335,7 +488,14 @@ const multiplayer = (io) => {
   // SOCKET.IO EVENTS ////////////////////////////////////////////////////////////
   io.sockets.on("connection", (socket) => {
     // Initialize modular event handlers for each multiplayer activity.
-    registerMultiplayerActivityEvents(io, socket);
+    registerMultiplayerActivityEvents(io, socket, touchRoom);
+
+    // Send available public rooms to newly connected client
+    socket.emit("publicRoomsList", getPublicRoomsList());
+
+    socket.on("getPublicRooms", function () {
+      socket.emit("publicRoomsList", getPublicRoomsList());
+    });
 
     socket.on("join", function (data) {
       if (!data || typeof data !== 'object') return;
@@ -369,6 +529,7 @@ const multiplayer = (io) => {
 
     socket.on("roomSearch", function (data) {
       if (!isStr(data, 60)) return;
+      touchRoom(data);
       const room = privateRooms[data] || publicRooms[data] || null;
       socket.emit("roomSearch", room);
     });
@@ -377,6 +538,7 @@ const multiplayer = (io) => {
       if (!data || typeof data !== 'object' || !isStr(data.id, 60)) return;
       if (data.roomname !== undefined && !isStr(data.roomname, 60)) return;
       let roomname = data.roomname;
+      touchRoom(roomname);
       let room;
       let adj = adjectives[Math.floor(Math.random() * adjectives.length)];
       let noun = nouns[Math.floor(Math.random() * nouns.length)];
@@ -424,6 +586,7 @@ const multiplayer = (io) => {
       if (!isStr(data.roomname, 60) || !isStr(data.id, 60)) return;
       if (!isStr(data.color, 20) || !/^#[0-9a-fA-F]{3,8}$/.test(data.color)) return;
       let roomname = data.roomname;
+      touchRoom(roomname);
       let room = publicRooms[roomname] || privateRooms[roomname];
 
       if (room) {
@@ -442,6 +605,7 @@ const multiplayer = (io) => {
     socket.on("leave", function (data) {
       const clean = sanitizePlayerData(data);
       if (!clean) return;
+      touchRoom(clean.roomname);
       leaveRoom(socket, clean);
       socket.emit("youLeft");
     });
@@ -451,6 +615,7 @@ const multiplayer = (io) => {
       if (!isStr(data.roomname, 60) || !isStr(data.id, 60)) return;
       if (data.activity !== undefined && data.activity !== null && !isStr(data.activity, 30)) return;
       let roomname = data.roomname;
+      touchRoom(roomname);
       let room = privateRooms[roomname] || publicRooms[roomname];
       if (!room) {
         socket.emit("error", { message: "Room not found or closed." });
@@ -462,8 +627,8 @@ const multiplayer = (io) => {
         player.activity = data.activity || null;
       }
 
-      // If the host updated their activity selection
-      if (room.hostId === data.id) {
+      const isHost = (room.hostId === data.id);
+      if (isHost) {
         if (data.activity && hostActivityIds.has(data.activity)) {
           room.selectedHostActivity = data.activity;
         } else {
@@ -471,57 +636,76 @@ const multiplayer = (io) => {
         }
       }
 
-      // If a host-controlled activity is active, it only starts when the host clicks Start
-      if (room.selectedHostActivity) {
+      // Solitary host in room (players.length === 1):
+      if (room.players.length === 1) {
+        if (data.activity) {
+          // Host with no other players selects an activity thereby creating a public room
+          room.activity = null;
+          room.roomtype = "public";
+          publicRooms[roomname] = room;
+          delete privateRooms[roomname];
+
+          socket.emit("roomOpened", {
+            players: room.players,
+            roomtype: "public",
+            selectedHostActivity: room.selectedHostActivity,
+          });
+          io.to(roomname).emit("activityChosen", {
+            players: room.players,
+            selectedHostActivity: room.selectedHostActivity,
+            roomtype: "public",
+          });
+          broadcastPublicRooms();
+        } else {
+          // Deselected activity while alone -> revert to private room
+          room.activity = null;
+          room.selectedHostActivity = null;
+          room.roomtype = "private";
+          privateRooms[roomname] = room;
+          delete publicRooms[roomname];
+
+          socket.emit("roomClosed", {
+            players: room.players,
+            roomtype: "private",
+            selectedHostActivity: null,
+          });
+          io.to(roomname).emit("activityChosen", {
+            players: room.players,
+            selectedHostActivity: null,
+            roomtype: "private",
+          });
+          broadcastPublicRooms();
+        }
+        return;
+      }
+
+      // Room has multiple players (players.length > 1)
+      const isHostActivity = Boolean(
+        room.selectedHostActivity ||
+        (data.activity && hostActivityIds.has(data.activity))
+      );
+
+      if (isHostActivity) {
+        // Host activities do not start on consensus; they require the host to click Start
         io.to(roomname).emit("activityChosen", {
           players: room.players,
-          selectedHostActivity: room.selectedHostActivity,
+          selectedHostActivity: room.selectedHostActivity || (hostActivityIds.has(data.activity) ? data.activity : null),
         });
         return;
       }
 
-      if (privateRooms[roomname]) {
-        if (room.players.length === 1) {
-          // alone in your room
-          publicRooms[roomname] = room; // move the room to public
-          delete privateRooms[roomname];
-          socket.emit("roomOpened", room.players);
-        } else {
-          let allSame = room.players.every(
-            (p) => p.activity === data.activity && p.activity !== null
-          );
-          if (allSame) {
-            room.activity = data.activity;
-            io.to(roomname).emit("loadActivity", data.activity);
-          } else {
-            io.to(roomname).emit("activityChosen", {
-              players: room.players,
-              selectedHostActivity: null,
-            });
-          }
-        }
-      } else if (publicRooms[roomname]) {
-        if (room.players.length === 1) {
-          // alone in public room
-          room.activity = data.activity;
-          io.to(roomname).emit("activityChosen", {
-            players: room.players,
-            selectedHostActivity: null,
-          });
-        } else {
-          let allSame = room.players.every(
-            (p) => p.activity === data.activity && p.activity !== null
-          );
-          if (allSame) {
-            room.activity = data.activity;
-            io.to(roomname).emit("loadActivity", data.activity);
-          } else {
-            io.to(roomname).emit("activityChosen", {
-              players: room.players,
-              selectedHostActivity: null,
-            });
-          }
-        }
+      const isStandardActivity = Boolean(data.activity && !hostActivityIds.has(data.activity));
+      let allSame = isStandardActivity && room.players.every(
+        (p) => p.activity === data.activity && p.activity !== null
+      );
+      if (allSame) {
+        room.activity = data.activity;
+        io.to(roomname).emit("loadActivity", data.activity);
+      } else {
+        io.to(roomname).emit("activityChosen", {
+          players: room.players,
+          selectedHostActivity: null,
+        });
       }
     });
 
@@ -530,6 +714,7 @@ const multiplayer = (io) => {
       if (!isStr(data.roomname, 60) || !isStr(data.id, 60)) return;
       if (!isStr(data.activity, 30)) return;
       let roomname = data.roomname;
+      touchRoom(roomname);
       let room = privateRooms[roomname] || publicRooms[roomname];
       if (!room) return;
 
@@ -540,16 +725,21 @@ const multiplayer = (io) => {
 
       room.activity = data.activity;
       room.activityPayload = data.payload || data.questions || null;
-      io.to(roomname).emit("loadActivity", {
-        activity: data.activity,
-        questions: room.activityPayload,
-      });
+      if (data.activity === 'popquiz') {
+        const popquiz = require('./multiplayer/activities/popquiz');
+        if (popquiz && typeof popquiz.getOrCreatePopquizState === 'function') {
+          const state = popquiz.getOrCreatePopquizState(roomname, room.activityPayload, data.id);
+          state.started = true;
+        }
+      }
+      io.to(roomname).emit("loadActivity", data.activity);
     });
 
     socket.on("activityComplete", function (data) {
       if (!data || !data.roomname) return;
 
       const roomname = data.roomname;
+      touchRoom(roomname);
       const room = privateRooms[roomname] || publicRooms[roomname];
       if (!room) return;
 
@@ -560,6 +750,13 @@ const multiplayer = (io) => {
       room.players.forEach((p) => {
         p.activity = null;
       });
+
+      if (publicRooms[roomname] && room.players.length === 1) {
+        room.roomtype = "private";
+        privateRooms[roomname] = room;
+        delete publicRooms[roomname];
+        broadcastPublicRooms();
+      }
 
       io.to(roomname).emit("activityChosen", {
         players: room.players,

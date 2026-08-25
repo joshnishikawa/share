@@ -44,9 +44,14 @@ function removeSocketFromPopquiz(socketId, roomname) {
   state.readySockets.delete(socketId);
 }
 
+function clearPopquizState(roomname) {
+  popquizStates.delete(roomname);
+}
+
 function emitRoundStart(io, roomname, state) {
   state.started = true;
   state.graded = false;
+  state.lastRoundStart = Date.now();
   state.selections.clear();
 
   const currentChoices = state.questions[state.currentQuestionIndex] || [];
@@ -62,12 +67,16 @@ function emitRoundStart(io, roomname, state) {
   });
 }
 
-const popquizEvents = (io, socket) => {
+const popquizEvents = (io, socket, touchRoom) => {
   socket.on('popquiz/ready', function(data) {
     if (!data || !data.roomname) return;
+    if (typeof touchRoom === 'function') touchRoom(data.roomname);
+
+    socket.join(data.roomname);
     socket.data.popquizRoomname = data.roomname;
 
-    const state = getOrCreatePopquizState(data.roomname, data.questions, data.hostId);
+
+    const state = getOrCreatePopquizState(data.roomname, data.questions, data.hostId || (data.isHost ? data.playerId : null));
     state.readySockets.add(socket.id);
 
     if (data.playerId) {
@@ -123,34 +132,37 @@ const popquizEvents = (io, socket) => {
     if (state.isGameOver && state.gameOverData) {
       socket.emit('popquiz/gameover', state.gameOverData);
     } else if (state.started) {
-      const currentChoices = state.questions[state.currentQuestionIndex] || [];
-      socket.emit('popquiz/roundstart', {
-        questionIndex: state.currentQuestionIndex,
-        totalQuestions: state.questions.length,
-        choices: currentChoices,
-        scores: state.scores,
-        players: uniquePlayers,
-        hostId: state.hostId,
-      });
+      // Only emit directly to reconnecting socket if they didn't just receive the host's roundstart broadcast
+      const timeSinceRoundStart = Date.now() - (state.lastRoundStart || 0);
+      if (timeSinceRoundStart > 150) {
+        const currentChoices = state.questions[state.currentQuestionIndex] || [];
+        socket.emit('popquiz/roundstart', {
+          questionIndex: state.currentQuestionIndex,
+          totalQuestions: state.questions.length,
+          choices: currentChoices,
+          scores: state.scores,
+          players: uniquePlayers,
+          hostId: state.hostId,
+        });
 
-      state.selections.forEach((choiceIndex, pId) => {
-        const playerObj = state.players.get(pId);
-        if (playerObj) {
-          socket.emit('popquiz/playerselected', {
-            playerId: pId,
-            playerNumber: playerObj.number,
-            color: playerObj.color,
-            choiceIndex: choiceIndex,
-          });
-        }
-      });
-    } else {
-      emitRoundStart(io, data.roomname, state);
+        state.selections.forEach((choiceIndex, pId) => {
+          const playerObj = state.players.get(pId);
+          if (playerObj) {
+            socket.emit('popquiz/playerselected', {
+              playerId: pId,
+              playerNumber: playerObj.number,
+              color: playerObj.color,
+              choiceIndex: choiceIndex,
+            });
+          }
+        });
+      }
     }
   });
 
   socket.on('popquiz/updateQuestions', function(data) {
     if (!data || !data.roomname) return;
+    if (typeof touchRoom === 'function') touchRoom(data.roomname);
     const state = popquizStates.get(data.roomname);
     if (!state) return;
 
@@ -174,6 +186,7 @@ const popquizEvents = (io, socket) => {
 
   socket.on('popquiz/select', function(data) {
     if (!data || !data.roomname) return;
+    if (typeof touchRoom === 'function') touchRoom(data.roomname);
     const state = popquizStates.get(data.roomname);
     if (!state || !state.started || state.graded || state.isGameOver) return;
 
@@ -189,6 +202,7 @@ const popquizEvents = (io, socket) => {
 
   socket.on('popquiz/grade', function(data) {
     if (!data || !data.roomname) return;
+    if (typeof touchRoom === 'function') touchRoom(data.roomname);
     const state = popquizStates.get(data.roomname);
     if (!state || !state.started || state.graded || state.isGameOver) return;
 
@@ -263,5 +277,8 @@ const popquizEvents = (io, socket) => {
     removeSocketFromPopquiz(socket.id, socket.data.popquizRoomname);
   });
 };
+
+popquizEvents.getOrCreatePopquizState = getOrCreatePopquizState;
+popquizEvents.clearPopquizState = clearPopquizState;
 
 module.exports = popquizEvents;

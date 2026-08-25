@@ -221,6 +221,10 @@
 
     $('#popquiz-game-screen').removeClass('d-none');
     $('#popquiz-gameover-screen').addClass('d-none');
+    $('#popquiz-round-badge').addClass('d-none').text('');
+    $('#popquiz-status').text('Waiting for host to start.');
+    $('#popquiz-host-indicator').addClass('d-none');
+    $('#popquiz-choices-container').empty();
     $('#popquiz-pawn-layer').empty();
 
     // Resize listener for keeping pawns perfectly aligned on viewport changes
@@ -259,7 +263,7 @@
       const qIndex = (data.questionIndex || 0) + 1;
       const totalQ = data.totalQuestions || 1;
 
-      $('#popquiz-round-badge').text(`Question ${qIndex} of ${totalQ}`);
+      $('#popquiz-round-badge').removeClass('d-none').text(`Question ${qIndex} of ${totalQ}`);
       $('#popquiz-status').text(isHost ? 'You are the Host: tap the correct answer to grade!' : 'Tap an answer to move your pawn!');
 
       if (isHost) {

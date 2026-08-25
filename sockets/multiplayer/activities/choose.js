@@ -95,9 +95,14 @@ function removeSocketFromRoom(socketId, roomname) {
   }
 }
 
-const chooseEvents = (io, socket) => {
+function clearChooseState(roomname) {
+  roomStates.delete(roomname);
+}
+
+const chooseEvents = (io, socket, touchRoom) => {
   socket.on('choose/playerready', function(data) {
     if (!data || !data.roomname) return;
+    if (typeof touchRoom === 'function') touchRoom(data.roomname);
 
     if (socket.data.chooseRoomname && socket.data.chooseRoomname !== data.roomname) {
       removeSocketFromRoom(socket.id, socket.data.chooseRoomname);
@@ -130,6 +135,7 @@ const chooseEvents = (io, socket) => {
 
   socket.on('choose/selectimg', function(data) {
     if (!data || !data.roomname) return;
+    if (typeof touchRoom === 'function') touchRoom(data.roomname);
     const state = roomStates.get(data.roomname);
     if (!state || !state.started) return;
 
@@ -152,6 +158,7 @@ const chooseEvents = (io, socket) => {
 
   socket.on('choose/selectword', function(data) {
     if (!data || !data.roomname) return;
+    if (typeof touchRoom === 'function') touchRoom(data.roomname);
     const state = roomStates.get(data.roomname);
     if (!state || !state.started || !state.selectedWord) return;
 
@@ -209,5 +216,7 @@ const chooseEvents = (io, socket) => {
     removeSocketFromRoom(socket.id, socket.data.chooseRoomname);
   });
 };
+
+chooseEvents.clearChooseState = clearChooseState;
 
 module.exports = chooseEvents;
