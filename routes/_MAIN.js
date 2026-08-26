@@ -77,7 +77,7 @@ router.get('/LT2', (req, res)=>{
 router.get('/NH', async (req, res)=>{
   try{
     let NH_vocab = await getNHVocab();
-    res.render('students/NH', {NH_vocab, NH_colors, teacher: false});
+    res.render('students/NH', {NH_vocab, NH_colors, colors: NH_colors, teacher: false});
   }
   catch(err){
     res.status(500).render('error');

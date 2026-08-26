@@ -26,6 +26,27 @@ getCookieObject = ()=>{
   return cookieObject;
 }
 
+// Automatically sync browser language (navigator.language) to 'lang' cookie if not explicitly set
+(function syncBrowserLanguage() {
+  if (typeof document === 'undefined' || typeof navigator === 'undefined') return;
+  const cookies = getCookieObject ? getCookieObject() : {};
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlLang = urlParams.get('lang');
+
+  if (urlLang && ['en', 'ja'].includes(urlLang)) {
+    document.cookie = `lang=${urlLang}; path=/; max-age=31536000; SameSite=Lax`;
+  } else if (!cookies.lang) {
+    const navLang = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
+    const detected = navLang.startsWith('ja') ? 'ja' : 'en';
+    document.cookie = `lang=${detected}; path=/; max-age=31536000; SameSite=Lax`;
+    const currentDocLang = (document.documentElement.getAttribute('lang') || 'en').toLowerCase();
+    if (!currentDocLang.startsWith(detected) && !sessionStorage.getItem('lang_reloaded')) {
+      sessionStorage.setItem('lang_reloaded', '1');
+      window.location.reload();
+    }
+  }
+})();
+
 
 // Fisher-Yates shuffle (in-place). Returns the shuffled array.
 // Special-cases 2-element arrays with a coin flip.

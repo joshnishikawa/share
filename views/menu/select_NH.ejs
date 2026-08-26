@@ -8,15 +8,54 @@
       white-space: nowrap;
       padding: 0.5rem 0;
     }
-  
 </style>
 
-<!-- <div class="ms-3 text-muted">NEW HORIZON VOCAB</div> -->
+<%
+  const _colors = typeof colors !== 'undefined' ? colors : (typeof NH_colors !== 'undefined' ? NH_colors : {});
+  const _vocab = typeof NH_vocab !== 'undefined' ? NH_vocab : {};
+%>
 
 <div id="themes" class="d-flex flex-wrap align-content-start">
-  <!-- Content will be populated dynamically -->
+<% for (let p in _vocab) {
+  let color = '';
+  for (let c in _colors) {
+    if (_colors[c].includes(p)) {
+      color = c;
+      break;
+    }
+  }
+  if (p == '+') { %>
+    <div class="rounded-3 p-1" style="display: block !important;margin:2px;background-color:lightgray;">
+      <div id="<%= p %>" class="d-flex flex-wrap">
+      <% for (let t in _vocab[p]) {
+        let id = t.replace(/ /g, "_"); %>
+        <div class="form-check">
+          <input id="theme_<%= id %>" name="themes" aria-label="themes" class="form-check-input" type="checkbox" value="<%= t %>">
+          <label class="form-check-label me-3" style="margin-left:-5px;" for="theme_<%= id %>">
+            <%- __(t) %> <u><%= Object.keys(_vocab[p][t]).length %></u>
+          </label>
+        </div>
+      <% } %>
+      </div>
+    </div>
+  <% } else { %>
+    <div class="rounded-3 p-1 d-flex" style="margin:2px;background-color:<%= color %>">
+      <div class="vertical-label"><%= p.replace(/_/g, ', ') %></div>
+      <div id="<%= p %>">
+      <% for (let t in _vocab[p]) {
+        let id = t.replace(/ /g, "_"); %>
+        <div class="form-check">
+          <input id="theme_<%= id %>" name="themes" aria-label="themes" class="form-check-input" type="checkbox" value="<%= t %>">
+          <label class="form-check-label me-3" style="margin-left:-5px;" for="theme_<%= id %>">
+            <%- __(t) %> <u><%= Object.keys(_vocab[p][t]).length %></u>
+          </label>
+        </div>
+      <% } %>
+      </div>
+    </div>
+  <% } %>
+<% } %>
 </div>
-
 
 <script>
   // Initialize global variables only if they don't exist
@@ -44,100 +83,25 @@
       if (typeof updateDoubleSwitch === 'function') updateDoubleSwitch();
     }
   }
-  
+
 $(function(){
-  let NH_vocab = {};
-  let colors = {};
+  const NH_vocab = <%- JSON.stringify(_vocab) %>;
 
-  // Function to create themes HTML
-  function createThemesHTML(NH_vocab, colors, translations) {
-    let html = '';
-    
-    for (let p in NH_vocab) {
-      let color = '';
-      for (let c in colors) {
-        if (colors[c].includes(p)) {
-          color = c;
-          break;
-        }
-      }
-      
-      if (p == '+') {
-        html += '<div class="rounded-3 p-1" style="display: block !important;margin:2px;background-color:lightgray;">';
-        html += '<div id="' + p + '" class="d-flex flex-wrap">';
-        
-        for (let t in NH_vocab[p]) {
-          let id = t.replace(/ /g, "_");
-          let translatedTheme = translations[t] || t; // fallback to original if no translation
-          html += '<div class="form-check">';
-          html += '<input id="theme_' + id + '" name="themes" aria-label="themes" class="form-check-input" type="checkbox" value="' + t + '">';
-          html += '<label class="form-check-label me-3" style="margin-left:-5px;" for="theme_' + id + '">';
-          html += translatedTheme + ' <u>' + Object.keys(NH_vocab[p][t]).length + '</u>';
-          html += '</label>';
-          html += '</div>';
-        }
-        
-        html += '</div>';
-        html += '</div>';
-      } else {
-        html += '<div class="rounded-3 p-1 d-flex" style="margin:2px;background-color:' + color + '">';
-        html += '<div class="vertical-label">' + p.replace(/_/g, ', ') + '</div>';
-        html += '<div id="' + p + '">';
-        
-        for (let t in NH_vocab[p]) {
-          let id = t.replace(/ /g, "_");
-          let translatedTheme = translations[t] || t; // fallback to original if no translation
-          html += '<div class="form-check">';
-          html += '<input id="theme_' + id + '" name="themes" aria-label="themes" class="form-check-input" type="checkbox" value="' + t + '">';
-          html += '<label class="form-check-label me-3" style="margin-left:-5px;" for="theme_' + id + '">';
-          html += translatedTheme + ' <u>' + Object.keys(NH_vocab[p][t]).length + '</u>';
-          html += '</label>';
-          html += '</div>';
-        }
-        
-        html += '</div>';
-        html += '</div>';
-      }
+  $("#themes input").on('change', function(){
+    let list = [];
+    let p = $(this).parent().parent().attr('id');
+    let theme = $(this).val();
+
+    for (let word in NH_vocab[p][theme]) {
+      let id = NH_vocab[p][theme][word];
+      list.push({word, id});
     }
-    
-    return html;
-  }
 
-  // Function to set up event handlers
-  function setupEventHandlers() {
-    $("#themes input").on('change', function(){
-      let list = [];
-      let p = $(this).parent().parent().attr('id');
-      let theme = $(this).val();
-
-      for (let word in NH_vocab[p][theme]) {
-        let id = NH_vocab[p][theme][word];
-        list.push({word, id});
-      }
-
-      if ($(this).is(':checked')) {
-        window.addWords(list);
-      } else {
-        window.removeWords(list);
-      }
-    });
-  }
-
-  // Load NH vocabulary data via AJAX
-  $.get('/api/nh-vocab')
-    .done(function(data) {
-      NH_vocab = data.NH_vocab;
-      colors = data.NH_colors;
-      
-      // Populate the themes div
-      $('#themes').html(createThemesHTML(NH_vocab, colors, data.translations));
-      
-      // Set up event handlers
-      setupEventHandlers();
-    })
-    .fail(function(xhr, status, error) {
-      console.error('Failed to load NH vocabulary data:', error);
-      $('#themes').html('<div class="alert alert-danger">Failed to load vocabulary data</div>');
-    });
+    if ($(this).is(':checked')) {
+      window.addWords(list);
+    } else {
+      window.removeWords(list);
+    }
+  });
 });
 </script>

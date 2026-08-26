@@ -262,6 +262,8 @@ router.get('/any-vocab', async (req, res) => {
 // GET /api/nh-vocab - Get NH vocabulary and colors data with translations
 router.get('/nh-vocab', async (req, res) => {
   try {
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.set('Vary', 'Accept-Language');
     let NH_vocab = await getNHVocab();
 
     let translations = {};

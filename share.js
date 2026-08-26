@@ -26,6 +26,10 @@ const apiRouter = require('./routes/api');
 const { I18n } = require('i18n');
 const i18n = new I18n({
   locales: ['en', 'ja'],
+  fallbacks: { 'en-*': 'en', 'ja-*': 'ja' },
+  defaultLocale: 'en',
+  cookie: 'lang',
+  queryParameter: 'lang',
   directory: path.join(__dirname, 'locales'),
   retryInDefaultLocale: true,
   objectNotation: true,
@@ -51,13 +55,15 @@ require('./config/passport')(passport);
 
 
 const port = process.env.PORT;
-server.listen(port, (err)=>{
-  if(err) {
-    console.error(err);
-    return;
-  }
-  console.log('Listening on port: ', port);
-});
+if (process.env.NODE_ENV !== 'test') {
+  server.listen(port, (err)=>{
+    if(err) {
+      console.error(err);
+      return;
+    }
+    console.log('Listening on port: ', port);
+  });
+}
 
 // SET VIEW ENGINE /////////////////////////////////////////////////////////////
 app.set('view engine', 'ejs');
@@ -114,7 +120,26 @@ app.use((req, res, next) => {
   next();
 });
 
+// Parse cookies for i18n if req.cookies is not populated
+app.use((req, res, next) => {
+  if (!req.cookies && req.headers.cookie) {
+    req.cookies = {};
+    req.headers.cookie.split(';').forEach(c => {
+      const parts = c.trim().split('=');
+      if (parts[0] && parts[1]) req.cookies[parts[0]] = decodeURIComponent(parts[1]);
+    });
+  }
+  // Persist language to cookie if ?lang= is passed
+  if (req.query.lang && ['en', 'ja'].includes(req.query.lang)) {
+    res.cookie('lang', req.query.lang, { maxAge: 365 * 24 * 60 * 60 * 1000, httpOnly: false, sameSite: 'lax', path: '/' });
+  }
+  next();
+});
 app.use( i18n.init );
+app.use((req, res, next) => {
+  console.log(`[REQ-LOCALE] ${req.method} ${req.url} | Accept-Language: "${req.headers['accept-language']}" | Cookie: "${req.headers.cookie}" | Resolved: "${req.locale}"`);
+  next();
+});
 app.use('/auth', authRouter);
 app.use('/api', apiRouter);
 app.use('/teachers', TRouter);

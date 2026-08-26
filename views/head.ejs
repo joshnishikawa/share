@@ -20,7 +20,7 @@
     • No <body> tag — each page view must open its own <body>.
 -->
 <!DOCTYPE html>
-<html lang="en-US" translate="no">
+<html lang="<%= typeof locale !== 'undefined' ? locale : 'en' %>" translate="no">
 <head>
   <title>English Jones</title>
   
