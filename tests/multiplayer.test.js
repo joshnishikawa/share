@@ -55,12 +55,63 @@ describe('Multiplayer Router', () => {
   test('GET /multiplayer/popquiz should render popquiz index', async () => {
     const response = await request(app).get('/multiplayer/popquiz');
     expect(response.status).toBe(200);
-    expect(app.render).toHaveBeenCalledWith('activities/multiplayer/popquiz/index', expect.any(Object), expect.any(Function));
+    expect(app.render).toHaveBeenCalledWith('activities/hosted/popquiz/index', expect.any(Object), expect.any(Function));
+  });
+
+  test('GET /multiplayer/raffle should render raffle index', async () => {
+    const response = await request(app).get('/multiplayer/raffle');
+    expect(response.status).toBe(200);
+    expect(app.render).toHaveBeenCalledWith('activities/hosted/raffle/index', expect.any(Object), expect.any(Function));
   });
 
   test('should handle render errors by returning 500 and error view', async () => {
     renderError = true;
     const response = await request(app).get('/multiplayer');
+    expect(response.status).toBe(500);
+    expect(app.render).toHaveBeenCalledWith('error', expect.any(Object), expect.any(Function));
+  });
+});
+
+describe('Hosted Activities Router', () => {
+  let app;
+  let renderError = false;
+  let consoleErrorSpy;
+  const hostedRouter = require('../routes/hosted/index');
+
+  beforeEach(() => {
+    renderError = false;
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    app = express();
+    app.set('view engine', 'ejs');
+    app.render = jest.fn((view, options, callback) => {
+      const cb = typeof options === 'function' ? options : callback;
+      if (renderError) {
+        throw new Error('Synchronous render exception');
+      }
+      cb(null, `Mocked ${view} content`);
+    });
+    app.use('/hosted', hostedRouter);
+  });
+
+  afterEach(() => {
+    consoleErrorSpy.mockRestore();
+  });
+
+  test('GET /hosted/popquiz should render hosted popquiz index', async () => {
+    const response = await request(app).get('/hosted/popquiz');
+    expect(response.status).toBe(200);
+    expect(app.render).toHaveBeenCalledWith('activities/hosted/popquiz/index', expect.any(Object), expect.any(Function));
+  });
+
+  test('GET /hosted/raffle should render hosted raffle index', async () => {
+    const response = await request(app).get('/hosted/raffle');
+    expect(response.status).toBe(200);
+    expect(app.render).toHaveBeenCalledWith('activities/hosted/raffle/index', expect.any(Object), expect.any(Function));
+  });
+
+  test('should handle render errors by returning 500 and error view', async () => {
+    renderError = true;
+    const response = await request(app).get('/hosted/popquiz');
     expect(response.status).toBe(500);
     expect(app.render).toHaveBeenCalledWith('error', expect.any(Object), expect.any(Function));
   });

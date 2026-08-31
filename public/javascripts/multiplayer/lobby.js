@@ -54,11 +54,15 @@ const socket = io();
 let currentActivity = null;
 let timer;
 
-// Escape HTML to prevent XSS when inserting user-controlled data into the DOM
+// Escape HTML to prevent XSS when inserting user-controlled data into the DOM and attributes
 function escapeHtml(str) {
-  const div = document.createElement('div');
-  div.appendChild(document.createTextNode(str || ''));
-  return div.innerHTML;
+  if (typeof str !== 'string') return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 function renderPublicRooms(publicRooms) {
@@ -208,6 +212,18 @@ $(function(){
     }
   }
 
+  // Restore draft raffle values from localStorage
+  const savedRaffleValues = localStorage.getItem('raffle_values_draft');
+  if (savedRaffleValues) {
+    $("#raffle-values").val(savedRaffleValues);
+    const parsedValues = savedRaffleValues.split(',')
+      .map(function(item) { return item.trim(); })
+      .filter(Boolean);
+    if (parsedValues.length > 0) {
+      window.raffleValues = parsedValues;
+    }
+  }
+
   $(".menuitem").on('submit', function(e){
     e.preventDefault();
     if (!window.deck || window.deck.length == 0) {
@@ -276,6 +292,7 @@ $(function(){
       const p = playersList[i];
       const safeColor = sanitizeColor(p.color);
       const safeId = escapeHtml(p.id);
+      const safeNum = parseInt(p.number, 10) || (i + 1);
 
       if (p.id == player.id || (player.number && p.number == player.number)){
         player.id = p.id;
@@ -289,10 +306,10 @@ $(function(){
         otherPlayersHTML += `
           <div class="row bg-light border border-primary rounded-3 my-1">
             <div class="col-2">
-              <div class="pawn${p.number} text-center my-1" style="margin:auto;width:24px;">${getPawn(safeColor)}</div>
+              <div class="pawn${safeNum} text-center my-1" style="margin:auto;width:24px;">${getPawn(safeColor)}</div>
             </div>
             <div class="col-10">
-              <div id="name${p.number}" class="fs-4 text-break" style="color: ${safeColor};text-shadow:0px 0px 2px #555;">${safeId}</div>
+              <div id="name${safeNum}" class="fs-4 text-break" style="color: ${safeColor};text-shadow:0px 0px 2px #555;">${safeId}</div>
             </div>
           </div>
         `;
@@ -310,20 +327,23 @@ $(function(){
 
     for (let i = 0; i < playersList.length; i++) {
       const p = playersList[i];
-      if (p.activity) {
-        const isHostPlayer = (p.id === hostId);
-        if (isHostPlayer) {
-          // Host's pawn appears at the left of the menu item
-          $(`#${p.activity} .host-pawn`).html(getPawn(p.color));
-        } else {
-          // Other players appear on the right and increment selection count
-          activityCounts[p.activity] = (activityCounts[p.activity] || 0) + 1;
-          const $target = $(`#${p.activity}`);
-          const $targetPawns = $target.find(".activity-pawns");
-          if ($targetPawns.length) {
-            $targetPawns.append(getPawn(p.color));
+      if (p.activity && typeof p.activity === 'string') {
+        const actEl = document.getElementById(p.activity);
+        if (actEl) {
+          const isHostPlayer = (p.id === hostId);
+          const pSafeColor = sanitizeColor(p.color);
+          if (isHostPlayer) {
+            // Host's pawn appears at the left of the menu item
+            $(actEl).find('.host-pawn').html(getPawn(pSafeColor));
           } else {
-            $target.append(getPawn(p.color));
+            // Other players appear on the right and increment selection count
+            activityCounts[p.activity] = (activityCounts[p.activity] || 0) + 1;
+            const $targetPawns = $(actEl).find(".activity-pawns");
+            if ($targetPawns.length) {
+              $targetPawns.append(getPawn(pSafeColor));
+            } else {
+              $(actEl).append(getPawn(pSafeColor));
+            }
           }
         }
       }
@@ -381,10 +401,17 @@ $(function(){
       } else {
         $("#popquiz-config").addClass("d-none");
       }
+
+      if (player.activity === 'raffle') {
+        $("#raffle-config").removeClass("d-none");
+      } else {
+        $("#raffle-config").addClass("d-none");
+      }
     } else {
       // Non-host players:
       $(".start-activity-btn").addClass("d-none");
       $("#popquiz-config").addClass("d-none");
+      $("#raffle-config").addClass("d-none");
       if (room && room.selectedHostActivity) {
         // Only show the host-selected activity
         $("#standardActivities").addClass("d-none");
@@ -497,12 +524,37 @@ $(function(){
     }
   }
 
+  function getActivityModule(activityId) {
+    if (!activityId) return null;
+    if (window.hostedActivities && window.hostedActivities[activityId]) {
+      return window.hostedActivities[activityId];
+    }
+    if (window.multiplayerActivities && window.multiplayerActivities[activityId]) {
+      return window.multiplayerActivities[activityId];
+    }
+    return null;
+  }
+
   function loadActivity(activity) {
-    if (currentActivity && window.multiplayerActivities && window.multiplayerActivities[currentActivity] && typeof window.multiplayerActivities[currentActivity].teardown === "function") {
-      window.multiplayerActivities[currentActivity].teardown(socket);
+    if (!activity || typeof activity !== 'string') return;
+    const isValid = (Array.isArray(activitiesConfig) && activitiesConfig.some(a => a.id === activity)) ||
+                    ['choose', 'race', 'match', 'popquiz', 'raffle'].includes(activity);
+    if (!isValid) {
+      console.warn('Attempted to load unknown activity:', activity);
+      return;
     }
 
-    $("#activityContent").load("/multiplayer/" + activity, function(responseText, status) {
+    const currentModule = getActivityModule(currentActivity);
+    if (currentModule && typeof currentModule.teardown === "function") {
+      currentModule.teardown(socket);
+    }
+
+    const configItem = Array.isArray(activitiesConfig) ? activitiesConfig.find(a => a.id === activity) : null;
+    const loadUrl = ((configItem && configItem.group === 'host') || activity === 'popquiz' || activity === 'raffle')
+      ? "/hosted/" + encodeURIComponent(activity)
+      : "/multiplayer/" + encodeURIComponent(activity);
+
+    $("#activityContent").load(loadUrl, function(responseText, status) {
       if (status !== "success") {
         $("#activityContent").html("<div class='alert alert-danger'>Failed to load activity.</div>");
         return;
@@ -510,8 +562,15 @@ $(function(){
 
       currentActivity = activity;
       enterActivityMode();
-      if (window.multiplayerActivities && window.multiplayerActivities[activity] && typeof window.multiplayerActivities[activity].mount === "function") {
-        window.multiplayerActivities[activity].mount({ socket: socket, player: player, room: room, questions: window.popquizQuestions });
+      const actModule = getActivityModule(activity);
+      if (actModule && typeof actModule.mount === "function") {
+        actModule.mount({
+          socket: socket,
+          player: player,
+          room: room,
+          questions: window.popquizQuestions,
+          values: window.raffleValues,
+        });
       }
     });
   }
@@ -533,8 +592,9 @@ $(function(){
   }
 
   function exitActivityMode() {
-    if (currentActivity && window.multiplayerActivities && window.multiplayerActivities[currentActivity] && typeof window.multiplayerActivities[currentActivity].teardown === "function") {
-      window.multiplayerActivities[currentActivity].teardown(socket);
+    const currentModule = getActivityModule(currentActivity);
+    if (currentModule && typeof currentModule.teardown === "function") {
+      currentModule.teardown(socket);
     }
     currentActivity = null;
 
@@ -635,10 +695,34 @@ $(function(){
     }
   });
 
+  $(document).on("input change", "#raffle-values", function () {
+    const rawVal = $(this).val() || '';
+    try {
+      localStorage.setItem('raffle_values_draft', rawVal);
+    } catch (e) {}
+
+    const rawText = rawVal.trim();
+    let values = null;
+    if (rawText) {
+      values = rawText.split(',')
+        .map(function(item) { return item.trim(); })
+        .filter(Boolean);
+    }
+    if (values && values.length > 0) {
+      window.raffleValues = values;
+      socket.emit("raffle/updateValues", {
+        roomname: player.roomname,
+        id: player.id,
+        values: values,
+      });
+    }
+  });
+
   $(document).on("click", ".start-activity-btn", function (e) {
     e.stopPropagation();
     const activity = $(this).data("activity");
     let questions = null;
+    let values = null;
 
     if (activity === 'popquiz') {
       const rawVal = $("#popquiz-questions").val() || '';
@@ -663,11 +747,40 @@ $(function(){
       window.popquizQuestions = questions;
     }
 
+    if (activity === 'raffle') {
+      const rawVal = $("#raffle-values").val() || '';
+      try {
+        localStorage.setItem('raffle_values_draft', rawVal);
+      } catch (e) {}
+
+      const rawText = rawVal.trim();
+      if (rawText) {
+        values = rawText.split(',')
+          .map(function(item) { return item.trim(); })
+          .filter(Boolean);
+      }
+      if (!values || values.length === 0) {
+        values = [
+          'Grand Prize',
+          'Gold Medal',
+          'Silver Trophy',
+          'Surprise Mystery Box',
+          'Bonus Points x100',
+          'Free Pass',
+          'Super Sticker Pack',
+          'High Five'
+        ];
+      }
+      window.raffleValues = values;
+    }
+
     socket.emit("startActivity", {
       roomname: player.roomname,
       id: player.id,
       activity: activity,
       questions: questions,
+      values: values,
+      payload: values || questions,
     });
   });
 
@@ -860,6 +973,9 @@ $(function(){
     const activity = (typeof data === 'object' && data) ? data.activity : data;
     if (typeof data === 'object' && data && data.questions) {
       window.popquizQuestions = data.questions;
+    }
+    if (typeof data === 'object' && data && data.values) {
+      window.raffleValues = data.values;
     }
     loadActivity(activity);
   });

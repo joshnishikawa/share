@@ -23,4 +23,10 @@ module.exports = [
     group: 'host',
     enabled: true,
   },
+  {
+    id: 'raffle',
+    label: 'Raffle',
+    group: 'host',
+    enabled: true,
+  },
 ];

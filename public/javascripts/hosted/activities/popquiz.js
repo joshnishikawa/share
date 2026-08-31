@@ -1,5 +1,5 @@
 /**
- * multiplayer/activities/popquiz.js — Pop Quiz multiplayer activity (client)
+ * hosted/activities/popquiz.js — Pop Quiz hosted activity (client)
  * ────────────────────────────────────────────────────────────────────────────
  * Features:
  *   1. Fixed answer dimensions — pawns sit ON answers, not inside them.
@@ -28,6 +28,16 @@
       return '#' + trimmed[1] + trimmed[1] + trimmed[2] + trimmed[2] + trimmed[3] + trimmed[3];
     }
     return /^#[0-9a-fA-F]{6}$/.test(trimmed) ? trimmed : '#0d6efd';
+  }
+
+  function escapeHtml(str) {
+    if (typeof str !== 'string') return '';
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   function getInitials(name) {
@@ -349,7 +359,8 @@
         });
       }
 
-      $('#popquiz-status').html(`<span class="text-success fw-extrabold">Correct: ${correctWord}!</span> Loading next question...`);
+      const safeWord = escapeHtml(correctWord);
+      $('#popquiz-status').html(`<span class="text-success fw-extrabold">Correct: ${safeWord}!</span> Loading next question...`);
     });
 
     // Handle game over / winner podium
@@ -387,13 +398,16 @@
 
         const trophyIcon = isWinner ? '<div class="fs-1 mb-2">👑</div>' : `<div class="badge bg-secondary mb-2">#${i + 1}</div>`;
         const pawnSvg = getLargePawnSvg(safeColor);
+        const safeId = escapeHtml(playerObj.id);
+        const safeInitials = escapeHtml(initials);
+        const safeScore = parseInt(entry.score, 10) || 0;
 
         $card.html(`
           ${trophyIcon}
           <div class="mb-2">${pawnSvg}</div>
-          <div class="fs-4 fw-bold mb-1" style="color: ${safeColor}">${initials}</div>
-          <div class="small text-muted mb-2">${playerObj.id}</div>
-          <div class="fs-5 fw-extrabold text-primary">Score: ${entry.score}</div>
+          <div class="fs-4 fw-bold mb-1" style="color: ${safeColor}">${safeInitials}</div>
+          <div class="small text-muted mb-2">${safeId}</div>
+          <div class="fs-5 fw-extrabold text-primary">Score: ${safeScore}</div>
         `);
 
         $col.append($card);
@@ -451,9 +465,12 @@
     }
   }
 
-  window.multiplayerActivities = window.multiplayerActivities || {};
-  window.multiplayerActivities.popquiz = {
+  window.hostedActivities = window.hostedActivities || {};
+  window.hostedActivities.popquiz = {
     mount,
     teardown,
   };
+
+  window.multiplayerActivities = window.multiplayerActivities || {};
+  window.multiplayerActivities.popquiz = window.hostedActivities.popquiz;
 })();

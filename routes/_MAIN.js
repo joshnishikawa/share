@@ -9,6 +9,7 @@ const vocab = require('./vocab.js');
 const tools = require('./tools.js');
 const labs = require('./labs.js');
 const multiplayer = require('./multiplayer');
+const hosted = require('./hosted');
 const db = require('../config/db.js');
 const { NH_colors, getNHVocab } = require('../config/nh_helpers.js');
 const { getSRSCard } = require('../config/srs_cards.js');
@@ -19,6 +20,7 @@ router.use('/vocab', vocab);
 router.use('/tools', tools);
 router.use('/labs', labs.router);
 router.use('/multiplayer', multiplayer);
+router.use('/hosted', hosted);
 
 
 router.get('/SRS/loadcard', (req, res) => {

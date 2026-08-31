@@ -245,6 +245,62 @@ describe('Multiplayer Sockets Integration', () => {
     });
   });
 
+  test('chooseActivity ignores invalid activity IDs', (done) => {
+    clientSocket1.emit('join', {
+      id: 'InvalidActPlayer',
+      roomtype: 'private',
+      color: '#0d6efd',
+    });
+
+    clientSocket1.on('joined', ({ room }) => {
+      const roomname = room.roomname;
+      clientSocket1.emit('chooseActivity', {
+        roomname,
+        id: 'InvalidActPlayer',
+        activity: 'malicious-activity-script',
+      });
+
+      clientSocket1.on('roomOpened', () => {
+        // If invalid activity was accepted, solitary player would open a public room
+        done(new Error('Invalid activity should not open public room or set activity'));
+      });
+
+      clientSocket1.on('activityChosen', (data) => {
+        const p = data.players.find(x => x.id === 'InvalidActPlayer');
+        expect(p.activity).toBeNull();
+        done();
+      });
+    });
+  });
+
+  test('startActivity ignores unknown activity IDs and does not emit loadActivity', (done) => {
+    clientSocket1.emit('join', {
+      id: 'InvalidStartHost',
+      roomtype: 'private',
+      color: '#0d6efd',
+    });
+
+    clientSocket1.on('joined', ({ room }) => {
+      const roomname = room.roomname;
+      let loadEmitted = false;
+
+      clientSocket1.on('loadActivity', () => {
+        loadEmitted = true;
+      });
+
+      clientSocket1.emit('startActivity', {
+        roomname,
+        id: 'InvalidStartHost',
+        activity: '../../nonexistent',
+      });
+
+      setTimeout(() => {
+        expect(loadEmitted).toBe(false);
+        done();
+      }, 150);
+    });
+  });
+
   test('choose activity flow: playerready, selectimg, selectword, reveal', (done) => {
     clientSocket1.emit('join', {
       id: 'Chooser',

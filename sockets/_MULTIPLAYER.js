@@ -40,7 +40,9 @@ const nouns = [
 
 
 const registerMultiplayerActivityEvents = require("./multiplayer/activities");
+const registerHostedActivityEvents = require("./hosted/activities");
 const multiplayerActivitiesConfig = require("../config/multiplayer_activities.js");
+const validActivityIds = new Set(multiplayerActivitiesConfig.map((a) => a.id));
 const hostActivityIds = new Set(
   multiplayerActivitiesConfig.filter((a) => a.group === "host").map((a) => a.id)
 );
@@ -79,8 +81,8 @@ function sanitizePlayerData(data) {
 
 const multiplayer = (io, options = {}) => {
   const rooms = require("../rooms.json");
-  var publicRooms = {};
-  var privateRooms = {};
+  let publicRooms = {};
+  let privateRooms = {};
   const INACTIVITY_TIMEOUT = (options && typeof options.inactivityTimeout === 'number') ? options.inactivityTimeout : 10 * 60 * 1000;
   const CLEANUP_INTERVAL = (options && typeof options.cleanupInterval === 'number') ? options.cleanupInterval : 60 * 1000;
 
@@ -140,7 +142,7 @@ const multiplayer = (io, options = {}) => {
 
   function clearActivityRoomStates(roomname) {
     try {
-      const popquiz = require("./multiplayer/activities/popquiz");
+      const popquiz = require("./hosted/activities/popquiz");
       if (popquiz && typeof popquiz.clearPopquizState === "function") {
         popquiz.clearPopquizState(roomname);
       }
@@ -487,8 +489,9 @@ const multiplayer = (io, options = {}) => {
 
   // SOCKET.IO EVENTS ////////////////////////////////////////////////////////////
   io.sockets.on("connection", (socket) => {
-    // Initialize modular event handlers for each multiplayer activity.
+    // Register activity events
     registerMultiplayerActivityEvents(io, socket, touchRoom);
+    registerHostedActivityEvents(io, socket, touchRoom);
 
     // Send available public rooms to newly connected client
     socket.emit("publicRoomsList", getPublicRoomsList());
@@ -613,7 +616,9 @@ const multiplayer = (io, options = {}) => {
     socket.on("chooseActivity", function (data) {
       if (!data || typeof data !== 'object') return;
       if (!isStr(data.roomname, 60) || !isStr(data.id, 60)) return;
-      if (data.activity !== undefined && data.activity !== null && !isStr(data.activity, 30)) return;
+      if (data.activity !== undefined && data.activity !== null && (!isStr(data.activity, 30) || !validActivityIds.has(data.activity))) {
+        data.activity = null;
+      }
       let roomname = data.roomname;
       touchRoom(roomname);
       let room = privateRooms[roomname] || publicRooms[roomname];
@@ -712,7 +717,7 @@ const multiplayer = (io, options = {}) => {
     socket.on("startActivity", function (data) {
       if (!data || typeof data !== 'object') return;
       if (!isStr(data.roomname, 60) || !isStr(data.id, 60)) return;
-      if (!isStr(data.activity, 30)) return;
+      if (!isStr(data.activity, 30) || !validActivityIds.has(data.activity)) return;
       let roomname = data.roomname;
       touchRoom(roomname);
       let room = privateRooms[roomname] || publicRooms[roomname];
@@ -724,11 +729,18 @@ const multiplayer = (io, options = {}) => {
       }
 
       room.activity = data.activity;
-      room.activityPayload = data.payload || data.questions || null;
+      room.activityPayload = data.payload || data.questions || data.values || null;
       if (data.activity === 'popquiz') {
-        const popquiz = require('./multiplayer/activities/popquiz');
+        const popquiz = require('./hosted/activities/popquiz');
         if (popquiz && typeof popquiz.getOrCreatePopquizState === 'function') {
           const state = popquiz.getOrCreatePopquizState(roomname, room.activityPayload, data.id);
+          state.started = true;
+        }
+      }
+      if (data.activity === 'raffle') {
+        const raffle = require('./hosted/activities/raffle');
+        if (raffle && typeof raffle.getOrCreateRaffleState === 'function') {
+          const state = raffle.getOrCreateRaffleState(roomname, room.activityPayload, data.id);
           state.started = true;
         }
       }

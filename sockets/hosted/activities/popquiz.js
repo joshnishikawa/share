@@ -1,5 +1,5 @@
 /**
- * sockets/multiplayer/activities/popquiz.js — Pop Quiz activity server socket handlers
+ * sockets/hosted/activities/popquiz.js — Pop Quiz hosted activity server socket handlers
  */
 const defaultQuestions = [
   ['apples', 'bananas', 'pears'],
@@ -74,7 +74,6 @@ const popquizEvents = (io, socket, touchRoom) => {
 
     socket.join(data.roomname);
     socket.data.popquizRoomname = data.roomname;
-
 
     const state = getOrCreatePopquizState(data.roomname, data.questions, data.hostId || (data.isHost ? data.playerId : null));
     state.readySockets.add(socket.id);
