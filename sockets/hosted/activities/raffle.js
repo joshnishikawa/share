@@ -230,6 +230,7 @@ const raffleEvents = (io, socket, touchRoom) => {
     if (typeof touchRoom === 'function') touchRoom(data.roomname);
     const state = raffleStates.get(data.roomname);
     if (!state || state.stage !== 'numbers') return;
+    if (state.hostId && data.playerId === state.hostId) return;
 
     const chosenNumber = parseInt(data.number, 10);
     if (isNaN(chosenNumber) || chosenNumber < 1 || chosenNumber > state.values.length) return;
@@ -267,6 +268,7 @@ const raffleEvents = (io, socket, touchRoom) => {
     if (typeof touchRoom === 'function') touchRoom(data.roomname);
     const state = raffleStates.get(data.roomname);
     if (!state || state.stage !== 'emojis') return;
+    if (state.hostId && data.playerId === state.hostId) return;
 
     const emojiIdx = parseInt(data.emojiIndex, 10);
     if (isNaN(emojiIdx) || emojiIdx < 0 || emojiIdx >= state.emojis.length) return;

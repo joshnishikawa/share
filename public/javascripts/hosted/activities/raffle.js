@@ -19,6 +19,7 @@
   const playerTokensMap = {};
   const playerPositionsMap = {}; // playerId -> targetCardId (e.g. 'raffle-num-2', 'raffle-emoji-0', 'raffle-flip-0', or null for dock)
   let playersList = [];
+  let numberSelectionsMap = {}; // playerId -> number
   let claimedEmojiMap = {}; // emojiIndex -> playerId
 
   function sanitizeColor(color) {
@@ -96,8 +97,7 @@
 
     const uniquePlayers = Array.from(uniqueMap.values());
     const studentPlayers = uniquePlayers.filter((p) => p.id !== roomHostId);
-    // Show student pawns if multiple exist, or show all pawns if testing alone
-    const activePlayers = studentPlayers.length > 0 ? studentPlayers : uniquePlayers;
+    const activePlayers = studentPlayers;
 
     const $pawnLayer = $('#raffle-pawn-layer');
     if (!$pawnLayer.length) return;
@@ -221,6 +221,25 @@
       $card.append($numText);
       $container.append($card);
     }
+
+    updateNumberCardsUI();
+  }
+
+  function updateNumberCardsUI() {
+    const selectedNums = new Set();
+    Object.keys(numberSelectionsMap).forEach((pId) => {
+      const n = numberSelectionsMap[pId];
+      if (n) selectedNums.add(n);
+    });
+
+    $('.raffle-number-card').each(function() {
+      const num = $(this).data('number');
+      if (selectedNums.has(num)) {
+        $(this).addClass('card-muted');
+      } else {
+        $(this).removeClass('card-muted');
+      }
+    });
   }
 
   function renderEmojisGrid(emojis) {
@@ -252,13 +271,9 @@
       const claimingPlayerId = claimedEmojiMap[idx];
 
       if (claimingPlayerId) {
-        if (currentPlayer && claimingPlayerId === currentPlayer.id) {
-          $(this).addClass('selected-by-me').removeClass('claimed-by-other');
-        } else {
-          $(this).addClass('claimed-by-other').removeClass('selected-by-me');
-        }
+        $(this).addClass('card-muted').removeClass('locked');
       } else {
-        $(this).removeClass('selected-by-me claimed-by-other');
+        $(this).removeClass('card-muted');
         if (mySelectedEmojiIndex !== null) {
           $(this).addClass('locked');
         } else {
@@ -287,11 +302,10 @@
       const $front = $('<div>', { class: 'raffle-flip-front' });
       $front.append($('<div>', { class: 'raffle-card-emoji', text: emoji }));
 
-      // Back face: Revealed Value / Prize
+      // Back face: Revealed Value / Prize only (no emoji)
       const $back = $('<div>', {
         class: `raffle-flip-back ${claimingPlayerId ? 'has-winner' : ''}`,
       });
-      $back.append($('<div>', { class: 'raffle-revealed-emoji', text: emoji }));
       $back.append($('<div>', { class: 'raffle-revealed-value', text: prizeValue }));
 
       $inner.append($front, $back);
@@ -334,10 +348,12 @@
       $('#raffle-numbers-screen').removeClass('d-none');
 
       if (isHost) {
+        $('#raffle-arena').addClass('host-view');
         $('#raffle-top-host-actions').removeClass('d-none');
         $('#raffle-set-btn').removeClass('d-none');
         $('#raffle-go-btn, #raffle-print-btn').addClass('d-none');
       } else {
+        $('#raffle-arena').removeClass('host-view');
         $('#raffle-top-host-actions').addClass('d-none');
       }
     } else if (stage === 'emojis') {
@@ -346,10 +362,12 @@
       $('#raffle-emojis-screen').removeClass('d-none');
 
       if (isHost) {
+        $('#raffle-arena').addClass('host-view');
         $('#raffle-top-host-actions').removeClass('d-none');
         $('#raffle-go-btn').removeClass('d-none');
         $('#raffle-set-btn, #raffle-print-btn').addClass('d-none');
       } else {
+        $('#raffle-arena').removeClass('host-view');
         $('#raffle-top-host-actions').addClass('d-none');
       }
     } else if (stage === 'revealed') {
@@ -358,10 +376,12 @@
       $('#raffle-reveal-screen').removeClass('d-none');
 
       if (isHost) {
+        $('#raffle-arena').addClass('host-view');
         $('#raffle-top-host-actions').removeClass('d-none');
         $('#raffle-print-btn').removeClass('d-none');
         $('#raffle-set-btn, #raffle-go-btn').addClass('d-none');
       } else {
+        $('#raffle-arena').removeClass('host-view');
         $('#raffle-top-host-actions').addClass('d-none');
       }
     }
@@ -398,9 +418,11 @@
     });
 
     if (isHost) {
+      $('#raffle-arena').addClass('host-view');
       $('#raffle-host-badge').removeClass('d-none');
       $('#raffle-top-host-actions').removeClass('d-none');
     } else {
+      $('#raffle-arena').removeClass('host-view');
       $('#raffle-host-badge').addClass('d-none');
       $('#raffle-top-host-actions').addClass('d-none');
     }
@@ -438,21 +460,24 @@
       claimedEmojiMap = data.claimedEmojis || {};
 
       if (isHost) {
+        $('#raffle-arena').addClass('host-view');
         $('#raffle-host-badge').removeClass('d-none');
         $('#raffle-top-host-actions').removeClass('d-none');
       } else {
+        $('#raffle-arena').removeClass('host-view');
         $('#raffle-host-badge').addClass('d-none');
         $('#raffle-top-host-actions').addClass('d-none');
       }
 
       if (data.stage === 'numbers') {
-        renderNumbersGrid(totalItemsCount);
         if (data.numberSelections) {
+          numberSelectionsMap = data.numberSelections;
           Object.keys(data.numberSelections).forEach((pId) => {
             const num = data.numberSelections[pId];
             playerPositionsMap[pId] = num ? `raffle-num-${num}` : null;
           });
         }
+        renderNumbersGrid(totalItemsCount);
       } else if (data.stage === 'emojis') {
         renderEmojisGrid(roomEmojis);
         if (data.claimedEmojis) {
@@ -460,6 +485,7 @@
             const pId = data.claimedEmojis[idx];
             playerPositionsMap[pId] = `raffle-emoji-${idx}`;
           });
+          updateEmojiCardsUI();
         }
       } else if (data.stage === 'revealed' && data.values) {
         roomValues = data.values;
@@ -478,14 +504,14 @@
 
     currentSocket.on('raffle/numberSelected', function(data) {
       if (!data) return;
+      numberSelectionsMap[data.playerId] = data.number;
       playerPositionsMap[data.playerId] = data.number ? `raffle-num-${data.number}` : null;
 
-      $('.raffle-number-card').removeClass('selected-by-me');
       if (currentPlayer && data.playerId === currentPlayer.id) {
         mySelectedNumber = data.number;
-        $(`#raffle-num-${data.number}`).addClass('selected-by-me');
       }
 
+      updateNumberCardsUI();
       updatePawnPositions();
     });
 
@@ -558,7 +584,7 @@
     // DOM Handlers
     // 1. Select Number (Phase 1)
     $(document).off('click.raffle', '.raffle-number-card').on('click.raffle', '.raffle-number-card', function() {
-      if (currentStage !== 'numbers') return;
+      if (isHost || currentStage !== 'numbers') return;
       const num = $(this).data('number');
       mySelectedNumber = num;
 
@@ -580,7 +606,7 @@
 
     // 3. Select Emoji (Phase 2)
     $(document).off('click.raffle', '.raffle-emoji-card').on('click.raffle', '.raffle-emoji-card', function() {
-      if (currentStage !== 'emojis') return;
+      if (isHost || currentStage !== 'emojis') return;
       if (mySelectedEmojiIndex !== null) return;
 
       const idx = $(this).data('index');
