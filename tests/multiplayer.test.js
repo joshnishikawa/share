@@ -37,31 +37,31 @@ describe('Multiplayer Router', () => {
   test('GET /multiplayer/race should render race index', async () => {
     const response = await request(app).get('/multiplayer/race');
     expect(response.status).toBe(200);
-    expect(app.render).toHaveBeenCalledWith('activities/multiplayer/race/index', expect.any(Object), expect.any(Function));
+    expect(app.render).toHaveBeenCalledWith('lobby/multiplayer/race/index', expect.any(Object), expect.any(Function));
   });
 
   test('GET /multiplayer/choose should render choose index', async () => {
     const response = await request(app).get('/multiplayer/choose');
     expect(response.status).toBe(200);
-    expect(app.render).toHaveBeenCalledWith('activities/multiplayer/choose/index', expect.any(Object), expect.any(Function));
+    expect(app.render).toHaveBeenCalledWith('lobby/multiplayer/choose/index', expect.any(Object), expect.any(Function));
   });
 
   test('GET /multiplayer/match should render match index', async () => {
     const response = await request(app).get('/multiplayer/match');
     expect(response.status).toBe(200);
-    expect(app.render).toHaveBeenCalledWith('activities/multiplayer/match/index', expect.any(Object), expect.any(Function));
+    expect(app.render).toHaveBeenCalledWith('lobby/multiplayer/match/index', expect.any(Object), expect.any(Function));
   });
 
   test('GET /multiplayer/popquiz should render popquiz index', async () => {
     const response = await request(app).get('/multiplayer/popquiz');
     expect(response.status).toBe(200);
-    expect(app.render).toHaveBeenCalledWith('activities/hosted/popquiz/index', expect.any(Object), expect.any(Function));
+    expect(app.render).toHaveBeenCalledWith('lobby/hosted/popquiz/index', expect.any(Object), expect.any(Function));
   });
 
   test('GET /multiplayer/raffle should render raffle index', async () => {
     const response = await request(app).get('/multiplayer/raffle');
     expect(response.status).toBe(200);
-    expect(app.render).toHaveBeenCalledWith('activities/hosted/raffle/index', expect.any(Object), expect.any(Function));
+    expect(app.render).toHaveBeenCalledWith('lobby/hosted/raffle/index', expect.any(Object), expect.any(Function));
   });
 
   test('should handle render errors by returning 500 and error view', async () => {
@@ -100,13 +100,13 @@ describe('Hosted Activities Router', () => {
   test('GET /hosted/popquiz should render hosted popquiz index', async () => {
     const response = await request(app).get('/hosted/popquiz');
     expect(response.status).toBe(200);
-    expect(app.render).toHaveBeenCalledWith('activities/hosted/popquiz/index', expect.any(Object), expect.any(Function));
+    expect(app.render).toHaveBeenCalledWith('lobby/hosted/popquiz/index', expect.any(Object), expect.any(Function));
   });
 
   test('GET /hosted/raffle should render hosted raffle index', async () => {
     const response = await request(app).get('/hosted/raffle');
     expect(response.status).toBe(200);
-    expect(app.render).toHaveBeenCalledWith('activities/hosted/raffle/index', expect.any(Object), expect.any(Function));
+    expect(app.render).toHaveBeenCalledWith('lobby/hosted/raffle/index', expect.any(Object), expect.any(Function));
   });
 
   test('should handle render errors by returning 500 and error view', async () => {

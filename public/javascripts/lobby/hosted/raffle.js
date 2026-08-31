@@ -1,5 +1,5 @@
 /**
- * hosted/activities/raffle.js — Raffle hosted activity (client)
+ * lobby/hosted/raffle.js — Raffle hosted activity (client)
  */
 
 (function() {
@@ -54,6 +54,17 @@
     const safeColor = sanitizeColor(color);
     return (
       '<svg class="img-fluid raffle-token-pawn" width="32" height="64" viewBox="0 0 64 128" xmlns="http://www.w3.org/2000/svg">' +
+      '<path transform="matrix(0.78482373,0,0,0.3410327,-40.6,58)" d="m 54.796244,189.05536 c -12.062025,-20.89204 13.56978,-65.28763 37.693831,-65.28763 24.124055,0 49.755855,44.39559 37.693825,65.28763 -12.06202,20.89204 -63.325631,20.89204 -75.387656,0 z" fill="' + safeColor + '" />' +
+      '<path transform="matrix(0.45050681,0,0,0.62867557,3.2,35)" d="m 105,121.60049 c -11.851854,8.65104 -69.62828,8.77896 -81.518324,0.1805 C 11.591632,113.18252 -6.3839294,58.273407 -1.8805296,44.308232 2.6228701,30.343057 49.289789,-3.7205685 63.963086,-3.7530573 78.636384,-3.785546 125.45369,30.071092 130.01888,44.016188 134.58408,57.961284 116.85185,112.94946 105,121.60049 Z" fill="' + safeColor + '" />' +
+      '<circle cx="32" cy="22" r="22" fill="' + safeColor + '" />' +
+      '</svg>'
+    );
+  }
+
+  function renderHeaderPawn(color) {
+    const safeColor = sanitizeColor(color || (currentPlayer && currentPlayer.color) || '#3b82f6');
+    $('#raffle-player-pawn').html(
+      '<svg width="18" height="32" viewBox="0 0 64 128" xmlns="http://www.w3.org/2000/svg">' +
       '<path transform="matrix(0.78482373,0,0,0.3410327,-40.6,58)" d="m 54.796244,189.05536 c -12.062025,-20.89204 13.56978,-65.28763 37.693831,-65.28763 24.124055,0 49.755855,44.39559 37.693825,65.28763 -12.06202,20.89204 -63.325631,20.89204 -75.387656,0 z" fill="' + safeColor + '" />' +
       '<path transform="matrix(0.45050681,0,0,0.62867557,3.2,35)" d="m 105,121.60049 c -11.851854,8.65104 -69.62828,8.77896 -81.518324,0.1805 C 11.591632,113.18252 -6.3839294,58.273407 -1.8805296,44.308232 2.6228701,30.343057 49.289789,-3.7205685 63.963086,-3.7530573 78.636384,-3.785546 125.45369,30.071092 130.01888,44.016188 134.58408,57.961284 116.85185,112.94946 105,121.60049 Z" fill="' + safeColor + '" />' +
       '<circle cx="32" cy="22" r="22" fill="' + safeColor + '" />' +
@@ -343,7 +354,6 @@
     $('.raffle-screen').addClass('d-none');
 
     if (stage === 'numbers') {
-      $('#raffle-stage-badge').removeClass('bg-warning bg-success').addClass('bg-primary').text('Phase 1: Numbers');
       $('#raffle-status').text(isHost ? 'Guests are choosing numbers. Tap "Set" when ready.' : 'Select a number card!');
       $('#raffle-numbers-screen').removeClass('d-none');
 
@@ -357,7 +367,6 @@
         $('#raffle-top-host-actions').addClass('d-none');
       }
     } else if (stage === 'emojis') {
-      $('#raffle-stage-badge').removeClass('bg-primary bg-success').addClass('bg-warning text-dark').text('Phase 2: Emojis');
       $('#raffle-status').text(isHost ? 'Guests are picking emojis. Tap "GO!" to reveal prizes.' : (mySelectedEmojiIndex !== null ? 'Emoji selected! Waiting for reveal...' : 'Pick an emoji! (One per guest)'));
       $('#raffle-emojis-screen').removeClass('d-none');
 
@@ -371,7 +380,6 @@
         $('#raffle-top-host-actions').addClass('d-none');
       }
     } else if (stage === 'revealed') {
-      $('#raffle-stage-badge').removeClass('bg-primary bg-warning text-dark').addClass('bg-success').text('Phase 3: Results');
       $('#raffle-status').text('🎉 Prizes Revealed!');
       $('#raffle-reveal-screen').removeClass('d-none');
 
@@ -408,6 +416,9 @@
     claimedEmojiMap = {};
     playersList = (currentRoom && Array.isArray(currentRoom.players)) ? currentRoom.players : [];
 
+    const roomName = (currentRoom && currentRoom.roomname) || (currentPlayer && currentPlayer.roomname) || '';
+    $('#raffle-room-name').text(roomName);
+
     // Clear pawn maps
     Object.keys(playerTokensMap).forEach((id) => {
       playerTokensMap[id].remove();
@@ -421,11 +432,22 @@
       $('#raffle-arena').addClass('host-view');
       $('#raffle-host-badge').removeClass('d-none');
       $('#raffle-top-host-actions').removeClass('d-none');
+      $('#raffle-player-pawn').addClass('d-none');
     } else {
       $('#raffle-arena').removeClass('host-view');
       $('#raffle-host-badge').addClass('d-none');
       $('#raffle-top-host-actions').addClass('d-none');
+      $('#raffle-player-pawn').removeClass('d-none');
+      renderHeaderPawn((currentPlayer && currentPlayer.color) || '#3b82f6');
     }
+
+    $(document).off('click.raffle', '#raffle-exit-btn').on('click.raffle', '#raffle-exit-btn', function() {
+      if (currentSocket && currentPlayer) {
+        currentSocket.emit('leave', currentPlayer);
+      } else {
+        $('#activityExit').click();
+      }
+    });
 
     // Parse options.values
     let valuesArray = null;
@@ -443,6 +465,16 @@
     });
 
     // Socket Event Handlers
+    currentSocket.on('setColor', function(data) {
+      if (!data) return;
+      if (currentPlayer && (data.number === currentPlayer.number || data.id === currentPlayer.id)) {
+        currentPlayer.color = data.color;
+        if (!isHost) {
+          renderHeaderPawn(data.color);
+        }
+      }
+    });
+
     currentSocket.on('raffle/sync', function(data) {
       if (!data) return;
       totalItemsCount = data.totalCount || 0;
@@ -463,10 +495,13 @@
         $('#raffle-arena').addClass('host-view');
         $('#raffle-host-badge').removeClass('d-none');
         $('#raffle-top-host-actions').removeClass('d-none');
+        $('#raffle-player-pawn').addClass('d-none');
       } else {
         $('#raffle-arena').removeClass('host-view');
         $('#raffle-host-badge').addClass('d-none');
         $('#raffle-top-host-actions').addClass('d-none');
+        $('#raffle-player-pawn').removeClass('d-none');
+        renderHeaderPawn((currentPlayer && currentPlayer.color) || '#3b82f6');
       }
 
       if (data.stage === 'numbers') {
@@ -639,7 +674,9 @@
   function teardown(socket) {
     $(window).off('resize.raffle');
     $(document).off('.raffle');
+    $('#raffle-player-pawn').empty().addClass('d-none');
     if (socket) {
+      socket.off('setColor');
       socket.off('raffle/sync');
       socket.off('raffle/numberSelected');
       socket.off('raffle/stageChanged');

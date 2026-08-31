@@ -202,7 +202,6 @@ const multiplayer = (io, options = {}) => {
       if (now - lastActive >= INACTIVITY_TIMEOUT) {
         io.to(roomname).emit("roomExpired", {
           roomname,
-          message: "This group was closed due to 10 minutes of inactivity.",
         });
         clearActivityRoomStates(roomname);
         delete publicRooms[roomname];
@@ -218,7 +217,6 @@ const multiplayer = (io, options = {}) => {
       if (now - lastActive >= INACTIVITY_TIMEOUT) {
         io.to(roomname).emit("roomExpired", {
           roomname,
-          message: "This group was closed due to 10 minutes of inactivity.",
         });
         clearActivityRoomStates(roomname);
         delete privateRooms[roomname];

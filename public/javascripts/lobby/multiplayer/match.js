@@ -1,5 +1,5 @@
 /**
- * multiplayer/activities/match.js — "Match" multiplayer activity (client)
+ * lobby/multiplayer/match.js — "Match" multiplayer activity (client)
  * ────────────────────────────────────────────────────────────────────────
  * STUB: Only emits a ready signal. The matching game logic is NOT yet
  * implemented on the client. Server-side counterpart is also a 7-line stub.

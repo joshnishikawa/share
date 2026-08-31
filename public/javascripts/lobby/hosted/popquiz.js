@@ -1,5 +1,5 @@
 /**
- * hosted/activities/popquiz.js — Pop Quiz hosted activity (client)
+ * lobby/hosted/popquiz.js — Pop Quiz hosted activity (client)
  * ────────────────────────────────────────────────────────────────────────────
  * Features:
  *   1. Fixed answer dimensions — pawns sit ON answers, not inside them.

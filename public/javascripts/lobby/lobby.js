@@ -1,5 +1,5 @@
 /**
- * public/javascripts/multiplayer/lobby.js — Multiplayer lobby, player management, and activity coordination
+ * public/javascripts/lobby/lobby.js — Multiplayer lobby, player management, and activity coordination
  */
 
 // CONFIG & VARIABLES ///////////////////////////////////////////////////////////
@@ -922,8 +922,6 @@ $(function(){
     $("#foundplayers").empty();
     $("#roomSearch").val('');
     $("#join").prop('disabled', true);
-
-    $("#info").html(data && data.message ? data.message : "Group closed due to inactivity.").show();
 
     localStorage.setItem('player', JSON.stringify(player));
     socket.emit('join', player);

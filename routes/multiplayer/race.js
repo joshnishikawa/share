@@ -3,7 +3,7 @@ const router = express.Router();
 
 router.get('/', (req, res) => {
   try {
-    res.render('activities/multiplayer/race/index');
+    res.render('lobby/multiplayer/race/index');
   } catch (err) {
     res.status(500).render('error');
     console.error(err);

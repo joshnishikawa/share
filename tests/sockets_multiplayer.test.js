@@ -1027,7 +1027,6 @@ describe('Multiplayer Sockets Integration', () => {
 
         customClient1.on('roomExpired', (data) => {
           expect(data.roomname).toBe(roomname);
-          expect(data.message).toContain('inactivity');
 
           // Verify the room no longer exists in search
           customClient1.emit('roomSearch', roomname);

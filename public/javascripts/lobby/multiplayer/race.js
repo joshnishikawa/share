@@ -1,5 +1,5 @@
 /**
- * multiplayer/activities/race.js — "Race" multiplayer activity (client)
+ * lobby/multiplayer/race.js — "Race" multiplayer activity (client)
  * ────────────────────────────────────────────────────────────────────────
  * STUB: Only emits a ready signal. The race game logic is NOT yet
  * implemented on the client. Server-side counterpart is also a 7-line stub.

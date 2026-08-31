@@ -3,7 +3,7 @@ const router = express.Router();
 
 router.get('/', (req, res) => {
   try {
-    res.render('activities/hosted/popquiz/index');
+    res.render('lobby/hosted/popquiz/index');
   } catch (err) {
     res.status(500).render('error');
     console.error(err);

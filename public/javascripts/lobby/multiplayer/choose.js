@@ -1,5 +1,5 @@
 /**
- * multiplayer/activities/choose.js — "Choose" multiplayer activity (client)
+ * lobby/multiplayer/choose.js — "Choose" multiplayer activity (client)
  * ──────────────────────────────────────────────────────────────────────
  * Flow:
  *   1. mount() is called by the multiplayer framework with {socket, player, room}.
