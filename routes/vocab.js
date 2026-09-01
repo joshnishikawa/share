@@ -1,10 +1,19 @@
 const express = require('express');
 const router = express.Router();
+const rateLimit = require('express-rate-limit');
 const vocabulary = require('../public/vocabulary.js');
 const db = require('../config/db.js');
 
+// Rate limiter for link creation (30 requests/minute per IP)
+const linkCreateLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests, please try again later' }
+});
 
-router.post('/:activity', async(req, res)=>{
+router.post('/:activity', linkCreateLimiter, async(req, res)=>{
   try{
     if ( !valid(req.params.activity, req.body) ) throw '404';
     let activity = req.params.activity;

@@ -38,6 +38,57 @@ const nouns = [
   "Ant", "Mantis", "Caterpillar", "Butterfly", "Dragonfly", "Grasshopper", "Locust", "Cicada", "Ladybug"
 ];
 
+const rooms = [
+  "ace", "act", "add", "age", "air", "all", "and", "ant", "any", "are", "arm",
+  "art", "ask", "bad", "bag", "bar", "bat", "bed", "beg", "bet", "big", "bit",
+  "box", "boy", "bug", "but", "buy", "cat", "can", "cap", "car", "cup", "cut",
+  "day", "dog", "dry", "due", "eat", "end", "far", "fat", "fly", "for", "get",
+  "god", "gun", "hat", "hen", "him", "hit", "hot", "how", "ice", "ink", "its",
+  "jam", "job", "key", "law", "leg", "let", "log", "low", "man", "map", "may",
+  "new", "not", "now", "old", "one", "our", "pen", "pet", "pig", "pot", "red",
+  "run", "sad", "see", "set", "sit", "sun", "top", "try", "use", "war", "was",
+  "wet", "win", "yes", "you", "able", "acid", "aged", "also", "area", "army",
+  "away", "back", "ball", "band", "bank", "base", "bath", "bear", "beat", "been",
+  "bell", "best", "bill", "bird", "blow", "blue", "boat", "body", "bomb", "book",
+  "born", "both", "bowl", "bulk", "burn", "bush", "busy", "call", "calm", "came",
+  "camp", "card", "care", "case", "cash", "cast", "cell", "chat", "city", "club",
+  "coal", "coat", "cold", "come", "cool", "cope", "cost", "crew", "crop", "dark",
+  "data", "date", "deal", "dear", "deck", "deep", "deny", "desk", "diet", "disk",
+  "does", "door", "down", "draw", "drop", "dual", "dust", "duty", "earn", "east",
+  "easy", "edge", "else", "even", "ever", "exit", "face", "fact", "fair", "fall",
+  "farm", "fast", "fear", "feed", "feel", "feet", "felt", "file", "fill", "film",
+  "find", "fire", "firm", "fish", "five", "flat", "flow", "food", "foot", "ford",
+  "form", "fort", "four", "free", "from", "fuel", "full", "fund", "gain", "game",
+  "gate", "gave", "gear", "gift", "girl", "give", "glad", "goal", "goes", "golf",
+  "gone", "good", "gray", "grew", "grow", "hair", "half", "hand", "hang", "hard",
+  "harm", "hate", "have", "head", "hear", "heat", "held", "help", "here", "hero",
+  "high", "hill", "hire", "hold", "hole", "holy", "home", "hope", "host", "hour",
+  "huge", "hunt", "hurt", "idea", "inch", "into", "iron", "item", "jack", "join",
+  "jump", "just", "keen", "keep", "kind", "king", "knee", "knew", "know",
+  "lack", "lady", "lake", "land", "lane", "last", "late", "lead", "left",
+  "less", "life", "lift", "like", "line", "link", "list", "live", "load", "loan",
+  "lock", "long", "look", "lord", "lose", "loss", "lost", "love", "luck", "made",
+  "mail", "main", "make", "many", "mark", "mass", "meal", "mean", "meet", "mile",
+  "milk", "mind", "mine", "miss", "mode", "move", "much", "must", "name", "navy",
+  "near", "neck", "need", "news", "next", "nice", "note", "okay", "once", "only",
+  "open", "part", "pass", "past", "path", "peak", "pick", "plan", "play", "plus",
+  "poor", "port", "post", "pull", "push", "race", "rain", "rank", "rate", "read",
+  "real", "rear", "rest", "rice", "rich", "ride", "ring", "rise", "risk", "road",
+  "rock", "role", "room", "root", "rope", "rose", "rule", "rush", "safe", "said",
+  "same", "sand", "save", "seat", "seed", "seek", "seem", "seen", "sell", "send",
+  "sent", "ship", "shop", "show", "shut", "sick", "side", "sign", "site", "size",
+  "slip", "slow", "snow", "soft", "soil", "sold", "sole", "some", "song", "sort",
+  "soul", "soup", "spot", "star", "stay", "step", "stop", "such", "suit", "sure",
+  "take", "talk", "tall", "tank", "tape", "task", "team", "tell", "tend", "term",
+  "test", "than", "that", "them", "then", "they", "thin", "this", "thus", "time",
+  "tiny", "told", "toll", "tone", "tool", "tour", "town", "tree", "trip", "true",
+  "tune", "turn", "type", "unit", "upon", "used", "user", "vary", "vast", "very",
+  "vice", "view", "vote", "wage", "wait", "walk", "wall", "want", "warm", "warn",
+  "wash", "wave", "wear", "week", "well", "went", "were", "west", "what", "when",
+  "whom", "wide", "wife", "wild", "will", "wind", "wine", "wing", "wire", "wise",
+  "wish", "wood", "word", "work", "yard", "yeah", "year", "your", "zero", "zone"
+];
+
 
 const registerMultiplayerActivityEvents = require("./multiplayer/activities");
 const registerHostedActivityEvents = require("./hosted/activities");
@@ -61,26 +112,28 @@ function sanitizePlayerData(data) {
     if (isStr(data.roomname, 60)) clean.roomname = data.roomname;
     else return null;
   }
-  if (data.roomtype !== undefined && data.roomtype !== null) {
-    if (['public', 'private'].includes(data.roomtype)) clean.roomtype = data.roomtype;
-    else return null;
+  if (data.name !== undefined && data.name !== null) {
+    if (isStr(data.name, 40)) clean.name = data.name;
+    else clean.name = 'Anonymous';
   }
   if (data.color !== undefined && data.color !== null) {
-    if (isStr(data.color, 20) && /^#[0-9a-fA-F]{3,8}$/.test(data.color)) clean.color = data.color;
-    else clean.color = '#0d6efd';
+    if (typeof data.color === 'string' && /^#[0-9a-fA-F]{3,8}$/.test(data.color)) clean.color = data.color;
+  }
+  if (data.number !== undefined && data.number !== null) {
+    if (typeof data.number === 'number' && Number.isInteger(data.number) && data.number >= 1 && data.number <= 100) clean.number = data.number;
   }
   if (data.activity !== undefined && data.activity !== null) {
-    if (isStr(data.activity, 30)) clean.activity = data.activity;
-    else clean.activity = null;
+    if (isStr(data.activity, 60) && validActivityIds.has(data.activity)) clean.activity = data.activity;
   }
-  if (data.number !== undefined && data.number !== null) clean.number = data.number;
+  if (data.avatar !== undefined && data.avatar !== null) {
+    if (isStr(data.avatar, 200)) clean.avatar = data.avatar;
+  }
   return clean;
 }
 
 
 
 const multiplayer = (io, options = {}) => {
-  const rooms = require("../rooms.json");
   let publicRooms = {};
   let privateRooms = {};
   const INACTIVITY_TIMEOUT = (options && typeof options.inactivityTimeout === 'number') ? options.inactivityTimeout : 10 * 60 * 1000;

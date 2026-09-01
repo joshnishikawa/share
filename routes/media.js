@@ -4,6 +4,24 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 
+// Helper to ensure target directory remains within the public folder
+function getSafePublicPath(subpath) {
+  if (!subpath || typeof subpath !== 'string') return null;
+  const baseDir = path.resolve(__dirname, '../public');
+  const resolvedPath = path.resolve(baseDir, subpath);
+  if (!resolvedPath.startsWith(baseDir)) {
+    return null;
+  }
+  return resolvedPath;
+}
+
+// Authentication guard for modifying media metadata
+function requireAuth(req, res, next) {
+  if (req.isAuthenticated && req.isAuthenticated() && req.user) {
+    return next();
+  }
+  return res.status(401).send('Unauthorized');
+}
 
 router.get('/', (req, res)=>{
   res.render('labs/media');
@@ -34,15 +52,17 @@ router.get('/files', (req, res)=>{
 });
 
 
-router.post('/addTags', (req, res)=>{
+router.post('/addTags', requireAuth, (req, res)=>{
   try{
     let tags = JSON.parse( fs.readFileSync( path.join(__dirname, '../public/image/svg/_tags.json') ) );
-    let selectedTags = req.body.selectedTags;
-    let selectedFiles = req.body.selectedFiles;
+    let selectedTags = Array.isArray(req.body.selectedTags) ? req.body.selectedTags : [];
+    let selectedFiles = Array.isArray(req.body.selectedFiles) ? req.body.selectedFiles : [];
 
     for (let t of selectedTags){
+      if (typeof t !== 'string') continue;
       if ( !tags[t] ) tags[t] = [];
       for (let f of selectedFiles){
+        if (typeof f !== 'string') continue;
         if ( !tags[t] ) tags[t] = [];
         if ( !tags[t].includes(f) ) tags[t].push(f);
       }
@@ -59,14 +79,16 @@ router.post('/addTags', (req, res)=>{
 });
 
 
-router.post('/removeTags', (req, res)=>{
+router.post('/removeTags', requireAuth, (req, res)=>{
   try{
     let tags = JSON.parse( fs.readFileSync( path.join(__dirname, '../public/image/svg/_tags.json') ) );
-    let selectedTags = req.body.selectedTags;
-    let selectedFiles = req.body.selectedFiles;
+    let selectedTags = Array.isArray(req.body.selectedTags) ? req.body.selectedTags : [];
+    let selectedFiles = Array.isArray(req.body.selectedFiles) ? req.body.selectedFiles : [];
 
     for (let t of selectedTags){
+      if (typeof t !== 'string') continue;
       for (let f of selectedFiles){
+        if (typeof f !== 'string') continue;
         if ( tags[t].includes(f) ) tags[t].splice( tags[t].indexOf(f), 1 );
       }
     }
@@ -84,15 +106,19 @@ router.post('/removeTags', (req, res)=>{
 
 router.get('/findMissing', (req, res)=>{
   try{
-    var needleList = getNeedleList(req.query.needleType, req.query.needle);
     var haystack = req.query.haystack;
+    const safeHaystack = getSafePublicPath(haystack);
+    if (!safeHaystack || !fs.existsSync(safeHaystack) || !fs.statSync(safeHaystack).isDirectory()) {
+      return res.status(400).send('Invalid haystack directory');
+    }
+
+    var needleList = getNeedleList(req.query.needleType, req.query.needle);
 
     let haystackList = {};
-    let files = fs.readdirSync( path.join(__dirname, `../public/${haystack}`) );
+    let files = fs.readdirSync( safeHaystack );
     files.filter(v=> !["README.md", ".git", "_tags.json", "_synonyms.json"].includes(v) );
     for (let i = 0; i < files.length; i++){ 
-      let name = files[i].replace(`public/${haystack}/`, '');
-      name = name.replace(/\.[^/.]+$/, "");
+      let name = files[i].replace(/\.[^/.]+$/, "");
       let path = `/${haystack}/${files[i]}`;
       haystackList[name] = path;
     }
@@ -106,7 +132,7 @@ router.get('/findMissing', (req, res)=>{
     }
     res.send({found, missing});
   }
-  catch(err){console.error(err);}
+  catch(err){console.error(err); res.status(500).send('Error searching media');}
 });
 
 
@@ -114,11 +140,14 @@ function getNeedleList(needleType, needle){
   let needleList = [];
 
   switch (needleType){
-    case "dir":
-
-      var files = fs.readdirSync( path.join(__dirname, `../public/${needle}`) );
+    case "dir": {
+      const safeNeedle = getSafePublicPath(needle);
+      if (!safeNeedle || !fs.existsSync(safeNeedle) || !fs.statSync(safeNeedle).isDirectory()) {
+        return [];
+      }
+      var files = fs.readdirSync( safeNeedle );
       for (let i = 0; i < files.length; i++){
-        let str = files[i].replace(`public/${needle}/`, '');
+        let str = files[i];
 
         // remove file extension
         str = str.replace(/\.[^/.]+$/, "");
@@ -131,9 +160,11 @@ function getNeedleList(needleType, needle){
         needleList.push( str );
       }
       break;
-
+    }
     case "list":
-      needleList = needle.split(/,|\n/).map(v=>v.trim());
+      if (typeof needle === 'string') {
+        needleList = needle.split(/,|\n/).map(v=>v.trim()).filter(Boolean);
+      }
       break;
   }
   return needleList;
@@ -144,7 +175,9 @@ function getNeedleList(needleType, needle){
 router.get('/findAudio', (req, res) => {
   try {
     let file = req.query.file;
-    if (!file) return res.send('');
+    if (!file || typeof file !== 'string' || file.includes('..') || file.includes('/') || file.includes('\\')) {
+      return res.send('');
+    }
 
     const dirs = ['words', 'sounds', 'letters', 'phrases', 'sentences', 'uploads'];
     const extensions = ['.mp3', '.wav', '.m4a', ''];

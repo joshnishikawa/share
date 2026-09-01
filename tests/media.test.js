@@ -14,6 +14,12 @@ let renderErrorForFirstCall = false;
 // Setup Express app
 const app = express();
 app.use(express.json()); // Needed for POST requests with JSON body
+app.use((req, res, next) => {
+  // Mock authentication for tests
+  req.isAuthenticated = () => true;
+  req.user = { id: 1, name: 'Test' };
+  next();
+});
 app.set('view engine', 'ejs');
 app.render = jest.fn((view, options, callback) => {
   if (renderErrorForFirstCall) {
@@ -46,10 +52,12 @@ describe('Media Router', () => {
     fs.readFileSync.mockReturnValue('{}'); // Default to empty JSON for tags
     fs.readdirSync.mockReturnValue([]);    // Default to empty directory
     fs.writeFileSync.mockReturnValue(undefined); // No error on write
-    fs.existsSync.mockReturnValue(false);  // Default to file not existing
+    fs.existsSync.mockReturnValue(true);  // Default to file existing
+    fs.statSync = jest.fn().mockReturnValue({ isDirectory: () => true });
 
-    // Reset path.join mock to its original implementation for easier debugging unless specifically mocked
+    // Reset path mock to actual implementations
     path.join.mockImplementation(jest.requireActual('path').join);
+    path.resolve.mockImplementation(jest.requireActual('path').resolve);
   });
 
   afterEach(() => {
@@ -246,6 +254,20 @@ describe('Media Router', () => {
       const response = await request(app).get('/findAudio?file=nonexistent');
       expect(response.status).toBe(200);
       expect(response.text).toBe('');
+    });
+
+    test('should reject path traversal in findAudio file query', async () => {
+      const response = await request(app).get('/findAudio?file=../../secret');
+      expect(response.status).toBe(200);
+      expect(response.text).toBe('');
+    });
+  });
+
+  describe('Security & Path Traversal Guards', () => {
+    test('should reject invalid or escaping haystack in findMissing', async () => {
+      const response = await request(app)
+        .get('/findMissing?needleType=list&needle=apple&haystack=../../../../etc');
+      expect(response.status).toBe(400);
     });
   });
 });
