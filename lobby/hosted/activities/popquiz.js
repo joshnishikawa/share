@@ -8,6 +8,13 @@ const defaultQuestions = [
 
 const popquizStates = new Map();
 
+function getTotalCount(state) {
+  const studentCount = Array.from(state.players.values()).filter((p) => p.id !== state.hostId).length;
+  const userCount = studentCount > 0 ? studentCount : state.players.size;
+  const itemCount = state.questions ? state.questions.length : 0;
+  return Math.max(1, itemCount, userCount);
+}
+
 function getOrCreatePopquizState(roomname, initialQuestions, hostId) {
   if (!popquizStates.has(roomname)) {
     const questions = Array.isArray(initialQuestions) && initialQuestions.length > 0
@@ -17,9 +24,11 @@ function getOrCreatePopquizState(roomname, initialQuestions, hostId) {
     popquizStates.set(roomname, {
       questions,
       currentQuestionIndex: 0,
+      stage: 'numbers', // 'numbers' | 'quiz' | 'gameover'
       hostId: hostId || null,
       scores: {},
-      selections: new Map(),
+      numberSelections: new Map(), // playerId -> number (1..totalCount)
+      selections: new Map(),        // playerId -> choiceIndex
       readySockets: new Set(),
       players: new Map(),
       graded: false,
@@ -27,9 +36,6 @@ function getOrCreatePopquizState(roomname, initialQuestions, hostId) {
     });
   } else {
     const state = popquizStates.get(roomname);
-    if (Array.isArray(initialQuestions) && initialQuestions.length > 0) {
-      state.questions = initialQuestions;
-    }
     if (hostId) {
       state.hostId = hostId;
     }
@@ -48,7 +54,33 @@ function clearPopquizState(roomname) {
   popquizStates.delete(roomname);
 }
 
+function serializePopquizState(state) {
+  const numberSelectionsObj = {};
+  state.numberSelections.forEach((num, pId) => {
+    numberSelectionsObj[pId] = num;
+  });
+
+  const totalCount = getTotalCount(state);
+  const currentChoices = state.questions[state.currentQuestionIndex] || [];
+
+  return {
+    stage: state.stage,
+    totalCount: totalCount,
+    questionIndex: state.currentQuestionIndex,
+    totalQuestions: state.questions.length,
+    choices: currentChoices,
+    hostId: state.hostId,
+    players: Array.from(state.players.values()),
+    numberSelections: numberSelectionsObj,
+    scores: state.scores,
+    started: state.started,
+    isGameOver: state.isGameOver || false,
+    gameOverData: state.gameOverData || null,
+  };
+}
+
 function emitRoundStart(io, roomname, state) {
+  state.stage = 'quiz';
   state.started = true;
   state.graded = false;
   state.lastRoundStart = Date.now();
@@ -75,7 +107,12 @@ const popquizEvents = (io, socket, touchRoom) => {
     socket.join(data.roomname);
     socket.data.popquizRoomname = data.roomname;
 
-    const state = getOrCreatePopquizState(data.roomname, data.questions, data.hostId || (data.isHost ? data.playerId : null));
+    const isHost = Boolean(data.isHost || (data.hostId && data.playerId === data.hostId));
+    const state = getOrCreatePopquizState(
+      data.roomname,
+      isHost ? data.questions : null,
+      data.hostId || (data.isHost ? data.playerId : null)
+    );
     state.readySockets.add(socket.id);
 
     if (data.playerId) {
@@ -105,58 +142,83 @@ const popquizEvents = (io, socket, touchRoom) => {
       });
     }
 
-    if (Array.isArray(data.questions) && data.questions.length > 0) {
-      state.questions = data.questions;
-    }
-
-    if (data.isHost) {
+    if (isHost && data.playerId) {
       state.hostId = data.playerId;
+      if (Array.isArray(data.questions) && data.questions.length > 0 && !state.started) {
+        state.questions = data.questions;
+      }
     }
 
-    const uniquePlayers = Array.from(state.players.values());
+    const serialized = serializePopquizState(state);
 
-    // Broadcast player synchronization to all clients in the room
+    // Broadcast synchronization to all clients in the room
+    io.to(data.roomname).emit('popquiz/sync', serialized);
     io.to(data.roomname).emit('popquiz/playersync', {
-      players: uniquePlayers,
+      players: serialized.players,
       scores: state.scores,
       hostId: state.hostId,
     });
 
-    if (data.isHost) {
-      // When the host connects with questions, ensure all players start on the host's question set
-      emitRoundStart(io, data.roomname, state);
+    if (state.isGameOver && state.gameOverData) {
+      socket.emit('popquiz/gameover', state.gameOverData);
+    } else if (state.stage === 'quiz' && state.started) {
+      const currentChoices = state.questions[state.currentQuestionIndex] || [];
+      socket.emit('popquiz/roundstart', {
+        questionIndex: state.currentQuestionIndex,
+        totalQuestions: state.questions.length,
+        choices: currentChoices,
+        scores: state.scores,
+        players: serialized.players,
+        hostId: state.hostId,
+      });
+
+      state.selections.forEach((choiceIndex, pId) => {
+        const playerObj = state.players.get(pId);
+        if (playerObj) {
+          socket.emit('popquiz/playerselected', {
+            playerId: pId,
+            playerNumber: playerObj.number,
+            color: playerObj.color,
+            choiceIndex: choiceIndex,
+          });
+        }
+      });
+    }
+  });
+
+  socket.on('popquiz/selectNumber', function(data) {
+    if (!data || !data.roomname || !data.playerId) return;
+    if (typeof touchRoom === 'function') touchRoom(data.roomname);
+    const state = popquizStates.get(data.roomname);
+    if (!state || state.stage !== 'numbers') return;
+    if (state.hostId && data.playerId === state.hostId) return;
+
+    const totalCount = getTotalCount(state);
+    const chosenNumber = parseInt(data.number, 10);
+    if (isNaN(chosenNumber) || chosenNumber < 1 || chosenNumber > totalCount) return;
+
+    state.numberSelections.set(data.playerId, chosenNumber);
+
+    io.to(data.roomname).emit('popquiz/numberSelected', {
+      playerId: data.playerId,
+      number: chosenNumber,
+    });
+  });
+
+  socket.on('popquiz/setNumbers', function(data) {
+    if (!data || !data.roomname) return;
+    if (typeof touchRoom === 'function') touchRoom(data.roomname);
+    const state = popquizStates.get(data.roomname);
+    if (!state || state.stage !== 'numbers') return;
+
+    if (state.hostId && data.id !== state.hostId) {
+      socket.emit('error', { message: 'Only the host can start the quiz.' });
       return;
     }
 
-    if (state.isGameOver && state.gameOverData) {
-      socket.emit('popquiz/gameover', state.gameOverData);
-    } else if (state.started) {
-      // Only emit directly to reconnecting socket if they didn't just receive the host's roundstart broadcast
-      const timeSinceRoundStart = Date.now() - (state.lastRoundStart || 0);
-      if (timeSinceRoundStart > 150) {
-        const currentChoices = state.questions[state.currentQuestionIndex] || [];
-        socket.emit('popquiz/roundstart', {
-          questionIndex: state.currentQuestionIndex,
-          totalQuestions: state.questions.length,
-          choices: currentChoices,
-          scores: state.scores,
-          players: uniquePlayers,
-          hostId: state.hostId,
-        });
-
-        state.selections.forEach((choiceIndex, pId) => {
-          const playerObj = state.players.get(pId);
-          if (playerObj) {
-            socket.emit('popquiz/playerselected', {
-              playerId: pId,
-              playerNumber: playerObj.number,
-              color: playerObj.color,
-              choiceIndex: choiceIndex,
-            });
-          }
-        });
-      }
-    }
+    state.stage = 'quiz';
+    state.started = true;
+    emitRoundStart(io, data.roomname, state);
   });
 
   socket.on('popquiz/updateQuestions', function(data) {
@@ -169,7 +231,7 @@ const popquizEvents = (io, socket, touchRoom) => {
 
     if (Array.isArray(data.questions) && data.questions.length > 0) {
       state.questions = data.questions;
-      if (state.started && !state.isGameOver) {
+      if (state.started && state.stage === 'quiz' && !state.isGameOver) {
         const currentChoices = state.questions[state.currentQuestionIndex] || [];
         io.to(data.roomname).emit('popquiz/roundstart', {
           questionIndex: state.currentQuestionIndex,
@@ -179,6 +241,8 @@ const popquizEvents = (io, socket, touchRoom) => {
           players: Array.from(state.players.values()),
           hostId: state.hostId,
         });
+      } else if (state.stage === 'numbers') {
+        io.to(data.roomname).emit('popquiz/sync', serializePopquizState(state));
       }
     }
   });
@@ -187,7 +251,7 @@ const popquizEvents = (io, socket, touchRoom) => {
     if (!data || !data.roomname) return;
     if (typeof touchRoom === 'function') touchRoom(data.roomname);
     const state = popquizStates.get(data.roomname);
-    if (!state || !state.started || state.graded || state.isGameOver) return;
+    if (!state || state.stage !== 'quiz' || state.graded || state.isGameOver) return;
 
     state.selections.set(data.playerId, data.choiceIndex);
 
@@ -203,7 +267,7 @@ const popquizEvents = (io, socket, touchRoom) => {
     if (!data || !data.roomname) return;
     if (typeof touchRoom === 'function') touchRoom(data.roomname);
     const state = popquizStates.get(data.roomname);
-    if (!state || !state.started || state.graded || state.isGameOver) return;
+    if (!state || state.stage !== 'quiz' || state.graded || state.isGameOver) return;
 
     if (state.hostId && data.id !== state.hostId) {
       socket.emit('error', { message: 'Only the host can grade answers.' });
@@ -244,6 +308,7 @@ const popquizEvents = (io, socket, touchRoom) => {
 
     const transitionTimer = setTimeout(() => {
       if (isGameOver) {
+        state.stage = 'gameover';
         state.isGameOver = true;
         const scoresArr = targetPlayers.map((p) => ({
           playerId: p.id,
@@ -279,5 +344,6 @@ const popquizEvents = (io, socket, touchRoom) => {
 
 popquizEvents.getOrCreatePopquizState = getOrCreatePopquizState;
 popquizEvents.clearPopquizState = clearPopquizState;
+popquizEvents.getTotalCount = getTotalCount;
 
 module.exports = popquizEvents;

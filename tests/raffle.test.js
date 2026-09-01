@@ -60,6 +60,30 @@ describe('Raffle Hosted Activity Socket Handlers', () => {
     }));
   });
 
+  test('calculates totalCount as max(userCount, itemCount)', () => {
+    // 2 prizes but 4 student players
+    socketHost.trigger('raffle/ready', {
+      roomname,
+      playerId: 'HostTeacher',
+      playerNumber: 1,
+      color: '#ff0000',
+      isHost: true,
+      values: ['Prize 1', 'Prize 2'],
+      roomPlayers: [
+        { id: 'HostTeacher', number: 1 },
+        { id: 'Student1', number: 2 },
+        { id: 'Student2', number: 3 },
+        { id: 'Student3', number: 4 },
+        { id: 'Student4', number: 5 },
+      ],
+    });
+
+    expect(ioMock.emit).toHaveBeenCalledWith('raffle/sync', expect.objectContaining({
+      stage: 'numbers',
+      totalCount: 4,
+    }));
+  });
+
   test('allows guests to select numbers in Phase 1', () => {
     socketHost.trigger('raffle/ready', {
       roomname,
@@ -212,4 +236,34 @@ describe('Raffle Hosted Activity Socket Handlers', () => {
       ]),
     }));
   });
+
+  test('rejoining guest with different values does not overwrite host values', () => {
+    // Host readies with host values
+    socketHost.trigger('raffle/ready', {
+      roomname,
+      playerId: 'HostTeacher',
+      playerNumber: 1,
+      isHost: true,
+      values: ['Host Prize A', 'Host Prize B', 'Host Prize C'],
+    });
+
+    // Guest readies with guest's local storage values
+    socketGuest1.trigger('raffle/ready', {
+      roomname,
+      playerId: 'GuestStudent',
+      playerNumber: 2,
+      isHost: false,
+      values: ['Rogue Prize X', 'Rogue Prize Y'],
+    });
+
+    // The state values must remain the host values
+    const state = raffleEvents.getOrCreateRaffleState(roomname);
+    expect(state.values).toEqual(['Host Prize A', 'Host Prize B', 'Host Prize C']);
+
+    // The broadcast sync must have totalCount 3
+    expect(ioMock.emit).toHaveBeenLastCalledWith('raffle/sync', expect.objectContaining({
+      totalCount: 3,
+    }));
+  });
 });
+

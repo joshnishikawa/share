@@ -46,6 +46,13 @@ function getRandomEmojis(count) {
 
 const raffleStates = new Map();
 
+function getTotalCount(state) {
+  const studentCount = Array.from(state.players.values()).filter((p) => p.id !== state.hostId).length;
+  const userCount = studentCount > 0 ? studentCount : state.players.size;
+  const itemCount = state.values ? state.values.length : 0;
+  return Math.max(1, itemCount, userCount);
+}
+
 function getOrCreateRaffleState(roomname, initialValues, hostId) {
   if (!raffleStates.has(roomname)) {
     let values = [];
@@ -74,14 +81,6 @@ function getOrCreateRaffleState(roomname, initialValues, hostId) {
     });
   } else {
     const state = raffleStates.get(roomname);
-    if (Array.isArray(initialValues) && initialValues.length > 0) {
-      const cleanValues = initialValues.filter((v) => typeof v === 'string' && v.trim().length > 0);
-      if (cleanValues.length > 0) {
-        state.values = cleanValues;
-        state.shuffledValues = shuffleArray(cleanValues);
-        state.emojis = getRandomEmojis(cleanValues.length);
-      }
-    }
     if (hostId) {
       state.hostId = hostId;
     }
@@ -115,9 +114,11 @@ function serializeRaffleState(state) {
     emojiSelectionsObj[pId] = val;
   });
 
+  const totalCount = getTotalCount(state);
+
   return {
     stage: state.stage,
-    totalCount: state.values.length,
+    totalCount: totalCount,
     values: state.stage === 'revealed' ? state.shuffledValues : null,
     emojis: state.emojis,
     hostId: state.hostId,
@@ -162,9 +163,10 @@ const raffleEvents = (io, socket, touchRoom) => {
     socket.join(data.roomname);
     socket.data.raffleRoomname = data.roomname;
 
+    const isHost = Boolean(data.isHost || (data.hostId && data.playerId === data.hostId));
     const state = getOrCreateRaffleState(
       data.roomname,
-      data.values || data.questions,
+      isHost ? (data.values || data.questions) : null,
       data.hostId || (data.isHost ? data.playerId : null)
     );
     state.readySockets.add(socket.id);
@@ -190,17 +192,22 @@ const raffleEvents = (io, socket, touchRoom) => {
       });
     }
 
-    if (data.isHost) {
+    if (isHost && data.playerId) {
       state.hostId = data.playerId;
       state.started = true;
-      if (Array.isArray(data.values) && data.values.length > 0) {
+      if (Array.isArray(data.values) && data.values.length > 0 && state.stage === 'numbers') {
         const cleanValues = data.values.filter((v) => typeof v === 'string' && v.trim().length > 0);
         if (cleanValues.length > 0) {
           state.values = cleanValues;
           state.shuffledValues = shuffleArray(cleanValues);
-          state.emojis = getRandomEmojis(cleanValues.length);
+          state.emojis = getRandomEmojis(Math.max(cleanValues.length, getTotalCount(state)));
         }
       }
+    }
+
+    const totalCount = getTotalCount(state);
+    if (state.emojis.length < totalCount) {
+      state.emojis = getRandomEmojis(totalCount);
     }
 
     io.to(data.roomname).emit('raffle/sync', serializeRaffleState(state));
@@ -219,7 +226,8 @@ const raffleEvents = (io, socket, touchRoom) => {
       if (cleanValues.length > 0) {
         state.values = cleanValues;
         state.shuffledValues = shuffleArray(cleanValues);
-        state.emojis = getRandomEmojis(cleanValues.length);
+        const totalCount = getTotalCount(state);
+        state.emojis = getRandomEmojis(totalCount);
         io.to(data.roomname).emit('raffle/sync', serializeRaffleState(state));
       }
     }
@@ -232,8 +240,9 @@ const raffleEvents = (io, socket, touchRoom) => {
     if (!state || state.stage !== 'numbers') return;
     if (state.hostId && data.playerId === state.hostId) return;
 
+    const totalCount = getTotalCount(state);
     const chosenNumber = parseInt(data.number, 10);
-    if (isNaN(chosenNumber) || chosenNumber < 1 || chosenNumber > state.values.length) return;
+    if (isNaN(chosenNumber) || chosenNumber < 1 || chosenNumber > totalCount) return;
 
     state.numberSelections.set(data.playerId, chosenNumber);
 
@@ -254,11 +263,16 @@ const raffleEvents = (io, socket, touchRoom) => {
       return;
     }
 
+    const totalCount = getTotalCount(state);
+    if (state.emojis.length < totalCount) {
+      state.emojis = getRandomEmojis(totalCount);
+    }
+
     state.stage = 'emojis';
     io.to(data.roomname).emit('raffle/stageChanged', {
       stage: 'emojis',
       emojis: state.emojis,
-      totalCount: state.values.length,
+      totalCount: totalCount,
       numberSelections: Object.fromEntries(state.numberSelections),
     });
   });
@@ -336,5 +350,6 @@ const raffleEvents = (io, socket, touchRoom) => {
 
 raffleEvents.getOrCreateRaffleState = getOrCreateRaffleState;
 raffleEvents.clearRaffleState = clearRaffleState;
+raffleEvents.getTotalCount = getTotalCount;
 
 module.exports = raffleEvents;

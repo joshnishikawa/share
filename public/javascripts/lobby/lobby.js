@@ -212,13 +212,25 @@ $(function(){
     }
   }
 
+  function parseValuesInput(rawText) {
+    if (!rawText || typeof rawText !== 'string') return [];
+    const text = rawText.trim();
+    if (!text) return [];
+    if (text.includes('\n')) {
+      return text.split('\n')
+        .map(function(item) { return item.replace(/,$/, '').trim(); })
+        .filter(Boolean);
+    }
+    return text.split(',')
+      .map(function(item) { return item.trim(); })
+      .filter(Boolean);
+  }
+
   // Restore draft raffle values from localStorage
   const savedRaffleValues = localStorage.getItem('raffle_values_draft');
   if (savedRaffleValues) {
     $("#raffle-values").val(savedRaffleValues);
-    const parsedValues = savedRaffleValues.split(',')
-      .map(function(item) { return item.trim(); })
-      .filter(Boolean);
+    const parsedValues = parseValuesInput(savedRaffleValues);
     if (parsedValues.length > 0) {
       window.raffleValues = parsedValues;
     }
@@ -228,9 +240,7 @@ $(function(){
   const savedVoteValues = localStorage.getItem('vote_values_draft');
   if (savedVoteValues) {
     $("#vote-values").val(savedVoteValues);
-    const parsedVoteValues = savedVoteValues.split(',')
-      .map(function(item) { return item.trim(); })
-      .filter(Boolean);
+    const parsedVoteValues = parseValuesInput(savedVoteValues);
     if (parsedVoteValues.length > 0) {
       window.voteValues = parsedVoteValues;
     }
@@ -579,6 +589,7 @@ $(function(){
         return;
       }
 
+      const isHost = Boolean(room && room.hostId && player.id === room.hostId);
       currentActivity = activity;
       enterActivityMode();
       const actModule = getActivityModule(activity);
@@ -587,8 +598,8 @@ $(function(){
           socket: socket,
           player: player,
           room: room,
-          questions: window.popquizQuestions,
-          values: (activity === 'vote' ? window.voteValues : window.raffleValues) || window.raffleValues || window.voteValues,
+          questions: isHost ? window.popquizQuestions : null,
+          values: isHost ? ((activity === 'vote' ? window.voteValues : window.raffleValues) || window.raffleValues || window.voteValues) : null,
         });
       }
     });
@@ -722,13 +733,7 @@ $(function(){
       localStorage.setItem('raffle_values_draft', rawVal);
     } catch (e) {}
 
-    const rawText = rawVal.trim();
-    let values = null;
-    if (rawText) {
-      values = rawText.split(',')
-        .map(function(item) { return item.trim(); })
-        .filter(Boolean);
-    }
+    const values = parseValuesInput(rawVal);
     if (values && values.length > 0) {
       window.raffleValues = values;
       socket.emit("raffle/updateValues", {
@@ -745,13 +750,7 @@ $(function(){
       localStorage.setItem('vote_values_draft', rawVal);
     } catch (e) {}
 
-    const rawText = rawVal.trim();
-    let values = null;
-    if (rawText) {
-      values = rawText.split(',')
-        .map(function(item) { return item.trim(); })
-        .filter(Boolean);
-    }
+    const values = parseValuesInput(rawVal);
     if (values && values.length > 0) {
       window.voteValues = values;
       socket.emit("vote/updateValues", {
@@ -797,12 +796,7 @@ $(function(){
         localStorage.setItem('raffle_values_draft', rawVal);
       } catch (e) {}
 
-      const rawText = rawVal.trim();
-      if (rawText) {
-        values = rawText.split(',')
-          .map(function(item) { return item.trim(); })
-          .filter(Boolean);
-      }
+      values = parseValuesInput(rawVal);
       if (!values || values.length === 0) {
         values = [
           'Grand Prize',
@@ -824,12 +818,7 @@ $(function(){
         localStorage.setItem('vote_values_draft', rawVal);
       } catch (e) {}
 
-      const rawText = rawVal.trim();
-      if (rawText) {
-        values = rawText.split(',')
-          .map(function(item) { return item.trim(); })
-          .filter(Boolean);
-      }
+      values = parseValuesInput(rawVal);
       if (!values || values.length === 0) {
         values = [
           'Option A',

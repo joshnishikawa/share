@@ -12,6 +12,13 @@ const defaultValues = [
 
 const voteStates = new Map();
 
+function getTotalCount(state) {
+  const studentCount = Array.from(state.players.values()).filter((p) => p.id !== state.hostId).length;
+  const userCount = studentCount > 0 ? studentCount : state.players.size;
+  const itemCount = state.values ? state.values.length : 0;
+  return Math.max(1, itemCount, userCount);
+}
+
 function calculateTotals(state) {
   const count = state.values ? state.values.length : 0;
   const totals = new Array(count).fill(0);
@@ -86,12 +93,6 @@ function getOrCreateVoteState(roomname, initialValues, hostId) {
     });
   } else {
     const state = voteStates.get(roomname);
-    if (Array.isArray(initialValues) && initialValues.length > 0) {
-      const cleanValues = initialValues.filter((v) => typeof v === 'string' && v.trim().length > 0);
-      if (cleanValues.length > 0) {
-        state.values = cleanValues;
-      }
-    }
     if (hostId) {
       state.hostId = hostId;
     }
@@ -115,9 +116,11 @@ function serializeVoteState(state) {
     numberSelectionsObj[pId] = num;
   });
 
+  const totalCount = getTotalCount(state);
+
   return {
     stage: state.stage,
-    totalCount: state.values.length,
+    totalCount: totalCount,
     values: state.values,
     hostId: state.hostId,
     players: Array.from(state.players.values()),
@@ -137,9 +140,10 @@ const voteEvents = (io, socket, touchRoom) => {
     socket.join(data.roomname);
     socket.data.voteRoomname = data.roomname;
 
+    const isHost = Boolean(data.isHost || (data.hostId && data.playerId === data.hostId));
     const state = getOrCreateVoteState(
       data.roomname,
-      data.values || data.questions,
+      isHost ? (data.values || data.questions) : null,
       data.hostId || (data.isHost ? data.playerId : null)
     );
     state.readySockets.add(socket.id);
@@ -165,10 +169,10 @@ const voteEvents = (io, socket, touchRoom) => {
       });
     }
 
-    if (data.isHost) {
+    if (isHost && data.playerId) {
       state.hostId = data.playerId;
       state.started = true;
-      if (Array.isArray(data.values) && data.values.length > 0) {
+      if (Array.isArray(data.values) && data.values.length > 0 && state.stage === 'numbers') {
         const cleanValues = data.values.filter((v) => typeof v === 'string' && v.trim().length > 0);
         if (cleanValues.length > 0) {
           state.values = cleanValues;
@@ -203,8 +207,9 @@ const voteEvents = (io, socket, touchRoom) => {
     if (!state || state.stage !== 'numbers') return;
     if (state.hostId && data.playerId === state.hostId) return;
 
+    const totalCount = getTotalCount(state);
     const chosenNumber = parseInt(data.number, 10);
-    if (isNaN(chosenNumber) || chosenNumber < 1 || chosenNumber > state.values.length) return;
+    if (isNaN(chosenNumber) || chosenNumber < 1 || chosenNumber > totalCount) return;
 
     state.numberSelections.set(data.playerId, chosenNumber);
 
@@ -225,11 +230,12 @@ const voteEvents = (io, socket, touchRoom) => {
       return;
     }
 
+    const totalCount = getTotalCount(state);
     state.stage = 'voting';
     io.to(data.roomname).emit('vote/stageChanged', {
       stage: 'voting',
       values: state.values,
-      totalCount: state.values.length,
+      totalCount: totalCount,
       numberSelections: Object.fromEntries(state.numberSelections),
       totals: calculateTotals(state),
     });
@@ -286,5 +292,6 @@ voteEvents.getOrCreateVoteState = getOrCreateVoteState;
 voteEvents.clearVoteState = clearVoteState;
 voteEvents.calculateTotals = calculateTotals;
 voteEvents.buildResultsMatrix = buildResultsMatrix;
+voteEvents.getTotalCount = getTotalCount;
 
 module.exports = voteEvents;

@@ -16,6 +16,36 @@
     z-index: 20;
   }
 
+  /* Phase 1: Number Cards */
+  .popquiz-card {
+    height: 140px;
+    cursor: pointer;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .popquiz-card:hover:not(.card-muted):not(.locked) {
+    transform: translateY(-4px);
+    border-color: var(--bs-primary) !important;
+  }
+
+  .popquiz-card.card-muted {
+    opacity: 0.4;
+    background-color: var(--bs-light) !important;
+    cursor: not-allowed !important;
+  }
+
+  .popquiz-card.card-muted:hover {
+    transform: none !important;
+  }
+
+  #popquiz-arena.host-view .popquiz-card {
+    cursor: default !important;
+  }
+  #popquiz-arena.host-view .popquiz-card:hover {
+    transform: none !important;
+  }
+
+  /* Phase 2: Choice Cards */
   .popquiz-choice-card {
     background: #ffffff;
     border: 3px solid #cbd5e1;
@@ -143,39 +173,60 @@
     50% { transform: scale(1.4); }
     100% { transform: scale(1); }
   }
+
+  /* Print Styles */
+  #popquiz-printable-area {
+    display: none;
+  }
+
+  @media print {
+    body * {
+      visibility: hidden;
+    }
+    #popquiz-printable-area, #popquiz-printable-area * {
+      visibility: visible;
+    }
+    #popquiz-printable-area {
+      display: block !important;
+      position: absolute !important;
+      left: 0 !important;
+      top: 0 !important;
+      width: 100% !important;
+      min-height: 100% !important;
+      background: #fff !important;
+      color: #000 !important;
+      z-index: 999999 !important;
+      padding: 24px !important;
+    }
+  }
 </style>
 
-<div class="container py-2" id="popquiz-arena">
+<div class="container py-2 position-relative user-select-none" id="popquiz-arena">
   <!-- Dynamic Absolute Pawn Layer -->
   <div id="popquiz-pawn-layer"></div>
 
-  <!-- Game Round Screen -->
-  <div id="popquiz-game-screen">
-    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-      <div>
-        <span class="badge bg-primary fs-6 px-3 py-2 d-none" id="popquiz-round-badge"></span>
-      </div>
-      <div id="popquiz-status" class="fs-5 fw-bold text-secondary text-center flex-grow-1 mx-2">
-        Waiting for host to start.
-      </div>
-      <div id="popquiz-host-indicator" class="badge bg-warning text-dark d-none px-2 py-1">
-        Host: Tap correct answer to grade
-      </div>
-    </div>
-
-    <!-- Answer Choices Grid (Fixed shape/size) -->
-    <div id="popquiz-choices-container" class="row g-3 justify-content-center mb-4">
-      <!-- Dynamic choice cards -->
-    </div>
-
-    <!-- Players Staging Dock (Unlabeled and unoutlined) -->
-    <div class="mt-4">
-      <div id="popquiz-staging-dock" class="d-flex justify-content-center align-items-center"></div>
+  <!-- PHASE 1: NUMBERS GRID -->
+  <div id="popquiz-numbers-screen" class="popquiz-screen">
+    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3 justify-content-center my-2" id="popquiz-numbers-container">
+      <!-- Dynamically generated numbered cards -->
     </div>
   </div>
 
-  <!-- Winner / Game Over Screen -->
-  <div id="popquiz-gameover-screen" class="d-none text-center py-4">
+  <!-- PHASE 2: QUIZ ROUNDS -->
+  <div id="popquiz-quiz-screen" class="popquiz-screen d-none">
+    <!-- Answer Choices Grid (Fixed shape/size) -->
+    <div id="popquiz-choices-container" class="row g-3 justify-content-center my-2">
+      <!-- Dynamic choice cards -->
+    </div>
+  </div>
+
+  <!-- Players Staging Dock -->
+  <div class="mt-3" id="popquiz-dock-container">
+    <div id="popquiz-staging-dock" class="d-flex justify-content-center align-items-center"></div>
+  </div>
+
+  <!-- PHASE 3: WINNER / GAME OVER SCREEN -->
+  <div id="popquiz-gameover-screen" class="popquiz-screen d-none text-center py-4">
     <div class="mb-4">
       <h2 class="display-5 fw-extrabold text-primary mb-1">🏆 Quiz Finished!</h2>
       <p class="text-muted fs-5">Highest scoring player(s):</p>
@@ -184,11 +235,32 @@
     <div id="popquiz-winners-container" class="row justify-content-center g-4 mb-5">
       <!-- Winner pawns rendered here -->
     </div>
+  </div>
 
-    <div class="d-flex justify-content-center gap-3">
-      <button id="popquiz-finish-btn" class="btn btn-lg btn-primary px-5 shadow">
-        Return to Lobby
-      </button>
+  <!-- Printable Table (Visible only when printing) -->
+  <div id="popquiz-printable-area" class="p-4">
+    <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
+      <div>
+        <h2 class="fw-bold mb-1">Pop Quiz Results</h2>
+        <div class="text-muted" id="popquiz-print-meta">Activity Summary &amp; Leaderboard</div>
+      </div>
+    </div>
+
+    <div class="mt-4">
+      <h5 class="fw-bold mb-2">Final Scores</h5>
+      <table class="table table-bordered table-striped" id="popquiz-results-table">
+        <thead class="table-dark">
+          <tr>
+            <th class="text-center" style="width: 80px;">Rank</th>
+            <th>Player</th>
+            <th class="text-center" style="width: 150px;">Selected Number</th>
+            <th class="text-center" style="width: 120px;">Score</th>
+          </tr>
+        </thead>
+        <tbody id="popquiz-results-table-body">
+          <!-- Dynamic rows per student -->
+        </tbody>
+      </table>
     </div>
   </div>
 </div>

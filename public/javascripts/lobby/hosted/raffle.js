@@ -452,9 +452,9 @@
       delete playerPositionsMap[id];
     });
 
-    // Parse options.values
+    // Parse options.values only if host
     let valuesArray = null;
-    if (options.values) {
+    if (isHost && options.values) {
       if (Array.isArray(options.values)) {
         valuesArray = options.values;
       } else if (typeof options.values === 'string') {
@@ -605,7 +605,7 @@
       playerNumber: currentPlayer.number,
       color: currentPlayer.color,
       isHost: isHost,
-      values: valuesArray,
+      values: isHost ? valuesArray : null,
       roomPlayers: currentRoom ? currentRoom.players : [],
     });
 

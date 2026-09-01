@@ -726,16 +726,16 @@
     });
     starElements.length = 0;
 
-    // Parse options.values
+    // Parse options.values only if host
     let valuesArray = null;
-    if (options.values) {
+    if (isHost && options.values) {
       if (Array.isArray(options.values)) {
         valuesArray = options.values;
       } else if (typeof options.values === 'string') {
         valuesArray = options.values.split(',').map((s) => s.trim()).filter(Boolean);
       }
     }
-    if (valuesArray && valuesArray.length > 0) {
+    if (isHost && valuesArray && valuesArray.length > 0) {
       roomValues = valuesArray;
     }
 
@@ -851,7 +851,7 @@
       playerNumber: currentPlayer.number,
       color: currentPlayer.color,
       isHost: isHost,
-      values: valuesArray || (window.voteValues || null),
+      values: isHost ? (valuesArray || (window.voteValues || null)) : null,
       roomPlayers: currentRoom ? currentRoom.players : [],
     });
 

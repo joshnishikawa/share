@@ -92,6 +92,10 @@ const rooms = [
 
 const registerMultiplayerActivityEvents = require("./multiplayer/activities");
 const registerHostedActivityEvents = require("./hosted/activities");
+const popquizActivity = require("./hosted/activities/popquiz");
+const raffleActivity = require("./hosted/activities/raffle");
+const voteActivity = require("./hosted/activities/vote");
+const chooseActivity = require("./multiplayer/activities/choose");
 const multiplayerActivitiesConfig = require("../config/multiplayer_activities.js");
 const validActivityIds = new Set(multiplayerActivitiesConfig.map((a) => a.id));
 const hostActivityIds = new Set(
@@ -198,21 +202,17 @@ const multiplayer = (io, options = {}) => {
 
   function clearActivityRoomStates(roomname) {
     try {
-      const popquiz = require("./hosted/activities/popquiz");
-      if (popquiz && typeof popquiz.clearPopquizState === "function") {
-        popquiz.clearPopquizState(roomname);
+      if (popquizActivity && typeof popquizActivity.clearPopquizState === "function") {
+        popquizActivity.clearPopquizState(roomname);
       }
-      const raffle = require("./hosted/activities/raffle");
-      if (raffle && typeof raffle.clearRaffleState === "function") {
-        raffle.clearRaffleState(roomname);
+      if (raffleActivity && typeof raffleActivity.clearRaffleState === "function") {
+        raffleActivity.clearRaffleState(roomname);
       }
-      const vote = require("./hosted/activities/vote");
-      if (vote && typeof vote.clearVoteState === "function") {
-        vote.clearVoteState(roomname);
+      if (voteActivity && typeof voteActivity.clearVoteState === "function") {
+        voteActivity.clearVoteState(roomname);
       }
-      const choose = require("./multiplayer/activities/choose");
-      if (choose && typeof choose.clearChooseState === "function") {
-        choose.clearChooseState(roomname);
+      if (chooseActivity && typeof chooseActivity.clearChooseState === "function") {
+        chooseActivity.clearChooseState(roomname);
       }
     } catch (e) {
       // ignore
@@ -793,23 +793,23 @@ const multiplayer = (io, options = {}) => {
       room.activity = data.activity;
       room.activityPayload = data.payload || data.questions || data.values || null;
       if (data.activity === 'popquiz') {
-        const popquiz = require('./hosted/activities/popquiz');
-        if (popquiz && typeof popquiz.getOrCreatePopquizState === 'function') {
-          const state = popquiz.getOrCreatePopquizState(roomname, room.activityPayload, data.id);
+        if (popquizActivity && typeof popquizActivity.getOrCreatePopquizState === 'function') {
+          if (typeof popquizActivity.clearPopquizState === 'function') popquizActivity.clearPopquizState(roomname);
+          const state = popquizActivity.getOrCreatePopquizState(roomname, room.activityPayload, data.id);
           state.started = true;
         }
       }
       if (data.activity === 'raffle') {
-        const raffle = require('./hosted/activities/raffle');
-        if (raffle && typeof raffle.getOrCreateRaffleState === 'function') {
-          const state = raffle.getOrCreateRaffleState(roomname, room.activityPayload, data.id);
+        if (raffleActivity && typeof raffleActivity.getOrCreateRaffleState === 'function') {
+          if (typeof raffleActivity.clearRaffleState === 'function') raffleActivity.clearRaffleState(roomname);
+          const state = raffleActivity.getOrCreateRaffleState(roomname, room.activityPayload, data.id);
           state.started = true;
         }
       }
       if (data.activity === 'vote') {
-        const vote = require('./hosted/activities/vote');
-        if (vote && typeof vote.getOrCreateVoteState === 'function') {
-          const state = vote.getOrCreateVoteState(roomname, room.activityPayload, data.id);
+        if (voteActivity && typeof voteActivity.getOrCreateVoteState === 'function') {
+          if (typeof voteActivity.clearVoteState === 'function') voteActivity.clearVoteState(roomname);
+          const state = voteActivity.getOrCreateVoteState(roomname, room.activityPayload, data.id);
           state.started = true;
         }
       }

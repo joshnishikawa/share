@@ -574,6 +574,12 @@ describe('Multiplayer Sockets Integration', () => {
           questions: customQuestions,
         });
 
+        // Host sets numbers and starts quiz
+        clientSocket1.emit('popquiz/setNumbers', {
+          roomname,
+          id: 'QuizHost',
+        });
+
         // Listen for roundstart
         clientSocket2.on('popquiz/roundstart', (roundData) => {
           expect(roundData.choices).toEqual(['apples', 'bananas', 'pears']);
@@ -645,6 +651,18 @@ describe('Multiplayer Sockets Integration', () => {
         });
 
         clientSocket2.on('loadActivity', () => {
+          // Host readies and starts quiz
+          clientSocket1.emit('popquiz/ready', {
+            roomname,
+            playerId: 'HostRefresh',
+            isHost: true,
+            questions: [['yes', 'no']],
+          });
+          clientSocket1.emit('popquiz/setNumbers', {
+            roomname,
+            id: 'HostRefresh',
+          });
+
           // Guest simulates page refresh by disconnecting socket2 and connecting socket3
           clientSocket2.disconnect();
 
@@ -762,6 +780,11 @@ describe('Multiplayer Sockets Integration', () => {
           questions: [['finish_now']],
         });
 
+        clientSocket1.emit('popquiz/setNumbers', {
+          roomname,
+          id: 'HostPodium',
+        });
+
         clientSocket2.on('popquiz/roundstart', () => {
           clientSocket2.emit('popquiz/select', {
             roomname,
@@ -823,20 +846,6 @@ describe('Multiplayer Sockets Integration', () => {
       });
 
       clientSocket2.on('joined', () => {
-        // Both players ready in popquiz with initial questions
-        clientSocket1.emit('popquiz/ready', {
-          roomname,
-          playerId: 'HostQuestionUpdater',
-          isHost: true,
-          questions: [['initial_1', 'initial_2']],
-        });
-
-        clientSocket2.emit('popquiz/ready', {
-          roomname,
-          playerId: 'GuestQuestionUpdater',
-          isHost: false,
-        });
-
         let receivedInitial = false;
         clientSocket2.on('popquiz/roundstart', (roundData) => {
           if (!receivedInitial) {
@@ -854,6 +863,27 @@ describe('Multiplayer Sockets Integration', () => {
             expect(roundData.choices).toEqual(['updated_cat', 'updated_dog', 'updated_bird']);
             done();
           }
+        });
+
+        // Both players ready in popquiz with initial questions
+        clientSocket1.emit('popquiz/ready', {
+          roomname,
+          playerId: 'HostQuestionUpdater',
+          isHost: true,
+          questions: [['initial_1', 'initial_2']],
+        });
+
+        clientSocket2.emit('popquiz/ready', {
+          roomname,
+          playerId: 'GuestQuestionUpdater',
+          isHost: false,
+        });
+
+        clientSocket2.once('popquiz/sync', () => {
+          clientSocket1.emit('popquiz/setNumbers', {
+            roomname,
+            id: 'HostQuestionUpdater',
+          });
         });
       });
     });
@@ -979,6 +1009,237 @@ describe('Multiplayer Sockets Integration', () => {
           roomname,
           id: 'NoConsensusGuest',
           activity: 'popquiz',
+        });
+      });
+    });
+  });
+
+  test('rejoining guest with different questions in Pop Quiz does not replace items for room', (done) => {
+    const hostQuestions = [
+      ['host_apple', 'host_banana', 'host_cherry'],
+    ];
+    const guestRogueQuestions = [
+      ['rogue_dog', 'rogue_cat'],
+    ];
+
+    clientSocket1.emit('join', {
+      id: 'HostQuizMaster',
+      roomtype: 'private',
+      color: '#ff0000',
+    });
+
+    clientSocket1.on('joined', ({ room }) => {
+      const roomname = room.roomname;
+      clientSocket2 = Client(`http://localhost:${serverPort}`);
+      clientSocket2.on('connect', () => {
+        clientSocket2.emit('join', {
+          id: 'GuestStudent',
+          roomtype: 'private',
+          roomname: roomname,
+          color: '#00ff00',
+        });
+      });
+
+      clientSocket2.on('joined', () => {
+        // Host starts Pop Quiz with hostQuestions
+        clientSocket1.emit('startActivity', {
+          roomname,
+          id: 'HostQuizMaster',
+          activity: 'popquiz',
+          questions: hostQuestions,
+        });
+
+        clientSocket2.on('loadActivity', () => {
+          // Host readies
+          clientSocket1.emit('popquiz/ready', {
+            roomname,
+            playerId: 'HostQuizMaster',
+            playerNumber: 1,
+            isHost: true,
+            questions: hostQuestions,
+          });
+
+          // Guest disconnects to simulate refresh
+          clientSocket2.disconnect();
+
+          const clientSocket3 = Client(`http://localhost:${serverPort}`);
+          clientSocket3.on('connect', () => {
+            clientSocket3.emit('join', {
+              id: 'GuestStudent',
+              roomtype: 'private',
+              roomname: roomname,
+              number: 2,
+              color: '#00ff00',
+            });
+          });
+
+          clientSocket3.on('joined', () => {
+            // Guest rejoins and readies with guest's local rogue questions
+            clientSocket3.emit('popquiz/ready', {
+              roomname,
+              playerId: 'GuestStudent',
+              playerNumber: 2,
+              isHost: false,
+              questions: guestRogueQuestions,
+            });
+
+            clientSocket3.on('popquiz/sync', (syncData) => {
+              // Sync must contain the host questions, NOT the guest's rogue questions
+              expect(syncData.choices).toEqual(['host_apple', 'host_banana', 'host_cherry']);
+              expect(syncData.totalQuestions).toBe(1);
+              clientSocket3.disconnect();
+              done();
+            });
+          });
+        });
+      });
+    });
+  });
+
+  test('rejoining guest with different values in Raffle does not replace items for room', (done) => {
+    const hostPrizes = ['Host Prize 1', 'Host Prize 2', 'Host Prize 3'];
+    const guestPrizes = ['Rogue Prize X', 'Rogue Prize Y'];
+
+    clientSocket1.emit('join', {
+      id: 'HostRaffleMaster',
+      roomtype: 'private',
+      color: '#ff0000',
+    });
+
+    clientSocket1.on('joined', ({ room }) => {
+      const roomname = room.roomname;
+      clientSocket2 = Client(`http://localhost:${serverPort}`);
+      clientSocket2.on('connect', () => {
+        clientSocket2.emit('join', {
+          id: 'GuestRaffler',
+          roomtype: 'private',
+          roomname: roomname,
+          color: '#00ff00',
+        });
+      });
+
+      clientSocket2.on('joined', () => {
+        // Host starts Raffle with hostPrizes
+        clientSocket1.emit('startActivity', {
+          roomname,
+          id: 'HostRaffleMaster',
+          activity: 'raffle',
+          values: hostPrizes,
+        });
+
+        clientSocket2.on('loadActivity', () => {
+          clientSocket1.emit('raffle/ready', {
+            roomname,
+            playerId: 'HostRaffleMaster',
+            playerNumber: 1,
+            isHost: true,
+            values: hostPrizes,
+          });
+
+          clientSocket2.disconnect();
+
+          const clientSocket3 = Client(`http://localhost:${serverPort}`);
+          clientSocket3.on('connect', () => {
+            clientSocket3.emit('join', {
+              id: 'GuestRaffler',
+              roomtype: 'private',
+              roomname: roomname,
+              number: 2,
+              color: '#00ff00',
+            });
+          });
+
+          clientSocket3.on('joined', () => {
+            // Guest rejoins and readies with guest's local rogue prizes
+            clientSocket3.emit('raffle/ready', {
+              roomname,
+              playerId: 'GuestRaffler',
+              playerNumber: 2,
+              isHost: false,
+              values: guestPrizes,
+            });
+
+            clientSocket3.on('raffle/sync', (syncData) => {
+              expect(syncData.totalCount).toBe(3);
+              clientSocket3.disconnect();
+              done();
+            });
+          });
+        });
+      });
+    });
+  });
+
+  test('rejoining guest with different values in Vote does not replace items for room', (done) => {
+    const hostOptions = ['Option Red', 'Option Green', 'Option Blue'];
+    const guestOptions = ['Rogue Option 1', 'Rogue Option 2'];
+
+    clientSocket1.emit('join', {
+      id: 'HostVoteMaster',
+      roomtype: 'private',
+      color: '#ff0000',
+    });
+
+    clientSocket1.on('joined', ({ room }) => {
+      const roomname = room.roomname;
+      clientSocket2 = Client(`http://localhost:${serverPort}`);
+      clientSocket2.on('connect', () => {
+        clientSocket2.emit('join', {
+          id: 'GuestVoter',
+          roomtype: 'private',
+          roomname: roomname,
+          color: '#00ff00',
+        });
+      });
+
+      clientSocket2.on('joined', () => {
+        // Host starts Vote with hostOptions
+        clientSocket1.emit('startActivity', {
+          roomname,
+          id: 'HostVoteMaster',
+          activity: 'vote',
+          values: hostOptions,
+        });
+
+        clientSocket2.on('loadActivity', () => {
+          clientSocket1.emit('vote/ready', {
+            roomname,
+            playerId: 'HostVoteMaster',
+            playerNumber: 1,
+            isHost: true,
+            values: hostOptions,
+          });
+
+          clientSocket2.disconnect();
+
+          const clientSocket3 = Client(`http://localhost:${serverPort}`);
+          clientSocket3.on('connect', () => {
+            clientSocket3.emit('join', {
+              id: 'GuestVoter',
+              roomtype: 'private',
+              roomname: roomname,
+              number: 2,
+              color: '#00ff00',
+            });
+          });
+
+          clientSocket3.on('joined', () => {
+            // Guest rejoins and readies with guest's local rogue options
+            clientSocket3.emit('vote/ready', {
+              roomname,
+              playerId: 'GuestVoter',
+              playerNumber: 2,
+              isHost: false,
+              values: guestOptions,
+            });
+
+            clientSocket3.on('vote/sync', (syncData) => {
+              expect(syncData.values).toEqual(['Option Red', 'Option Green', 'Option Blue']);
+              expect(syncData.totalCount).toBe(3);
+              clientSocket3.disconnect();
+              done();
+            });
+          });
         });
       });
     });

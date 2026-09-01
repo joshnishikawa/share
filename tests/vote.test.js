@@ -61,6 +61,31 @@ describe('Vote Hosted Activity Socket Handlers', () => {
     }));
   });
 
+  test('calculates totalCount as max(userCount, itemCount)', () => {
+    // 2 voting options but 5 student players
+    socketHost.trigger('vote/ready', {
+      roomname,
+      playerId: 'HostTeacher',
+      playerNumber: 1,
+      color: '#ff0000',
+      isHost: true,
+      values: ['Option 1', 'Option 2'],
+      roomPlayers: [
+        { id: 'HostTeacher', number: 1 },
+        { id: 'Student1', number: 2 },
+        { id: 'Student2', number: 3 },
+        { id: 'Student3', number: 4 },
+        { id: 'Student4', number: 5 },
+        { id: 'Student5', number: 6 },
+      ],
+    });
+
+    expect(ioMock.emit).toHaveBeenCalledWith('vote/sync', expect.objectContaining({
+      stage: 'numbers',
+      totalCount: 5,
+    }));
+  });
+
   test('allows guests to select numbers in Phase 1', () => {
     socketHost.trigger('vote/ready', {
       roomname,
@@ -271,4 +296,35 @@ describe('Vote Hosted Activity Socket Handlers', () => {
       values: ['Alpha', 'Beta', 'Gamma'],
     }));
   });
+
+  test('rejoining guest with different values does not overwrite host values', () => {
+    // Host readies with host values
+    socketHost.trigger('vote/ready', {
+      roomname,
+      playerId: 'HostTeacher',
+      playerNumber: 1,
+      isHost: true,
+      values: ['Option 1', 'Option 2', 'Option 3'],
+    });
+
+    // Guest readies with guest's local storage values
+    socketGuest1.trigger('vote/ready', {
+      roomname,
+      playerId: 'GuestStudent',
+      playerNumber: 2,
+      isHost: false,
+      values: ['Rogue Vote A', 'Rogue Vote B'],
+    });
+
+    // The state values must remain the host values
+    const state = voteEvents.getOrCreateVoteState(roomname);
+    expect(state.values).toEqual(['Option 1', 'Option 2', 'Option 3']);
+
+    // The broadcast sync must have host values
+    expect(ioMock.emit).toHaveBeenLastCalledWith('vote/sync', expect.objectContaining({
+      values: ['Option 1', 'Option 2', 'Option 3'],
+      totalCount: 3,
+    }));
+  });
 });
+
