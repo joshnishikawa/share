@@ -29,4 +29,10 @@ module.exports = [
     group: 'host',
     enabled: true,
   },
+  {
+    id: 'vote',
+    label: 'Vote',
+    group: 'host',
+    enabled: true,
+  },
 ];

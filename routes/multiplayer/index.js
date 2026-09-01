@@ -6,6 +6,7 @@ const race = require('./race.js');
 const match = require('./match.js');
 const hostedPopquiz = require('../hosted/popquiz.js');
 const hostedRaffle = require('../hosted/raffle.js');
+const hostedVote = require('../hosted/vote.js');
 
 const activityRoutes = {
   choose,
@@ -13,6 +14,7 @@ const activityRoutes = {
   match,
   popquiz: hostedPopquiz,
   raffle: hostedRaffle,
+  vote: hostedVote,
 };
 
 const enabledActivities = activities.filter((activity) => activity.enabled);

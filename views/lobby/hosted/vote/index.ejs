@@ -1,0 +1,252 @@
+<style>
+  #vote-arena {
+    min-height: 520px;
+  }
+
+  /* Overlay layer for smooth pawn transitions in Phase 1 */
+  #vote-pawn-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 20;
+  }
+
+  /* Gliding pawn token */
+  .vote-pawn-token {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 44px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+    pointer-events: none;
+    z-index: 25;
+  }
+
+  .vote-token-number {
+    font-size: 0.75rem;
+    font-weight: 800;
+    background: #1e293b;
+    color: #ffffff;
+    padding: 1px 7px;
+    border-radius: 12px;
+    margin-bottom: 2px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+
+  .vote-token-pawn {
+    width: 32px;
+    height: 64px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+  }
+
+  .vote-token-initials {
+    font-size: 0.85rem;
+    font-weight: 800;
+    margin-top: 1px;
+    text-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+  }
+
+  #vote-staging-dock, #vote-star-dock {
+    min-height: 80px;
+    height: 80px;
+  }
+
+  /* Phase 1 Number Cards */
+  .vote-card {
+    min-height: 140px;
+    cursor: pointer;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .vote-card:hover:not(.card-muted):not(.locked) {
+    transform: translateY(-4px);
+    border-color: var(--bs-primary) !important;
+  }
+
+  .vote-card.card-muted {
+    opacity: 0.4;
+    background-color: var(--bs-light) !important;
+    cursor: not-allowed !important;
+  }
+
+  .vote-card.card-muted:hover {
+    transform: none !important;
+  }
+
+  #vote-arena.host-view .vote-number-card {
+    cursor: default !important;
+  }
+  #vote-arena.host-view .vote-number-card:hover {
+    transform: none !important;
+  }
+
+  /* Phase 2: Smooth Gliding Stars Layer */
+  #vote-star-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 30;
+  }
+
+  .vote-star-token {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+    z-index: 35;
+  }
+
+  .vote-star-token svg {
+    width: 48px;
+    height: 48px;
+    filter: drop-shadow(0 3px 6px rgba(234, 179, 8, 0.5));
+    transition: transform 0.2s ease, filter 0.2s ease;
+  }
+
+  .vote-star-token:hover svg {
+    transform: scale(1.2);
+    filter: drop-shadow(0 0 12px rgba(234, 179, 8, 0.85));
+  }
+
+  /* Phase 2: Voting Item Cards */
+  .vote-item-card {
+    min-height: 160px;
+    cursor: pointer;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    user-select: none;
+  }
+
+  .vote-item-card:hover {
+    transform: translateY(-4px);
+    border-color: #0d6efd !important;
+    box-shadow: 0 0.5rem 1rem rgba(13, 110, 253, 0.15) !important;
+  }
+
+  /* Print Styles */
+  #vote-printable-area {
+    display: none;
+  }
+
+  @media print {
+    body * {
+      visibility: hidden;
+    }
+    #vote-printable-area, #vote-printable-area * {
+      visibility: visible;
+    }
+    #vote-printable-area {
+      display: block !important;
+      position: absolute !important;
+      left: 0 !important;
+      top: 0 !important;
+      width: 100% !important;
+      min-height: 100% !important;
+      background: #fff !important;
+      color: #000 !important;
+      z-index: 999999 !important;
+      padding: 24px !important;
+    }
+    .print-chart-box {
+      max-width: 650px;
+      margin: 0 auto 24px auto;
+      text-align: center;
+    }
+    #vote-print-chart-container svg {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+  }
+</style>
+
+<div class="container py-2 position-relative user-select-none" id="vote-arena">
+  <!-- Dynamic Absolute Pawn Layer for Phase 1 -->
+  <div id="vote-pawn-layer"></div>
+
+  <!-- Dynamic Absolute Star Layer for Phase 2 (5 big gliding stars) -->
+  <div id="vote-star-layer"></div>
+
+  <!-- PHASE 1: NUMBERS GRID -->
+  <div id="vote-numbers-screen" class="vote-screen">
+    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3 justify-content-center my-2" id="vote-numbers-container">
+      <!-- Dynamically generated numbered cards -->
+    </div>
+    <!-- Players Staging Dock for Phase 1 -->
+    <div class="mt-3" id="vote-dock-container">
+      <div id="vote-staging-dock" class="d-flex justify-content-center align-items-center"></div>
+    </div>
+  </div>
+
+  <!-- PHASE 2: VOTING SCREEN -->
+  <div id="vote-voting-screen" class="vote-screen d-none">
+    <!-- GUEST VIEW: Clean Item Cards and 5-Star Dock -->
+    <div id="vote-guest-view" class="d-none">
+      <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-3 justify-content-center my-2" id="vote-items-container">
+        <!-- Dynamically generated vote option cards -->
+      </div>
+      <!-- Star Reserve Dock -->
+      <div class="mt-4">
+        <div id="vote-star-dock" class="d-flex justify-content-center align-items-center"></div>
+      </div>
+    </div>
+
+    <!-- HOST VIEW: Just the Live Chart -->
+    <div id="vote-host-view" class="d-none">
+      <div class="card shadow-sm border-0 rounded-4 p-4 bg-white">
+        <div style="position: relative; height: 380px; width: 100%;">
+          <canvas id="vote-chart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRINTABLE AREA (Only visible when printing) -->
+  <div id="vote-printable-area" class="p-4">
+    <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
+      <div>
+        <h2 class="fw-bold mb-1">Vote Results</h2>
+        <div class="text-muted" id="vote-print-meta">Activity Summary &amp; Breakdown</div>
+      </div>
+    </div>
+
+    <!-- Printable Chart Box -->
+    <div class="print-chart-box mb-4 text-center">
+      <h5 class="fw-bold mb-3">Vote Distribution</h5>
+      <div id="vote-print-chart-container" class="border rounded-3 p-2 bg-light shadow-sm">
+        <!-- Dynamically rendered SVG chart -->
+      </div>
+    </div>
+
+    <!-- Printable Per-User Breakdown Table -->
+    <div class="mt-4">
+      <h5 class="fw-bold mb-2">User Vote Breakdown</h5>
+      <table class="table table-bordered table-striped" id="vote-results-table">
+        <thead class="table-dark" id="vote-results-table-head">
+          <!-- Dynamic headers: Player, Option A, Option B, ..., Total Stars -->
+        </thead>
+        <tbody id="vote-results-table-body">
+          <!-- Dynamic rows per student -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

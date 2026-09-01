@@ -144,7 +144,7 @@
         <div id="activityHeader" class="d-flex justify-content-between align-items-center mb-2 gap-2">
           <!-- Left: Host Badge & Room Name -->
           <div class="d-flex align-items-center gap-2 flex-shrink-0">
-            <span class="small">Room:</span><div id="activityRoomName" class="fs-6 fw-bold text-primary"></div>
+            <div id="activityRoomName" class="fs-6 fw-bold text-primary"></div>
             <span id="activityHostBadge" class="small badge bg-warning text-dark d-none px-1" style="font-size: 0.75rem;" title="You are the Table Host" aria-label="Table Host">
               Host
             </span>
@@ -204,6 +204,11 @@
                   <textarea id="raffle-values" class="form-control form-control-sm font-monospace" rows="3" placeholder="Enter comma-separated values (e.g. Prize 1, Prize 2, Prize 3, Bonus Points, Free Pass, Sticker, Surprise, High Five)"></textarea>
                 </div>
               <% } %>
+              <% if (activity.id === 'vote') { %>
+                <div id="vote-config" class="d-none mb-3">
+                  <textarea id="vote-values" class="form-control form-control-sm font-monospace" rows="3" placeholder="Enter comma-separated options to vote on (e.g. Option A, Option B, Option C, Option D, Option E)"></textarea>
+                </div>
+              <% } %>
             <% }); %>
           </div>
         </div>
@@ -222,6 +227,7 @@
 
 <script id="activitiesConfigData" type="application/json"><%- JSON.stringify(activities) %></script>
 <script id="multiplayerI18nData" type="application/json"><%- JSON.stringify({ pleaseSelect: __('pleaseSelect') }) %></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.socket.io/4.0.1/socket.io.js"></script>
 <% activities.forEach(function(activity){ %>
   <script src="/javascripts/lobby/<%= activity.group === 'host' ? 'hosted' : 'multiplayer' %>/<%= activity.id %>.js"></script>

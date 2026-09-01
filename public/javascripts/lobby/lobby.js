@@ -224,6 +224,18 @@ $(function(){
     }
   }
 
+  // Restore draft vote values from localStorage
+  const savedVoteValues = localStorage.getItem('vote_values_draft');
+  if (savedVoteValues) {
+    $("#vote-values").val(savedVoteValues);
+    const parsedVoteValues = savedVoteValues.split(',')
+      .map(function(item) { return item.trim(); })
+      .filter(Boolean);
+    if (parsedVoteValues.length > 0) {
+      window.voteValues = parsedVoteValues;
+    }
+  }
+
   $(".menuitem").on('submit', function(e){
     e.preventDefault();
     if (!window.deck || window.deck.length == 0) {
@@ -407,11 +419,18 @@ $(function(){
       } else {
         $("#raffle-config").addClass("d-none");
       }
+
+      if (player.activity === 'vote') {
+        $("#vote-config").removeClass("d-none");
+      } else {
+        $("#vote-config").addClass("d-none");
+      }
     } else {
       // Non-host players:
       $(".start-activity-btn").addClass("d-none");
       $("#popquiz-config").addClass("d-none");
       $("#raffle-config").addClass("d-none");
+      $("#vote-config").addClass("d-none");
       if (room && room.selectedHostActivity) {
         // Only show the host-selected activity
         $("#standardActivities").addClass("d-none");
@@ -538,7 +557,7 @@ $(function(){
   function loadActivity(activity) {
     if (!activity || typeof activity !== 'string') return;
     const isValid = (Array.isArray(activitiesConfig) && activitiesConfig.some(a => a.id === activity)) ||
-                    ['choose', 'race', 'match', 'popquiz', 'raffle'].includes(activity);
+                    ['choose', 'race', 'match', 'popquiz', 'raffle', 'vote'].includes(activity);
     if (!isValid) {
       console.warn('Attempted to load unknown activity:', activity);
       return;
@@ -550,7 +569,7 @@ $(function(){
     }
 
     const configItem = Array.isArray(activitiesConfig) ? activitiesConfig.find(a => a.id === activity) : null;
-    const loadUrl = ((configItem && configItem.group === 'host') || activity === 'popquiz' || activity === 'raffle')
+    const loadUrl = ((configItem && configItem.group === 'host') || activity === 'popquiz' || activity === 'raffle' || activity === 'vote')
       ? "/hosted/" + encodeURIComponent(activity)
       : "/lobby/" + encodeURIComponent(activity);
 
@@ -569,7 +588,7 @@ $(function(){
           player: player,
           room: room,
           questions: window.popquizQuestions,
-          values: window.raffleValues,
+          values: (activity === 'vote' ? window.voteValues : window.raffleValues) || window.raffleValues || window.voteValues,
         });
       }
     });
@@ -720,6 +739,29 @@ $(function(){
     }
   });
 
+  $(document).on("input change", "#vote-values", function () {
+    const rawVal = $(this).val() || '';
+    try {
+      localStorage.setItem('vote_values_draft', rawVal);
+    } catch (e) {}
+
+    const rawText = rawVal.trim();
+    let values = null;
+    if (rawText) {
+      values = rawText.split(',')
+        .map(function(item) { return item.trim(); })
+        .filter(Boolean);
+    }
+    if (values && values.length > 0) {
+      window.voteValues = values;
+      socket.emit("vote/updateValues", {
+        roomname: player.roomname,
+        id: player.id,
+        values: values,
+      });
+    }
+  });
+
   $(document).on("click", ".start-activity-btn", function (e) {
     e.stopPropagation();
     const activity = $(this).data("activity");
@@ -774,6 +816,30 @@ $(function(){
         ];
       }
       window.raffleValues = values;
+    }
+
+    if (activity === 'vote') {
+      const rawVal = $("#vote-values").val() || '';
+      try {
+        localStorage.setItem('vote_values_draft', rawVal);
+      } catch (e) {}
+
+      const rawText = rawVal.trim();
+      if (rawText) {
+        values = rawText.split(',')
+          .map(function(item) { return item.trim(); })
+          .filter(Boolean);
+      }
+      if (!values || values.length === 0) {
+        values = [
+          'Option A',
+          'Option B',
+          'Option C',
+          'Option D',
+          'Option E'
+        ];
+      }
+      window.voteValues = values;
     }
 
     socket.emit("startActivity", {
@@ -976,6 +1042,7 @@ $(function(){
     }
     if (typeof data === 'object' && data && data.values) {
       window.raffleValues = data.values;
+      window.voteValues = data.values;
     }
     loadActivity(activity);
   });

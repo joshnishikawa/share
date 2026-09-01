@@ -202,6 +202,14 @@ const multiplayer = (io, options = {}) => {
       if (popquiz && typeof popquiz.clearPopquizState === "function") {
         popquiz.clearPopquizState(roomname);
       }
+      const raffle = require("./hosted/activities/raffle");
+      if (raffle && typeof raffle.clearRaffleState === "function") {
+        raffle.clearRaffleState(roomname);
+      }
+      const vote = require("./hosted/activities/vote");
+      if (vote && typeof vote.clearVoteState === "function") {
+        vote.clearVoteState(roomname);
+      }
       const choose = require("./multiplayer/activities/choose");
       if (choose && typeof choose.clearChooseState === "function") {
         choose.clearChooseState(roomname);
@@ -795,6 +803,13 @@ const multiplayer = (io, options = {}) => {
         const raffle = require('./hosted/activities/raffle');
         if (raffle && typeof raffle.getOrCreateRaffleState === 'function') {
           const state = raffle.getOrCreateRaffleState(roomname, room.activityPayload, data.id);
+          state.started = true;
+        }
+      }
+      if (data.activity === 'vote') {
+        const vote = require('./hosted/activities/vote');
+        if (vote && typeof vote.getOrCreateVoteState === 'function') {
+          const state = vote.getOrCreateVoteState(roomname, room.activityPayload, data.id);
           state.started = true;
         }
       }

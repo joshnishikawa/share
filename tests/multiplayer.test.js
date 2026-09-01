@@ -64,6 +64,12 @@ describe('Multiplayer Router', () => {
     expect(app.render).toHaveBeenCalledWith('lobby/hosted/raffle/index', expect.any(Object), expect.any(Function));
   });
 
+  test('GET /multiplayer/vote should render vote index', async () => {
+    const response = await request(app).get('/multiplayer/vote');
+    expect(response.status).toBe(200);
+    expect(app.render).toHaveBeenCalledWith('lobby/hosted/vote/index', expect.any(Object), expect.any(Function));
+  });
+
   test('should handle render errors by returning 500 and error view', async () => {
     renderError = true;
     const response = await request(app).get('/multiplayer');
@@ -107,6 +113,12 @@ describe('Hosted Activities Router', () => {
     const response = await request(app).get('/hosted/raffle');
     expect(response.status).toBe(200);
     expect(app.render).toHaveBeenCalledWith('lobby/hosted/raffle/index', expect.any(Object), expect.any(Function));
+  });
+
+  test('GET /hosted/vote should render hosted vote index', async () => {
+    const response = await request(app).get('/hosted/vote');
+    expect(response.status).toBe(200);
+    expect(app.render).toHaveBeenCalledWith('lobby/hosted/vote/index', expect.any(Object), expect.any(Function));
   });
 
   test('should handle render errors by returning 500 and error view', async () => {
