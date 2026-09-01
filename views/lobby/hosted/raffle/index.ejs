@@ -1,11 +1,9 @@
 <style>
   #raffle-arena {
-    min-height: 540px;
-    position: relative;
-    user-select: none;
+    min-height: 520px;
   }
 
-  /* Overlay layer for smooth pawn transitions across the arena */
+  /* Overlay layer for smooth pawn transitions */
   #raffle-pawn-layer {
     position: absolute;
     top: 0;
@@ -16,7 +14,7 @@
     z-index: 20;
   }
 
-  /* Smooth gliding pawn token */
+  /* Gliding pawn token */
   .raffle-pawn-token {
     position: absolute;
     top: 0;
@@ -40,7 +38,6 @@
     border-radius: 12px;
     margin-bottom: 2px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-    white-space: nowrap;
   }
 
   .raffle-token-pawn {
@@ -52,140 +49,50 @@
   .raffle-token-initials {
     font-size: 0.85rem;
     font-weight: 800;
-    text-align: center;
     margin-top: 1px;
     text-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
   }
 
   #raffle-staging-dock {
-    min-height: 90px;
-    height: 90px;
-    border-radius: 16px;
-    position: relative;
+    min-height: 80px;
+    height: 80px;
   }
 
-  /* Scoped: Hide outer duplicate activity header when Raffle is active */
-  #activityHeader,
-  #activityColumn > .d-flex.justify-content-between.align-items-center.mb-2 {
-    display: none !important;
-  }
-
-  /* Streamlined header card with top host actions */
-  .raffle-header-card {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(241, 245, 249, 0.9));
-    backdrop-filter: blur(8px);
-    border: 1px solid #e2e8f0;
-    border-radius: 14px;
-    padding: 0.5rem 0.85rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    min-height: 52px;
-  }
-
-  /* Grid layout */
-  .raffle-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-    gap: 1.25rem;
-    justify-content: center;
-    margin: 1.5rem 0;
-  }
-
-  @media (min-width: 768px) {
-    .raffle-grid {
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 1.5rem;
-    }
-  }
-
-  /* Interactive Card */
+  /* Interactive Cards */
   .raffle-card {
-    background: #ffffff;
-    border: 2.5px solid #cbd5e1;
-    border-radius: 18px;
     height: 140px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
     cursor: pointer;
-    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
-    user-select: none;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   }
 
-  .raffle-card:hover:not(.locked):not(.claimed-by-other) {
+  .raffle-card:hover:not(.card-muted):not(.locked) {
     transform: translateY(-4px);
-    border-color: #3b82f6;
-    box-shadow: 0 10px 18px -3px rgba(59, 130, 246, 0.2);
-  }
-
-  .raffle-card.selected-by-me {
-    border-color: #2563eb;
-    background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
-    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.25);
+    border-color: var(--bs-primary) !important;
   }
 
   .raffle-card.card-muted {
-    opacity: 0.45;
-    background: #f1f5f9 !important;
-    border-color: #cbd5e1 !important;
-    box-shadow: none !important;
+    opacity: 0.4;
+    background-color: var(--bs-light) !important;
     cursor: not-allowed !important;
-  }
-
-  .raffle-card.card-muted .raffle-card-number,
-  .raffle-card.card-muted .raffle-card-emoji {
-    filter: grayscale(80%) opacity(0.5);
   }
 
   .raffle-card.card-muted:hover {
     transform: none !important;
-    border-color: #cbd5e1 !important;
-    box-shadow: none !important;
-  }
-
-  .raffle-card.claimed-by-other {
-    opacity: 0.45;
-    background: #f8fafc;
-    border-color: #e2e8f0;
-    cursor: not-allowed;
   }
 
   .raffle-card.locked {
     cursor: default;
   }
 
-  .raffle-card-number {
-    font-size: 2.5rem;
-    font-weight: 800;
-    color: #1e293b;
-    line-height: 1;
-  }
-
-  .raffle-card-emoji {
-    font-size: 3.5rem;
-    line-height: 1;
-    transition: transform 0.2s ease;
-  }
-
-  .raffle-card:hover:not(.claimed-by-other) .raffle-card-emoji {
-    transform: scale(1.08);
-  }
-
-  /* Host View: Cards are not interactive for the host */
   #raffle-arena.host-view .raffle-card {
     cursor: default !important;
   }
   #raffle-arena.host-view .raffle-card:hover {
     transform: none !important;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06) !important;
-    border-color: #cbd5e1 !important;
   }
 
-  /* 3D Flip Card Container for Phase 3 */
+  /* 3D Flip Card Container */
   .raffle-flip-card {
-    background-color: transparent;
     perspective: 1000px;
     height: 140px;
   }
@@ -194,7 +101,6 @@
     position: relative;
     width: 100%;
     height: 100%;
-    text-align: center;
     transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     transform-style: preserve-3d;
   }
@@ -209,53 +115,23 @@
     height: 100%;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
-    border-radius: 18px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 0.85rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
-  }
-
-  .raffle-flip-front {
-    background: #ffffff;
-    border: 2.5px solid #cbd5e1;
+    transform: rotateX(0deg);
   }
 
   .raffle-flip-back {
-    background: linear-gradient(145deg, #f0fdf4, #dcfce7);
-    border: 2.5px solid #22c55e;
     transform: rotateY(180deg);
   }
 
   .raffle-flip-back.has-winner {
-    background: linear-gradient(145deg, #fef9c3, #fef08a);
-    border: 2.5px solid #eab308;
-    box-shadow: 0 0 12px rgba(234, 179, 8, 0.3);
+    background: #fef9c3 !important;
+    border-color: #eab308 !important;
   }
 
-  .raffle-revealed-value {
-    font-size: 1.35rem;
-    font-weight: 800;
-    color: #14532d;
-    word-break: break-word;
-    text-align: center;
-    padding: 0 6px;
-  }
-
-  /* Staging Dock */
-  #raffle-staging-dock {
-    min-height: 80px;
-    height: 80px;
-  }
-
-  /* Screen Table Hidden - Only for print */
+  /* Print Styles */
   #raffle-printable-area {
     display: none;
   }
 
-  /* PRINT STYLES - Minimal styling with usernames, selected numbers and values */
   @media print {
     body * {
       visibility: hidden;
@@ -269,107 +145,51 @@
       left: 0;
       top: 0;
       width: 100%;
-      background: #ffffff !important;
-      color: #000000 !important;
-      padding: 10px;
-      font-family: sans-serif;
-    }
-    .raffle-print-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    .raffle-print-table th, .raffle-print-table td {
-      border: 1px solid #333;
-      padding: 6px 10px;
-      text-align: left;
-      font-size: 14px;
-    }
-    .raffle-print-table th {
-      background-color: #f2f2f2;
-      font-weight: bold;
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
+      background: #fff !important;
+      color: #000 !important;
     }
   }
 </style>
 
-<div class="container py-2" id="raffle-arena">
+<div class="container py-2 position-relative user-select-none" id="raffle-arena">
   <!-- Dynamic Absolute Pawn Layer -->
   <div id="raffle-pawn-layer"></div>
 
-  <!-- Single-Row Streamlined Top Header: Group Name, Host Indicator, Instructions, Host Navigation Buttons, Exit Button -->
-  <div class="raffle-header-card d-flex align-items-center justify-content-between mb-3 px-3 py-2 gap-2">
-    <!-- Left: Player Pawn (Non-host) + Group Name + Host Indicator (Host only) -->
-    <div class="d-flex align-items-center gap-2 flex-shrink-0">
-      <div id="raffle-player-pawn" class="d-none d-flex align-items-center"></div>
-      <span id="raffle-room-name" class="fs-5 fw-bold text-primary"></span>
-      <span class="badge bg-warning text-dark d-none px-2 py-1" id="raffle-host-badge" style="font-size: 0.75rem;">Host</span>
-    </div>
-    
-    <!-- Center: Instructions -->
-    <div id="raffle-status" class="fs-5 fw-bold text-secondary text-center flex-grow-1 mx-2 text-truncate">
-      Select a number card!
-    </div>
-
-    <!-- Right: Host Navigation Buttons + Exit Button -->
-    <div class="d-flex align-items-center gap-2 flex-shrink-0">
-      <div id="raffle-top-host-actions" class="d-none d-flex align-items-center gap-2">
-        <button id="raffle-set-btn" class="btn btn-primary btn-sm px-3 py-1 fw-bold shadow-sm" style="font-size: 1rem;">
-          Set
-        </button>
-        <button id="raffle-go-btn" class="btn btn-success btn-sm px-3 py-1 fw-bold shadow-sm d-none" style="font-size: 1rem;">
-          GO!
-        </button>
-        <button id="raffle-print-btn" class="btn btn-dark btn-sm px-3 py-1 fw-bold shadow-sm d-none d-inline-flex align-items-center gap-1" style="font-size: 0.95rem;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="vertical-align: -2px;">
-            <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
-            <path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z"/>
-          </svg>
-          <span>Print Results</span>
-        </button>
-      </div>
-
-      <button id="raffle-exit-btn" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px; padding: 0;" title="Leave activity" aria-label="Leave activity">
-        <i class="material-icons" style="font-size: 18px;">logout</i>
-      </button>
-    </div>
-  </div>
-
   <!-- PHASE 1: NUMBERS GRID -->
   <div id="raffle-numbers-screen" class="raffle-screen">
-    <div class="raffle-grid" id="raffle-numbers-container">
+    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3 justify-content-center my-2" id="raffle-numbers-container">
       <!-- Dynamically generated numbered cards -->
     </div>
   </div>
 
   <!-- PHASE 2: EMOJIS GRID -->
   <div id="raffle-emojis-screen" class="raffle-screen d-none">
-    <div class="raffle-grid" id="raffle-emojis-container">
+    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3 justify-content-center my-2" id="raffle-emojis-container">
       <!-- Dynamically generated emoji cards -->
     </div>
   </div>
 
   <!-- PHASE 3: REVEALED SCREEN -->
   <div id="raffle-reveal-screen" class="raffle-screen d-none">
-    <div class="raffle-grid" id="raffle-reveal-container">
+    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3 justify-content-center my-2" id="raffle-reveal-container">
       <!-- Dynamically flipped cards revealing values -->
     </div>
   </div>
 
-  <!-- Players Staging Dock at the bottom -->
+  <!-- Players Staging Dock -->
   <div class="mt-3">
     <div id="raffle-staging-dock" class="d-flex justify-content-center align-items-center"></div>
   </div>
 
-  <!-- Minimal Printable Table (Hidden on screen, visible only when printing) -->
-  <div id="raffle-printable-area">
-    <h3 style="margin-bottom: 12px;">Raffle Results</h3>
-    <table class="raffle-print-table">
-      <thead>
+  <!-- Printable Table (Visible only when printing) -->
+  <div id="raffle-printable-area" class="p-3">
+    <h3 class="mb-3">Raffle Results</h3>
+    <table class="table table-bordered">
+      <thead class="table-light">
         <tr>
           <th>Username</th>
           <th>Selected Number</th>
-          <th>Value</th>
+          <th>Prize / Value</th>
         </tr>
       </thead>
       <tbody id="raffle-results-table-body">

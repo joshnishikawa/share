@@ -26,10 +26,10 @@ describe('Multiplayer Router', () => {
     consoleErrorSpy.mockRestore();
   });
 
-  test('GET /multiplayer should render students/multiplayer with enabled activities', async () => {
+  test('GET /multiplayer should render lobby/lobby with enabled activities', async () => {
     const response = await request(app).get('/multiplayer');
     expect(response.status).toBe(200);
-    expect(app.render).toHaveBeenCalledWith('students/multiplayer', expect.objectContaining({
+    expect(app.render).toHaveBeenCalledWith('lobby/lobby', expect.objectContaining({
       activities: expect.any(Array),
     }), expect.any(Function));
   });

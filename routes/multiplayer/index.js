@@ -19,7 +19,7 @@ const enabledActivities = activities.filter((activity) => activity.enabled);
 
 router.get('/', (req, res) => {
   try {
-    res.render('students/multiplayer', { activities: enabledActivities });
+    res.render('lobby/lobby', { activities: enabledActivities });
   } catch (err) {
     res.status(500).render('error');
     console.error(err);

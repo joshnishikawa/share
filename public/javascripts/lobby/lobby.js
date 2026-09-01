@@ -600,6 +600,8 @@ $(function(){
 
     $("#studentSideMenu").removeClass("d-none");
     $("#activityContent").empty();
+    $("#activityStatus").empty();
+    $("#activityControls").empty();
     $("#activityExit").addClass("d-none");
     $("#activityHostBadge").addClass("d-none");
     $("#activityRoomName").empty();

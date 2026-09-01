@@ -1,5 +1,5 @@
 <!--
-  students/multiplayer.ejs — Multiplayer lobby + activity loader
+  lobby/lobby.ejs — Multiplayer lobby + activity loader
   ════════════════════════════════════════════════════════════════════════
   This view handles:
     1. Player identity (name, color, pawn SVG) persisted in localStorage
@@ -56,7 +56,7 @@
 
 <div id="menu-container" class="d-flex">
   <div id="studentSideMenu">
-    <%- include('navbar') -%>
+    <%- include('../students/navbar') -%>
   </div>
 
   <div class="container-fluid mt-3">
@@ -141,16 +141,25 @@
       </div> 
 
       <div id="activityColumn" class="col-sm-8">
-        <div id="activityHeader" class="d-flex justify-content-between align-items-center mb-2">
-          <div class="d-flex align-items-center gap-2">
+        <div id="activityHeader" class="d-flex justify-content-between align-items-center mb-2 gap-2">
+          <!-- Left: Host Badge & Room Name -->
+          <div class="d-flex align-items-center gap-2 flex-shrink-0">
+            <span class="small">Room:</span><div id="activityRoomName" class="fs-6 fw-bold text-primary"></div>
             <span id="activityHostBadge" class="small badge bg-warning text-dark d-none px-1" style="font-size: 0.75rem;" title="You are the Table Host" aria-label="Table Host">
               Host
             </span>
-            <div id="activityRoomName" class="fs-5 fw-bold text-primary"></div>
           </div>
-          <button id="activityExit" class="btn btn-sm btn-outline-danger d-none ms-auto" title="Leave activity" aria-label="Leave activity">
-            <i class="material-icons" style="font-size:16px;">logout</i>
-          </button>
+
+          <!-- Middle: User Instructions / Status -->
+          <div id="activityStatus" class="fs-5 fw-bold text-secondary text-center flex-grow-1 mx-2 text-truncate"></div>
+
+          <!-- Right: Host Controls & Exit Button -->
+          <div class="d-flex align-items-center gap-2 flex-shrink-0 ms-auto">
+            <div id="activityControls" class="d-flex align-items-center gap-2"></div>
+            <button id="activityExit" class="btn btn-sm btn-outline-danger d-none" title="Leave activity" aria-label="Leave activity">
+              <i class="material-icons" style="font-size:16px;">logout</i>
+            </button>
+          </div>
         </div>
 
         <div id="activityMenu">
@@ -220,4 +229,3 @@
 <script src="/javascripts/lobby/lobby.js"></script>
 
 <%- include('../foot') -%>
-

@@ -61,17 +61,6 @@
     );
   }
 
-  function renderHeaderPawn(color) {
-    const safeColor = sanitizeColor(color || (currentPlayer && currentPlayer.color) || '#3b82f6');
-    $('#raffle-player-pawn').html(
-      '<svg width="18" height="32" viewBox="0 0 64 128" xmlns="http://www.w3.org/2000/svg">' +
-      '<path transform="matrix(0.78482373,0,0,0.3410327,-40.6,58)" d="m 54.796244,189.05536 c -12.062025,-20.89204 13.56978,-65.28763 37.693831,-65.28763 24.124055,0 49.755855,44.39559 37.693825,65.28763 -12.06202,20.89204 -63.325631,20.89204 -75.387656,0 z" fill="' + safeColor + '" />' +
-      '<path transform="matrix(0.45050681,0,0,0.62867557,3.2,35)" d="m 105,121.60049 c -11.851854,8.65104 -69.62828,8.77896 -81.518324,0.1805 C 11.591632,113.18252 -6.3839294,58.273407 -1.8805296,44.308232 2.6228701,30.343057 49.289789,-3.7205685 63.963086,-3.7530573 78.636384,-3.785546 125.45369,30.071092 130.01888,44.016188 134.58408,57.961284 116.85185,112.94946 105,121.60049 Z" fill="' + safeColor + '" />' +
-      '<circle cx="32" cy="22" r="22" fill="' + safeColor + '" />' +
-      '</svg>'
-    );
-  }
-
   function createPlayerToken(playerObj) {
     const safeColor = sanitizeColor(playerObj.color);
     const initials = getInitials(playerObj.id);
@@ -218,19 +207,21 @@
     $container.empty();
 
     for (let i = 1; i <= count; i++) {
+      const $col = $('<div>', { class: 'col' });
       const $card = $('<div>', {
-        class: 'raffle-card raffle-number-card',
+        class: 'card raffle-card raffle-number-card h-100 shadow-sm border-2 rounded-4 text-center d-flex align-items-center justify-content-center bg-white',
         id: `raffle-num-${i}`,
         'data-number': i,
       });
 
       const $numText = $('<div>', {
-        class: 'raffle-card-number',
+        class: 'fs-1 fw-bold text-dark lh-1',
         text: i,
       });
 
       $card.append($numText);
-      $container.append($card);
+      $col.append($card);
+      $container.append($col);
     }
 
     updateNumberCardsUI();
@@ -258,19 +249,21 @@
     $container.empty();
 
     emojis.forEach((emoji, idx) => {
+      const $col = $('<div>', { class: 'col' });
       const $card = $('<div>', {
-        class: 'raffle-card raffle-emoji-card',
+        class: 'card raffle-card raffle-emoji-card h-100 shadow-sm border-2 rounded-4 text-center d-flex align-items-center justify-content-center bg-white',
         id: `raffle-emoji-${idx}`,
         'data-index': idx,
       });
 
       const $emojiText = $('<div>', {
-        class: 'raffle-card-emoji',
+        class: 'display-4 lh-1',
         text: emoji,
       });
 
       $card.append($emojiText);
-      $container.append($card);
+      $col.append($card);
+      $container.append($col);
     });
 
     updateEmojiCardsUI();
@@ -302,26 +295,30 @@
       const prizeValue = shuffledValues[idx] || '—';
       const claimingPlayerId = claimedEmojiMap[idx];
 
+      const $col = $('<div>', { class: 'col' });
       const $flipCard = $('<div>', {
-        class: 'raffle-flip-card',
+        class: 'raffle-flip-card w-100',
         id: `raffle-flip-${idx}`,
       });
 
       const $inner = $('<div>', { class: 'raffle-flip-inner' });
 
       // Front face: Emoji
-      const $front = $('<div>', { class: 'raffle-flip-front' });
-      $front.append($('<div>', { class: 'raffle-card-emoji', text: emoji }));
-
-      // Back face: Revealed Value / Prize only (no emoji)
-      const $back = $('<div>', {
-        class: `raffle-flip-back ${claimingPlayerId ? 'has-winner' : ''}`,
+      const $front = $('<div>', {
+        class: 'card raffle-flip-front shadow-sm border-2 rounded-4 text-center d-flex align-items-center justify-content-center bg-white p-2',
       });
-      $back.append($('<div>', { class: 'raffle-revealed-value', text: prizeValue }));
+      $front.append($('<div>', { class: 'display-4 lh-1', text: emoji }));
+
+      // Back face: Revealed Value / Prize
+      const $back = $('<div>', {
+        class: `card raffle-flip-back shadow-sm border-2 rounded-4 text-center d-flex align-items-center justify-content-center bg-success bg-opacity-10 border-success p-2 ${claimingPlayerId ? 'has-winner' : ''}`,
+      });
+      $back.append($('<div>', { class: 'fs-5 fw-bold text-success text-break px-1', text: prizeValue }));
 
       $inner.append($front, $back);
       $flipCard.append($inner);
-      $container.append($flipCard);
+      $col.append($flipCard);
+      $container.append($col);
     });
 
     // 3D flip card cascade animation
@@ -349,48 +346,75 @@
     }
   }
 
+  function setStatus(text) {
+    $('#activityStatus, #raffle-status').text(text);
+  }
+
+  function renderTopControls() {
+    $('#activityControls').html(`
+      <div id="raffle-top-host-actions" class="${isHost ? 'd-flex' : 'd-none'} align-items-center gap-2">
+        <button id="raffle-set-btn" class="btn btn-primary btn-sm px-4 fw-bold shadow-sm" style="min-width: 80px;">
+          Next
+        </button>
+        <button id="raffle-go-btn" class="btn btn-success btn-sm px-4 fw-bold shadow-sm d-none" style="min-width: 80px;">
+          Flip
+        </button>
+        <button id="raffle-print-btn" class="btn btn-dark btn-sm px-4 fw-bold shadow-sm d-none d-inline-flex align-items-center justify-content-center gap-1" style="min-width: 80px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="align-middle">
+            <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+            <path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z"/>
+          </svg>
+          <span>Print</span>
+        </button>
+      </div>
+    `);
+  }
+
   function setStage(stage) {
     currentStage = stage;
     $('.raffle-screen').addClass('d-none');
 
     if (stage === 'numbers') {
-      $('#raffle-status').text(isHost ? 'Guests are choosing numbers. Tap "Set" when ready.' : 'Select a number card!');
+      setStatus(isHost ? 'Guests are choosing numbers. Tap "Next" when ready.' : 'Select a number card!');
       $('#raffle-numbers-screen').removeClass('d-none');
 
       if (isHost) {
         $('#raffle-arena').addClass('host-view');
-        $('#raffle-top-host-actions').removeClass('d-none');
+        if ($('#raffle-top-host-actions').length === 0) renderTopControls();
+        $('#raffle-top-host-actions').removeClass('d-none').addClass('d-flex');
         $('#raffle-set-btn').removeClass('d-none');
         $('#raffle-go-btn, #raffle-print-btn').addClass('d-none');
       } else {
         $('#raffle-arena').removeClass('host-view');
-        $('#raffle-top-host-actions').addClass('d-none');
+        $('#raffle-top-host-actions').addClass('d-none').removeClass('d-flex');
       }
     } else if (stage === 'emojis') {
-      $('#raffle-status').text(isHost ? 'Guests are picking emojis. Tap "GO!" to reveal prizes.' : (mySelectedEmojiIndex !== null ? 'Emoji selected! Waiting for reveal...' : 'Pick an emoji! (One per guest)'));
+      setStatus(isHost ? 'Guests are picking emojis. Tap "Flip" to reveal prizes.' : (mySelectedEmojiIndex !== null ? 'Emoji selected! Waiting for reveal...' : 'Pick an emoji! (One per guest)'));
       $('#raffle-emojis-screen').removeClass('d-none');
 
       if (isHost) {
         $('#raffle-arena').addClass('host-view');
-        $('#raffle-top-host-actions').removeClass('d-none');
+        if ($('#raffle-top-host-actions').length === 0) renderTopControls();
+        $('#raffle-top-host-actions').removeClass('d-none').addClass('d-flex');
         $('#raffle-go-btn').removeClass('d-none');
         $('#raffle-set-btn, #raffle-print-btn').addClass('d-none');
       } else {
         $('#raffle-arena').removeClass('host-view');
-        $('#raffle-top-host-actions').addClass('d-none');
+        $('#raffle-top-host-actions').addClass('d-none').removeClass('d-flex');
       }
     } else if (stage === 'revealed') {
-      $('#raffle-status').text('🎉 Prizes Revealed!');
+      setStatus('🎉 Prizes Revealed!');
       $('#raffle-reveal-screen').removeClass('d-none');
 
       if (isHost) {
         $('#raffle-arena').addClass('host-view');
-        $('#raffle-top-host-actions').removeClass('d-none');
+        if ($('#raffle-top-host-actions').length === 0) renderTopControls();
+        $('#raffle-top-host-actions').removeClass('d-none').addClass('d-flex');
         $('#raffle-print-btn').removeClass('d-none');
         $('#raffle-set-btn, #raffle-go-btn').addClass('d-none');
       } else {
         $('#raffle-arena').removeClass('host-view');
-        $('#raffle-top-host-actions').addClass('d-none');
+        $('#raffle-top-host-actions').addClass('d-none').removeClass('d-flex');
       }
     }
 
@@ -416,8 +440,8 @@
     claimedEmojiMap = {};
     playersList = (currentRoom && Array.isArray(currentRoom.players)) ? currentRoom.players : [];
 
-    const roomName = (currentRoom && currentRoom.roomname) || (currentPlayer && currentPlayer.roomname) || '';
-    $('#raffle-room-name').text(roomName);
+    renderTopControls();
+    setStage('numbers');
 
     // Clear pawn maps
     Object.keys(playerTokensMap).forEach((id) => {
@@ -426,27 +450,6 @@
     });
     Object.keys(playerPositionsMap).forEach((id) => {
       delete playerPositionsMap[id];
-    });
-
-    if (isHost) {
-      $('#raffle-arena').addClass('host-view');
-      $('#raffle-host-badge').removeClass('d-none');
-      $('#raffle-top-host-actions').removeClass('d-none');
-      $('#raffle-player-pawn').addClass('d-none');
-    } else {
-      $('#raffle-arena').removeClass('host-view');
-      $('#raffle-host-badge').addClass('d-none');
-      $('#raffle-top-host-actions').addClass('d-none');
-      $('#raffle-player-pawn').removeClass('d-none');
-      renderHeaderPawn((currentPlayer && currentPlayer.color) || '#3b82f6');
-    }
-
-    $(document).off('click.raffle', '#raffle-exit-btn').on('click.raffle', '#raffle-exit-btn', function() {
-      if (currentSocket && currentPlayer) {
-        currentSocket.emit('leave', currentPlayer);
-      } else {
-        $('#activityExit').click();
-      }
     });
 
     // Parse options.values
@@ -469,9 +472,6 @@
       if (!data) return;
       if (currentPlayer && (data.number === currentPlayer.number || data.id === currentPlayer.id)) {
         currentPlayer.color = data.color;
-        if (!isHost) {
-          renderHeaderPawn(data.color);
-        }
       }
     });
 
@@ -493,15 +493,11 @@
 
       if (isHost) {
         $('#raffle-arena').addClass('host-view');
-        $('#raffle-host-badge').removeClass('d-none');
-        $('#raffle-top-host-actions').removeClass('d-none');
-        $('#raffle-player-pawn').addClass('d-none');
+        if ($('#raffle-top-host-actions').length === 0) renderTopControls();
+        $('#raffle-top-host-actions').removeClass('d-none').addClass('d-flex');
       } else {
         $('#raffle-arena').removeClass('host-view');
-        $('#raffle-host-badge').addClass('d-none');
-        $('#raffle-top-host-actions').addClass('d-none');
-        $('#raffle-player-pawn').removeClass('d-none');
-        renderHeaderPawn((currentPlayer && currentPlayer.color) || '#3b82f6');
+        $('#raffle-top-host-actions').addClass('d-none').removeClass('d-flex');
       }
 
       if (data.stage === 'numbers') {
@@ -578,7 +574,7 @@
 
       if (currentPlayer && data.playerId === currentPlayer.id) {
         mySelectedEmojiIndex = data.emojiIndex;
-        $('#raffle-status').text('Emoji selected! Waiting for reveal...');
+        setStatus('Emoji selected! Waiting for reveal...');
       }
 
       updateEmojiCardsUI();
@@ -674,7 +670,8 @@
   function teardown(socket) {
     $(window).off('resize.raffle');
     $(document).off('.raffle');
-    $('#raffle-player-pawn').empty().addClass('d-none');
+    $('#activityStatus').empty();
+    $('#activityControls').empty();
     if (socket) {
       socket.off('setColor');
       socket.off('raffle/sync');
