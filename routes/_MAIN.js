@@ -19,7 +19,7 @@ router.use('/things', things);
 router.use('/vocab', vocab);
 router.use('/tools', tools);
 router.use('/labs', labs.router);
-router.use('/multiplayer', multiplayer);
+router.use('/lobby', multiplayer);
 router.use('/hosted', hosted);
 
 
@@ -164,6 +164,28 @@ router.get('/New_Horizons', (req, res)=>{ // Because you borked it dude!
 router.get('/abc', (req, res)=>{
   try{
     res.redirect('/letters');
+  }
+  catch(err){
+    res.status(500).render('error');
+    console.error(err);
+  }
+});
+
+
+router.get('/multiplayer', (req, res)=>{
+  try{
+    res.redirect('/lobby');
+  }
+  catch(err){
+    res.status(500).render('error');
+    console.error(err);
+  }
+});
+
+
+router.get('/multiplayer/:activity', (req, res)=>{
+  try{
+    res.redirect(`/lobby/${encodeURIComponent(req.params.activity)}`);
   }
   catch(err){
     res.status(500).render('error');

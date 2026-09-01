@@ -1,4 +1,4 @@
-const raffleEvents = require('../sockets/hosted/activities/raffle');
+const raffleEvents = require('../lobby/hosted/activities/raffle');
 
 describe('Raffle Hosted Activity Socket Handlers', () => {
   let ioMock;

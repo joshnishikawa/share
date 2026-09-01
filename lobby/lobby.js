@@ -128,6 +128,9 @@ function sanitizePlayerData(data) {
   if (data.avatar !== undefined && data.avatar !== null) {
     if (isStr(data.avatar, 200)) clean.avatar = data.avatar;
   }
+  if (data.roomtype !== undefined && data.roomtype !== null) {
+    if (data.roomtype === 'public' || data.roomtype === 'private') clean.roomtype = data.roomtype;
+  }
   return clean;
 }
 

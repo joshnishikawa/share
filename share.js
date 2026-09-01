@@ -5,7 +5,7 @@ const app = express();
 const server = require('http').createServer(app);
 
 const socket_io = require('socket.io')(server);
-const multiplayer = require('./sockets/_MULTIPLAYER.js');
+const multiplayer = require('./lobby/lobby.js');
 multiplayer(socket_io);
 
 const createError = require('http-errors');

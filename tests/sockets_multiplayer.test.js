@@ -1,7 +1,7 @@
 const http = require('http');
 const { Server } = require('socket.io');
 const Client = require('socket.io-client');
-const multiplayer = require('../sockets/_MULTIPLAYER');
+const multiplayer = require('../lobby/lobby');
 
 describe('Multiplayer Sockets Integration', () => {
   let io, server, serverPort;

@@ -89,6 +89,18 @@ describe('Main Router', () => {
       expect(response.status).toBe(302);
       expect(response.headers.location).toBe('/NH');
     });
+
+    test('GET /multiplayer redirects to /lobby', async () => {
+      const response = await request(app).get('/multiplayer');
+      expect(response.status).toBe(302);
+      expect(response.headers.location).toBe('/lobby');
+    });
+
+    test('GET /multiplayer/race redirects to /lobby/race', async () => {
+      const response = await request(app).get('/multiplayer/race');
+      expect(response.status).toBe(302);
+      expect(response.headers.location).toBe('/lobby/race');
+    });
   });
 
   describe('SRS Card Loader', () => {

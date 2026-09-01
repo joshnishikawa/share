@@ -552,7 +552,7 @@ $(function(){
     const configItem = Array.isArray(activitiesConfig) ? activitiesConfig.find(a => a.id === activity) : null;
     const loadUrl = ((configItem && configItem.group === 'host') || activity === 'popquiz' || activity === 'raffle')
       ? "/hosted/" + encodeURIComponent(activity)
-      : "/multiplayer/" + encodeURIComponent(activity);
+      : "/lobby/" + encodeURIComponent(activity);
 
     $("#activityContent").load(loadUrl, function(responseText, status) {
       if (status !== "success") {

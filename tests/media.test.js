@@ -182,11 +182,9 @@ describe('Media Router', () => {
   describe('GET /findMissing', () => {
     test('should find missing files based on directory content', async () => {
       // Mock for getNeedleList (needleType: "dir")
-      path.join.mockReturnValueOnce('/mock/public/images'); // For readdirSync
       fs.readdirSync.mockReturnValueOnce(['apple.png', 'banana.jpg', 'grape.svg']); // Mock 'needle' dir content
 
       // Mock for haystack
-      path.join.mockReturnValueOnce('/mock/public/target'); // For readdirSync
       fs.readdirSync.mockReturnValueOnce(['apple.jpg', 'orange.png']); // Mock 'haystack' dir content
 
       const response = await request(app)
@@ -202,7 +200,6 @@ describe('Media Router', () => {
     test('should find missing files based on a list', async () => {
       // No mock for getNeedleList needed (needleType: "list")
       // Mock for haystack
-      path.join.mockReturnValueOnce('/mock/public/target'); // For readdirSync
       fs.readdirSync.mockReturnValueOnce(['apple.jpg', 'orange.png']); // Mock 'haystack' dir content
 
       const response = await request(app)
@@ -218,7 +215,6 @@ describe('Media Router', () => {
     test('should return empty found/missing if haystack is empty', async () => {
       // Mock for getNeedleList (needleType: "list")
       // Mock for haystack to be empty
-      path.join.mockReturnValueOnce('/mock/public/target'); // For readdirSync
       fs.readdirSync.mockReturnValueOnce([]); // Mock 'haystack' dir content
 
       const response = await request(app)
