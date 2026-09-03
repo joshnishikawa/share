@@ -326,5 +326,55 @@ describe('Vote Hosted Activity Socket Handlers', () => {
       totalCount: 3,
     }));
   });
+
+  test('host can directly edit totalCount in numbers stage via vote/setTotalCount', () => {
+    socketHost.trigger('vote/ready', {
+      roomname,
+      playerId: 'HostTeacher',
+      isHost: true,
+      values: ['Option 1', 'Option 2'],
+    });
+
+    socketGuest1.trigger('vote/selectNumber', {
+      roomname,
+      playerId: 'Student1',
+      number: 5,
+    });
+
+    socketHost.trigger('vote/setTotalCount', {
+      roomname,
+      id: 'HostTeacher',
+      totalCount: 3,
+    });
+
+    expect(ioMock.emit).toHaveBeenCalledWith('vote/sync', expect.objectContaining({
+      stage: 'numbers',
+      totalCount: 3,
+      customTotalCount: 3,
+    }));
+
+    // Student selection of 5 should have been pruned since totalCount is 3
+    const state = voteEvents.getOrCreateVoteState(roomname);
+    expect(state.numberSelections.has('Student1')).toBe(false);
+  });
+
+  test('non-host cannot edit item count in vote', () => {
+    socketHost.trigger('vote/ready', {
+      roomname,
+      playerId: 'HostTeacher',
+      isHost: true,
+      values: ['Option 1', 'Option 2'],
+    });
+
+    socketGuest1.trigger('vote/setTotalCount', {
+      roomname,
+      id: 'Student1',
+      totalCount: 10,
+    });
+
+    expect(socketGuest1.emit).toHaveBeenCalledWith('error', expect.objectContaining({
+      message: expect.stringContaining('Only the host'),
+    }));
+  });
 });
 

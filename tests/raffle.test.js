@@ -265,5 +265,55 @@ describe('Raffle Hosted Activity Socket Handlers', () => {
       totalCount: 3,
     }));
   });
+
+  test('host can directly edit totalCount in numbers stage via raffle/setTotalCount', () => {
+    socketHost.trigger('raffle/ready', {
+      roomname,
+      playerId: 'HostTeacher',
+      isHost: true,
+      values: ['Prize A', 'Prize B'],
+    });
+
+    socketGuest1.trigger('raffle/selectNumber', {
+      roomname,
+      playerId: 'Student1',
+      number: 5,
+    });
+
+    socketHost.trigger('raffle/setTotalCount', {
+      roomname,
+      id: 'HostTeacher',
+      totalCount: 3,
+    });
+
+    expect(ioMock.emit).toHaveBeenCalledWith('raffle/sync', expect.objectContaining({
+      stage: 'numbers',
+      totalCount: 3,
+      customTotalCount: 3,
+    }));
+
+    // Student selection of 5 should have been pruned since totalCount is 3
+    const state = raffleEvents.getOrCreateRaffleState(roomname);
+    expect(state.numberSelections.has('Student1')).toBe(false);
+  });
+
+  test('non-host cannot edit item count in raffle', () => {
+    socketHost.trigger('raffle/ready', {
+      roomname,
+      playerId: 'HostTeacher',
+      isHost: true,
+      values: ['Prize A', 'Prize B'],
+    });
+
+    socketGuest1.trigger('raffle/setTotalCount', {
+      roomname,
+      id: 'Student1',
+      totalCount: 10,
+    });
+
+    expect(socketGuest1.emit).toHaveBeenCalledWith('error', expect.objectContaining({
+      message: expect.stringContaining('Only the host'),
+    }));
+  });
 });
 

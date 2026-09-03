@@ -229,6 +229,7 @@
 <script id="multiplayerI18nData" type="application/json"><%- JSON.stringify({ pleaseSelect: __('pleaseSelect') }) %></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.socket.io/4.0.1/socket.io.js"></script>
+<script src="/javascripts/lobby/hosted/common.js"></script>
 <% activities.forEach(function(activity){ %>
   <script src="/javascripts/lobby/<%= activity.group === 'host' ? 'hosted' : 'multiplayer' %>/<%= activity.id %>.js"></script>
 <% }); %>

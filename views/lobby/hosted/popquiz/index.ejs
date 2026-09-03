@@ -1,8 +1,9 @@
 <style>
   #popquiz-arena {
-    min-height: 520px;
+    min-height: calc(100vh - 160px);
     position: relative;
     user-select: none;
+    width: 100%;
   }
 
   /* Overlay layer for smooth pawn transitions across the whole arena */
@@ -17,10 +18,32 @@
   }
 
   /* Phase 1: Number Cards */
+  #popquiz-numbers-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: 12px;
+    width: 100%;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
   .popquiz-card {
-    height: 140px;
+    min-height: 100px;
+    height: 100%;
     cursor: pointer;
     transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .popquiz-number-text {
+    font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+    font-weight: 800;
+    line-height: 1;
+    color: #1e293b;
+    user-select: none;
   }
 
   .popquiz-card:hover:not(.card-muted):not(.locked) {
@@ -46,18 +69,24 @@
   }
 
   /* Phase 2: Choice Cards */
+  #popquiz-choices-container {
+    min-height: clamp(300px, 50vh, 520px);
+    align-content: stretch;
+  }
+
   .popquiz-choice-card {
     background: #ffffff;
     border: 3px solid #cbd5e1;
-    border-radius: 18px;
-    padding: 1.75rem 1rem;
-    min-height: 140px;
-    height: 140px;
+    border-radius: 20px;
+    padding: 1.25rem 1rem;
+    min-height: clamp(240px, 36vh, 420px);
+    height: 100%;
     cursor: pointer;
     transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07);
+    box-shadow: 0 4px 10px -2px rgba(0, 0, 0, 0.08);
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    justify-content: flex-start;
     align-items: center;
     position: relative;
     overflow: visible;
@@ -66,7 +95,7 @@
   .popquiz-choice-card:hover {
     transform: translateY(-2px);
     border-color: #3b82f6;
-    box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.15);
+    box-shadow: 0 10px 20px -3px rgba(59, 130, 246, 0.2);
   }
 
   .popquiz-choice-selected {
@@ -89,12 +118,16 @@
   }
 
   .popquiz-choice-text {
-    font-size: 2rem;
+    font-size: clamp(1.75rem, 3.5vw, 2.75rem);
     font-weight: 800;
     color: #1e293b;
     text-align: center;
     word-break: break-word;
     user-select: none;
+    margin-bottom: 0.75rem;
+    width: 100%;
+    z-index: 5;
+    pointer-events: none;
   }
 
   /* Smooth gliding pawn token */
@@ -145,7 +178,9 @@
 
   #popquiz-staging-dock {
     min-height: 80px;
-    height: 80px;
+    height: auto;
+    position: relative;
+    width: 100%;
   }
 
   .popquiz-podium-card {
@@ -201,13 +236,13 @@
   }
 </style>
 
-<div class="container py-2 position-relative user-select-none" id="popquiz-arena">
+<div class="container-fluid px-3 py-1 position-relative user-select-none hosted-arena" id="popquiz-arena">
   <!-- Dynamic Absolute Pawn Layer -->
   <div id="popquiz-pawn-layer"></div>
 
   <!-- PHASE 1: NUMBERS GRID -->
   <div id="popquiz-numbers-screen" class="popquiz-screen">
-    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3 justify-content-center my-2" id="popquiz-numbers-container">
+    <div id="popquiz-numbers-container" class="hosted-numbers-grid">
       <!-- Dynamically generated numbered cards -->
     </div>
   </div>
@@ -221,7 +256,7 @@
   </div>
 
   <!-- Players Staging Dock -->
-  <div class="mt-3" id="popquiz-dock-container">
+  <div class="mt-2" id="popquiz-dock-container">
     <div id="popquiz-staging-dock" class="d-flex justify-content-center align-items-center"></div>
   </div>
 

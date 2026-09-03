@@ -13,6 +13,8 @@ const curatedEmojis = [
   '🎈', '🎁', '🏆', '💎', '⚽', '🏀', '🎸', '🎨', '🎯', '🔥'
 ];
 
+const { getSharedTotalCount, handleSetTotalCount, handleSelectNumber } = require('./shared');
+
 const defaultValues = [
   'Grand Prize',
   'Gold Medal',
@@ -47,10 +49,8 @@ function getRandomEmojis(count) {
 const raffleStates = new Map();
 
 function getTotalCount(state) {
-  const studentCount = Array.from(state.players.values()).filter((p) => p.id !== state.hostId).length;
-  const userCount = studentCount > 0 ? studentCount : state.players.size;
   const itemCount = state.values ? state.values.length : 0;
-  return Math.max(1, itemCount, userCount);
+  return getSharedTotalCount(state, itemCount);
 }
 
 function getOrCreateRaffleState(roomname, initialValues, hostId) {
@@ -72,6 +72,7 @@ function getOrCreateRaffleState(roomname, initialValues, hostId) {
       emojis,
       stage: 'numbers', // 'numbers' | 'emojis' | 'revealed'
       hostId: hostId || null,
+      customTotalCount: null,
       numberSelections: new Map(), // playerId -> number (1..N)
       emojiSelections: new Map(),  // playerId -> { emojiIndex, emoji }
       claimedEmojis: new Map(),    // emojiIndex -> playerId
@@ -119,6 +120,7 @@ function serializeRaffleState(state) {
   return {
     stage: state.stage,
     totalCount: totalCount,
+    customTotalCount: state.customTotalCount || null,
     values: state.stage === 'revealed' ? state.shuffledValues : null,
     emojis: state.emojis,
     hostId: state.hostId,
@@ -234,22 +236,13 @@ const raffleEvents = (io, socket, touchRoom) => {
   });
 
   socket.on('raffle/selectNumber', function(data) {
-    if (!data || !data.roomname || !data.playerId) return;
-    if (typeof touchRoom === 'function') touchRoom(data.roomname);
-    const state = raffleStates.get(data.roomname);
-    if (!state || state.stage !== 'numbers') return;
-    if (state.hostId && data.playerId === state.hostId) return;
+    const state = raffleStates.get(data && data.roomname);
+    handleSelectNumber(state, data, socket, io, 'raffle', (s) => (s.values ? s.values.length : 0), touchRoom);
+  });
 
-    const totalCount = getTotalCount(state);
-    const chosenNumber = parseInt(data.number, 10);
-    if (isNaN(chosenNumber) || chosenNumber < 1 || chosenNumber > totalCount) return;
-
-    state.numberSelections.set(data.playerId, chosenNumber);
-
-    io.to(data.roomname).emit('raffle/numberSelected', {
-      playerId: data.playerId,
-      number: chosenNumber,
-    });
+  socket.on('raffle/setTotalCount', function(data) {
+    const state = raffleStates.get(data && data.roomname);
+    handleSetTotalCount(state, data, socket, io, 'raffle', serializeRaffleState, touchRoom);
   });
 
   socket.on('raffle/setNumbers', function(data) {

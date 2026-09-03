@@ -154,44 +154,20 @@
     });
 
     // 1. Position pawns in the staging dock
-    const N = dockPlayers.length;
-    const dockSpacing = 52;
-    const dockTotalWidth = N * dockSpacing;
-    const dockStartX = (dockRect.left - arenaRect.left) + Math.max(0, (dockRect.width - dockTotalWidth) / 2);
-    const dockStartY = (dockRect.top - arenaRect.top) + (dockRect.height - 72) / 2;
+    if (window.hostedNumbers) {
+      window.hostedNumbers.positionDockPawns($arena, $dock, playerTokensMap, dockPlayers, instant);
+    } else {
+      const N = dockPlayers.length;
+      const dockSpacing = 52;
+      const dockTotalWidth = N * dockSpacing;
+      const dockStartX = (dockRect.left - arenaRect.left) + Math.max(0, (dockRect.width - dockTotalWidth) / 2);
+      const dockStartY = (dockRect.top - arenaRect.top) + (dockRect.height - 72) / 2;
 
-    dockPlayers.forEach((pId, i) => {
-      const $token = playerTokensMap[pId];
-      if ($token) {
-        if (instant) $token.css('transition', 'none');
-        $token.css('transform', `translate3d(${dockStartX + i * dockSpacing + 4}px, ${dockStartY}px, 0)`);
-        if (instant) {
-          setTimeout(() => {
-            $token.css('transition', '');
-          }, 30);
-        }
-      }
-    });
-
-    // 2. Position pawns in the bottom-right of target cards
-    Object.keys(cardPlayers).forEach((targetId) => {
-      const cardEl = document.getElementById(targetId);
-      if (!cardEl) return;
-      const cardRect = cardEl.getBoundingClientRect();
-      const list = cardPlayers[targetId];
-      const M = list.length;
-      const pawnSpacing = 36;
-      const pawnsWidth = M * pawnSpacing;
-      const rightPadding = 6;
-      const bottomPadding = 4;
-      const cardStartX = (cardRect.right - arenaRect.left) - pawnsWidth - rightPadding;
-      const cardStartY = (cardRect.bottom - arenaRect.top) - 72 - bottomPadding;
-
-      list.forEach((pId, j) => {
+      dockPlayers.forEach((pId, i) => {
         const $token = playerTokensMap[pId];
         if ($token) {
           if (instant) $token.css('transition', 'none');
-          $token.css('transform', `translate3d(${cardStartX + j * pawnSpacing}px, ${cardStartY}px, 0)`);
+          $token.css('transform', `translate3d(${dockStartX + i * dockSpacing + 4}px, ${dockStartY}px, 0)`);
           if (instant) {
             setTimeout(() => {
               $token.css('transition', '');
@@ -199,49 +175,79 @@
           }
         }
       });
+    }
+
+    // 2. Position pawns on target cards
+    Object.keys(cardPlayers).forEach((targetId) => {
+      const cardEl = document.getElementById(targetId);
+      if (!cardEl) return;
+      const list = cardPlayers[targetId];
+      if (list.length === 0) return;
+
+      const isNumberCard = cardEl.classList.contains('raffle-number-card');
+      if (isNumberCard && window.hostedNumbers) {
+        window.hostedNumbers.positionNumberCardPawns(arenaRect, cardEl, list, playerTokensMap, instant);
+      } else {
+        const cardRect = cardEl.getBoundingClientRect();
+        const M = list.length;
+        const pawnSpacing = 36;
+        const pawnsWidth = M * pawnSpacing;
+        const rightPadding = 6;
+        const bottomPadding = 4;
+        const cardStartX = (cardRect.right - arenaRect.left) - pawnsWidth - rightPadding;
+        const cardStartY = (cardRect.bottom - arenaRect.top) - 72 - bottomPadding;
+
+        list.forEach((pId, j) => {
+          const $token = playerTokensMap[pId];
+          if ($token) {
+            if (instant) $token.css('transition', 'none');
+            $token.css('transform', `translate3d(${cardStartX + j * pawnSpacing}px, ${cardStartY}px, 0)`);
+            if (instant) {
+              setTimeout(() => {
+                $token.css('transition', '');
+              }, 30);
+            }
+          }
+        });
+      }
     });
   }
 
   function renderNumbersGrid(count) {
-    const $container = $('#raffle-numbers-container');
-    $container.empty();
-
-    for (let i = 1; i <= count; i++) {
-      const $col = $('<div>', { class: 'col' });
-      const $card = $('<div>', {
-        class: 'card raffle-card raffle-number-card h-100 shadow-sm border-2 rounded-4 text-center d-flex align-items-center justify-content-center bg-white',
-        id: `raffle-num-${i}`,
-        'data-number': i,
+    if (window.hostedNumbers) {
+      window.hostedNumbers.renderGrid($('#raffle-numbers-container'), count, {
+        idPrefix: 'raffle',
+        numberSelectionsMap,
       });
+    } else {
+      const $container = $('#raffle-numbers-container');
+      $container.empty();
 
-      const $numText = $('<div>', {
-        class: 'fs-1 fw-bold text-dark lh-1',
-        text: i,
-      });
+      for (let i = 1; i <= count; i++) {
+        const $card = $('<div>', {
+          class: 'card raffle-card raffle-number-card shadow-sm border-2 rounded-4 text-center d-flex align-items-center justify-content-center bg-white',
+          id: `raffle-num-${i}`,
+          'data-number': i,
+        });
 
-      $card.append($numText);
-      $col.append($card);
-      $container.append($col);
+        const $numText = $('<div>', {
+          class: 'hosted-number-text raffle-number-text',
+          text: i,
+        });
+
+        $card.append($numText);
+        $container.append($card);
+      }
+      updateNumberCardsUI();
     }
-
-    updateNumberCardsUI();
   }
 
   function updateNumberCardsUI() {
-    const selectedNums = new Set();
-    Object.keys(numberSelectionsMap).forEach((pId) => {
-      const n = numberSelectionsMap[pId];
-      if (n) selectedNums.add(n);
-    });
-
-    $('.raffle-number-card').each(function() {
-      const num = $(this).data('number');
-      if (selectedNums.has(num)) {
-        $(this).addClass('card-muted');
-      } else {
-        $(this).removeClass('card-muted');
-      }
-    });
+    if (window.hostedNumbers) {
+      window.hostedNumbers.updateCardsUI($('#raffle-numbers-container'), numberSelectionsMap, {
+        cardSelector: '.raffle-number-card',
+      });
+    }
   }
 
   function renderEmojisGrid(emojis) {
@@ -351,9 +357,18 @@
   }
 
   function renderTopControls() {
+    const isNumbersStage = currentStage === 'numbers';
+    const countControlHtml = window.hostedNumbers ? window.hostedNumbers.renderHostCountControl(totalItemsCount, 'raffle') : `
+      <div id="raffle-count-control" class="${isHost && isNumbersStage ? 'd-flex' : 'd-none'} align-items-center gap-1 me-1">
+        <label for="raffle-total-count-input" class="small fw-bold text-secondary mb-0 text-nowrap">Items:</label>
+        <input type="number" id="raffle-total-count-input" class="form-control form-control-sm text-center fw-bold shadow-sm" style="width: 70px;" min="1" max="200" value="${totalItemsCount || 1}" title="Number of items to display" />
+      </div>
+    `;
+
     $('#activityControls').html(`
       <div id="raffle-top-host-actions" class="${isHost ? 'd-flex' : 'd-none'} align-items-center gap-2">
-        <button id="raffle-set-btn" class="btn btn-primary btn-sm px-4 fw-bold shadow-sm" style="min-width: 80px;">
+        ${countControlHtml}
+        <button id="raffle-set-btn" class="btn btn-primary btn-sm px-4 fw-bold shadow-sm ${isNumbersStage ? '' : 'd-none'}" style="min-width: 80px;">
           Next
         </button>
         <button id="raffle-go-btn" class="btn btn-success btn-sm px-4 fw-bold shadow-sm d-none" style="min-width: 80px;">
@@ -382,8 +397,12 @@
         $('#raffle-arena').addClass('host-view');
         if ($('#raffle-top-host-actions').length === 0) renderTopControls();
         $('#raffle-top-host-actions').removeClass('d-none').addClass('d-flex');
+        $('#raffle-count-control').removeClass('d-none').addClass('d-flex');
         $('#raffle-set-btn').removeClass('d-none');
         $('#raffle-go-btn, #raffle-print-btn').addClass('d-none');
+        if ($('#raffle-total-count-input').length && !$('#raffle-total-count-input').is(':focus')) {
+          $('#raffle-total-count-input').val(totalItemsCount || 1);
+        }
       } else {
         $('#raffle-arena').removeClass('host-view');
         $('#raffle-top-host-actions').addClass('d-none').removeClass('d-flex');
@@ -396,6 +415,7 @@
         $('#raffle-arena').addClass('host-view');
         if ($('#raffle-top-host-actions').length === 0) renderTopControls();
         $('#raffle-top-host-actions').removeClass('d-none').addClass('d-flex');
+        $('#raffle-count-control').addClass('d-none').removeClass('d-flex');
         $('#raffle-go-btn').removeClass('d-none');
         $('#raffle-set-btn, #raffle-print-btn').addClass('d-none');
       } else {
@@ -410,6 +430,7 @@
         $('#raffle-arena').addClass('host-view');
         if ($('#raffle-top-host-actions').length === 0) renderTopControls();
         $('#raffle-top-host-actions').removeClass('d-none').addClass('d-flex');
+        $('#raffle-count-control').addClass('d-none').removeClass('d-flex');
         $('#raffle-print-btn').removeClass('d-none');
         $('#raffle-set-btn, #raffle-go-btn').addClass('d-none');
       } else {
@@ -498,6 +519,13 @@
       } else {
         $('#raffle-arena').removeClass('host-view');
         $('#raffle-top-host-actions').addClass('d-none').removeClass('d-flex');
+      }
+
+      if (data.totalCount) {
+        totalItemsCount = data.totalCount;
+      }
+      if ($('#raffle-total-count-input').length && !$('#raffle-total-count-input').is(':focus')) {
+        $('#raffle-total-count-input').val(totalItemsCount || 1);
       }
 
       if (data.stage === 'numbers') {
@@ -634,6 +662,17 @@
         id: currentPlayer.id,
       });
     });
+
+    // 2b. Host direct editing of item count (Phase 1)
+    if (window.hostedNumbers) {
+      window.hostedNumbers.bindHostCountInput('#raffle-total-count-input', () => isHost, () => currentStage, (val) => {
+        currentSocket.emit('raffle/setTotalCount', {
+          roomname: currentPlayer.roomname,
+          id: currentPlayer.id,
+          totalCount: val,
+        });
+      });
+    }
 
     // 3. Select Emoji (Phase 2)
     $(document).off('click.raffle', '.raffle-emoji-card').on('click.raffle', '.raffle-emoji-card', function() {

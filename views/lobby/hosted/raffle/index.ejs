@@ -1,6 +1,9 @@
 <style>
   #raffle-arena {
-    min-height: 520px;
+    min-height: calc(100vh - 160px);
+    position: relative;
+    user-select: none;
+    width: 100%;
   }
 
   /* Overlay layer for smooth pawn transitions */
@@ -55,12 +58,15 @@
 
   #raffle-staging-dock {
     min-height: 80px;
-    height: 80px;
+    height: auto;
+    position: relative;
+    width: 100%;
   }
 
   /* Interactive Cards */
   .raffle-card {
-    height: 140px;
+    min-height: 100px;
+    height: 100%;
     cursor: pointer;
     transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   }
@@ -141,7 +147,7 @@
     }
     #raffle-printable-area {
       display: block !important;
-      position: absolute;
+      position: absolute !important;
       left: 0;
       top: 0;
       width: 100%;
@@ -151,13 +157,13 @@
   }
 </style>
 
-<div class="container py-2 position-relative user-select-none" id="raffle-arena">
+<div class="container-fluid px-3 py-1 position-relative user-select-none hosted-arena" id="raffle-arena">
   <!-- Dynamic Absolute Pawn Layer -->
   <div id="raffle-pawn-layer"></div>
 
   <!-- PHASE 1: NUMBERS GRID -->
   <div id="raffle-numbers-screen" class="raffle-screen">
-    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3 justify-content-center my-2" id="raffle-numbers-container">
+    <div id="raffle-numbers-container" class="hosted-numbers-grid">
       <!-- Dynamically generated numbered cards -->
     </div>
   </div>

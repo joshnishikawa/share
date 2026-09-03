@@ -115,12 +115,22 @@
   }
 
   function renderTopControls() {
+    const isNumbersStage = currentStage === 'numbers';
+    const isGradedQuiz = currentStage === 'quiz' && isRoundGraded;
+    const showSetBtn = isHost && (isNumbersStage || isGradedQuiz);
+    const isLastQ = currentQuestionIndex + 1 >= totalQuestionsCount;
+    const setBtnText = isNumbersStage ? 'Next' : (isLastQ ? 'Finish' : 'Next');
+
     $('#activityControls').html(`
       <div id="popquiz-top-host-actions" class="${isHost ? 'd-flex' : 'd-none'} align-items-center gap-2">
-        <button id="popquiz-set-btn" class="btn btn-primary btn-sm px-4 fw-bold shadow-sm" style="min-width: 80px;">
-          Next
+        <div id="popquiz-count-control" class="${isHost && isNumbersStage ? 'd-flex' : 'd-none'} align-items-center gap-1 me-1">
+          <label for="popquiz-total-count-input" class="small fw-bold text-secondary mb-0 text-nowrap">Items:</label>
+          <input type="number" id="popquiz-total-count-input" class="form-control form-control-sm text-center fw-bold shadow-sm" style="width: 70px;" min="1" max="200" value="${totalItemsCount || 1}" title="Number of items to display" />
+        </div>
+        <button id="popquiz-set-btn" class="btn btn-primary btn-sm px-4 fw-bold shadow-sm ${showSetBtn ? '' : 'd-none'}" style="min-width: 80px;">
+          ${setBtnText}
         </button>
-        <button id="popquiz-print-btn" class="btn btn-dark btn-sm px-4 fw-bold shadow-sm d-none d-inline-flex align-items-center justify-content-center gap-1" style="min-width: 80px;">
+        <button id="popquiz-print-btn" class="btn btn-dark btn-sm px-4 fw-bold shadow-sm ${currentStage === 'gameover' ? 'd-inline-flex' : 'd-none'} align-items-center justify-content-center gap-1" style="min-width: 80px;">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="align-middle">
             <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
             <path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z"/>
@@ -145,8 +155,12 @@
         $('#popquiz-arena').addClass('host-view');
         if ($('#popquiz-top-host-actions').length === 0) renderTopControls();
         $('#popquiz-top-host-actions').removeClass('d-none').addClass('d-flex');
-        $('#popquiz-set-btn').removeClass('d-none');
+        $('#popquiz-count-control').removeClass('d-none').addClass('d-flex');
+        $('#popquiz-set-btn').removeClass('d-none').text('Next');
         $('#popquiz-print-btn').addClass('d-none');
+        if ($('#popquiz-total-count-input').length && !$('#popquiz-total-count-input').is(':focus')) {
+          $('#popquiz-total-count-input').val(totalItemsCount || 1);
+        }
       } else {
         $('#popquiz-arena').removeClass('host-view');
         $('#popquiz-top-host-actions').addClass('d-none').removeClass('d-flex');
@@ -160,7 +174,13 @@
         $('#popquiz-arena').addClass('host-view');
         if ($('#popquiz-top-host-actions').length === 0) renderTopControls();
         $('#popquiz-top-host-actions').removeClass('d-none').addClass('d-flex');
-        $('#popquiz-set-btn').addClass('d-none');
+        $('#popquiz-count-control').addClass('d-none').removeClass('d-flex');
+        const isLastQ = currentQuestionIndex + 1 >= totalQuestionsCount;
+        if (isRoundGraded) {
+          $('#popquiz-set-btn').removeClass('d-none').text(isLastQ ? 'Finish' : 'Next');
+        } else {
+          $('#popquiz-set-btn').addClass('d-none');
+        }
         $('#popquiz-print-btn').addClass('d-none');
       } else {
         $('#popquiz-arena').removeClass('host-view');
@@ -177,8 +197,9 @@
         $('#popquiz-arena').addClass('host-view');
         if ($('#popquiz-top-host-actions').length === 0) renderTopControls();
         $('#popquiz-top-host-actions').removeClass('d-none').addClass('d-flex');
+        $('#popquiz-count-control').addClass('d-none').removeClass('d-flex');
         $('#popquiz-set-btn').addClass('d-none');
-        $('#popquiz-print-btn').removeClass('d-none');
+        $('#popquiz-print-btn').removeClass('d-none').addClass('d-inline-flex');
       } else {
         $('#popquiz-arena').removeClass('host-view');
         $('#popquiz-top-host-actions').addClass('d-none').removeClass('d-flex');
@@ -191,45 +212,40 @@
   }
 
   function renderNumbersGrid(count) {
-    const $container = $('#popquiz-numbers-container');
-    $container.empty();
-
-    for (let i = 1; i <= count; i++) {
-      const $col = $('<div>', { class: 'col' });
-      const $card = $('<div>', {
-        class: 'card popquiz-card popquiz-number-card h-100 shadow-sm border-2 rounded-4 text-center d-flex align-items-center justify-content-center bg-white',
-        id: `popquiz-num-${i}`,
-        'data-number': i,
+    if (window.hostedNumbers) {
+      window.hostedNumbers.renderGrid($('#popquiz-numbers-container'), count, {
+        idPrefix: 'popquiz',
+        numberSelectionsMap,
       });
+    } else {
+      const $container = $('#popquiz-numbers-container');
+      $container.empty();
 
-      const $numText = $('<div>', {
-        class: 'fs-1 fw-bold text-dark lh-1',
-        text: i,
-      });
+      for (let i = 1; i <= count; i++) {
+        const $card = $('<div>', {
+          class: 'card popquiz-card popquiz-number-card shadow-sm border-2 rounded-4 text-center d-flex align-items-center justify-content-center bg-white',
+          id: `popquiz-num-${i}`,
+          'data-number': i,
+        });
 
-      $card.append($numText);
-      $col.append($card);
-      $container.append($col);
+        const $numText = $('<div>', {
+          class: 'hosted-number-text popquiz-number-text',
+          text: i,
+        });
+
+        $card.append($numText);
+        $container.append($card);
+      }
+      updateNumberCardsUI();
     }
-
-    updateNumberCardsUI();
   }
 
   function updateNumberCardsUI() {
-    const selectedNums = new Set();
-    Object.keys(numberSelectionsMap).forEach((pId) => {
-      const n = numberSelectionsMap[pId];
-      if (n) selectedNums.add(n);
-    });
-
-    $('.popquiz-number-card').each(function() {
-      const num = $(this).data('number');
-      if (selectedNums.has(num)) {
-        $(this).addClass('card-muted');
-      } else {
-        $(this).removeClass('card-muted');
-      }
-    });
+    if (window.hostedNumbers) {
+      window.hostedNumbers.updateCardsUI($('#popquiz-numbers-container'), numberSelectionsMap, {
+        cardSelector: '.popquiz-number-card',
+      });
+    }
   }
 
   function populatePrintReport() {
@@ -291,43 +307,38 @@
       }
     });
 
-    // 1. Position pawns in the staging dock
-    const N = dockPlayers.length;
-    const dockSpacing = 52;
-    const dockTotalWidth = N * dockSpacing;
-    const dockStartX = (dockRect.left - arenaRect.left) + Math.max(0, (dockRect.width - dockTotalWidth) / 2);
-    const dockStartY = (dockRect.top - arenaRect.top) + (dockRect.height - 84) / 2;
+    // 1. Position pawns in the staging dock (with wrapping if needed)
+    if (window.hostedNumbers) {
+      window.hostedNumbers.positionDockPawns($arena, $dock, playerTokensMap, dockPlayers, instant);
+    } else {
+      const N = dockPlayers.length;
+      const dockW = dockRect.width;
+      const dockPawnW = N > 24 ? 34 : (N > 14 ? 38 : 44);
+      const dockPawnH = 40;
+      const maxDockCols = Math.max(1, Math.floor((dockW - 20) / dockPawnW));
+      const dockCols = Math.min(maxDockCols, N);
+      const dockRows = Math.ceil(N / (dockCols || 1));
 
-    dockPlayers.forEach((pId, i) => {
-      const $token = playerTokensMap[pId];
-      if ($token) {
-        if (instant) $token.css('transition', 'none');
-        $token.css('transform', `translate3d(${dockStartX + i * dockSpacing + 4}px, ${dockStartY}px, 0)`);
-        if (instant) {
-          setTimeout(() => {
-            $token.css('transition', '');
-          }, 30);
-        }
-      }
-    });
+      const neededDockHeight = Math.max(80, (dockRows - 1) * dockPawnH + 80);
+      $dock.css('min-height', neededDockHeight + 'px');
 
-    // 2. Position pawns on target cards (number card or choice card)
-    Object.keys(targetElementPlayers).forEach((elId) => {
-      const cardEl = document.getElementById(elId);
-      if (!cardEl) return;
-      const cardRect = cardEl.getBoundingClientRect();
-      const list = targetElementPlayers[elId];
-      const M = list.length;
-      const pawnSpacing = 40;
-      const pawnsWidth = M * pawnSpacing;
-      const cardStartX = (cardRect.left - arenaRect.left) + (cardRect.width - pawnsWidth) / 2;
-      const cardStartY = (cardRect.top - arenaRect.top) + (cardRect.height - 84) / 2;
+      const dockStartY = (dockRect.top - arenaRect.top) + Math.max(4, (dockRect.height - ((dockRows - 1) * dockPawnH + 75)) / 2);
 
-      list.forEach((pId, j) => {
+      dockPlayers.forEach((pId, i) => {
         const $token = playerTokensMap[pId];
         if ($token) {
+          const rowIndex = Math.floor(i / (dockCols || 1));
+          const colIndex = i % (dockCols || 1);
+          const itemsInThisRow = Math.min(dockCols, N - rowIndex * dockCols);
+          const rowWidth = (itemsInThisRow - 1) * dockPawnW + 44;
+          const rowStartX = (dockRect.left - arenaRect.left) + (dockRect.width - rowWidth) / 2;
+
+          const posX = rowStartX + colIndex * dockPawnW;
+          const posY = dockStartY + rowIndex * dockPawnH;
+
+          $token.css('z-index', 20 + rowIndex);
           if (instant) $token.css('transition', 'none');
-          $token.css('transform', `translate3d(${cardStartX + j * pawnSpacing}px, ${cardStartY}px, 0)`);
+          $token.css('transform', `translate3d(${posX}px, ${posY}px, 0)`);
           if (instant) {
             setTimeout(() => {
               $token.css('transition', '');
@@ -335,6 +346,112 @@
           }
         }
       });
+    }
+
+    // 2. Position pawns on target cards (number card or choice card) with wrapping
+    Object.keys(targetElementPlayers).forEach((elId) => {
+      const cardEl = document.getElementById(elId);
+      if (!cardEl) return;
+      const cardRect = cardEl.getBoundingClientRect();
+      const list = targetElementPlayers[elId];
+      const M = list.length;
+      if (M === 0) return;
+
+      const isChoiceCard = cardEl.classList.contains('popquiz-choice-card');
+
+      if (isChoiceCard) {
+        // CHOICE CARD: Place pawns wrapped below choice text
+        const textEl = cardEl.querySelector('.popquiz-choice-text');
+        let startAreaY = cardRect.top - arenaRect.top + 16;
+        let availableHeight = cardRect.height - 24;
+
+        if (textEl) {
+          const textRect = textEl.getBoundingClientRect();
+          startAreaY = textRect.bottom - arenaRect.top + 8;
+          availableHeight = Math.max(60, (cardRect.bottom - arenaRect.top) - startAreaY - 8);
+        }
+
+        const paddingX = 14;
+        const usableWidth = Math.max(44, cardRect.width - paddingX * 2);
+
+        // Adaptive pawn spacing based on crowd density
+        const pawnSpacingX = M > 20 ? 32 : (M > 10 ? 36 : 40);
+        const pawnSpacingY = M > 20 ? 36 : (M > 10 ? 40 : 44);
+        const tokenDisplayH = 75;
+
+        const maxCols = Math.max(1, Math.floor(usableWidth / pawnSpacingX));
+        const cols = Math.min(maxCols, M);
+        const rows = Math.ceil(M / (cols || 1));
+
+        const totalCrowdHeight = (rows - 1) * pawnSpacingY + tokenDisplayH;
+        const crowdStartY = availableHeight > totalCrowdHeight
+          ? startAreaY + (availableHeight - totalCrowdHeight) / 2
+          : startAreaY + 4;
+
+        list.forEach((pId, j) => {
+          const $token = playerTokensMap[pId];
+          if (!$token) return;
+
+          const rowIndex = Math.floor(j / (cols || 1));
+          const colIndex = j % (cols || 1);
+
+          const itemsInThisRow = Math.min(cols, M - rowIndex * cols);
+          const rowWidth = (itemsInThisRow - 1) * pawnSpacingX + 44;
+          const rowStartX = (cardRect.left - arenaRect.left) + (cardRect.width - rowWidth) / 2;
+
+          const posX = rowStartX + colIndex * pawnSpacingX;
+          const posY = crowdStartY + rowIndex * pawnSpacingY;
+
+          $token.css('z-index', 25 + rowIndex);
+
+          if (instant) $token.css('transition', 'none');
+          $token.css('transform', `translate3d(${posX}px, ${posY}px, 0)`);
+          if (instant) {
+            setTimeout(() => {
+              $token.css('transition', '');
+            }, 30);
+          }
+        });
+      } else {
+        // NUMBER CARD: Center pawn(s) on the card
+        if (window.hostedNumbers) {
+          window.hostedNumbers.positionNumberCardPawns(arenaRect, cardEl, list, playerTokensMap, instant);
+        } else {
+          const cardW = cardRect.width;
+          const cardH = cardRect.height;
+          const pawnSpacingX = 36;
+          const maxCols = Math.max(1, Math.floor((cardW - 10) / pawnSpacingX));
+          const cols = Math.min(maxCols, M);
+          const rows = Math.ceil(M / (cols || 1));
+          const pawnSpacingY = 36;
+
+          const startY = (cardRect.top - arenaRect.top) + Math.max(2, (cardH - ((rows - 1) * pawnSpacingY + 70)) / 2);
+
+          list.forEach((pId, j) => {
+            const $token = playerTokensMap[pId];
+            if (!$token) return;
+
+            const rowIndex = Math.floor(j / (cols || 1));
+            const colIndex = j % (cols || 1);
+            const itemsInThisRow = Math.min(cols, M - rowIndex * cols);
+            const rowWidth = (itemsInThisRow - 1) * pawnSpacingX + 44;
+            const rowStartX = (cardRect.left - arenaRect.left) + (cardW - rowWidth) / 2;
+
+            const posX = rowStartX + colIndex * pawnSpacingX;
+            const posY = startY + rowIndex * pawnSpacingY;
+
+            $token.css('z-index', 25 + rowIndex);
+
+            if (instant) $token.css('transition', 'none');
+            $token.css('transform', `translate3d(${posX}px, ${posY}px, 0)`);
+            if (instant) {
+              setTimeout(() => {
+                $token.css('transition', '');
+              }, 30);
+            }
+          });
+        }
+      }
     });
   }
 
@@ -436,6 +553,10 @@
     currentSocket.on('popquiz/sync', function(data) {
       if (!data) return;
       totalItemsCount = data.totalCount || 0;
+      if ($('#popquiz-total-count-input').length && !$('#popquiz-total-count-input').is(':focus')) {
+        $('#popquiz-total-count-input').val(totalItemsCount || 1);
+      }
+
       if (data.hostId) {
         roomHostId = data.hostId;
       }
@@ -469,6 +590,19 @@
       } else if (data.stage === 'quiz') {
         currentQuestionIndex = data.questionIndex || 0;
         totalQuestionsCount = data.totalQuestions || 1;
+        isRoundGraded = Boolean(data.graded);
+        if (data.choices) roundChoices = data.choices;
+        if (isRoundGraded && data.correctChoiceIndex !== null && data.correctChoiceIndex !== undefined) {
+          const correctIndex = Number(data.correctChoiceIndex);
+          $('.popquiz-choice-card').each(function() {
+            const idx = Number($(this).data('index'));
+            if (idx === correctIndex) {
+              $(this).addClass('popquiz-choice-correct');
+            } else {
+              $(this).addClass('popquiz-choice-incorrect');
+            }
+          });
+        }
       }
 
       syncPawnsForPlayers(playersList);
@@ -529,16 +663,25 @@
         $('#popquiz-top-host-actions').addClass('d-none').removeClass('d-flex');
       }
 
-      // Render choice cards
+      // Render choice cards: 2x2 grid for 4 choices, full screen taking
       const $container = $('#popquiz-choices-container');
       $container.empty();
 
-      const colClass = roundChoices.length <= 2 ? 'col-sm-6 col-12' : (roundChoices.length <= 4 ? 'col-sm-6 col-md-3 col-12' : 'col-sm-4 col-12');
+      let colClass = 'col-sm-6 col-12';
+      if (roundChoices.length === 2) {
+        colClass = 'col-sm-6 col-12';
+      } else if (roundChoices.length === 3) {
+        colClass = 'col-md-4 col-sm-6 col-12';
+      } else if (roundChoices.length === 4) {
+        colClass = 'col-6'; // 2x2 grid filling width and height!
+      } else {
+        colClass = 'col-md-4 col-sm-6 col-12';
+      }
 
       roundChoices.forEach((choiceText, index) => {
-        const $col = $('<div>', { class: colClass });
+        const $col = $('<div>', { class: colClass + ' d-flex' });
         const $card = $('<div>', {
-          class: 'popquiz-choice-card w-100',
+          class: 'popquiz-choice-card w-100 flex-grow-1',
           id: `choice-${index}`,
           'data-index': index,
         });
@@ -610,7 +753,17 @@
       }
 
       const safeWord = escapeHtml(correctWord);
-      setStatus(`<span class="text-success fw-bold">Correct: ${safeWord}!</span> Loading next question...`);
+      const isLastQ = (currentQuestionIndex + 1 >= totalQuestionsCount) || data.isGameOver;
+
+      if (isHost) {
+        setStatus(`<span class="text-success fw-bold">Correct: ${safeWord}!</span> Tap "${isLastQ ? 'Finish' : 'Next'}" to continue.`);
+        $('#popquiz-set-btn')
+          .removeClass('d-none')
+          .text(isLastQ ? 'Finish' : 'Next');
+      } else {
+        setStatus(`<span class="text-success fw-bold">Correct: ${safeWord}!</span> Waiting for host...`);
+        $('#popquiz-set-btn').addClass('d-none');
+      }
     });
 
     // Handle game over / winner podium
@@ -695,14 +848,32 @@
       });
     });
 
-    // 2. Host advances to quiz (Phase 1 -> Phase 2)
+    // 2. Host advances (Phase 1 -> Phase 2 OR Next Question in Phase 2)
     $(document).off('click.popquiz', '#popquiz-set-btn').on('click.popquiz', '#popquiz-set-btn', function() {
-      if (!isHost || currentStage !== 'numbers') return;
-      currentSocket.emit('popquiz/setNumbers', {
-        roomname: currentPlayer.roomname,
-        id: currentPlayer.id,
-      });
+      if (!isHost) return;
+      if (currentStage === 'numbers') {
+        currentSocket.emit('popquiz/setNumbers', {
+          roomname: currentPlayer.roomname,
+          id: currentPlayer.id,
+        });
+      } else if (currentStage === 'quiz' && isRoundGraded) {
+        currentSocket.emit('popquiz/nextRound', {
+          roomname: currentPlayer.roomname,
+          id: currentPlayer.id,
+        });
+      }
     });
+
+    // 2b. Host direct editing of item count (Phase 1)
+    if (window.hostedNumbers) {
+      window.hostedNumbers.bindHostCountInput('#popquiz-total-count-input', () => isHost, () => currentStage, (val) => {
+        currentSocket.emit('popquiz/setTotalCount', {
+          roomname: currentPlayer.roomname,
+          id: currentPlayer.id,
+          totalCount: val,
+        });
+      });
+    }
 
     // 3. Interactive Choice Click (Phase 2)
     $(document).off('click.popquiz', '.popquiz-choice-card').on('click.popquiz', '.popquiz-choice-card', function() {

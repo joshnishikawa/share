@@ -2,6 +2,8 @@
  * sockets/hosted/activities/vote.js — Vote hosted activity server socket handlers
  */
 
+const { getSharedTotalCount, handleSetTotalCount, handleSelectNumber } = require('./shared');
+
 const defaultValues = [
   'Option A',
   'Option B',
@@ -13,10 +15,8 @@ const defaultValues = [
 const voteStates = new Map();
 
 function getTotalCount(state) {
-  const studentCount = Array.from(state.players.values()).filter((p) => p.id !== state.hostId).length;
-  const userCount = studentCount > 0 ? studentCount : state.players.size;
   const itemCount = state.values ? state.values.length : 0;
-  return Math.max(1, itemCount, userCount);
+  return getSharedTotalCount(state, itemCount);
 }
 
 function calculateTotals(state) {
@@ -85,6 +85,7 @@ function getOrCreateVoteState(roomname, initialValues, hostId) {
       values,
       stage: 'numbers', // 'numbers' | 'voting'
       hostId: hostId || null,
+      customTotalCount: null,
       numberSelections: new Map(), // playerId -> number (1..N)
       userVotes: new Map(),        // playerId -> { [itemIndex]: count } (sum <= 5)
       readySockets: new Set(),
@@ -121,6 +122,7 @@ function serializeVoteState(state) {
   return {
     stage: state.stage,
     totalCount: totalCount,
+    customTotalCount: state.customTotalCount || null,
     values: state.values,
     hostId: state.hostId,
     players: Array.from(state.players.values()),
@@ -201,22 +203,13 @@ const voteEvents = (io, socket, touchRoom) => {
   });
 
   socket.on('vote/selectNumber', function(data) {
-    if (!data || !data.roomname || !data.playerId) return;
-    if (typeof touchRoom === 'function') touchRoom(data.roomname);
-    const state = voteStates.get(data.roomname);
-    if (!state || state.stage !== 'numbers') return;
-    if (state.hostId && data.playerId === state.hostId) return;
+    const state = voteStates.get(data && data.roomname);
+    handleSelectNumber(state, data, socket, io, 'vote', (s) => (s.values ? s.values.length : 0), touchRoom);
+  });
 
-    const totalCount = getTotalCount(state);
-    const chosenNumber = parseInt(data.number, 10);
-    if (isNaN(chosenNumber) || chosenNumber < 1 || chosenNumber > totalCount) return;
-
-    state.numberSelections.set(data.playerId, chosenNumber);
-
-    io.to(data.roomname).emit('vote/numberSelected', {
-      playerId: data.playerId,
-      number: chosenNumber,
-    });
+  socket.on('vote/setTotalCount', function(data) {
+    const state = voteStates.get(data && data.roomname);
+    handleSetTotalCount(state, data, socket, io, 'vote', serializeVoteState, touchRoom);
   });
 
   socket.on('vote/setNumbers', function(data) {

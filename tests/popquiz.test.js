@@ -166,12 +166,15 @@ describe('Pop Quiz Hosted Activity Socket Handlers', () => {
     }));
   });
 
-  test('full quiz flow: select answer, host grade, advance question and gameover', () => {
+  test('full quiz flow: select answer, host grade, advance question and gameover via popquiz/nextRound', () => {
     socketHost.trigger('popquiz/ready', {
       roomname,
       playerId: 'HostTeacher',
       isHost: true,
-      questions: [['a', 'b']],
+      questions: [
+        ['a', 'b'],
+        ['c', 'd'],
+      ],
     });
 
     socketGuest1.trigger('popquiz/ready', {
@@ -213,7 +216,97 @@ describe('Pop Quiz Hosted Activity Socket Handlers', () => {
     expect(ioMock.emit).toHaveBeenCalledWith('popquiz/graded', expect.objectContaining({
       correctChoiceIndex: 0,
       scores: expect.objectContaining({ Student1: 1 }),
+      isGameOver: false,
+    }));
+
+    // Verify state did not automatically advance
+    const state = popquizEvents.getOrCreatePopquizState(roomname);
+    expect(state.currentQuestionIndex).toBe(0);
+    expect(state.graded).toBe(true);
+
+    // Host manually advances to question 2
+    socketHost.trigger('popquiz/nextRound', {
+      roomname,
+      id: 'HostTeacher',
+    });
+
+    expect(ioMock.emit).toHaveBeenCalledWith('popquiz/roundstart', expect.objectContaining({
+      choices: ['c', 'd'],
+      questionIndex: 1,
+      totalQuestions: 2,
+    }));
+
+    // Host grades question 2
+    socketHost.trigger('popquiz/grade', {
+      roomname,
+      id: 'HostTeacher',
+      correctChoiceIndex: 1,
+    });
+
+    expect(ioMock.emit).toHaveBeenCalledWith('popquiz/graded', expect.objectContaining({
+      correctChoiceIndex: 1,
       isGameOver: true,
+    }));
+
+    // Host manually finishes quiz
+    socketHost.trigger('popquiz/nextRound', {
+      roomname,
+      id: 'HostTeacher',
+    });
+
+    expect(ioMock.emit).toHaveBeenCalledWith('popquiz/gameover', expect.objectContaining({
+      scores: expect.objectContaining({ Student1: 1 }),
+    }));
+  });
+
+  test('host can directly edit totalCount in numbers stage via popquiz/setTotalCount', () => {
+    socketHost.trigger('popquiz/ready', {
+      roomname,
+      playerId: 'HostTeacher',
+      isHost: true,
+      questions: [['a', 'b']],
+    });
+
+    socketGuest1.trigger('popquiz/selectNumber', {
+      roomname,
+      playerId: 'Student1',
+      number: 5,
+    });
+
+    // Host updates totalCount to 3
+    socketHost.trigger('popquiz/setTotalCount', {
+      roomname,
+      id: 'HostTeacher',
+      totalCount: 3,
+    });
+
+    expect(ioMock.emit).toHaveBeenCalledWith('popquiz/sync', expect.objectContaining({
+      stage: 'numbers',
+      totalCount: 3,
+      customTotalCount: 3,
+    }));
+
+    // Guest selection of 5 should have been pruned since totalCount is 3
+    const state = popquizEvents.getOrCreatePopquizState(roomname);
+    expect(state.numberSelections.has('Student1')).toBe(false);
+  });
+
+  test('non-host cannot edit item count', () => {
+    socketHost.trigger('popquiz/ready', {
+      roomname,
+      playerId: 'HostTeacher',
+      isHost: true,
+      questions: [['a', 'b']],
+    });
+
+    socketGuest1.trigger('popquiz/setTotalCount', {
+      roomname,
+      id: 'Student1',
+      totalCount: 10,
+    });
+
+    expect(socketGuest1.emit).toHaveBeenCalledWith('error', expect.objectContaining({
+      message: expect.stringContaining('Only the host'),
     }));
   });
 

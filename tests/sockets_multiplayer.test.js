@@ -612,6 +612,12 @@ describe('Multiplayer Sockets Integration', () => {
           expect(gradedData.correctChoiceIndex).toBe(0);
           expect(gradedData.scores['QuizGuest']).toBe(1);
           expect(gradedData.isGameOver).toBe(true);
+
+          // Host taps Next to finish quiz
+          clientSocket1.emit('popquiz/nextRound', {
+            roomname,
+            id: 'QuizHost',
+          });
         });
 
         clientSocket2.on('popquiz/gameover', (overData) => {
@@ -798,6 +804,13 @@ describe('Multiplayer Sockets Integration', () => {
             roomname,
             id: 'HostPodium',
             correctChoiceIndex: 0,
+          });
+        });
+
+        clientSocket1.on('popquiz/graded', () => {
+          clientSocket1.emit('popquiz/nextRound', {
+            roomname,
+            id: 'HostPodium',
           });
         });
 

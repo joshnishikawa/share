@@ -1,6 +1,8 @@
 /**
  * sockets/hosted/activities/popquiz.js — Pop Quiz hosted activity server socket handlers
  */
+const { getSharedTotalCount, handleSetTotalCount, handleSelectNumber } = require('./shared');
+
 const defaultQuestions = [
   ['apples', 'bananas', 'pears'],
   ['red', 'yellow', 'green', 'blue'],
@@ -9,10 +11,8 @@ const defaultQuestions = [
 const popquizStates = new Map();
 
 function getTotalCount(state) {
-  const studentCount = Array.from(state.players.values()).filter((p) => p.id !== state.hostId).length;
-  const userCount = studentCount > 0 ? studentCount : state.players.size;
   const itemCount = state.questions ? state.questions.length : 0;
-  return Math.max(1, itemCount, userCount);
+  return getSharedTotalCount(state, itemCount);
 }
 
 function getOrCreatePopquizState(roomname, initialQuestions, hostId) {
@@ -33,6 +33,8 @@ function getOrCreatePopquizState(roomname, initialQuestions, hostId) {
       players: new Map(),
       graded: false,
       started: false,
+      customTotalCount: null,
+      correctChoiceIndex: null,
     });
   } else {
     const state = popquizStates.get(roomname);
@@ -66,6 +68,7 @@ function serializePopquizState(state) {
   return {
     stage: state.stage,
     totalCount: totalCount,
+    customTotalCount: state.customTotalCount || null,
     questionIndex: state.currentQuestionIndex,
     totalQuestions: state.questions.length,
     choices: currentChoices,
@@ -74,6 +77,8 @@ function serializePopquizState(state) {
     numberSelections: numberSelectionsObj,
     scores: state.scores,
     started: state.started,
+    graded: state.graded || false,
+    correctChoiceIndex: state.correctChoiceIndex !== undefined ? state.correctChoiceIndex : null,
     isGameOver: state.isGameOver || false,
     gameOverData: state.gameOverData || null,
   };
@@ -187,22 +192,13 @@ const popquizEvents = (io, socket, touchRoom) => {
   });
 
   socket.on('popquiz/selectNumber', function(data) {
-    if (!data || !data.roomname || !data.playerId) return;
-    if (typeof touchRoom === 'function') touchRoom(data.roomname);
-    const state = popquizStates.get(data.roomname);
-    if (!state || state.stage !== 'numbers') return;
-    if (state.hostId && data.playerId === state.hostId) return;
+    const state = popquizStates.get(data && data.roomname);
+    handleSelectNumber(state, data, socket, io, 'popquiz', (s) => (s.questions ? s.questions.length : 0), touchRoom);
+  });
 
-    const totalCount = getTotalCount(state);
-    const chosenNumber = parseInt(data.number, 10);
-    if (isNaN(chosenNumber) || chosenNumber < 1 || chosenNumber > totalCount) return;
-
-    state.numberSelections.set(data.playerId, chosenNumber);
-
-    io.to(data.roomname).emit('popquiz/numberSelected', {
-      playerId: data.playerId,
-      number: chosenNumber,
-    });
+  socket.on('popquiz/setTotalCount', function(data) {
+    const state = popquizStates.get(data && data.roomname);
+    handleSetTotalCount(state, data, socket, io, 'popquiz', serializePopquizState, touchRoom);
   });
 
   socket.on('popquiz/setNumbers', function(data) {
@@ -276,6 +272,7 @@ const popquizEvents = (io, socket, touchRoom) => {
 
     state.graded = true;
     const correctIndex = Number(data.correctChoiceIndex);
+    state.correctChoiceIndex = correctIndex;
 
     const playersArray = Array.from(state.players.values());
     const studentPlayers = playersArray.filter((p) => p.id !== state.hostId);
@@ -305,35 +302,50 @@ const popquizEvents = (io, socket, touchRoom) => {
       scores: state.scores,
       isGameOver,
     });
+  });
 
-    const transitionTimer = setTimeout(() => {
-      if (isGameOver) {
-        state.stage = 'gameover';
-        state.isGameOver = true;
-        const scoresArr = targetPlayers.map((p) => ({
-          playerId: p.id,
-          score: state.scores[p.id] || 0,
-          player: p,
-        }));
+  socket.on('popquiz/nextRound', function(data) {
+    if (!data || !data.roomname) return;
+    if (typeof touchRoom === 'function') touchRoom(data.roomname);
+    const state = popquizStates.get(data.roomname);
+    if (!state || state.stage !== 'quiz' || !state.graded || state.isGameOver) return;
 
-        scoresArr.sort((a, b) => b.score - a.score);
-        const topScore = scoresArr.length > 0 ? scoresArr[0].score : 0;
-        const winners = scoresArr.filter((s) => s.score === topScore && topScore > 0);
+    if (state.hostId && data.id !== state.hostId) {
+      socket.emit('error', { message: 'Only the host can advance rounds.' });
+      return;
+    }
 
-        state.gameOverData = {
-          winners: winners.length > 0 ? winners : scoresArr,
-          leaderboard: scoresArr,
-          scores: state.scores,
-        };
+    const playersArray = Array.from(state.players.values());
+    const studentPlayers = playersArray.filter((p) => p.id !== state.hostId);
+    const targetPlayers = studentPlayers.length > 0 ? studentPlayers : playersArray;
 
-        io.to(data.roomname).emit('popquiz/gameover', state.gameOverData);
-      } else {
-        state.currentQuestionIndex += 1;
-        emitRoundStart(io, data.roomname, state);
-      }
-    }, 2500);
+    const isGameOver = state.currentQuestionIndex + 1 >= state.questions.length;
 
-    if (transitionTimer.unref) transitionTimer.unref();
+    if (isGameOver) {
+      state.stage = 'gameover';
+      state.isGameOver = true;
+      const scoresArr = targetPlayers.map((p) => ({
+        playerId: p.id,
+        score: state.scores[p.id] || 0,
+        player: p,
+      }));
+
+      scoresArr.sort((a, b) => b.score - a.score);
+      const topScore = scoresArr.length > 0 ? scoresArr[0].score : 0;
+      const winners = scoresArr.filter((s) => s.score === topScore && topScore > 0);
+
+      state.gameOverData = {
+        winners: winners.length > 0 ? winners : scoresArr,
+        leaderboard: scoresArr,
+        scores: state.scores,
+      };
+
+      io.to(data.roomname).emit('popquiz/gameover', state.gameOverData);
+    } else {
+      state.currentQuestionIndex += 1;
+      state.correctChoiceIndex = null;
+      emitRoundStart(io, data.roomname, state);
+    }
   });
 
   socket.on('disconnect', function() {

@@ -175,44 +175,20 @@
     });
 
     // 1. Position pawns in the staging dock
-    const N = dockPlayers.length;
-    const dockSpacing = 52;
-    const dockTotalWidth = N * dockSpacing;
-    const dockStartX = (dockRect.left - arenaRect.left) + Math.max(0, (dockRect.width - dockTotalWidth) / 2);
-    const dockStartY = (dockRect.top - arenaRect.top) + (dockRect.height - 72) / 2;
+    if (window.hostedNumbers) {
+      window.hostedNumbers.positionDockPawns($arena, $dock, playerTokensMap, dockPlayers, instant);
+    } else {
+      const N = dockPlayers.length;
+      const dockSpacing = 52;
+      const dockTotalWidth = N * dockSpacing;
+      const dockStartX = (dockRect.left - arenaRect.left) + Math.max(0, (dockRect.width - dockTotalWidth) / 2);
+      const dockStartY = (dockRect.top - arenaRect.top) + (dockRect.height - 72) / 2;
 
-    dockPlayers.forEach((pId, i) => {
-      const $token = playerTokensMap[pId];
-      if ($token) {
-        if (instant) $token.css('transition', 'none');
-        $token.css('transform', `translate3d(${dockStartX + i * dockSpacing + 4}px, ${dockStartY}px, 0)`);
-        if (instant) {
-          setTimeout(() => {
-            $token.css('transition', '');
-          }, 30);
-        }
-      }
-    });
-
-    // 2. Position pawns in target cards
-    Object.keys(cardPlayers).forEach((targetId) => {
-      const cardEl = document.getElementById(targetId);
-      if (!cardEl) return;
-      const cardRect = cardEl.getBoundingClientRect();
-      const list = cardPlayers[targetId];
-      const M = list.length;
-      const pawnSpacing = 36;
-      const pawnsWidth = M * pawnSpacing;
-      const rightPadding = 6;
-      const bottomPadding = 4;
-      const cardStartX = (cardRect.right - arenaRect.left) - pawnsWidth - rightPadding;
-      const cardStartY = (cardRect.bottom - arenaRect.top) - 72 - bottomPadding;
-
-      list.forEach((pId, j) => {
+      dockPlayers.forEach((pId, i) => {
         const $token = playerTokensMap[pId];
         if ($token) {
           if (instant) $token.css('transition', 'none');
-          $token.css('transform', `translate3d(${cardStartX + j * pawnSpacing}px, ${cardStartY}px, 0)`);
+          $token.css('transform', `translate3d(${dockStartX + i * dockSpacing + 4}px, ${dockStartY}px, 0)`);
           if (instant) {
             setTimeout(() => {
               $token.css('transition', '');
@@ -220,49 +196,78 @@
           }
         }
       });
+    }
+
+    // 2. Position pawns in target cards
+    Object.keys(cardPlayers).forEach((targetId) => {
+      const cardEl = document.getElementById(targetId);
+      if (!cardEl) return;
+      const list = cardPlayers[targetId];
+      if (list.length === 0) return;
+
+      if (window.hostedNumbers) {
+        window.hostedNumbers.positionNumberCardPawns(arenaRect, cardEl, list, playerTokensMap, instant);
+      } else {
+        const cardRect = cardEl.getBoundingClientRect();
+        const M = list.length;
+        const pawnSpacing = 36;
+        const pawnsWidth = M * pawnSpacing;
+        const rightPadding = 6;
+        const bottomPadding = 4;
+        const cardStartX = (cardRect.right - arenaRect.left) - pawnsWidth - rightPadding;
+        const cardStartY = (cardRect.bottom - arenaRect.top) - 72 - bottomPadding;
+
+        list.forEach((pId, j) => {
+          const $token = playerTokensMap[pId];
+          if ($token) {
+            if (instant) $token.css('transition', 'none');
+            $token.css('transform', `translate3d(${cardStartX + j * pawnSpacing}px, ${cardStartY}px, 0)`);
+            if (instant) {
+              setTimeout(() => {
+                $token.css('transition', '');
+              }, 30);
+            }
+          }
+        });
+      }
     });
   }
 
   function renderNumbersGrid(count) {
-    const $container = $('#vote-numbers-container');
-    $container.empty();
-
-    for (let i = 1; i <= count; i++) {
-      const $col = $('<div>', { class: 'col' });
-      const $card = $('<div>', {
-        class: 'card vote-card vote-number-card h-100 shadow-sm border-2 rounded-4 text-center d-flex align-items-center justify-content-center bg-white',
-        id: `vote-num-${i}`,
-        'data-number': i,
+    if (window.hostedNumbers) {
+      window.hostedNumbers.renderGrid($('#vote-numbers-container'), count, {
+        idPrefix: 'vote',
+        numberSelectionsMap,
       });
+    } else {
+      const $container = $('#vote-numbers-container');
+      $container.empty();
 
-      const $numText = $('<div>', {
-        class: 'fs-1 fw-bold text-dark lh-1',
-        text: i,
-      });
+      for (let i = 1; i <= count; i++) {
+        const $card = $('<div>', {
+          class: 'card vote-card vote-number-card shadow-sm border-2 rounded-4 text-center d-flex align-items-center justify-content-center bg-white',
+          id: `vote-num-${i}`,
+          'data-number': i,
+        });
 
-      $card.append($numText);
-      $col.append($card);
-      $container.append($col);
+        const $numText = $('<div>', {
+          class: 'hosted-number-text vote-number-text',
+          text: i,
+        });
+
+        $card.append($numText);
+        $container.append($card);
+      }
+      updateNumberCardsUI();
     }
-
-    updateNumberCardsUI();
   }
 
   function updateNumberCardsUI() {
-    const selectedNums = new Set();
-    Object.keys(numberSelectionsMap).forEach((pId) => {
-      const n = numberSelectionsMap[pId];
-      if (n) selectedNums.add(n);
-    });
-
-    $('.vote-number-card').each(function() {
-      const num = $(this).data('number');
-      if (selectedNums.has(num)) {
-        $(this).addClass('card-muted');
-      } else {
-        $(this).removeClass('card-muted');
-      }
-    });
+    if (window.hostedNumbers) {
+      window.hostedNumbers.updateCardsUI($('#vote-numbers-container'), numberSelectionsMap, {
+        cardSelector: '.vote-number-card',
+      });
+    }
   }
 
   // --- Phase 2: Star Token Management & Smooth Gliding ---
@@ -630,12 +635,21 @@
   }
 
   function renderTopControls() {
+    const isNumbersStage = currentStage === 'numbers';
+    const countControlHtml = window.hostedNumbers ? window.hostedNumbers.renderHostCountControl(totalItemsCount, 'vote') : `
+      <div id="vote-count-control" class="${isHost && isNumbersStage ? 'd-flex' : 'd-none'} align-items-center gap-1 me-1">
+        <label for="vote-total-count-input" class="small fw-bold text-secondary mb-0 text-nowrap">Items:</label>
+        <input type="number" id="vote-total-count-input" class="form-control form-control-sm text-center fw-bold shadow-sm" style="width: 70px;" min="1" max="200" value="${totalItemsCount || 1}" title="Number of items to display" />
+      </div>
+    `;
+
     $('#activityControls').html(`
       <div id="vote-top-host-actions" class="${isHost ? 'd-flex' : 'd-none'} align-items-center gap-2">
-        <button id="vote-set-btn" class="btn btn-primary btn-sm px-4 fw-bold shadow-sm" style="min-width: 80px;">
+        ${countControlHtml}
+        <button id="vote-set-btn" class="btn btn-primary btn-sm px-4 fw-bold shadow-sm ${isNumbersStage ? '' : 'd-none'}" style="min-width: 80px;">
           Next
         </button>
-        <button id="vote-print-btn" class="btn btn-dark btn-sm px-4 fw-bold shadow-sm d-none d-inline-flex align-items-center justify-content-center gap-1" style="min-width: 80px;">
+        <button id="vote-print-btn" class="btn btn-dark btn-sm px-4 fw-bold shadow-sm ${currentStage === 'voting' ? 'd-inline-flex' : 'd-none'} align-items-center justify-content-center gap-1" style="min-width: 80px;">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="align-middle">
             <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
             <path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z"/>
@@ -659,8 +673,12 @@
         $('#vote-arena').addClass('host-view');
         if ($('#vote-top-host-actions').length === 0) renderTopControls();
         $('#vote-top-host-actions').removeClass('d-none').addClass('d-flex');
+        $('#vote-count-control').removeClass('d-none').addClass('d-flex');
         $('#vote-set-btn').removeClass('d-none');
         $('#vote-print-btn').addClass('d-none');
+        if ($('#vote-total-count-input').length && !$('#vote-total-count-input').is(':focus')) {
+          $('#vote-total-count-input').val(totalItemsCount || 1);
+        }
       } else {
         $('#vote-arena').removeClass('host-view');
         $('#vote-top-host-actions').addClass('d-none').removeClass('d-flex');
@@ -677,6 +695,7 @@
         $('#vote-star-layer').empty();
         if ($('#vote-top-host-actions').length === 0) renderTopControls();
         $('#vote-top-host-actions').removeClass('d-none').addClass('d-flex');
+        $('#vote-count-control').addClass('d-none').removeClass('d-flex');
         $('#vote-set-btn').addClass('d-none');
         $('#vote-print-btn').removeClass('d-none');
         updateHostVotingView();
@@ -784,6 +803,13 @@
         $('#vote-top-host-actions').addClass('d-none').removeClass('d-flex');
       }
 
+      if (data.totalCount) {
+        totalItemsCount = data.totalCount;
+      }
+      if ($('#vote-total-count-input').length && !$('#vote-total-count-input').is(':focus')) {
+        $('#vote-total-count-input').val(totalItemsCount || 1);
+      }
+
       if (data.stage === 'numbers') {
         if (data.numberSelections) {
           numberSelectionsMap = data.numberSelections;
@@ -881,6 +907,17 @@
         id: currentPlayer.id,
       });
     });
+
+    // 2b. Host direct editing of item count (Phase 1)
+    if (window.hostedNumbers) {
+      window.hostedNumbers.bindHostCountInput('#vote-total-count-input', () => isHost, () => currentStage, (val) => {
+        currentSocket.emit('vote/setTotalCount', {
+          roomname: currentPlayer.roomname,
+          id: currentPlayer.id,
+          totalCount: val,
+        });
+      });
+    }
 
     // 3. Guest Voting Click Handlers (Phase 2)
     // Clicking an item card moves an available star from reserve to that item
