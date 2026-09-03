@@ -598,6 +598,7 @@ $(function(){
           socket: socket,
           player: player,
           room: room,
+          isHost: isHost,
           questions: isHost ? window.popquizQuestions : null,
           values: isHost ? ((activity === 'vote' ? window.voteValues : window.raffleValues) || window.raffleValues || window.voteValues) : null,
         });

@@ -636,16 +636,23 @@
 
   function renderTopControls() {
     const isNumbersStage = currentStage === 'numbers';
-    const countControlHtml = window.hostedNumbers ? window.hostedNumbers.renderHostCountControl(totalItemsCount, 'vote') : `
-      <div id="vote-count-control" class="${isHost && isNumbersStage ? 'd-flex' : 'd-none'} align-items-center gap-1 me-1">
-        <label for="vote-total-count-input" class="small fw-bold text-secondary mb-0 text-nowrap">Items:</label>
-        <input type="number" id="vote-total-count-input" class="form-control form-control-sm text-center fw-bold shadow-sm" style="width: 70px;" min="1" max="200" value="${totalItemsCount || 1}" title="Number of items to display" />
-      </div>
-    `;
+    let countControlHtml = '';
+    if (window.hostedNumbers) {
+      countControlHtml = window.hostedNumbers.renderHostCountControl(totalItemsCount || 1, 'vote');
+    } else {
+      countControlHtml = `
+        <div id="vote-count-control" class="${isHost && isNumbersStage ? 'd-flex' : 'd-none'} align-items-center gap-1 me-1">
+          <label for="vote-total-count-input" class="small fw-bold text-secondary mb-0 text-nowrap">Items:</label>
+          <input type="number" id="vote-total-count-input" class="form-control form-control-sm text-center fw-bold shadow-sm hosted-total-count-input" style="width: 70px;" min="1" max="200" value="${totalItemsCount || 1}" title="Number of items to display" />
+        </div>
+      `;
+    }
 
     $('#activityControls').html(`
       <div id="vote-top-host-actions" class="${isHost ? 'd-flex' : 'd-none'} align-items-center gap-2">
-        ${countControlHtml}
+        <div class="${isHost && isNumbersStage ? 'd-flex' : 'd-none'} align-items-center">
+          ${countControlHtml}
+        </div>
         <button id="vote-set-btn" class="btn btn-primary btn-sm px-4 fw-bold shadow-sm ${isNumbersStage ? '' : 'd-none'}" style="min-width: 80px;">
           Next
         </button>
@@ -669,19 +676,12 @@
       $('#vote-numbers-screen').removeClass('d-none');
       $('#vote-voting-screen').addClass('d-none');
 
+      renderTopControls();
       if (isHost) {
         $('#vote-arena').addClass('host-view');
-        if ($('#vote-top-host-actions').length === 0) renderTopControls();
-        $('#vote-top-host-actions').removeClass('d-none').addClass('d-flex');
-        $('#vote-count-control').removeClass('d-none').addClass('d-flex');
-        $('#vote-set-btn').removeClass('d-none');
-        $('#vote-print-btn').addClass('d-none');
-        if ($('#vote-total-count-input').length && !$('#vote-total-count-input').is(':focus')) {
-          $('#vote-total-count-input').val(totalItemsCount || 1);
-        }
+        $('#vote-total-count-input').val(totalItemsCount || 1);
       } else {
         $('#vote-arena').removeClass('host-view');
-        $('#vote-top-host-actions').addClass('d-none').removeClass('d-flex');
       }
     } else if (stage === 'voting') {
       setStatus(isHost ? 'Live Vote Distribution' : 'Place your stars!');
@@ -720,6 +720,7 @@
     currentRoom = options.room;
     roomHostId = (currentRoom && currentRoom.hostId) ? currentRoom.hostId : null;
     isHost = Boolean(
+      options.isHost ||
       (roomHostId && currentPlayer && currentPlayer.id === roomHostId) ||
       (currentRoom && Array.isArray(currentRoom.players) && currentRoom.players.length > 0 && currentRoom.players[0].id === (currentPlayer && currentPlayer.id)) ||
       (currentPlayer && currentPlayer.isHost)
@@ -796,11 +797,8 @@
 
       if (isHost) {
         $('#vote-arena').addClass('host-view');
-        if ($('#vote-top-host-actions').length === 0) renderTopControls();
-        $('#vote-top-host-actions').removeClass('d-none').addClass('d-flex');
       } else {
         $('#vote-arena').removeClass('host-view');
-        $('#vote-top-host-actions').addClass('d-none').removeClass('d-flex');
       }
 
       if (data.totalCount) {
@@ -809,6 +807,7 @@
       if ($('#vote-total-count-input').length && !$('#vote-total-count-input').is(':focus')) {
         $('#vote-total-count-input').val(totalItemsCount || 1);
       }
+      renderTopControls();
 
       if (data.stage === 'numbers') {
         if (data.numberSelections) {

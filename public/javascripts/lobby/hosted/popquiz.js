@@ -121,11 +121,22 @@
     const isLastQ = currentQuestionIndex + 1 >= totalQuestionsCount;
     const setBtnText = isNumbersStage ? 'Next' : (isLastQ ? 'Finish' : 'Next');
 
+    let countControlHtml = '';
+    if (window.hostedNumbers) {
+      countControlHtml = window.hostedNumbers.renderHostCountControl(totalItemsCount || 1, 'popquiz');
+    } else {
+      countControlHtml = `
+        <div id="popquiz-count-control" class="hosted-count-control d-flex align-items-center gap-1 me-1">
+          <label for="popquiz-total-count-input" class="small fw-bold text-secondary mb-0 text-nowrap">Items:</label>
+          <input type="number" id="popquiz-total-count-input" class="form-control form-control-sm text-center fw-bold shadow-sm hosted-total-count-input" style="width: 70px;" min="1" max="200" value="${totalItemsCount || 1}" title="Number of items to display" />
+        </div>
+      `;
+    }
+
     $('#activityControls').html(`
       <div id="popquiz-top-host-actions" class="${isHost ? 'd-flex' : 'd-none'} align-items-center gap-2">
-        <div id="popquiz-count-control" class="${isHost && isNumbersStage ? 'd-flex' : 'd-none'} align-items-center gap-1 me-1">
-          <label for="popquiz-total-count-input" class="small fw-bold text-secondary mb-0 text-nowrap">Items:</label>
-          <input type="number" id="popquiz-total-count-input" class="form-control form-control-sm text-center fw-bold shadow-sm" style="width: 70px;" min="1" max="200" value="${totalItemsCount || 1}" title="Number of items to display" />
+        <div class="${isHost && isNumbersStage ? 'd-flex' : 'd-none'} align-items-center">
+          ${countControlHtml}
         </div>
         <button id="popquiz-set-btn" class="btn btn-primary btn-sm px-4 fw-bold shadow-sm ${showSetBtn ? '' : 'd-none'}" style="min-width: 80px;">
           ${setBtnText}
@@ -151,19 +162,12 @@
       $('#popquiz-quiz-screen').addClass('d-none');
       $('#popquiz-gameover-screen').addClass('d-none');
 
+      renderTopControls();
       if (isHost) {
         $('#popquiz-arena').addClass('host-view');
-        if ($('#popquiz-top-host-actions').length === 0) renderTopControls();
-        $('#popquiz-top-host-actions').removeClass('d-none').addClass('d-flex');
-        $('#popquiz-count-control').removeClass('d-none').addClass('d-flex');
-        $('#popquiz-set-btn').removeClass('d-none').text('Next');
-        $('#popquiz-print-btn').addClass('d-none');
-        if ($('#popquiz-total-count-input').length && !$('#popquiz-total-count-input').is(':focus')) {
-          $('#popquiz-total-count-input').val(totalItemsCount || 1);
-        }
+        $('#popquiz-total-count-input').val(totalItemsCount || 1);
       } else {
         $('#popquiz-arena').removeClass('host-view');
-        $('#popquiz-top-host-actions').addClass('d-none').removeClass('d-flex');
       }
     } else if (stage === 'quiz') {
       $('#popquiz-numbers-screen').addClass('d-none');
@@ -512,6 +516,7 @@
     currentRoom = options.room;
     roomHostId = (currentRoom && currentRoom.hostId) ? currentRoom.hostId : null;
     isHost = Boolean(
+      options.isHost ||
       (roomHostId && currentPlayer && currentPlayer.id === roomHostId) ||
       (currentRoom && Array.isArray(currentRoom.players) && currentRoom.players.length > 0 && currentRoom.players[0].id === (currentPlayer && currentPlayer.id)) ||
       (currentPlayer && currentPlayer.isHost)
@@ -571,12 +576,10 @@
 
       if (isHost) {
         $('#popquiz-arena').addClass('host-view');
-        if ($('#popquiz-top-host-actions').length === 0) renderTopControls();
-        $('#popquiz-top-host-actions').removeClass('d-none').addClass('d-flex');
       } else {
         $('#popquiz-arena').removeClass('host-view');
-        $('#popquiz-top-host-actions').addClass('d-none').removeClass('d-flex');
       }
+      renderTopControls();
 
       if (data.stage === 'numbers') {
         if (data.numberSelections) {

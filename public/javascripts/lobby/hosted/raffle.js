@@ -358,16 +358,23 @@
 
   function renderTopControls() {
     const isNumbersStage = currentStage === 'numbers';
-    const countControlHtml = window.hostedNumbers ? window.hostedNumbers.renderHostCountControl(totalItemsCount, 'raffle') : `
-      <div id="raffle-count-control" class="${isHost && isNumbersStage ? 'd-flex' : 'd-none'} align-items-center gap-1 me-1">
-        <label for="raffle-total-count-input" class="small fw-bold text-secondary mb-0 text-nowrap">Items:</label>
-        <input type="number" id="raffle-total-count-input" class="form-control form-control-sm text-center fw-bold shadow-sm" style="width: 70px;" min="1" max="200" value="${totalItemsCount || 1}" title="Number of items to display" />
-      </div>
-    `;
+    let countControlHtml = '';
+    if (window.hostedNumbers) {
+      countControlHtml = window.hostedNumbers.renderHostCountControl(totalItemsCount || 1, 'raffle');
+    } else {
+      countControlHtml = `
+        <div id="raffle-count-control" class="${isHost && isNumbersStage ? 'd-flex' : 'd-none'} align-items-center gap-1 me-1">
+          <label for="raffle-total-count-input" class="small fw-bold text-secondary mb-0 text-nowrap">Items:</label>
+          <input type="number" id="raffle-total-count-input" class="form-control form-control-sm text-center fw-bold shadow-sm hosted-total-count-input" style="width: 70px;" min="1" max="200" value="${totalItemsCount || 1}" title="Number of items to display" />
+        </div>
+      `;
+    }
 
     $('#activityControls').html(`
       <div id="raffle-top-host-actions" class="${isHost ? 'd-flex' : 'd-none'} align-items-center gap-2">
-        ${countControlHtml}
+        <div class="${isHost && isNumbersStage ? 'd-flex' : 'd-none'} align-items-center">
+          ${countControlHtml}
+        </div>
         <button id="raffle-set-btn" class="btn btn-primary btn-sm px-4 fw-bold shadow-sm ${isNumbersStage ? '' : 'd-none'}" style="min-width: 80px;">
           Next
         </button>
@@ -393,19 +400,12 @@
       setStatus(isHost ? 'Guests are choosing numbers. Tap "Next" when ready.' : 'Select a number card!');
       $('#raffle-numbers-screen').removeClass('d-none');
 
+      renderTopControls();
       if (isHost) {
         $('#raffle-arena').addClass('host-view');
-        if ($('#raffle-top-host-actions').length === 0) renderTopControls();
-        $('#raffle-top-host-actions').removeClass('d-none').addClass('d-flex');
-        $('#raffle-count-control').removeClass('d-none').addClass('d-flex');
-        $('#raffle-set-btn').removeClass('d-none');
-        $('#raffle-go-btn, #raffle-print-btn').addClass('d-none');
-        if ($('#raffle-total-count-input').length && !$('#raffle-total-count-input').is(':focus')) {
-          $('#raffle-total-count-input').val(totalItemsCount || 1);
-        }
+        $('#raffle-total-count-input').val(totalItemsCount || 1);
       } else {
         $('#raffle-arena').removeClass('host-view');
-        $('#raffle-top-host-actions').addClass('d-none').removeClass('d-flex');
       }
     } else if (stage === 'emojis') {
       setStatus(isHost ? 'Guests are picking emojis. Tap "Flip" to reveal prizes.' : (mySelectedEmojiIndex !== null ? 'Emoji selected! Waiting for reveal...' : 'Pick an emoji! (One per guest)'));
@@ -450,6 +450,7 @@
     currentRoom = options.room;
     roomHostId = (currentRoom && currentRoom.hostId) ? currentRoom.hostId : null;
     isHost = Boolean(
+      options.isHost ||
       (roomHostId && currentPlayer && currentPlayer.id === roomHostId) ||
       (currentRoom && Array.isArray(currentRoom.players) && currentRoom.players.length > 0 && currentRoom.players[0].id === (currentPlayer && currentPlayer.id)) ||
       (currentPlayer && currentPlayer.isHost)
@@ -514,11 +515,8 @@
 
       if (isHost) {
         $('#raffle-arena').addClass('host-view');
-        if ($('#raffle-top-host-actions').length === 0) renderTopControls();
-        $('#raffle-top-host-actions').removeClass('d-none').addClass('d-flex');
       } else {
         $('#raffle-arena').removeClass('host-view');
-        $('#raffle-top-host-actions').addClass('d-none').removeClass('d-flex');
       }
 
       if (data.totalCount) {
@@ -527,6 +525,7 @@
       if ($('#raffle-total-count-input').length && !$('#raffle-total-count-input').is(':focus')) {
         $('#raffle-total-count-input').val(totalItemsCount || 1);
       }
+      renderTopControls();
 
       if (data.stage === 'numbers') {
         if (data.numberSelections) {

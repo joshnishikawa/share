@@ -69,7 +69,7 @@
     },
 
     /**
-     * Generate HTML for host's item count editor
+     * Generate HTML for host's item count editor (top nav bar)
      */
     renderHostCountControl: function(count, idPrefix) {
       const prefix = idPrefix || 'hosted';
