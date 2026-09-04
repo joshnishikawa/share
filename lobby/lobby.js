@@ -61,7 +61,7 @@ const rooms = [
   "form", "fort", "four", "free", "from", "fuel", "full", "fund", "gain", "game",
   "gate", "gave", "gear", "gift", "girl", "give", "glad", "goal", "goes", "golf",
   "gone", "good", "gray", "grew", "grow", "hair", "half", "hand", "hang", "hard",
-  "harm", "hate", "have", "head", "hear", "heat", "held", "help", "here", "hero",
+  "have", "head", "hear", "heat", "held", "help", "here", "hero",
   "high", "hill", "hire", "hold", "hole", "holy", "home", "hope", "host", "hour",
   "huge", "hunt", "hurt", "idea", "inch", "into", "iron", "item", "jack", "join",
   "jump", "just", "keen", "keep", "kind", "king", "knee", "knew", "know",
@@ -90,12 +90,12 @@ const rooms = [
 ];
 
 
-const registerMultiplayerActivityEvents = require("./multiplayer/activities");
-const registerHostedActivityEvents = require("./hosted/activities");
-const popquizActivity = require("./hosted/activities/popquiz");
-const raffleActivity = require("./hosted/activities/raffle");
-const voteActivity = require("./hosted/activities/vote");
-const chooseActivity = require("./multiplayer/activities/choose");
+const registerMultiplayerActivityEvents = require("./multiplayer");
+const registerHostedActivityEvents = require("./hosted");
+const popquizActivity = require("./hosted/popquiz");
+const raffleActivity = require("./hosted/raffle");
+const voteActivity = require("./hosted/vote");
+const chooseActivity = require("./multiplayer/choose");
 const multiplayerActivitiesConfig = require("../config/multiplayer_activities.js");
 const validActivityIds = new Set(multiplayerActivitiesConfig.map((a) => a.id));
 const hostActivityIds = new Set(
@@ -600,8 +600,9 @@ const multiplayer = (io, options = {}) => {
     });
 
     socket.on("getName", function (data) {
-      if (!data || typeof data !== 'object' || !isStr(data.id, 60)) return;
-      if (data.roomname !== undefined && !isStr(data.roomname, 60)) return;
+      if (!data || typeof data !== 'object') return;
+      if (data.id !== undefined && data.id !== null && !isStr(data.id, 60)) return;
+      if (data.roomname !== undefined && data.roomname !== null && !isStr(data.roomname, 60)) return;
       let roomname = data.roomname;
       touchRoom(roomname);
       let room;
@@ -609,7 +610,7 @@ const multiplayer = (io, options = {}) => {
       let noun = nouns[Math.floor(Math.random() * nouns.length)];
       let newName = `${adj} ${noun}`;
 
-      if (roomname) {
+      if (roomname && data.id) {
         // user is already in a room
         if (publicRooms[roomname]) {
           room = publicRooms[roomname];
@@ -826,27 +827,33 @@ const multiplayer = (io, options = {}) => {
 
       if (data.activity && room.activity && room.activity !== data.activity) return;
 
+      clearActivityRoomStates(roomname);
+
       room.activity = null;
       room.selectedHostActivity = null;
       room.players.forEach((p) => {
         p.activity = null;
       });
 
-      if (publicRooms[roomname] && room.players.length === 1) {
-        room.roomtype = "private";
-        privateRooms[roomname] = room;
-        delete publicRooms[roomname];
+      if (publicRooms[roomname]) {
+        if (room.players.length === 1) {
+          room.roomtype = "private";
+          privateRooms[roomname] = room;
+          delete publicRooms[roomname];
+        }
         broadcastPublicRooms();
       }
 
       io.to(roomname).emit("activityChosen", {
         players: room.players,
         selectedHostActivity: null,
+        roomtype: room.roomtype,
       });
       io.to(roomname).emit("returnToLobby", {
         roomname,
         players: room.players,
         selectedHostActivity: null,
+        roomtype: room.roomtype,
       });
     });
 

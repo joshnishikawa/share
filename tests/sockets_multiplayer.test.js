@@ -45,6 +45,17 @@ describe('Multiplayer Sockets Integration', () => {
     });
   });
 
+  test('getName generates a random name and emits setName when no prior id is provided', (done) => {
+    clientSocket1.emit('getName', {});
+    clientSocket1.on('setName', (data) => {
+      expect(data).toHaveProperty('id');
+      expect(typeof data.id).toBe('string');
+      expect(data.id.split(' ').length).toBeGreaterThanOrEqual(2);
+      expect(data.number).toBe(1);
+      done();
+    });
+  });
+
   test('join private room and allow second player to join', (done) => {
     clientSocket1.emit('join', {
       id: 'Player1',
@@ -146,6 +157,62 @@ describe('Multiplayer Sockets Integration', () => {
         expect(lobbyData.roomname).toBe(roomname);
         expect(lobbyData.players[0].activity).toBeNull();
         done();
+      });
+    });
+  });
+
+  test('host ending hosted activity with activityComplete returns everyone to lobby while remaining host to select another activity', (done) => {
+    clientSocket1.emit('join', {
+      id: 'HostedHost',
+      roomtype: 'private',
+      color: '#0d6efd',
+    });
+
+    clientSocket1.on('joined', ({ room }) => {
+      const roomname = room.roomname;
+
+      clientSocket2 = Client(`http://localhost:${serverPort}`);
+      clientSocket2.on('connect', () => {
+        clientSocket2.emit('join', {
+          newRoom: roomname,
+          player: { id: 'HostedStudent', color: '#ff0000', number: 2 },
+        });
+      });
+
+      let returnedToLobby = false;
+
+      clientSocket2.on('joined', () => {
+        clientSocket1.emit('startActivity', {
+          roomname,
+          id: 'HostedHost',
+          activity: 'popquiz',
+        });
+      });
+
+      clientSocket1.on('loadActivity', (act) => {
+        if (act === 'popquiz') {
+          clientSocket1.emit('activityComplete', {
+            roomname,
+            activity: 'popquiz',
+          });
+        } else if (act === 'raffle') {
+          expect(returnedToLobby).toBe(true);
+          done();
+        }
+      });
+
+      clientSocket1.on('returnToLobby', (lobbyData) => {
+        returnedToLobby = true;
+        expect(lobbyData.roomname).toBe(roomname);
+        expect(lobbyData.players.length).toBe(2);
+        expect(lobbyData.players[0].activity).toBeNull();
+        expect(lobbyData.players[1].activity).toBeNull();
+
+        clientSocket1.emit('startActivity', {
+          roomname,
+          id: 'HostedHost',
+          activity: 'raffle',
+        });
       });
     });
   });

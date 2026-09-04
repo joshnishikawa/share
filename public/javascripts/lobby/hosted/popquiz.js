@@ -126,20 +126,23 @@
       countControlHtml = window.hostedNumbers.renderHostCountControl(totalItemsCount || 1, 'popquiz');
     } else {
       countControlHtml = `
-        <div id="popquiz-count-control" class="hosted-count-control d-flex align-items-center gap-1 me-1">
-          <label for="popquiz-total-count-input" class="small fw-bold text-secondary mb-0 text-nowrap">Items:</label>
-          <input type="number" id="popquiz-total-count-input" class="form-control form-control-sm text-center fw-bold shadow-sm hosted-total-count-input" style="width: 70px;" min="1" max="200" value="${totalItemsCount || 1}" title="Number of items to display" />
+        <div id="popquiz-count-control" class="hosted-count-control ${isHost && isNumbersStage ? 'd-flex' : 'd-none'} align-items-center gap-2 me-1">
+          <input type="hidden" id="popquiz-total-count-input" class="hosted-total-count-input" value="${totalItemsCount || 1}" />
+          <button type="button" id="popquiz-count-minus" class="btn btn-primary btn-sm px-4 fw-bold shadow-sm hosted-count-btn hosted-count-minus d-inline-flex align-items-center justify-content-center" title="Remove an item" aria-label="Remove an item" style="min-width: 80px; height: 32px; font-size: 1.25rem; line-height: 1;">−</button>
+          <button type="button" id="popquiz-count-plus" class="btn btn-primary btn-sm px-4 fw-bold shadow-sm hosted-count-btn hosted-count-plus d-inline-flex align-items-center justify-content-center" title="Add an item" aria-label="Add an item" style="min-width: 80px; height: 32px; font-size: 1.25rem; line-height: 1;">+</button>
         </div>
       `;
     }
+
+    const arrowSvg = ` <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/></svg>`;
 
     $('#activityControls').html(`
       <div id="popquiz-top-host-actions" class="${isHost ? 'd-flex' : 'd-none'} align-items-center gap-2">
         <div class="${isHost && isNumbersStage ? 'd-flex' : 'd-none'} align-items-center">
           ${countControlHtml}
         </div>
-        <button id="popquiz-set-btn" class="btn btn-primary btn-sm px-4 fw-bold shadow-sm ${showSetBtn ? '' : 'd-none'}" style="min-width: 80px;">
-          ${setBtnText}
+        <button id="popquiz-set-btn" class="btn btn-success btn-sm px-4 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center gap-1 ${showSetBtn ? '' : 'd-none'}" style="min-width: 80px; height: 32px;">
+          <span>${setBtnText}</span>${setBtnText === 'Next' ? arrowSvg : ''}
         </button>
         <button id="popquiz-print-btn" class="btn btn-dark btn-sm px-4 fw-bold shadow-sm ${currentStage === 'gameover' ? 'd-inline-flex' : 'd-none'} align-items-center justify-content-center gap-1" style="min-width: 80px;">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="align-middle">
@@ -181,7 +184,8 @@
         $('#popquiz-count-control').addClass('d-none').removeClass('d-flex');
         const isLastQ = currentQuestionIndex + 1 >= totalQuestionsCount;
         if (isRoundGraded) {
-          $('#popquiz-set-btn').removeClass('d-none').text(isLastQ ? 'Finish' : 'Next');
+          const arrowHtml = isLastQ ? '' : ` <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/></svg>`;
+          $('#popquiz-set-btn').removeClass('d-none').html(`<span>${isLastQ ? 'Finish' : 'Next'}</span>${arrowHtml}`);
         } else {
           $('#popquiz-set-btn').addClass('d-none');
         }
@@ -760,9 +764,10 @@
 
       if (isHost) {
         setStatus(`<span class="text-success fw-bold">Correct: ${safeWord}!</span> Tap "${isLastQ ? 'Finish' : 'Next'}" to continue.`);
+        const arrowHtml = isLastQ ? '' : ` <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/></svg>`;
         $('#popquiz-set-btn')
           .removeClass('d-none')
-          .text(isLastQ ? 'Finish' : 'Next');
+          .html(`<span>${isLastQ ? 'Finish' : 'Next'}</span>${arrowHtml}`);
       } else {
         setStatus(`<span class="text-success fw-bold">Correct: ${safeWord}!</span> Waiting for host...`);
         $('#popquiz-set-btn').addClass('d-none');

@@ -327,16 +327,17 @@
 	"manageCanvases": "Manage Canvases",
 	"add": "Add",
 	"delete": "Delete",
-  "addCommaSeparatedNames": "Add comma-separated names here.",
-  "images": "Images",
-  "text": "Text",
-  "nameTags": "Nametags",
-  "nametags": {
-    "p1": "Please use the following format and spelling convention for making new nametags. These nametags are for the benefit of all teachers during the students' 4-years of elementary English education.",
-    "p2": "Spelling: If a student or their parents already have a preferred spelling, that spelling should be used. Otherwise, the Hepburn romanization should be used.",
-    "ex1": "ちなつ &rarr; Chinatsu しおり &rarr; Shiori ふじた &rarr; Fujita <br />しゃ &rarr; sha しゅ &rarr; shu しょ &rarr; sho <br />ちゃ &rarr; cha ちゅ &rarr; chu ちょ &rarr; cho <br />じゃ &rarr; ja じゅ &rarr; ju じょ &rarr; jo",
-    "p3": "Phonetic symbols: Phonetic symbols for elongated vowels should not be used. They are not formally used for writing English names and they actually make names more difficult to read especially from a distance.",
-    "ex2": "Yûki &rarr; Yuki<br />Tōya &rarr; Toya",
-    "p4": "Students may enjoy decorating their own name tags but this usually detracts from readability. Since name tags are primarily to help teachers learn and use students' names, readability is the most important thing. Please keep nametags simple."
-  }
+	"addCommaSeparatedNames": "Add comma-separated names here.",
+	"images": "Images",
+	"text": "Text",
+	"nameTags": "Nametags",
+	"nametags": {
+		"p1": "Please use the following format and spelling convention for making new nametags. These nametags are for the benefit of all teachers during the students' 4-years of elementary English education.",
+		"p2": "Spelling: If a student or their parents already have a preferred spelling, that spelling should be used. Otherwise, the Hepburn romanization should be used.",
+		"ex1": "ちなつ &rarr; Chinatsu しおり &rarr; Shiori ふじた &rarr; Fujita <br />しゃ &rarr; sha しゅ &rarr; shu しょ &rarr; sho <br />ちゃ &rarr; cha ちゅ &rarr; chu ちょ &rarr; cho <br />じゃ &rarr; ja じゅ &rarr; ju じょ &rarr; jo",
+		"p3": "Phonetic symbols: Phonetic symbols for elongated vowels should not be used. They are not formally used for writing English names and they actually make names more difficult to read especially from a distance.",
+		"ex2": "Yûki &rarr; Yuki<br />Tōya &rarr; Toya",
+		"p4": "Students may enjoy decorating their own name tags but this usually detracts from readability. Since name tags are primarily to help teachers learn and use students' names, readability is the most important thing. Please keep nametags simple."
+	},
+	"lobby": "lobby"
 }

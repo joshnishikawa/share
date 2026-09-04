@@ -363,9 +363,10 @@
       countControlHtml = window.hostedNumbers.renderHostCountControl(totalItemsCount || 1, 'raffle');
     } else {
       countControlHtml = `
-        <div id="raffle-count-control" class="${isHost && isNumbersStage ? 'd-flex' : 'd-none'} align-items-center gap-1 me-1">
-          <label for="raffle-total-count-input" class="small fw-bold text-secondary mb-0 text-nowrap">Items:</label>
-          <input type="number" id="raffle-total-count-input" class="form-control form-control-sm text-center fw-bold shadow-sm hosted-total-count-input" style="width: 70px;" min="1" max="200" value="${totalItemsCount || 1}" title="Number of items to display" />
+        <div id="raffle-count-control" class="hosted-count-control ${isHost && isNumbersStage ? 'd-flex' : 'd-none'} align-items-center gap-2 me-1">
+          <input type="hidden" id="raffle-total-count-input" class="hosted-total-count-input" value="${totalItemsCount || 1}" />
+          <button type="button" id="raffle-count-minus" class="btn btn-primary btn-sm px-4 fw-bold shadow-sm hosted-count-btn hosted-count-minus d-inline-flex align-items-center justify-content-center" title="Remove an item" aria-label="Remove an item" style="min-width: 80px; height: 32px; font-size: 1.25rem; line-height: 1;">−</button>
+          <button type="button" id="raffle-count-plus" class="btn btn-primary btn-sm px-4 fw-bold shadow-sm hosted-count-btn hosted-count-plus d-inline-flex align-items-center justify-content-center" title="Add an item" aria-label="Add an item" style="min-width: 80px; height: 32px; font-size: 1.25rem; line-height: 1;">+</button>
         </div>
       `;
     }
@@ -375,8 +376,11 @@
         <div class="${isHost && isNumbersStage ? 'd-flex' : 'd-none'} align-items-center">
           ${countControlHtml}
         </div>
-        <button id="raffle-set-btn" class="btn btn-primary btn-sm px-4 fw-bold shadow-sm ${isNumbersStage ? '' : 'd-none'}" style="min-width: 80px;">
-          Next
+        <button id="raffle-set-btn" class="btn btn-success btn-sm px-4 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center gap-1 ${isNumbersStage ? '' : 'd-none'}" style="min-width: 80px; height: 32px;">
+          <span>Next</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/>
+          </svg>
         </button>
         <button id="raffle-go-btn" class="btn btn-success btn-sm px-4 fw-bold shadow-sm d-none" style="min-width: 80px;">
           Flip

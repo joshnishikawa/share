@@ -69,38 +69,54 @@
     },
 
     /**
-     * Generate HTML for host's item count editor (top nav bar)
+     * Generate HTML for host's item count editor (- and + buttons in top nav bar)
      */
     renderHostCountControl: function(count, idPrefix) {
       const prefix = idPrefix || 'hosted';
       return `
-        <div id="${prefix}-count-control" class="hosted-count-control d-flex align-items-center gap-1 me-1">
-          <label for="${prefix}-total-count-input" class="small fw-bold text-secondary mb-0 text-nowrap">Items:</label>
-          <input type="number" id="${prefix}-total-count-input" class="form-control form-control-sm text-center fw-bold shadow-sm hosted-total-count-input" style="width: 70px;" min="1" max="200" value="${count || 1}" title="Number of items to display" />
+        <div id="${prefix}-count-control" class="hosted-count-control d-flex align-items-center gap-2 me-1">
+          <input type="hidden" id="${prefix}-total-count-input" class="hosted-total-count-input" value="${count || 1}" />
+          <button type="button" id="${prefix}-count-minus" class="btn btn-primary btn-sm px-4 fw-bold shadow-sm hosted-count-btn hosted-count-minus d-inline-flex align-items-center justify-content-center" title="Remove an item" aria-label="Remove an item" style="min-width: 80px; height: 32px; font-size: 1.25rem; line-height: 1;">−</button>
+          <button type="button" id="${prefix}-count-plus" class="btn btn-primary btn-sm px-4 fw-bold shadow-sm hosted-count-btn hosted-count-plus d-inline-flex align-items-center justify-content-center" title="Add an item" aria-label="Add an item" style="min-width: 80px; height: 32px; font-size: 1.25rem; line-height: 1;">+</button>
         </div>
       `;
     },
 
     /**
-     * Bind input and change events for the host item count editor
+     * Bind - and + button click and change events for the host item count editor
      */
     bindHostCountInput: function(inputSelector, isHostFn, getStageFn, onCountChange) {
-      let debounceTimer = null;
-      $(document).off('input change', inputSelector).on('input change', inputSelector, function(e) {
+      const prefix = inputSelector.replace('-total-count-input', '').replace('#', '');
+      const eventNamespace = `.hostedCount_${prefix}`;
+
+      $(document).off(`click${eventNamespace}`).on(`click${eventNamespace}`, `#${prefix}-count-minus, #${prefix}-count-plus`, function(e) {
+        e.preventDefault();
+        if (typeof isHostFn === 'function' && !isHostFn()) return;
+        if (typeof getStageFn === 'function' && getStageFn() !== 'numbers') return;
+
+        const $input = $(inputSelector);
+        let currentVal = parseInt($input.val(), 10) || 1;
+
+        if (this.id === `${prefix}-count-plus`) {
+          currentVal = Math.min(200, currentVal + 1);
+        } else if (this.id === `${prefix}-count-minus`) {
+          if (currentVal <= 1) return;
+          currentVal = Math.max(1, currentVal - 1);
+        }
+
+        $input.val(currentVal);
+        if (typeof onCountChange === 'function') {
+          onCountChange(currentVal);
+        }
+      });
+
+      $(document).off(`change${eventNamespace}`, inputSelector).on(`change${eventNamespace}`, inputSelector, function() {
         if (typeof isHostFn === 'function' && !isHostFn()) return;
         if (typeof getStageFn === 'function' && getStageFn() !== 'numbers') return;
 
         const val = parseInt($(this).val(), 10);
         if (isNaN(val) || val < 1) return;
-
-        clearTimeout(debounceTimer);
-        if (e.type === 'change') {
-          if (typeof onCountChange === 'function') onCountChange(val);
-        } else {
-          debounceTimer = setTimeout(() => {
-            if (typeof onCountChange === 'function') onCountChange(val);
-          }, 400);
-        }
+        if (typeof onCountChange === 'function') onCountChange(val);
       });
     },
 

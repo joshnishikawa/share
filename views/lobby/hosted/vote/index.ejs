@@ -71,11 +71,6 @@
     transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   }
 
-  .vote-card:hover:not(.card-muted):not(.locked) {
-    transform: translateY(-4px);
-    border-color: var(--bs-primary) !important;
-  }
-
   .vote-card.card-muted {
     opacity: 0.4;
     background-color: var(--bs-light) !important;
@@ -93,57 +88,142 @@
     transform: none !important;
   }
 
-  /* Phase 2: Smooth Gliding Stars Layer */
-  #vote-star-layer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 30;
-  }
-
+  /* Phase 2: Dragula Draggable Stars & Trays */
   .vote-star-token {
-    position: absolute;
-    top: 0;
-    left: 0;
     width: 50px;
     height: 50px;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    pointer-events: auto;
-    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-    will-change: transform;
-    z-index: 35;
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+    transition: transform 0.15s ease;
+    z-index: 10;
+  }
+
+  .vote-star-token:active {
+    cursor: grabbing;
   }
 
   .vote-star-token svg {
-    width: 48px;
-    height: 48px;
+    width: 46px;
+    height: 46px;
     filter: drop-shadow(0 3px 6px rgba(234, 179, 8, 0.5));
     transition: transform 0.2s ease, filter 0.2s ease;
+    pointer-events: none;
   }
 
   .vote-star-token:hover svg {
-    transform: scale(1.2);
-    filter: drop-shadow(0 0 12px rgba(234, 179, 8, 0.85));
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 10px rgba(234, 179, 8, 0.85));
   }
 
-  /* Phase 2: Voting Item Cards */
+  /* Dragula Drag Mirror & Transit Styles */
+  .gu-mirror.vote-star-token {
+    cursor: grabbing !important;
+    transform: scale(1.25) !important;
+    filter: drop-shadow(0 8px 18px rgba(234, 179, 8, 0.85)) !important;
+    pointer-events: none;
+    z-index: 9999 !important;
+  }
+
+  .gu-transit {
+    opacity: 0.35 !important;
+    transform: scale(0.9);
+  }
+
+  /* Safeguard: Stars outside an active mirror must ALWAYS stay visible and never disappear */
+  .vote-star-token:not(.gu-mirror):not(.gu-transit) {
+    display: inline-flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .vote-star-token.gu-hide:not(.gu-mirror):not(.gu-transit) {
+    display: inline-flex !important;
+    visibility: visible !important;
+  }
+
+  /* Phase 2: Voting Item Cards & Star Trays */
   .vote-item-card {
-    min-height: 160px;
+    min-height: 175px;
     cursor: pointer;
     transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     user-select: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
   }
 
-  .vote-item-card:hover {
-    transform: translateY(-4px);
+  .vote-card-title {
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .vote-card-star-tray {
+    min-height: 80px;
+    width: 100%;
+    flex-grow: 1;
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    padding: 6px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    background: rgba(248, 250, 252, 0.7);
+    transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .vote-card-star-tray.gu-over {
+    background: rgba(13, 110, 253, 0.12) !important;
     border-color: #0d6efd !important;
-    box-shadow: 0 0.5rem 1rem rgba(13, 110, 253, 0.15) !important;
+    border-style: solid !important;
+    box-shadow: 0 0 10px rgba(13, 110, 253, 0.25);
+  }
+
+  .vote-card-star-tray:empty::before {
+    content: "";
+    width: 44px;
+    height: 44px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23cbd5e1'%3E%3Cpath d='M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z'/%3E%3C/svg%3E") no-repeat center center;
+    background-size: contain;
+    opacity: 0.65;
+    pointer-events: none;
+    user-select: none;
+    display: block;
+  }
+
+  #vote-star-dock {
+    min-height: 85px;
+    border: 2px dashed #cbd5e1;
+    border-radius: 16px;
+    padding: 10px 20px;
+    background: rgba(248, 250, 252, 0.9);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  #vote-star-dock.gu-over {
+    background: rgba(234, 179, 8, 0.15) !important;
+    border-color: #eab308 !important;
+    border-style: solid !important;
+    box-shadow: 0 0 12px rgba(234, 179, 8, 0.3);
+  }
+
+  #vote-star-dock:empty::before {
+    content: "All 5 stars allocated! Drag stars back here to return them.";
+    color: #94a3b8;
+    font-size: 0.85rem;
+    font-weight: 600;
+    pointer-events: none;
   }
 
   /* Print Styles */
@@ -188,8 +268,6 @@
   <!-- Dynamic Absolute Pawn Layer for Phase 1 -->
   <div id="vote-pawn-layer"></div>
 
-  <!-- Dynamic Absolute Star Layer for Phase 2 (5 big gliding stars) -->
-  <div id="vote-star-layer"></div>
 
   <!-- PHASE 1: NUMBERS GRID -->
   <div id="vote-numbers-screen" class="vote-screen">

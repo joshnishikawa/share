@@ -1,4 +1,4 @@
-const popquizEvents = require('../lobby/hosted/activities/popquiz');
+const popquizEvents = require('../lobby/hosted/popquiz');
 
 describe('Pop Quiz Hosted Activity Socket Handlers', () => {
   let ioMock;

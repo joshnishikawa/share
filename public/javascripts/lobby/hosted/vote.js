@@ -21,10 +21,9 @@
   let playersList = [];
   let numberSelectionsMap = {}; // playerId -> number
 
-  // Phase 2: 5 Big Stars for Guest
-  // starAssignments: array of length 5, each element is either null (in dock) or itemIndex (0..N-1)
-  const starAssignments = [null, null, null, null, null];
-  const starElements = [];
+  // Phase 2: Dragula Drag-and-Drop Stars for Guest
+  let voteDrake = null;
+  let isDraggingStar = false;
 
   // Chart instance
   let hostChartInstance = null;
@@ -270,209 +269,294 @@
     }
   }
 
-  // --- Phase 2: Star Token Management & Smooth Gliding ---
-  function initStarTokens() {
-    const $starLayer = $('#vote-star-layer');
-    $starLayer.empty();
-    starElements.length = 0;
-
-    for (let i = 0; i < 5; i++) {
-      const $star = $('<div>', {
-        class: 'vote-star-token',
-        id: `vote-star-${i}`,
-        'data-star-index': i,
-        html: getBigStarSvg(),
-      });
-      $starLayer.append($star);
-      starElements.push($star);
+  // --- Phase 2: Dragula Draggable Star Management ---
+  function ensureDragula(callback) {
+    if (typeof dragula === 'function') {
+      callback();
+      return;
     }
+    $.getScript('https://cdn.jsdelivr.net/gh/bevacqua/dragula@3.7.3/dist/dragula.min.js')
+      .done(function() {
+        callback();
+      })
+      .fail(function(err) {
+        console.error('Failed to load Dragula library:', err);
+      });
   }
 
-  function updateStarPositions(instant) {
-    if (isHost || currentStage !== 'voting') return;
-    const $arena = $('#vote-arena');
-    if (!$arena.length || !$arena.is(':visible')) return;
+  function getRealStars() {
+    return $('.vote-star-token:not(.gu-mirror)');
+  }
 
-    const arenaRect = $arena[0].getBoundingClientRect();
-    const $dock = $('#vote-star-dock');
-    if (!$dock.length) return;
-    const dockRect = $dock[0].getBoundingClientRect();
+  function getVotesObject() {
+    const votesObj = {};
+    $('#vote-items-container .vote-card-star-tray').each(function() {
+      const idx = $(this).data('item-index');
+      const count = $(this).find('.vote-star-token:not(.gu-mirror)').length;
+      if (count > 0) {
+        votesObj[idx] = count;
+      }
+    });
+    return votesObj;
+  }
 
-    const dockStars = [];
-    const cardStars = {}; // itemIndex -> [starIndex]
+  function emitVotes() {
+    if (!currentPlayer || !currentSocket) return;
+    currentSocket.emit('vote/setPlayerVotes', {
+      roomname: currentPlayer.roomname,
+      playerId: currentPlayer.id,
+      votes: getVotesObject(),
+    });
+  }
 
-    starAssignments.forEach((itemIdx, starIdx) => {
-      if (itemIdx === null || !document.getElementById(`vote-item-${itemIdx}`)) {
-        dockStars.push(starIdx);
-      } else {
-        cardStars[itemIdx] = cardStars[itemIdx] || [];
-        cardStars[itemIdx].push(starIdx);
+  /**
+   * INVARIANT GUARDIAN: Stars must NEVER disappear.
+   * Ensures exactly 5 star tokens exist, all visible, with no residual hiding classes,
+   * housed in either a card tray or the reserve dock.
+   * NEVER touches .gu-mirror so Dragula's internal cleanup can safely remove it.
+   */
+  function ensureFiveStars() {
+    const dock = document.getElementById('vote-star-dock');
+    if (!dock) return;
+
+    // 1. Remove any Dragula residual hiding or transit classes from real stars
+    getRealStars().removeClass('gu-hide gu-transit').css({
+      display: '',
+      opacity: '',
+      visibility: '',
+    });
+
+    // 2. Collect all REAL star elements (ignoring any active drag mirror)
+    let stars = getRealStars().toArray();
+
+    // If fewer than 5 exist, recreate missing ones directly in the dock
+    if (stars.length < 5) {
+      const existingIds = new Set(stars.map((s) => s.id));
+      for (let i = 0; i < 5; i++) {
+        const id = `vote-star-${i}`;
+        if (!existingIds.has(id)) {
+          const $star = $('<div>', {
+            class: 'vote-star-token',
+            id: id,
+            'data-star-index': i,
+            html: getBigStarSvg(),
+          });
+          dock.appendChild($star[0]);
+        }
+      }
+      stars = getRealStars().toArray();
+    }
+
+    // If more than 5 real stars exist (e.g. duplicates), prune extra ones from dock
+    if (stars.length > 5) {
+      const seen = new Set();
+      stars.forEach((s) => {
+        if (seen.has(s.id)) {
+          s.remove();
+        } else {
+          seen.add(s.id);
+        }
+      });
+      stars = getRealStars().toArray();
+      while (stars.length > 5) {
+        const lastInDock = dock.querySelector('.vote-star-token:last-child:not(.gu-mirror)');
+        if (lastInDock) {
+          lastInDock.remove();
+        } else {
+          break;
+        }
+        stars = getRealStars().toArray();
+      }
+    }
+
+    // 3. Make sure every real star is in a legitimate container (card tray or dock)
+    stars.forEach((s) => {
+      const p = s.parentElement;
+      if (!p || (!p.classList.contains('vote-card-star-tray') && p.id !== 'vote-star-dock')) {
+        dock.appendChild(s);
       }
     });
 
-    // 1. Position stars in the reserve dock
-    const N = dockStars.length;
-    const starWidth = 50;
-    const dockSpacing = 64;
-    const dockTotalWidth = N * dockSpacing;
-    const dockStartX = (dockRect.left - arenaRect.left) + Math.max(0, (dockRect.width - dockTotalWidth) / 2);
-    const dockStartY = (dockRect.top - arenaRect.top) + (dockRect.height - starWidth) / 2;
-
-    dockStars.forEach((starIdx, i) => {
-      const $token = starElements[starIdx];
-      if ($token) {
-        if (instant) $token.css('transition', 'none');
-        $token.css('transform', `translate3d(${dockStartX + i * dockSpacing + 7}px, ${dockStartY}px, 0)`);
-        if (instant) {
-          setTimeout(() => {
-            $token.css('transition', '');
-          }, 30);
-        }
-      }
+    // 4. Force visibility on all 5 real stars
+    getRealStars().removeClass('gu-hide gu-transit').css({
+      display: '',
+      opacity: '',
+      visibility: '',
     });
+  }
 
-    // 2. Position stars inside target item cards
-    Object.keys(cardStars).forEach((itemIdx) => {
-      const cardEl = document.getElementById(`vote-item-${itemIdx}`);
-      if (!cardEl) return;
-      const cardRect = cardEl.getBoundingClientRect();
-      const starsOnThisCard = cardStars[itemIdx];
-      const M = starsOnThisCard.length;
-      const itemStarSpacing = 40;
-      const totalStarsWidth = (M - 1) * itemStarSpacing + starWidth;
-      const cardStartX = (cardRect.left - arenaRect.left) + Math.max(0, (cardRect.width - totalStarsWidth) / 2);
-      const cardStartY = (cardRect.bottom - arenaRect.top) - starWidth - 14;
+  function setupDragula() {
+    if (voteDrake) {
+      voteDrake.destroy();
+      voteDrake = null;
+    }
 
-      starsOnThisCard.forEach((starIdx, j) => {
-        const $token = starElements[starIdx];
-        if ($token) {
-          if (instant) $token.css('transition', 'none');
-          $token.css('transform', `translate3d(${cardStartX + j * itemStarSpacing}px, ${cardStartY}px, 0)`);
-          if (instant) {
-            setTimeout(() => {
-              $token.css('transition', '');
-            }, 30);
-          }
+    ensureDragula(function() {
+      if (isHost || currentStage !== 'voting') return;
+
+      const dock = document.getElementById('vote-star-dock');
+      const trays = Array.from(document.querySelectorAll('.vote-card-star-tray'));
+      const containers = [dock, ...trays].filter(Boolean);
+
+      if (containers.length === 0) return;
+
+      voteDrake = dragula(containers, {
+        moves: function(el) {
+          return el && el.classList.contains('vote-star-token') && !el.classList.contains('gu-mirror');
+        },
+        accepts: function(el, target) {
+          return target && (target.id === 'vote-star-dock' || target.classList.contains('vote-card-star-tray'));
+        },
+        removeOnSpill: true,
+        mirrorContainer: document.body,
+      });
+
+      voteDrake.on('drag', function() {
+        isDraggingStar = true;
+      });
+
+      voteDrake.on('dragend', function(el) {
+        if (el) {
+          $(el).removeClass('gu-hide gu-transit').css({ display: '', opacity: '', visibility: '' });
         }
+        setTimeout(function() {
+          ensureFiveStars();
+          emitVotes();
+          isDraggingStar = false;
+        }, 0);
+      });
+
+      // Dragged onto card, between cards, or back to dock
+      voteDrake.on('drop', function(el) {
+        if (el) {
+          $(el).removeClass('gu-hide gu-transit').css({ display: '', opacity: '', visibility: '' });
+        }
+        emitVotes();
+        setTimeout(function() {
+          ensureFiveStars();
+        }, 0);
+      });
+
+      // Dragged off cards / dock into empty space (spill) -> safely returned to reserve dock
+      voteDrake.on('remove', function(el) {
+        if (el && dock) {
+          $(el).removeClass('gu-hide gu-transit').css({ display: '', opacity: '', visibility: '' });
+          dock.appendChild(el);
+        }
+        emitVotes();
+        setTimeout(function() {
+          ensureFiveStars();
+        }, 0);
+      });
+
+      voteDrake.on('cancel', function(el) {
+        if (el) {
+          $(el).removeClass('gu-hide gu-transit').css({ display: '', opacity: '', visibility: '' });
+        }
+        emitVotes();
+        setTimeout(function() {
+          ensureFiveStars();
+        }, 0);
       });
     });
   }
 
   function renderGuestVotingGrid() {
     const $container = $('#vote-items-container');
+    const dock = document.getElementById('vote-star-dock');
+
+    // CRITICAL: Safely move all existing real stars into the dock BEFORE emptying container
+    // so $container.empty() can NEVER destroy stars that are on cards!
+    if (dock) {
+      getRealStars().each(function() {
+        dock.appendChild(this);
+      });
+    }
+
     $container.empty();
 
     roomValues.forEach((val, idx) => {
       const $col = $('<div>', { class: 'col' });
       const $card = $('<div>', {
-        class: 'card vote-card vote-item-card h-100 shadow-sm border-2 rounded-4 p-3 d-flex flex-column align-items-center justify-content-start bg-white',
+        class: 'card vote-card vote-item-card h-100 shadow-sm border-2 rounded-4 p-3 d-flex flex-column align-items-center justify-content-between bg-white',
         id: `vote-item-${idx}`,
         'data-item-index': idx,
       });
 
       const $title = $('<div>', {
-        class: 'fs-4 fw-bold text-dark text-center text-break mt-2',
+        class: 'fs-4 fw-bold text-dark text-center text-break mt-1 mb-2 vote-card-title',
         text: val,
       });
 
-      $card.append($title);
+      const $starTray = $('<div>', {
+        class: 'vote-card-star-tray',
+        id: `vote-card-tray-${idx}`,
+        'data-item-index': idx,
+      });
+
+      $card.append($title, $starTray);
       $col.append($card);
       $container.append($col);
     });
 
-    setTimeout(() => {
-      updateStarPositions();
-    }, 50);
+    ensureFiveStars();
+    setupDragula();
   }
 
-  function getVotesObject() {
-    const votesObj = {};
-    starAssignments.forEach((itemIdx) => {
-      if (itemIdx !== null && itemIdx >= 0) {
-        votesObj[itemIdx] = (votesObj[itemIdx] || 0) + 1;
-      }
-    });
-    return votesObj;
-  }
-
-  /**
-   * Syncs star assignments with incoming target votes.
-   * INVARIANT: Stars only ever move from reserve to item (null -> item)
-   * or from item to reserve (item -> null). Stars NEVER move item to item.
-   */
   function syncStarsFromUserVotes(userVotesObj) {
-    const targetCounts = {};
+    if (isHost || currentStage !== 'voting') return;
+    if (voteDrake && voteDrake.dragging) return;
+
+    ensureFiveStars();
+
+    const dock = document.getElementById('vote-star-dock');
+    if (!dock) return;
+
+    // Gather all 5 real stars into dock first
+    const allStars = getRealStars().toArray();
+    allStars.forEach((s) => dock.appendChild(s));
+
+    let starPointer = 0;
+
     roomValues.forEach((_, idx) => {
-      targetCounts[idx] = (userVotesObj && parseInt(userVotesObj[idx], 10)) || 0;
-    });
-
-    const currentCounts = {};
-    roomValues.forEach((_, idx) => {
-      currentCounts[idx] = 0;
-    });
-    starAssignments.forEach((assignedItem) => {
-      if (assignedItem !== null && currentCounts[assignedItem] !== undefined) {
-        currentCounts[assignedItem]++;
+      const tray = document.getElementById(`vote-card-tray-${idx}`);
+      if (!tray) return;
+      const targetCount = (userVotesObj && parseInt(userVotesObj[idx], 10)) || 0;
+      for (let c = 0; c < targetCount && starPointer < allStars.length; c++) {
+        tray.appendChild(allStars[starPointer]);
+        starPointer++;
       }
     });
 
-    // 1. Return excess stars to reserve (item -> null)
-    roomValues.forEach((_, itemIdx) => {
-      while (currentCounts[itemIdx] > targetCounts[itemIdx]) {
-        const s = starAssignments.findIndex((assigned) => assigned === itemIdx);
-        if (s !== -1) {
-          starAssignments[s] = null;
-          currentCounts[itemIdx]--;
-        } else {
-          break;
-        }
-      }
-    });
-
-    // 2. Move needed stars from reserve to item (null -> item)
-    roomValues.forEach((_, itemIdx) => {
-      while (currentCounts[itemIdx] < targetCounts[itemIdx]) {
-        const s = starAssignments.findIndex((assigned) => assigned === null);
-        if (s !== -1) {
-          starAssignments[s] = itemIdx;
-          currentCounts[itemIdx]++;
-        } else {
-          break;
-        }
-      }
-    });
-
-    updateStarPositions();
+    // Remaining stars stay in dock
+    ensureFiveStars();
   }
 
   function moveStarToItem(itemIdx) {
-    if (isHost || currentStage !== 'voting') return;
-    // Strictly find a star currently in the reserve dock
-    const freeStarIdx = starAssignments.indexOf(null);
-    if (freeStarIdx === -1) return; // No stars in reserve; do not move stars between items
+    if (isHost || currentStage !== 'voting' || isDraggingStar) return;
+    const dock = document.getElementById('vote-star-dock');
+    if (!dock) return;
+    const availStar = dock.querySelector('.vote-star-token:not(.gu-mirror)');
+    if (!availStar) return;
 
-    starAssignments[freeStarIdx] = itemIdx;
-    updateStarPositions();
-
-    currentSocket.emit('vote/setPlayerVotes', {
-      roomname: currentPlayer.roomname,
-      playerId: currentPlayer.id,
-      votes: getVotesObject(),
-    });
+    const tray = document.getElementById(`vote-card-tray-${itemIdx}`);
+    if (tray) {
+      tray.appendChild(availStar);
+      ensureFiveStars();
+      emitVotes();
+    }
   }
 
-  function returnStarToReserve(starIdx) {
-    if (isHost || currentStage !== 'voting') return;
-    if (starAssignments[starIdx] === null) return; // Already in reserve
+  function returnStarToReserve(starEl) {
+    if (isHost || currentStage !== 'voting' || isDraggingStar) return;
+    if (!starEl || starEl.classList.contains('gu-mirror')) return;
+    const dock = document.getElementById('vote-star-dock');
+    if (!dock) return;
+    if (starEl.parentElement === dock) return;
 
-    starAssignments[starIdx] = null;
-    updateStarPositions();
-
-    currentSocket.emit('vote/setPlayerVotes', {
-      roomname: currentPlayer.roomname,
-      playerId: currentPlayer.id,
-      votes: getVotesObject(),
-    });
+    dock.appendChild(starEl);
+    ensureFiveStars();
+    emitVotes();
   }
 
   // --- Phase 2: Host Chart View ---
@@ -641,9 +725,10 @@
       countControlHtml = window.hostedNumbers.renderHostCountControl(totalItemsCount || 1, 'vote');
     } else {
       countControlHtml = `
-        <div id="vote-count-control" class="${isHost && isNumbersStage ? 'd-flex' : 'd-none'} align-items-center gap-1 me-1">
-          <label for="vote-total-count-input" class="small fw-bold text-secondary mb-0 text-nowrap">Items:</label>
-          <input type="number" id="vote-total-count-input" class="form-control form-control-sm text-center fw-bold shadow-sm hosted-total-count-input" style="width: 70px;" min="1" max="200" value="${totalItemsCount || 1}" title="Number of items to display" />
+        <div id="vote-count-control" class="hosted-count-control ${isHost && isNumbersStage ? 'd-flex' : 'd-none'} align-items-center gap-2 me-1">
+          <input type="hidden" id="vote-total-count-input" class="hosted-total-count-input" value="${totalItemsCount || 1}" />
+          <button type="button" id="vote-count-minus" class="btn btn-primary btn-sm px-4 fw-bold shadow-sm hosted-count-btn hosted-count-minus d-inline-flex align-items-center justify-content-center" title="Remove an item" aria-label="Remove an item" style="min-width: 80px; height: 32px; font-size: 1.25rem; line-height: 1;">−</button>
+          <button type="button" id="vote-count-plus" class="btn btn-primary btn-sm px-4 fw-bold shadow-sm hosted-count-btn hosted-count-plus d-inline-flex align-items-center justify-content-center" title="Add an item" aria-label="Add an item" style="min-width: 80px; height: 32px; font-size: 1.25rem; line-height: 1;">+</button>
         </div>
       `;
     }
@@ -653,8 +738,11 @@
         <div class="${isHost && isNumbersStage ? 'd-flex' : 'd-none'} align-items-center">
           ${countControlHtml}
         </div>
-        <button id="vote-set-btn" class="btn btn-primary btn-sm px-4 fw-bold shadow-sm ${isNumbersStage ? '' : 'd-none'}" style="min-width: 80px;">
-          Next
+        <button id="vote-set-btn" class="btn btn-success btn-sm px-4 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center gap-1 ${isNumbersStage ? '' : 'd-none'}" style="min-width: 80px; height: 32px;">
+          <span>Next</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/>
+          </svg>
         </button>
         <button id="vote-print-btn" class="btn btn-dark btn-sm px-4 fw-bold shadow-sm ${currentStage === 'voting' ? 'd-inline-flex' : 'd-none'} align-items-center justify-content-center gap-1" style="min-width: 80px;">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="align-middle">
@@ -672,6 +760,11 @@
     $('.vote-screen').addClass('d-none');
 
     if (stage === 'numbers') {
+      if (voteDrake) {
+        voteDrake.destroy();
+        voteDrake = null;
+      }
+      isDraggingStar = false;
       setStatus(isHost ? 'Guests are choosing numbers. Tap "Next" when ready to start voting.' : 'Select a number card!');
       $('#vote-numbers-screen').removeClass('d-none');
       $('#vote-voting-screen').addClass('d-none');
@@ -690,9 +783,12 @@
       $('#vote-pawn-layer').empty();
 
       if (isHost) {
+        if (voteDrake) {
+          voteDrake.destroy();
+          voteDrake = null;
+        }
         $('#vote-guest-view').addClass('d-none');
         $('#vote-host-view').removeClass('d-none');
-        $('#vote-star-layer').empty();
         if ($('#vote-top-host-actions').length === 0) renderTopControls();
         $('#vote-top-host-actions').removeClass('d-none').addClass('d-flex');
         $('#vote-count-control').addClass('d-none').removeClass('d-flex');
@@ -703,14 +799,12 @@
         $('#vote-host-view').addClass('d-none');
         $('#vote-guest-view').removeClass('d-none');
         $('#vote-top-host-actions').addClass('d-none').removeClass('d-flex');
-        if (starElements.length === 0) initStarTokens();
         renderGuestVotingGrid();
       }
     }
 
     setTimeout(() => {
       if (currentStage === 'numbers') updatePawnPositions();
-      if (currentStage === 'voting' && !isHost) updateStarPositions();
     }, 50);
   }
 
@@ -728,7 +822,11 @@
 
     currentStage = 'numbers';
     mySelectedNumber = null;
-    for (let i = 0; i < 5; i++) starAssignments[i] = null;
+    if (voteDrake) {
+      voteDrake.destroy();
+      voteDrake = null;
+    }
+    isDraggingStar = false;
     aggregateTotals = [];
     resultsMatrix = [];
     playersList = (currentRoom && Array.isArray(currentRoom.players)) ? currentRoom.players : [];
@@ -736,7 +834,7 @@
     renderTopControls();
     setStage('numbers');
 
-    // Clear pawn maps and star elements
+    // Clear pawn maps
     Object.keys(playerTokensMap).forEach((id) => {
       playerTokensMap[id].remove();
       delete playerTokensMap[id];
@@ -744,7 +842,6 @@
     Object.keys(playerPositionsMap).forEach((id) => {
       delete playerPositionsMap[id];
     });
-    starElements.length = 0;
 
     // Parse options.values only if host
     let valuesArray = null;
@@ -763,8 +860,6 @@
     $(window).off('resize.vote').on('resize.vote', function() {
       if (currentStage === 'numbers') {
         updatePawnPositions(true);
-      } else if (currentStage === 'voting' && !isHost) {
-        updateStarPositions(true);
       }
     });
 
@@ -823,7 +918,6 @@
         if (isHost) {
           updateHostVotingView();
         } else {
-          if (starElements.length === 0) initStarTokens();
           renderGuestVotingGrid();
           if (data.userVotes && currentPlayer && data.userVotes[currentPlayer.id]) {
             syncStarsFromUserVotes(data.userVotes[currentPlayer.id]);
@@ -920,16 +1014,18 @@
 
     // 3. Guest Voting Click Handlers (Phase 2)
     // Clicking an item card moves an available star from reserve to that item
-    $(document).off('click.vote', '.vote-item-card').on('click.vote', '.vote-item-card', function() {
+    $(document).off('click.vote', '.vote-item-card').on('click.vote', '.vote-item-card', function(e) {
+      if (isDraggingStar) return;
+      if ($(e.target).closest('.vote-star-token').length) return;
       const idx = $(this).data('item-index');
       moveStarToItem(idx);
     });
 
     // Clicking directly on a star moves it back to the reserve dock
     $(document).off('click.vote', '.vote-star-token').on('click.vote', '.vote-star-token', function(e) {
+      if (isDraggingStar) return;
       e.stopPropagation();
-      const starIdx = $(this).data('star-index');
-      returnStarToReserve(starIdx);
+      returnStarToReserve(this);
     });
 
     // 4. Print Results Button
@@ -947,6 +1043,11 @@
     $(document).off('.vote');
     $('#activityStatus').empty();
     $('#activityControls').empty();
+    if (voteDrake) {
+      voteDrake.destroy();
+      voteDrake = null;
+    }
+    isDraggingStar = false;
     if (hostChartInstance) {
       hostChartInstance.destroy();
       hostChartInstance = null;

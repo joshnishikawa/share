@@ -23,26 +23,9 @@ try {
   // fallback to defaults
 }
 
-const adjectives = [
-  "Agile", "Brave", "Cunning", "Daring", "Eager", "Fearless", "Gentle", "Happy", "Kind", "Lively",
-  "Mighty", "Nimble", "Playful", "Quick", "Rapid", "Swift", "Bold", "Charming", "Curious", "Diligent",
-  "Epic", "Funky", "Radiant", "Wise", "Wild", "Fierce", "Vibrant"
-];
-const nouns = [
-  "Ninja", "Penguin", "Pirate", "Dragon", "Unicorn", "Robot", "Wizard", "Alien", "Monster", "Shark",
-  "Eagle", "Cheetah", "Fox", "Panther", "Wolf", "Tiger", "Bear", "Owl", "Phoenix", "Dolphin",
-  "Knight", "Samurai", "Viking", "Ghost", "Titan", "Ranger", "Falcon"
-];
-
-function generateRandomName() {
-  const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
-  const noun = nouns[Math.floor(Math.random() * nouns.length)];
-  return `${adj} ${noun}`;
-}
-
 let room = {};
 let player = {
-  id: generateRandomName(),
+  id: null,
   color: "#0d6efd",
   roomname: null,
   roomtype: "private",
@@ -189,14 +172,12 @@ $(function(){
   const stored = loadStoredPlayer();
   if (stored) {
     player = stored;
-  } else {
-    try { localStorage.setItem('player', JSON.stringify(player)); } catch (e) {}
   }
 
   // Render pawn, color, and player ID immediately on DOM ready
   $("#myPawn").html(getPawn(player.color));
   $("#color").val(player.color);
-  $("#myName").text(player.id).css('color', player.color);
+  $("#myName").text(player.id || '...').css('color', player.color);
 
   // Restore draft popquiz questions from localStorage
   const savedPopquizQuestions = localStorage.getItem('popquiz_questions_draft');
@@ -553,6 +534,18 @@ $(function(){
     }
   }
 
+  function isHostedActivity(activityId) {
+    if (!activityId) return false;
+    if (Array.isArray(activitiesConfig)) {
+      const act = activitiesConfig.find(function(a) { return a.id === activityId; });
+      if (act && act.group === 'host') return true;
+    }
+    if (window.hostedActivities && window.hostedActivities[activityId]) {
+      return true;
+    }
+    return ['popquiz', 'raffle', 'vote'].includes(activityId);
+  }
+
   function getActivityModule(activityId) {
     if (!activityId) return null;
     if (window.hostedActivities && window.hostedActivities[activityId]) {
@@ -578,10 +571,7 @@ $(function(){
       currentModule.teardown(socket);
     }
 
-    const configItem = Array.isArray(activitiesConfig) ? activitiesConfig.find(a => a.id === activity) : null;
-    const loadUrl = ((configItem && configItem.group === 'host') || activity === 'popquiz' || activity === 'raffle' || activity === 'vote')
-      ? "/hosted/" + encodeURIComponent(activity)
-      : "/lobby/" + encodeURIComponent(activity);
+    const loadUrl = "/lobby/" + encodeURIComponent(activity);
 
     $("#activityContent").load(loadUrl, function(responseText, status) {
       if (status !== "success") {
@@ -614,11 +604,17 @@ $(function(){
     $("#activityColumn").removeClass("col-sm-8").addClass("col-12");
     $("#activityExit").removeClass("d-none");
     $("#activityRoomName").text(player.roomname || (room && room.roomname) || "");
-    const isHost = Boolean(room && room.hostId && player.id === room.hostId);
+    const isHost = Boolean(room && room.hostId ? player.id === room.hostId : (player && player.number === 1));
     if (isHost) {
       $("#activityHostBadge").removeClass("d-none");
+      if (isHostedActivity(currentActivity)) {
+        $("#activityExit").attr("title", "End activity and return to lobby").attr("aria-label", "End activity and return to lobby");
+      } else {
+        $("#activityExit").attr("title", "Leave activity").attr("aria-label", "Leave activity");
+      }
     } else {
       $("#activityHostBadge").addClass("d-none");
+      $("#activityExit").attr("title", "Leave activity").attr("aria-label", "Leave activity");
     }
   }
 
@@ -633,7 +629,7 @@ $(function(){
     $("#activityContent").empty();
     $("#activityStatus").empty();
     $("#activityControls").empty();
-    $("#activityExit").addClass("d-none");
+    $("#activityExit").addClass("d-none").attr("title", "Leave activity").attr("aria-label", "Leave activity");
     $("#activityHostBadge").addClass("d-none");
     $("#activityRoomName").empty();
     $("#activityColumn").removeClass("col-12").addClass("col-sm-8");
@@ -683,6 +679,17 @@ $(function(){
   });
 
   $("#activityExit").on('click', function(){
+    const isHost = Boolean(room && room.hostId ? player.id === room.hostId : (player && player.number === 1));
+    if (isHost && isHostedActivity(currentActivity)) {
+      if (window.confirm("Do you want to end the activity and return to the lobby?")) {
+        socket.emit("activityComplete", {
+          roomname: player.roomname || (room && room.roomname),
+          activity: currentActivity,
+        });
+      }
+      return;
+    }
+
     socket.emit('leave', player);
   });
 
@@ -846,7 +853,7 @@ $(function(){
   socket.on('connect', function(){
     const stored_player = loadStoredPlayer();
     
-    if (!stored_player) {
+    if (!stored_player || !stored_player.id) {
       getName().then(function() {
         socket.emit('join', player);
       });
@@ -1038,12 +1045,16 @@ $(function(){
   });
 
   socket.on('returnToLobby', function(data){
+    if (room) {
+      room.activity = null;
+      room.selectedHostActivity = null;
+    }
     exitActivityMode();
     player.activity = null;
     localStorage.setItem('player', JSON.stringify(player));
 
-    if (data && data.players) {
-      updatePlayerList(data.players);
+    if (data) {
+      updatePlayerList(data);
     }
   });
 

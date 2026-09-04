@@ -1,4 +1,4 @@
-const voteEvents = require('../lobby/hosted/activities/vote');
+const voteEvents = require('../lobby/hosted/vote');
 
 describe('Vote Hosted Activity Socket Handlers', () => {
   let ioMock;
