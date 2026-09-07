@@ -46,7 +46,7 @@ router.get('/', (req, res)=>{
     res.redirect('/abc');
   }
   catch(err){
-    res.status(500).render('error');
+    res.status(500).render('error', { message: err.message || String(err), error: err });
     console.error(err);
   }
 });
@@ -57,7 +57,7 @@ router.get('/LT1', (req, res)=>{
     res.sendFile(path.join(__dirname, '../public/LT1/index.html'));
   }
   catch(err){
-    res.status(500).render('error');
+    res.status(500).render('error', { message: err.message || String(err), error: err });
     console.error(err);
   }
 });
@@ -68,7 +68,7 @@ router.get('/LT2', (req, res)=>{
     res.sendFile(path.join(__dirname, '../public/LT2/index.html'));
   }
   catch(err){
-    res.status(500).render('error');
+    res.status(500).render('error', { message: err.message || String(err), error: err });
     console.error(err);
   }
 });
@@ -82,7 +82,7 @@ router.get('/NH', async (req, res)=>{
     res.render('students/NH', {NH_vocab, NH_colors, colors: NH_colors, teacher: false});
   }
   catch(err){
-    res.status(500).render('error');
+    res.status(500).render('error', { message: err.message || String(err), error: err });
     console.error(err);
   }
 });
@@ -93,7 +93,7 @@ router.get('/slots', (req, res)=>{
     res.render('activities/slots');
   }
   catch(err){
-    res.status(500).render('error');
+    res.status(500).render('error', { message: err.message || String(err), error: err });
     console.error(err);
   }
 });
@@ -119,7 +119,7 @@ router.get('/shapes', (req, res)=>{ // moved to things
     res.redirect('/things/shapes');
   }
   catch(err){
-    res.status(500).render('error');
+    res.status(500).render('error', { message: err.message || String(err), error: err });
     console.error(err);
   }
 });
@@ -130,7 +130,7 @@ router.get('/speech', (req, res)=>{
     res.redirect('/things/colors');
   }
   catch(err){
-    res.status(500).render('error');
+    res.status(500).render('error', { message: err.message || String(err), error: err });
     console.error(err);
   }
 });
@@ -142,7 +142,7 @@ router.get('/speak_spell', (req, res)=>{
   }
   catch
   (err){
-    res.status(500).render('error');
+    res.status(500).render('error', { message: err.message || String(err), error: err });
     console.error(err);
   }
 });
@@ -155,7 +155,7 @@ router.get('/New_Horizons', (req, res)=>{ // Because you borked it dude!
     res.redirect('/NH');
   }
   catch(err){
-    res.status(500).render('error');
+    res.status(500).render('error', { message: err.message || String(err), error: err });
     console.error(err);
   }
 });
@@ -166,7 +166,7 @@ router.get('/abc', (req, res)=>{
     res.redirect('/letters');
   }
   catch(err){
-    res.status(500).render('error');
+    res.status(500).render('error', { message: err.message || String(err), error: err });
     console.error(err);
   }
 });
@@ -177,7 +177,7 @@ router.get('/multiplayer', (req, res)=>{
     res.redirect('/lobby');
   }
   catch(err){
-    res.status(500).render('error');
+    res.status(500).render('error', { message: err.message || String(err), error: err });
     console.error(err);
   }
 });
@@ -188,7 +188,7 @@ router.get('/multiplayer/:activity', (req, res)=>{
     res.redirect(`/lobby/${encodeURIComponent(req.params.activity)}`);
   }
   catch(err){
-    res.status(500).render('error');
+    res.status(500).render('error', { message: err.message || String(err), error: err });
     console.error(err);
   }
 });
@@ -207,7 +207,8 @@ router.post('/:activity', async(req, res)=>{
     }
   }
   catch(err){
-    res.status(500).render('error');
+    if (err == '404') return res.status(404).render('404');
+    res.status(500).render('error', { message: err.message || String(err), error: err });
     console.error(err);
   }
 });

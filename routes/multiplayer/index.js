@@ -8,7 +8,7 @@ router.get('/', (req, res) => {
   try {
     res.render('lobby/lobby', { activities: enabledActivities });
   } catch (err) {
-    res.status(500).render('error');
+    res.status(500).render('error', { message: err.message || String(err), error: err });
     console.error(err);
   }
 });
@@ -22,7 +22,7 @@ router.get('/:activity', (req, res, next) => {
   try {
     res.render(`lobby/${groupDir}/${activity.id}/index`);
   } catch (err) {
-    res.status(500).render('error');
+    res.status(500).render('error', { message: err.message || String(err), error: err });
     console.error(err);
   }
 });

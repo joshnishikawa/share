@@ -41,7 +41,7 @@ router.get('/editsubs', (req, res)=>{
     res.render('labs/editsubs', {ENsubobj, JAsubobj});
   }
   catch(err){
-    res.status(500).render('error');
+    res.status(500).render('error', { message: err.message || String(err), error: err });
     console.error(err);
   }
 });
@@ -65,7 +65,7 @@ router.post('/editsubs', (req, res)=>{
     res.send('Saved');
   }
   catch(err){
-    res.status(500).render('error');
+    res.status(500).render('error', { message: err.message || String(err), error: err });
     console.error(err);
   }
 });
@@ -80,7 +80,7 @@ router.get('/:activity', (req, res)=>{
   }
   catch(err){
     console.error(err);
-    res.status(500).render('error');
+    res.status(500).render('error', { message: err.message || String(err), error: err });
   }
 });
 

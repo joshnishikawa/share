@@ -1,5 +1,7 @@
 //"use strict";
 require('dotenv').config();
+const monitor = require('/var/www/assets/monitor')({ site: 'dev.share' });
+monitor.catchGlobals();
 const express = require('express');
 const app = express();
 const server = require('http').createServer(app);
@@ -117,6 +119,31 @@ app.use(passport.session());
 app.use((req, res, next) => {
   res.locals.user = req.user || null;
   res.locals.isAuthenticated = req.isAuthenticated();
+  res.locals.message = '';
+  res.locals.error = {};
+  next();
+});
+
+// Capture direct res.render('error') calls that bypass next(err) so monitor can alert Discord
+app.use((req, res, next) => {
+  const originalRender = res.render;
+  res.render = function(view, options, callback) {
+    if (view === 'error' && (res.statusCode >= 500 || !res.statusCode)) {
+      if (!req._monitorAlertSent) {
+        req._monitorAlertSent = true;
+        const errObj = options?.error || (options instanceof Error ? options : null);
+        const errMsg = options?.message || (typeof options === 'string' ? options : null) || errObj?.message || 'Internal Server Error';
+        const errStack = errObj?.stack || (new Error().stack);
+        monitor.sendAlert({
+          title: `${res.statusCode || 500} ${errObj?.name || 'Application Error'}`,
+          message: errMsg,
+          stack: errStack,
+          req
+        });
+      }
+    }
+    return originalRender.call(this, view, options, callback);
+  };
   next();
 });
 
@@ -147,6 +174,13 @@ app.use('/media', mediaRouter);
 app.use('/', mainRouter);
 
 app.use( (req, res, next)=> { next(createError(404)); });
+
+// Error monitoring middleware
+app.use((err, req, res, next) => {
+  req._monitorAlertSent = true;
+  return monitor.errorHandler(err, req, res, next);
+});
+
 app.use( (err, req, res, next)=> {
   // set locals, only providing error in development
   res.locals.message = err.message;

@@ -58,7 +58,7 @@ router.post('/:activity', linkCreateLimiter, async(req, res)=>{
   }
   catch (err){
     if (err == '404') res.render('404');
-    else res.status(500).render('error');
+    else res.status(500).render('error', { message: err.message || String(err), error: err });
     console.error(err);
   }
 });
@@ -103,7 +103,7 @@ router.get('/:activity/:id', async (req, res)=>{
   }
   catch(err ){
     if (err == '404') res.render('404');
-    else res.status(500).render('error');
+    else res.status(500).render('error', { message: err.message || String(err), error: err });
     console.error(err);
   }
 });

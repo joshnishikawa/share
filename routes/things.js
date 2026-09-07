@@ -6,7 +6,7 @@ router.get('/', (req, res)=>{
     res.render('students/things');
   }
   catch(err){
-    res.status(500).render('error');
+    res.status(500).render('error', { message: err.message || String(err), error: err });
     console.error(err);
   }
 });
@@ -20,7 +20,7 @@ router.get('/dressup/:type', (req, res)=>{
   }
   catch(err){
     console.error(err);
-    res.status(500).render('error');
+    res.status(500).render('error', { message: err.message || String(err), error: err });
   }
 });
 
@@ -34,7 +34,7 @@ router.get('/:activity', (req, res)=>{
     res.render(`activities/things/${req.params.activity}`);
   }
   catch(err){
-    res.status(500).render('error');
+    res.status(500).render('error', { message: err.message || String(err), error: err });
     console.error(err);
   }
 });

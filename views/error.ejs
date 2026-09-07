@@ -2,9 +2,9 @@
 <%- include('head'); -%>
 
   <div class="container mt-5">
-    <h3><pre><%= message %></pre></h3>
-    <h5><%= error.status %></h5>
-    <pre><%- error.stack %></pre>
+    <h3><pre><%= locals.message || 'An unexpected error occurred' %></pre></h3>
+    <h5><%= locals.error?.status || '' %></h5>
+    <pre><%- locals.error?.stack || '' %></pre>
   </div>
 
 <%- include('foot'); -%>

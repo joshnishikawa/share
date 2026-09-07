@@ -46,7 +46,7 @@ router.get('/files', (req, res)=>{
     res.send({files, tags});
   }
   catch(err){
-    res.status(500).render('error');
+    res.status(500).render('error', { message: err.message || String(err), error: err });
     console.error(err);
   }
 });
@@ -73,7 +73,7 @@ router.post('/addTags', requireAuth, (req, res)=>{
     res.send('success');
   }
   catch(err){
-    res.status(500).render('error');
+    res.status(500).render('error', { message: err.message || String(err), error: err });
     console.error(err);
   }
 });
@@ -98,7 +98,7 @@ router.post('/removeTags', requireAuth, (req, res)=>{
     res.send('success');
   }
   catch(err){
-    res.status(500).render('error');
+    res.status(500).render('error', { message: err.message || String(err), error: err });
     console.error(err);
   }
 });

@@ -254,7 +254,7 @@ router.get('/any-vocab', async (req, res) => {
     }
     res.json(words);
   } catch (err) {
-    res.status(500).render('error');
+    res.status(500).render('error', { message: err.message || String(err), error: err });
     console.error(err);
   }
 });

@@ -11,7 +11,7 @@ router.get('/', (req, res)=>{
     res.redirect('/teachers/NH');
   }
   catch(err){
-    res.status(500).render('error');
+    res.status(500).render('error', { message: err.message || String(err), error: err });
     console.error(err);
   }
 });
@@ -22,7 +22,7 @@ router.get('/images', (req, res)=>{
     res.render('teachers/images');
   }
   catch(err){
-    res.status(500).render('error');
+    res.status(500).render('error', { message: err.message || String(err), error: err });
     console.error(err);
   }
 });
@@ -40,7 +40,7 @@ router.get('/LT', async (req, res)=>{
     res.render('teachers/LT', {LT_vocab});
   }
   catch(err){
-    res.status(500).render('error');
+    res.status(500).render('error', { message: err.message || String(err), error: err });
     console.error(err);
   }
 });
@@ -52,7 +52,7 @@ router.get('/NH', async(req, res)=>{
     res.render('teachers/NH', {NH_vocab, colors: NH_colors});
   }
   catch(err){
-    res.status(500).render('error');
+    res.status(500).render('error', { message: err.message || String(err), error: err });
     console.error(err);
   }
 });
@@ -63,7 +63,7 @@ router.get('/text', (req, res)=>{
     res.render('teachers/text', {text_decks});
   }
   catch(err){
-    res.status(500).render('error');
+    res.status(500).render('error', { message: err.message || String(err), error: err });
     console.error(err);
   }
 });
