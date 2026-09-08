@@ -70,6 +70,7 @@ $(function(){
   const deckType = '<%- deckType %>';
 
   var deck = <%- JSON.stringify(deck) %>;
+  window.deck = deck;
   const query = <%- JSON.stringify(query) %>;
   var spaces = query.spaces;
   $("#numCards").val(spaces);
@@ -122,10 +123,21 @@ $(function(){
     });
   };
 
-  $(document).on('input blur', '#grid [contenteditable]', function() {
+  $(document).on('input blur', '#grid [contenteditable]', function(e) {
     const idx = $(this).data('index');
     if (idx !== undefined && workingdeck[idx]) {
-      workingdeck[idx].word = $(this).text().trim();
+      workingdeck[idx].word = e.type === 'blur' ? $(this).text().trim() : $(this).text();
+      if (e.type === 'blur') {
+        $(this).text(workingdeck[idx].word);
+        $(this).siblings('img').attr('alt', workingdeck[idx].word);
+      }
+    }
+  });
+
+  $(document).on('keydown', '#grid [contenteditable]', function(e) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      $(this).blur();
     }
   });
 
@@ -148,6 +160,7 @@ $(function(){
 
     let cols = getCols(workingdeck.length);
     while (workingdeck.length % cols != 0) workingdeck.pop(); // reduce to a multiple of cols
+    window.deck = workingdeck;
     let colspan = (100 / cols - 1).toString(); // -1 to account for scrollbar
 
     let html = '<div class="border-top border-end d-flex flex-wrap justify-content-center">';

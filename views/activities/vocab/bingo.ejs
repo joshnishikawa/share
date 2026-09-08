@@ -1,6 +1,7 @@
 <%- include('../../head'); -%>
 <style>
-  #display div{ width: 16%;}
+  #display > div{ width: 16%;}
+  [contenteditable]{ user-select: text; }
 </style>
 
 <body>
@@ -59,42 +60,66 @@ $(function(){
   document.title = `Bingo ${deckType}`;
 
   var deck = <%- JSON.stringify(deck) %>;
+  window.deck = deck;
   var index = 0;
+  var started = false;
 
-  function getContent(i){
+  function getContent(i, idx){
     let str = i.word.split('(')[0].replace(/_/g, " ");
-    if (deckType == "text") return `<div class="rounded-3 bg-white border display-1 p-1">${str}</div>`;
+    if (deckType == "text") return `<div class="rounded-3 bg-white border display-1 p-1"><div class="txt w-100 h-100" contenteditable="true" data-index="${idx}">${str}</div></div>`;
     else {
       let img = i.image ? `<image alt="${str}" src="${i.image}" class="img-fluid">` : '';
-      return `<div class="rounded-3 bg-white border display-6 p-1">${img}<br />${str}</div>`;
+      return `<div class="rounded-3 bg-white border display-6 p-1">${img}<br /><div class="txt w-100" contenteditable="true" data-index="${idx}">${str}</div></div>`;
     }
   }
-  function getSlide(i){
+  function getSlide(i, idx){
     let str = i.word.split('(')[0].replace(/_/g, " ");
     if (deckType == "text") {
       // make size proportional to length of string
       let size = Math.max(10, 20 - str.length*2);
-      return `<div class="rounded-3 bg-white border h-100" style="font-size:${size}rem;">${str}</div>`;
+      return `<div class="rounded-3 bg-white border h-100" style="font-size:${size}rem;"><div class="txt w-100 h-100" contenteditable="true" data-index="${idx}">${str}</div></div>`;
     }
     else {
       let img = i.image ? `<image alt="${str}" src="${i.image}" class="img-fluid h-75">` : '';
-      return `<div class="rounded-3 bg-white border display-6 p-1 h-100">${img}<br/>${str}</div>`;
+      return `<div class="rounded-3 bg-white border display-6 p-1 h-100">${img}<br/><div class="txt w-100" contenteditable="true" data-index="${idx}">${str}</div></div>`;
     }
   }
 
 // PREPARE THE DISPLAY /////////////////////////////////////////////////////////
-  for (let i of deck){ $('#display').append( getContent(i) ); }
+  deck.forEach((item, i) => { $('#display').append( getContent(item, i) ); });
   fitText('#display > div');
 
-  deck = FYshuffle(deck);
-
   function showSlide() {
-    $("#currentSlide").html( getSlide(deck[index]) );
+    $("#currentSlide").html( getSlide(deck[index], index) );
     fitText('#currentSlide > div');
   }
 
+  $(document).on('input blur', '#display [contenteditable], #currentSlide [contenteditable]', function(e){
+    const idx = $(this).data('index');
+    if (idx === undefined || !deck[idx]) return;
+    deck[idx].word = e.type === 'blur' ? $(this).text().trim() : $(this).text();
+    if (e.type === 'blur') {
+      $(this).text(deck[idx].word);
+      $(this).siblings('image, img').attr('alt', deck[idx].word);
+      if ($(this).closest('#display').length) fitText('#display > div');
+      if ($(this).closest('#currentSlide').length) fitText('#currentSlide > div');
+    }
+  });
+
+  $(document).on('keydown', '#display [contenteditable], #currentSlide [contenteditable]', function(e){
+    if (e.key === "Enter") {
+      e.preventDefault();
+      $(this).blur();
+    }
+  });
+
   $("#start").on('click', ()=>{
     if ($("#slides").is(":hidden")) {
+      if (!started) {
+        deck = FYshuffle(deck);
+        window.deck = deck;
+        started = true;
+      }
       $("#display").empty();
       $("#start i").text('check_circle');
       $("#start").attr('aria-label', 'Check');
@@ -105,7 +130,7 @@ $(function(){
       $("#start i").text('play_arrow');
       $("#start").attr('aria-label', 'Start');
       for (let i=0; i<=index; i++){
-        $('#display').append( getContent(deck[i]) );
+        $('#display').append( getContent(deck[i], i) );
       }
       fitText('#display > div');
     }
@@ -131,6 +156,7 @@ $(function(){
   });
 
   $(document).off('keydown').on('keydown', (e)=>{
+    if (e.target.isContentEditable || $(e.target).is('[contenteditable]')) return;
     if (e.key == "Enter") $("#start").click();
     if (e.key == "ArrowLeft") $("#prev").click();
     if (e.key == "ArrowRight" || e.keyCode == 32) $("#next").click();

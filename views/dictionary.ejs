@@ -3,28 +3,32 @@
   ════════════════════════════════════════════════════════════════════════════
   Features:
     • Text input with debounced translation (500ms) via CDN translate module
-    • Speech recognition (currently commented out in the HTML but JS is active)
+    • Speech recognition (Web Speech API) with click-to-speak button & pulse feedback
     • Looks up words in local vocab data from /api/any-vocab
-    • Shows word, meaning, image, and audio
-
-  AUDIT NOTES:
-    • XSS: `showWord()` inserts `w.word`, `w.meaning`, and `w.image` directly
-      into HTML via template literal — no escaping. If vocab data contains HTML
-      or a malicious translation is returned, it will execute.
-    • The `processWord()` result is destructured but the processed variables
-      (`processedEnglish`, `processedJapanese`) are NEVER USED — the original
-      `EnglishWord`/`JapaneseWord` are passed to `showWord()` instead.
-    • Speech recognition JS is fully wired up but the HTML button is commented
-      out — `new SpeechRecognition()` will throw if API is unavailable.
-    • `recognition.onend` clears output even after a successful recognition
-      result, which may flash and disappear.
-    • `::placeholder` vendor prefixes (:-moz, ::-ms) are outdated — modern
-      browsers all support the unprefixed version.
+    • Shows word, meaning, image, and native audio pronunciation
 -->
 <style>
   ::placeholder { text-align:right; }
-  input:-moz-placeholder { text-align:right; }
-  ::-ms-input-placeholder { text-align:right; }
+  .mic-listening {
+    animation: mic-pulse 1.5s infinite;
+  }
+  @keyframes mic-pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+    }
+  }
+  .play-audio-btn {
+    transition: transform 0.15s ease, background-color 0.15s ease;
+  }
+  .play-audio-btn:hover {
+    transform: scale(1.1);
+  }
 </style>
 
 
@@ -41,12 +45,12 @@
       <input id="searchInput" name="word" type="text"
               class="form-control my-2" placeholder="日本語 / English" style="text-align:right;" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false">
 
-      <!-- <div class="d-flex justify-content-end">
-        <div class="text-muted me-3"><%//- __('speech') %></div>
-        <div id="speech_recognition" class="btn btn-success">
-          <i class="material-icons">mic</i>
-        </div>
-      </div> -->
+      <div class="d-flex justify-content-end align-items-center">
+        <div id="speech_label" class="text-muted me-3 small"><%- __('speech') %></div>
+        <button id="speech_recognition" type="button" class="btn btn-success" title="Click to speak">
+          <i class="material-icons align-middle">mic</i>
+        </button>
+      </div>
     </div>
 
     <div class="col-8">
@@ -58,7 +62,6 @@
 </div>
 
 
-<!-- <script src="javascripts/spell.js" type="text/javascript"></script> -->
 <script type="module">
 import translate from "https://cdn.jsdelivr.net/npm/translate/index.min.js";
 
@@ -77,152 +80,242 @@ $(function(){
     });
 
 
-// TEXT INPUT //////////////////////////////////////////////////////////////////
-  $('#searchInput').on('input', async function(){
-    clearTimeout(typingTimer);
-    typingTimer = setTimeout(async () => {
-      $("#output").html('<div class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>');
-      let word = $(this).val();
-
-      let EnglishWord = '';
-      let JapaneseWord = '';
-      let isJapanese = word.match(/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/);
-
-      if (word && isJapanese) {
-        JapaneseWord = word;
-        try{
-          EnglishWord = await translate(word, { from: "ja", to: "en" });
-        } catch (error) {
-          console.error("Translation error:", error);
-          EnglishWord = "Translation failed";
-        }
-      } else if (word) {
-        EnglishWord = word;
-        try {
-          JapaneseWord = await translate(word, { from: "en", to: "ja" });
-        } catch (error) {
-          console.error("Translation error:", error);
-          JapaneseWord = "Translation failed";
-        }
-      } else {
-        $("#output").html('');
-        return;
-      }
-
-      function processWord(EnglishWord, JapaneseWord) {
-        let image = '';
-        let audio = '';
-
-        if (Object.keys(words).includes(EnglishWord)) {
-          image = `<img src="${words[EnglishWord].image}" class="img-fluid" style="max-height:150px;" alt="${EnglishWord}">`;
-          audio = words[EnglishWord].audio;
-          if (JapaneseWord != words[EnglishWord].meaning) {
-            JapaneseWord += `, ${words[EnglishWord].meaning}`;
-          }
-        } else {
-          let lc = EnglishWord.toLowerCase();
-          if (Object.keys(words).includes(lc)) {
-            EnglishWord = lc;
-            image = `<img src="${words[EnglishWord].image}" class="img-fluid" style="max-height:150px;" alt="${EnglishWord}">`;
-            audio = words[lc].audio;
-            if (JapaneseWord != words[lc].meaning) {
-              JapaneseWord += `, ${words[lc].meaning}`;
-            }
-          }
-        }
-        
-        return { EnglishWord, JapaneseWord, image, audio };
-      }
-
-      const result = processWord(EnglishWord, JapaneseWord);
-      showWord({word: result.EnglishWord, meaning: result.JapaneseWord, image: result.image, audio: result.audio});
-    }, typingDelay);
-  });
-
-
-// SPEECH RECOGNITION //////////////////////////////////////////////////////////
-  // HTML button is commented out — JS commented out to match.
-  // Uncomment both the button in the template and the block below to re-enable.
-  /*
-  const SpeechRecognition =
-    window.SpeechRecognition || window.webkitSpeechRecognition;
-  const SpeechGrammarList =
-    window.SpeechGrammarList || window.webkitSpeechGrammarList;
-  const SpeechRecognitionEvent =
-    window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
-
-  if (SpeechRecognition) {
-  const recognition = new SpeechRecognition();
-  recognition.continuous = false;
-  recognition.lang = "en-US";
-  recognition.interimResults = false;
-  recognition.maxAlternatives = 1;
-
-  $("#speech_recognition").on('mousedown', () => {
-    recognition.start();
-  }).on('mouseup', () => {
-    $("#output").html('');
-    recognition.stop();
-  });
-
-  recognition.onstart = () => {
-    $("#output").html("Listening...");
-  };
-
-  recognition.onresult = async (event) => {
-    let image = '';
-    let audio = '';
-    let EnglishWord = event.results[0][0].transcript;
-    let conf = Math.round(event.results[0][0].confidence*100);
-    let JapaneseWord = await translate(EnglishWord, { from: "en", to: "ja" });
-
-    if (Object.keys(words).includes(EnglishWord)) {
-      image = `<img src="${words[EnglishWord].image}" class="img-fluid" style="max-height:150px;" alt="${EnglishWord}">`;
-      audio = words[EnglishWord].audio;
-      if (JapaneseWord != words[EnglishWord].meaning) {
-        JapaneseWord += `, ${words[EnglishWord].meaning}`;
-      }
-    } else {
-      let lc = EnglishWord.toLowerCase();
-      if (Object.keys(words).includes(lc)) {
-        EnglishWord = lc;
-        image = `<img src="${words[EnglishWord].image}" class="img-fluid" style="max-height:150px;" alt="${EnglishWord}">`;
-        audio = words[lc].audio;
-        if (JapaneseWord != words[lc].meaning) {
-          JapaneseWord += `, ${words[lc].meaning}`;
-        }
-      }
-    }
-    showWord({word: EnglishWord, meaning: JapaneseWord, image, audio});
-  };
-
-  recognition.onerror = (event) => {
-    console.error(event);
-    $("#output").html(`Error occurred in recognition: ${escapeHtml(event.error)}`);
-  };
-
-  } // end if (SpeechRecognition)
-  */
-
-
   function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
     var div = document.createElement('div');
-    div.appendChild(document.createTextNode(str));
+    div.appendChild(document.createTextNode(String(str)));
     return div.innerHTML;
   }
 
   function showWord(w) {
     let safeWord = escapeHtml(w.word);
     let safeMeaning = escapeHtml(w.meaning);
-    // w.image is already an <img> tag built from trusted vocab data, or empty string
-     $("#output").html(
-     `<div class="bg-light shadow border rounded-3 p-3 YM d-flex">
+    let audioButton = '';
+    if (w.audio) {
+      audioButton = `
+        <button type="button" class="btn btn-outline-primary btn-sm ms-2 play-audio-btn rounded-circle" data-audio="${escapeHtml(w.audio)}" title="Listen to pronunciation">
+          <i class="material-icons align-middle" style="font-size: 20px;">volume_up</i>
+        </button>`;
+    }
+
+    $("#output").html(
+     `<div class="bg-light shadow-sm border rounded-3 p-3 YM d-flex align-items-center justify-content-between">
         <div>
-          <span class="text-primary fs-1">${safeWord} </span> <br />
-          <span class="fs-3">${safeMeaning}</span>
+          <div class="d-flex align-items-center">
+            <span class="text-primary fs-1 fw-bold">${safeWord}</span>
+            ${audioButton}
+          </div>
+          <span class="fs-3 text-secondary">${safeMeaning}</span>
         </div>
-        <div class="w-100 text-center">${w.image}</div>
+        <div class="text-center ms-3">${w.image || ''}</div>
       </div>`);
+  }
+
+  // Audio button click listener
+  $(document).on('click', '.play-audio-btn', function(e) {
+    e.preventDefault();
+    const audioUrl = $(this).data('audio');
+    if (audioUrl) {
+      const audio = new Audio(audioUrl);
+      audio.play().catch(err => {
+        console.warn("Audio playback failed:", err);
+      });
+    }
+  });
+
+
+  // UNIFIED WORD LOOKUP ////////////////////////////////////////////////////////
+  async function lookupWord(word) {
+    if (!word || !word.trim()) {
+      $("#output").html('');
+      return;
+    }
+    word = word.trim();
+    $("#output").html('<div class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>');
+
+    let EnglishWord = '';
+    let JapaneseWord = '';
+    let isJapanese = word.match(/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/);
+
+    if (isJapanese) {
+      JapaneseWord = word;
+      try {
+        EnglishWord = await translate(word, { from: "ja", to: "en" });
+      } catch (error) {
+        console.error("Translation error:", error);
+        EnglishWord = "Translation failed";
+      }
+    } else {
+      EnglishWord = word;
+      let lc = EnglishWord.toLowerCase();
+      let matchedVocab = words[EnglishWord] || words[lc];
+      if (matchedVocab && matchedVocab.meaning) {
+        JapaneseWord = matchedVocab.meaning;
+      } else {
+        try {
+          JapaneseWord = await translate(word, { from: "en", to: "ja" });
+        } catch (error) {
+          console.error("Translation error:", error);
+          JapaneseWord = "Translation failed";
+        }
+      }
+    }
+
+    let image = '';
+    let audio = '';
+    let displayWord = EnglishWord;
+    let displayMeaning = JapaneseWord;
+
+    let lc = EnglishWord.toLowerCase();
+    let vocabEntry = words[EnglishWord] || words[lc];
+
+    if (vocabEntry) {
+      displayWord = words[EnglishWord] ? EnglishWord : lc;
+      if (vocabEntry.image) {
+        image = `<img src="${escapeHtml(vocabEntry.image)}" class="img-fluid" style="max-height:150px;" alt="${escapeHtml(displayWord)}">`;
+      }
+      audio = vocabEntry.audio || '';
+      if (vocabEntry.meaning && displayMeaning !== vocabEntry.meaning) {
+        if (displayMeaning && displayMeaning !== "Translation failed") {
+          displayMeaning += `, ${vocabEntry.meaning}`;
+        } else {
+          displayMeaning = vocabEntry.meaning;
+        }
+      }
+    }
+
+    showWord({ word: displayWord, meaning: displayMeaning, image, audio });
+  }
+
+
+// TEXT INPUT //////////////////////////////////////////////////////////////////
+  $('#searchInput').on('input', function(){
+    if (isListening && recognition) {
+      try { recognition.stop(); } catch (e) {}
+      resetMicUI();
+    }
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(async () => {
+      let word = $(this).val();
+      await lookupWord(word);
+    }, typingDelay);
+  });
+
+
+// SPEECH RECOGNITION //////////////////////////////////////////////////////////
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  let recognition = null;
+  let isListening = false;
+
+  function resetMicUI() {
+    isListening = false;
+    $("#speech_recognition")
+      .removeClass("btn-danger mic-listening")
+      .addClass("btn-success")
+      .attr("title", "Click to speak");
+  }
+
+  if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 3;
+
+    $("#speech_recognition").on('click', function() {
+      if (isListening) {
+        try {
+          recognition.stop();
+        } catch (e) {}
+        resetMicUI();
+      } else {
+        try {
+          recognition.start();
+        } catch (e) {
+          console.error("Speech recognition start error:", e);
+        }
+      }
+    });
+
+    recognition.onstart = () => {
+      isListening = true;
+      $("#speech_recognition")
+        .removeClass("btn-success")
+        .addClass("btn-danger mic-listening")
+        .attr("title", "Listening... Click to stop");
+      $("#output").html(
+        `<div class="bg-light shadow-sm border rounded-3 p-4 text-center">
+           <div class="text-danger mb-2">
+             <i class="material-icons align-middle fs-1">mic</i>
+             <span class="fs-4 ms-2 align-middle fw-bold">Listening...</span>
+           </div>
+           <div class="text-muted">Speak an English word to look it up in the dictionary</div>
+         </div>`
+      );
+    };
+
+    recognition.onresult = async (event) => {
+      let candidateWord = '';
+
+      if (event.results && event.results.length > 0) {
+        const result = event.results[0];
+        // Priority 1: Match against known dictionary vocabulary from alternatives
+        for (let i = 0; i < result.length; i++) {
+          const raw = (result[i].transcript || '').trim().replace(/[.,?!]/g, '');
+          const lc = raw.toLowerCase();
+          if (words[raw] || words[lc]) {
+            candidateWord = words[raw] ? raw : lc;
+            break;
+          }
+        }
+        // Priority 2: Fallback to the top transcript
+        if (!candidateWord && result[0] && result[0].transcript) {
+          candidateWord = result[0].transcript.trim().replace(/[.,?!]/g, '');
+        }
+      }
+
+      if (candidateWord) {
+        $('#searchInput').val(candidateWord);
+        await lookupWord(candidateWord);
+      }
+    };
+
+    recognition.onerror = (event) => {
+      console.warn("Speech recognition error:", event.error);
+      resetMicUI();
+      if (event.error === 'no-speech') {
+        $("#output").html(
+          `<div class="alert alert-warning text-center">
+             No speech was detected. Please click the mic and try again.
+           </div>`
+        );
+      } else if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+        $("#output").html(
+          `<div class="alert alert-danger text-center">
+             Microphone permission was denied. Please allow microphone access in your browser.
+           </div>`
+        );
+      } else if (event.error !== 'aborted') {
+        $("#output").html(
+          `<div class="alert alert-secondary text-center">
+             Speech error: ${escapeHtml(event.error)}
+           </div>`
+        );
+      }
+    };
+
+    recognition.onend = () => {
+      resetMicUI();
+    };
+
+  } else {
+    // SpeechRecognition not supported in browser
+    $("#speech_recognition")
+      .prop("disabled", true)
+      .addClass("disabled")
+      .attr("title", "Speech recognition is not supported in this browser.");
   }
 
 });

@@ -36,6 +36,7 @@ let player = {
 const socket = io();
 let currentActivity = null;
 let timer;
+let latestPublicRooms = [];
 
 // Escape HTML to prevent XSS when inserting user-controlled data into the DOM and attributes
 function escapeHtml(str) {
@@ -49,12 +50,20 @@ function escapeHtml(str) {
 }
 
 function renderPublicRooms(publicRooms) {
+  if (Array.isArray(publicRooms)) {
+    latestPublicRooms = publicRooms;
+  }
   const $container = $("#publicRoomsContainer");
   const $list = $("#publicRoomsList");
   $list.empty();
 
-  const availableRooms = (publicRooms || []).filter(function(r) {
-    return r && r.roomname && r.roomname !== player.roomname;
+  if (!player.activity) {
+    $container.hide();
+    return;
+  }
+
+  const availableRooms = (latestPublicRooms || []).filter(function(r) {
+    return r && r.roomname && r.roomname !== player.roomname && r.activity === player.activity;
   });
 
   if (availableRooms.length === 0) {
@@ -268,12 +277,9 @@ $(function(){
     }
 
     // Determine if group div should disappear:
-    // A) Another player joins their room (playersList.length > 1)
-    // B) The host with no other players in the room selects an activity thereby creating a public room
+    // When another player joins their room (playersList.length > 1)
     const hasOtherPlayers = playersList.length > 1;
-    const isPublic = (player.roomtype === "public" || (room && room.roomtype === "public") || roomTypeUpdate === "public");
-    const hasActivity = Boolean(player.activity || hostSelected || (room && room.activity));
-    const shouldHideGroup = hasOtherPlayers || (isPublic && hasActivity) || hasActivity;
+    const shouldHideGroup = hasOtherPlayers;
 
     if (shouldHideGroup) {
       $group.hide().removeClass("d-flex").addClass("d-none");
@@ -440,6 +446,7 @@ $(function(){
         $("#hostActivities").addClass("d-none");
       }
     }
+    renderPublicRooms();
   }
 
   function getPawn(color) {
@@ -707,6 +714,8 @@ $(function(){
     } else {
       player.activity = activity;
     }
+    localStorage.setItem('player', JSON.stringify(player));
+    renderPublicRooms();
     socket.emit("chooseActivity", player);
   });
 
@@ -887,8 +896,11 @@ $(function(){
       player.activity = room.activity;
       loadActivity(room.activity);
     } else {
+      const myPlayerRecord = room.players ? room.players.find(p => p.id === player.id || p.number === player.number) : null;
+      player.activity = (myPlayerRecord && myPlayerRecord.activity) ? myPlayerRecord.activity : null;
       exitActivityMode();
     }
+    renderPublicRooms();
   });
 
 
@@ -967,6 +979,7 @@ $(function(){
     
     // Update localStorage and join new room
     localStorage.setItem('player', JSON.stringify(player));
+    renderPublicRooms();
     socket.emit('join', player); // join a new private room
     socket.emit('getPublicRooms');
   });
@@ -989,6 +1002,7 @@ $(function(){
     $("#join").prop('disabled', true);
 
     localStorage.setItem('player', JSON.stringify(player));
+    renderPublicRooms();
     socket.emit('join', player);
     socket.emit('getPublicRooms');
   });
@@ -1015,7 +1029,6 @@ $(function(){
   });
 
   socket.on('roomOpened', function(data){
-    $("#leaveGroup").show();
     player.roomtype = "public";
     localStorage.setItem('player', JSON.stringify(player));
     updatePlayerList(data);
@@ -1026,6 +1039,7 @@ $(function(){
     player.activity = null;
     localStorage.setItem('player', JSON.stringify(player));
     updatePlayerList(data);
+    renderPublicRooms();
   });
 
   socket.on('activityChosen', function(data){
@@ -1052,6 +1066,7 @@ $(function(){
     exitActivityMode();
     player.activity = null;
     localStorage.setItem('player', JSON.stringify(player));
+    renderPublicRooms();
 
     if (data) {
       updatePlayerList(data);

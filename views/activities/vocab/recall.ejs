@@ -1,7 +1,7 @@
 <%- include('../../head'); -%>
 
 <style>
-  #display div{ width: 16%;}
+  #display > div{ width: 16%;}
 </style>
 
 <body>
@@ -41,9 +41,9 @@
 
 
   <div style="min-height:100vh;">
-    <div id="display" class="col d-flex flex-wrap justify-content-center text-center"></div>
+    <div id="display" class="col d-flex flex-wrap justify-content-center text-center YM"></div>
     <div id="gridContainer" style="display:none;">
-      <div id="grid" class="d-flex flex-wrap" style="user-select: none;"></div>
+      <div id="grid" class="d-flex flex-wrap YM" style="user-select: none;"></div>
     </div>
   </div>
 
@@ -58,30 +58,50 @@ $(function(){
   deck = FYshuffle(deck); // Shuffle first so that cards left out are random.
   let {length, colspan, rowheight} = getGrid({length: deck.length, even: false});
   deck = deck.slice(0, length); // Slice the deck to the correct length.
+  window.deck = deck;
   let fontsize = Math.floor( deck.length / 6 );
 
   $("#numCards").val(deck.length);
   $("#numCards").attr('max', deck.length);
 
 // PREPARE THE DISPLAY /////////////////////////////////////////////////////////
-  function getContent(i){
+  function getContent(i, index){
     let str = i.word.split('(')[0].replace(/_/g, " ");
-    if (deckType == "text") return `<div class="rounded-3 bg-white border display-1 p-1">${str}</div>`;
+    if (deckType == "text") return `<div class="rounded-3 bg-white border display-1 p-1"><div class="txt w-100 h-100" contenteditable="true" data-index="${index}">${str}</div></div>`;
     else {
       let img = i.image ? `<image alt="${str}" src="${i.image}" class="img-fluid">` : '';
-      return `<div class="rounded-3 bg-white border display-6 p-1">${img}<br/>${str}</div>`;
+      return `<div class="rounded-3 bg-white border display-6 p-1">${img}<br/><div class="txt w-100" contenteditable="true" data-index="${index}">${str}</div></div>`;
     }
   }
-  for (let i of deck){
-    $('#display').append(getContent(i));
-  }
+  deck.forEach((item, index) => {
+    $('#display').append(getContent(item, index));
+  });
   fitText('#display > div');
+
+  $(document).on('input blur', '#display [contenteditable]', function(e){
+    const idx = $(this).data('index');
+    if (idx === undefined || !deck[idx]) return;
+    deck[idx].word = e.type === 'blur' ? $(this).text().trim() : $(this).text();
+    if (e.type === 'blur') {
+      $(this).text(deck[idx].word);
+      $(this).siblings('image, img').attr('alt', deck[idx].word);
+      fitText('#display > div');
+    }
+  });
+
+  $(document).on('keydown', '#display [contenteditable]', function(e){
+    if (e.key === "Enter") {
+      e.preventDefault();
+      $(this).blur();
+    }
+  });
 
 
 // PREPARE THE GRID ////////////////////////////////////////////////////////////
   play = () => {
     $("#grid").empty();
     deck = FYshuffle(deck);
+    window.deck = deck;
     for (let i of deck){
       $("#grid").append(
       `<div id="${i.word.replace(/[ ()']/g, '_')}" class="col-${colspan} vocab p-0" style="height:${rowheight}vh;">
@@ -164,6 +184,7 @@ $(function(){
 
   let slash = false;
   $(document).on('keydown', function(e){
+    if (e.target.isContentEditable || $(e.target).is('[contenteditable]')) return;
     if (e.key == "Space"){
       e.preventDefault();
     }

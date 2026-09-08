@@ -1,5 +1,3 @@
-Get audio samples for all static vocab
-Get the spoken picture dictionary working
 code an activity format to practice dialogs
 labelled diagrams for: clothes, body, school, kitchen, tools, maps, around town
 
@@ -80,3 +78,9 @@ Time Bomb: Pause for 3 seconds = die. Don't finish in 1 minute = die. Three stri
   3rd person (like - likes, wish - wishes, have - has)
   comparative (tall - taller, large - larger, early - earlier, beautiful - more beautiful, good - better)
   superlative "
+
+
+
+
+
+Get audio samples for all static vocab

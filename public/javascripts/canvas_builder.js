@@ -448,10 +448,15 @@ function CanvasBuilder(options) {
 
       $(".drag-handle").remove();
 
+      let lastMenuPointerX = touch.clientX;
+      let lastMenuPointerY = touch.clientY;
+
       // Handle move
       const moveHandler = function(e) {
         if (!activeClone) return;
         const touch = e.type === 'touchmove' ? e.originalEvent.touches[0] : e;
+        lastMenuPointerX = touch.clientX;
+        lastMenuPointerY = touch.clientY;
         
         const canvas = document.getElementById(config.canvasId);
         const canvasBounds = canvas.getBoundingClientRect();
@@ -464,9 +469,32 @@ function CanvasBuilder(options) {
       };
 
       // Handle end
-      const endHandler = function() {
+      const endHandler = function(e) {
         $(document).off('mousemove touchmove', moveHandler);
         $(document).off('mouseup touchend', endHandler);
+
+        let endX = lastMenuPointerX;
+        let endY = lastMenuPointerY;
+        if (e) {
+          const touch = (e.originalEvent && e.originalEvent.changedTouches && e.originalEvent.changedTouches[0]) ||
+                        (e.originalEvent && e.originalEvent.touches && e.originalEvent.touches[0]);
+          if (touch) {
+            endX = touch.clientX;
+            endY = touch.clientY;
+          } else if (e.clientX !== undefined) {
+            endX = e.clientX;
+            endY = e.clientY;
+          }
+        }
+
+        if (isPointerInMenu(endX, endY) && activeClone) {
+          activeClone.remove();
+          activeClone = null;
+          isDraggingFromMenu = false;
+          saveToStorage();
+          return;
+        }
+
         activeClone = null;
         isDraggingFromMenu = false;
         // Show drag handle on the newly placed shape
@@ -563,6 +591,34 @@ function CanvasBuilder(options) {
     return (delta + 180) % 360 - 180;
   }
 
+  // Helper to check if pointer/finger or point is within the menu area or off canvas to the left
+  function isPointerInMenu(x, y) {
+    if (x === undefined || y === undefined) return false;
+
+    // Check primary menu container
+    const menuElement = document.getElementById(config.menuContainerId);
+    if (menuElement) {
+      const mb = menuElement.getBoundingClientRect();
+      if (x >= mb.left && x <= mb.right && y >= mb.top && y <= mb.bottom) return true;
+    }
+
+    // Check colorMenu if present (e.g. in shapes and supplies)
+    const colorMenu = document.getElementById('colorMenu');
+    if (colorMenu) {
+      const cb = colorMenu.getBoundingClientRect();
+      if (x >= cb.left && x <= cb.right && y >= cb.top && y <= cb.bottom) return true;
+    }
+
+    // Check if left of canvas boundary (dragged off canvas into menu area)
+    const canvas = document.getElementById(config.canvasId);
+    if (canvas) {
+      const canvasBounds = canvas.getBoundingClientRect();
+      if (x <= canvasBounds.left && y >= 0 && y <= window.innerHeight) return true;
+    }
+
+    return false;
+  }
+
   // Make item draggable (pan) and pinchable (scale/rotate) via Hammer.js.
   // On pan end, items dragged back over the menu are deleted (drag-to-delete).
   function makeTouchable(item) {
@@ -573,6 +629,8 @@ function CanvasBuilder(options) {
     let startingTouchRotation = 0;
     let initialLeft = 0;
     let initialTop = 0;
+    let lastPointerX = 0;
+    let lastPointerY = 0;
 
     mc.get('pinch').set({ enable: config.enableScale || config.enableRotate });
     mc.get('rotate').set({ enable: false });
@@ -581,6 +639,10 @@ function CanvasBuilder(options) {
       if (isDraggingHandle) return;
       initialLeft = parseInt(item.css("left"), 10) || 0;
       initialTop = parseInt(item.css("top"), 10) || 0;
+      if (e.center && (e.center.x !== 0 || e.center.y !== 0)) {
+        lastPointerX = e.center.x;
+        lastPointerY = e.center.y;
+      }
     });
 
     mc.on("panmove", function (e) {
@@ -591,22 +653,47 @@ function CanvasBuilder(options) {
         left: `${initialLeft + dx}px`,
         top: `${initialTop + dy}px`,
       });
+      if (e.center && (e.center.x !== 0 || e.center.y !== 0)) {
+        lastPointerX = e.center.x;
+        lastPointerY = e.center.y;
+      }
     });
 
     mc.on("panend", function (e) {
       if (isDraggingHandle) return;
 
-      // Remove if dragged back over menu
-      const menuElement = document.getElementById(config.menuContainerId);
-      if (menuElement) {
-        const menuBounds = menuElement.getBoundingClientRect();
-        const itemBounds = item[0].getBoundingClientRect();
-        const itemCenterX = itemBounds.left + itemBounds.width / 2;
-        
-        // Check if item center is over menu
-        if (itemCenterX >= menuBounds.left && itemCenterX <= menuBounds.right) {
-          item.remove();
+      // Determine pointer coordinates where the finger lifted
+      let pointerX = lastPointerX;
+      let pointerY = lastPointerY;
+
+      if (e.center && (e.center.x !== 0 || e.center.y !== 0)) {
+        pointerX = e.center.x;
+        pointerY = e.center.y;
+      } else if (e.srcEvent) {
+        const touch = (e.srcEvent.changedTouches && e.srcEvent.changedTouches[0]) ||
+                      (e.srcEvent.touches && e.srcEvent.touches[0]);
+        if (touch) {
+          pointerX = touch.clientX;
+          pointerY = touch.clientY;
+        } else if (e.srcEvent.clientX !== undefined) {
+          pointerX = e.srcEvent.clientX;
+          pointerY = e.srcEvent.clientY;
         }
+      }
+
+      // Check if finger lifted anywhere in the menu, or if item itself was dragged into menu
+      const itemBounds = item[0].getBoundingClientRect();
+      const itemCenterX = itemBounds.left + itemBounds.width / 2;
+      const itemCenterY = itemBounds.top + itemBounds.height / 2;
+      const canvas = document.getElementById(config.canvasId);
+
+      const fingerInMenu = isPointerInMenu(pointerX, pointerY);
+      const itemInMenu = isPointerInMenu(itemCenterX, itemCenterY);
+      const itemOffLeft = canvas ? (itemBounds.right <= canvas.getBoundingClientRect().left) : false;
+
+      if (fingerInMenu || itemInMenu || itemOffLeft) {
+        $(".drag-handle").remove();
+        item.remove();
       }
       
       // Always save after pan ends (whether removed or just moved)

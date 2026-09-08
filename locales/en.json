@@ -302,7 +302,7 @@
 	"objects": "objects",
 	"objects+": "objects+",
 	"textinput": "Enter EN or JA separated by ',' or '、'",
-	"speech": "Hold for speech recognition (EN only)",
+	"speech": "Speech input (EN only)",
 	"save": "Save",
 	"list_name": "Enter deck name",
 	"list_select": "Select a list (if any)",
