@@ -1468,6 +1468,240 @@ describe('Multiplayer Sockets Integration', () => {
       });
     });
   });
+
+  test('roomSearch is case-insensitive and finds room when searched in uppercase or mixed-case', (done) => {
+    clientSocket1.emit('join', {
+      id: 'CaseHost',
+      roomtype: 'private',
+      color: '#123456',
+    });
+
+    clientSocket1.on('joined', ({ room }) => {
+      const roomname = room.roomname;
+      clientSocket1.emit('roomSearch', '  ' + roomname.toUpperCase() + '  ');
+      clientSocket1.on('roomSearch', (foundRoom) => {
+        expect(foundRoom).not.toBeNull();
+        expect(foundRoom.roomname).toBe(roomname);
+        done();
+      });
+    });
+  });
+
+  test('join is case-insensitive and allows guest to join using uppercase room name', (done) => {
+    clientSocket1.emit('join', {
+      id: 'CaseHost2',
+      roomtype: 'private',
+      color: '#111111',
+    });
+
+    clientSocket1.on('joined', ({ room }) => {
+      const roomname = room.roomname;
+      clientSocket2 = Client(`http://localhost:${serverPort}`);
+      clientSocket2.on('connect', () => {
+        clientSocket2.emit('join', {
+          newRoom: roomname.toUpperCase(),
+          player: { id: 'CaseGuest', roomname: 'temp_room', roomtype: 'private', color: '#222222' },
+        });
+      });
+
+      clientSocket2.on('joined', (data) => {
+        expect(data.room).toBeDefined();
+        expect(data.room.roomname).toBe(roomname);
+        expect(data.playerNum).toBe(2);
+        done();
+      });
+    });
+  });
+
+  test('lobby groups allow more than 4 players to join before an activity is chosen', (done) => {
+    clientSocket1.emit('join', {
+      id: 'LobbyHost',
+      roomtype: 'private',
+      color: '#111111',
+    });
+
+    clientSocket1.on('joined', async ({ room }) => {
+      const roomname = room.roomname;
+      const extraClients = [];
+
+      try {
+        for (let i = 2; i <= 6; i++) {
+          await new Promise((resolve, reject) => {
+            const c = Client(`http://localhost:${serverPort}`);
+            extraClients.push(c);
+            c.on('connect', () => {
+              c.emit('join', {
+                newRoom: roomname,
+                player: { id: `LobbyGuest${i}`, roomname: `temp_${i}`, roomtype: 'private', color: '#333333' },
+              });
+            });
+            c.on('joined', (data) => {
+              expect(data.room).toBeDefined();
+              expect(data.room.roomname).toBe(roomname);
+              expect(data.room.players.length).toBe(i);
+              expect(data.playerNum).toBe(i);
+              resolve();
+            });
+          });
+        }
+        done();
+      } finally {
+        extraClients.forEach((c) => {
+          if (c.connected) c.disconnect();
+        });
+      }
+    });
+  });
+
+  test('attempting to join a non-existent room does not evict player from current room', (done) => {
+    clientSocket1.emit('join', {
+      id: 'SafePlayer',
+      roomtype: 'private',
+      color: '#123456',
+    });
+
+    clientSocket1.once('joined', (data1) => {
+      const originalRoom = data1.room.roomname;
+
+      clientSocket1.once('joined', (data2) => {
+        expect(data2.room).toBeUndefined();
+        expect(data2.message).toBe('Room not found.');
+
+        // Verify player is still recognized in original room by performing an action
+        clientSocket1.emit('getName', { roomname: originalRoom, id: 'SafePlayer' });
+        clientSocket1.once('setName', (nameData) => {
+          expect(nameData.id).toBeDefined();
+          done();
+        });
+      });
+
+      clientSocket1.emit('join', {
+        newRoom: 'this_room_does_not_exist_xyz',
+        player: { id: 'SafePlayer', roomname: originalRoom, roomtype: 'private', color: '#123456' },
+      });
+    });
+  });
+
+  test('host refreshes page after selecting correct answer in Pop Quiz: reconnected host receives popquiz/graded and can advance with popquiz/nextRound', (done) => {
+    clientSocket1.emit('join', {
+      id: 'HostGradedRefresh',
+      roomtype: 'private',
+      color: '#ff0000',
+    });
+
+    clientSocket1.once('joined', ({ room }) => {
+      const roomname = room.roomname;
+      clientSocket2 = Client(`http://localhost:${serverPort}`);
+
+      clientSocket2.once('connect', () => {
+        clientSocket2.emit('join', {
+          id: 'GuestGradedRefresh',
+          roomtype: 'private',
+          roomname: roomname,
+          color: '#00ff00',
+        });
+      });
+
+      clientSocket2.once('joined', () => {
+        // Start Pop Quiz
+        clientSocket1.emit('startActivity', {
+          roomname,
+          id: 'HostGradedRefresh',
+          activity: 'popquiz',
+          questions: [['ChoiceA', 'ChoiceB']],
+        });
+
+        clientSocket1.emit('popquiz/ready', {
+          roomname,
+          playerId: 'HostGradedRefresh',
+          playerNumber: 1,
+          isHost: true,
+          questions: [['ChoiceA', 'ChoiceB']],
+        });
+
+        clientSocket2.emit('popquiz/ready', {
+          roomname,
+          playerId: 'GuestGradedRefresh',
+          playerNumber: 2,
+          isHost: false,
+        });
+
+        clientSocket1.emit('popquiz/setNumbers', {
+          roomname,
+          id: 'HostGradedRefresh',
+        });
+
+        clientSocket2.once('popquiz/roundstart', () => {
+          clientSocket2.emit('popquiz/select', {
+            roomname,
+            playerId: 'GuestGradedRefresh',
+            playerNumber: 2,
+            color: '#00ff00',
+            choiceIndex: 1,
+          });
+        });
+
+        clientSocket1.once('popquiz/playerselected', (sel) => {
+          if (sel.playerId === 'GuestGradedRefresh') {
+            // Host grades choice 1 as correct
+            clientSocket1.emit('popquiz/grade', {
+              roomname,
+              id: 'HostGradedRefresh',
+              correctChoiceIndex: 1,
+            });
+          }
+        });
+
+        clientSocket1.once('popquiz/graded', (firstGradedData) => {
+          expect(firstGradedData.correctChoiceIndex).toBe(1);
+
+          // Host simulates page refresh: disconnect socket1 and connect socket3
+          clientSocket1.disconnect();
+
+          const clientSocket3 = Client(`http://localhost:${serverPort}`);
+          clientSocket3.once('connect', () => {
+            clientSocket3.emit('join', {
+              id: 'HostGradedRefresh',
+              roomtype: 'private',
+              roomname: roomname,
+              number: 1,
+              color: '#ff0000',
+            });
+          });
+
+          clientSocket3.once('joined', () => {
+            // Host emits popquiz/ready after refresh
+            clientSocket3.emit('popquiz/ready', {
+              roomname,
+              playerId: 'HostGradedRefresh',
+              playerNumber: 1,
+              color: '#ff0000',
+              isHost: true,
+            });
+
+            // Reconnected host MUST receive popquiz/graded!
+            clientSocket3.once('popquiz/graded', (reconnectedGradedData) => {
+              expect(reconnectedGradedData.correctChoiceIndex).toBe(1);
+              expect(reconnectedGradedData.scores['GuestGradedRefresh']).toBe(1);
+
+              // Host can now advance to next round / gameover
+              clientSocket3.emit('popquiz/nextRound', {
+                roomname,
+                id: 'HostGradedRefresh',
+              });
+
+              clientSocket3.once('popquiz/gameover', (gameOverData) => {
+                expect(gameOverData.scores['GuestGradedRefresh']).toBe(1);
+                clientSocket3.disconnect();
+                done();
+              });
+            });
+          });
+        });
+      });
+    });
+  });
 });
+
 
 

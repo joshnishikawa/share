@@ -388,11 +388,10 @@ const multiplayer = (io, options = {}) => {
               "Sorry, this room is closed and your name is not on the list.",
           });
         } else {
-          const isHostAct = Boolean(
-            (room.activity && hostActivityIds.has(room.activity)) ||
-            (room.selectedHostActivity && hostActivityIds.has(room.selectedHostActivity))
+          const isStandardAct = Boolean(
+            room.activity && !hostActivityIds.has(room.activity)
           );
-          if (isHostAct || room.players.length < 4) {
+          if (!isStandardAct || room.players.length < 4) {
             socket.join(roomname);
 
             // set the player number to the next available number
@@ -450,12 +449,11 @@ const multiplayer = (io, options = {}) => {
       }
 
       if (existingPlayerIndex === -1) {
-        const isHostAct = Boolean(
-          (room.activity && hostActivityIds.has(room.activity)) ||
-          (room.selectedHostActivity && hostActivityIds.has(room.selectedHostActivity))
+        const isStandardAct = Boolean(
+          room.activity && !hostActivityIds.has(room.activity)
         );
-        // Player not found, add new player (host activities do not have a 4 player limit)
-        if (isHostAct || room.players.length < 4) {
+        // Player not found, add new player (only enforce 4 player limit for active standard activities)
+        if (!isStandardAct || room.players.length < 4) {
           // set the player number to the next available number
           let playerNums = room.players.map((x) => x.number);
           let playerNum = 1;
@@ -566,22 +564,38 @@ const multiplayer = (io, options = {}) => {
       if (!data || typeof data !== 'object') return;
       if (data.newRoom) {
         if (!isStr(data.newRoom, 60)) return;
+        const cleanNewRoom = data.newRoom.trim().toLowerCase();
         const player = sanitizePlayerData(data.player);
         if (!player) return;
+
+        const targetRoom = privateRooms[cleanNewRoom] || publicRooms[cleanNewRoom];
+        if (!targetRoom) {
+          socket.emit("joined", { message: "Room not found." });
+          return;
+        }
+
+        const isExistingPlayer = findPlayerIndex(targetRoom.players, player.id) !== -1;
+        const isStandardAct = Boolean(
+          targetRoom.activity && !hostActivityIds.has(targetRoom.activity)
+        );
+        if (!isExistingPlayer && isStandardAct && targetRoom.players.length >= 4) {
+          socket.emit("joined", { message: "Sorry, this room is full." });
+          return;
+        }
+
         leaveRoom(socket, player);
-        if (Object.keys(privateRooms).includes(data.newRoom)) {
-          player.roomname = data.newRoom;
+        player.roomname = cleanNewRoom;
+        if (Object.keys(privateRooms).includes(cleanNewRoom)) {
           joinPrivateRoom(socket, player);
-        } else if (Object.keys(publicRooms).includes(data.newRoom)) {
-          player.roomname = data.newRoom;
-          joinPublicRoom(socket, player);
         } else {
-          player.roomname = data.newRoom;
-          joinPrivateRoom(socket, player);
+          joinPublicRoom(socket, player);
         }
       } else {
         const clean = sanitizePlayerData(data);
         if (!clean) return;
+        if (clean.roomname) {
+          clean.roomname = clean.roomname.trim().toLowerCase();
+        }
         if (clean.roomtype === "public") {
           joinPublicRoom(socket, clean);
         } else if (clean.roomtype === "private") {
@@ -594,8 +608,9 @@ const multiplayer = (io, options = {}) => {
 
     socket.on("roomSearch", function (data) {
       if (!isStr(data, 60)) return;
-      touchRoom(data);
-      const room = privateRooms[data] || publicRooms[data] || null;
+      const cleanRoom = data.trim().toLowerCase();
+      touchRoom(cleanRoom);
+      const room = privateRooms[cleanRoom] || publicRooms[cleanRoom] || null;
       socket.emit("roomSearch", room);
     });
 
@@ -759,6 +774,9 @@ const multiplayer = (io, options = {}) => {
           players: room.players,
           selectedHostActivity: room.selectedHostActivity || (hostActivityIds.has(data.activity) ? data.activity : null),
         });
+        if (publicRooms[roomname]) {
+          broadcastPublicRooms();
+        }
         return;
       }
 

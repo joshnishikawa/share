@@ -35,6 +35,7 @@ function getOrCreatePopquizState(roomname, initialQuestions, hostId) {
       started: false,
       customTotalCount: null,
       correctChoiceIndex: null,
+      lastGradedData: null,
     });
   } else {
     const state = popquizStates.get(roomname);
@@ -88,6 +89,8 @@ function emitRoundStart(io, roomname, state) {
   state.stage = 'quiz';
   state.started = true;
   state.graded = false;
+  state.correctChoiceIndex = null;
+  state.lastGradedData = null;
   state.lastRoundStart = Date.now();
   state.selections.clear();
 
@@ -188,6 +191,34 @@ const popquizEvents = (io, socket, touchRoom) => {
           });
         }
       });
+
+      if (state.graded) {
+        if (!state.lastGradedData && state.correctChoiceIndex !== null && state.correctChoiceIndex !== undefined) {
+          const playersArray = Array.from(state.players.values());
+          const studentPlayers = playersArray.filter((p) => p.id !== state.hostId);
+          const targetPlayers = studentPlayers.length > 0 ? studentPlayers : playersArray;
+          const results = targetPlayers.map((p) => {
+            const selectedIndex = state.selections.has(p.id) ? state.selections.get(p.id) : null;
+            return {
+              playerId: p.id,
+              playerNumber: p.number,
+              color: p.color,
+              choiceIndex: selectedIndex,
+              correct: selectedIndex === state.correctChoiceIndex,
+              score: state.scores[p.id] || 0,
+            };
+          });
+          state.lastGradedData = {
+            correctChoiceIndex: state.correctChoiceIndex,
+            results,
+            scores: state.scores,
+            isGameOver: state.currentQuestionIndex + 1 >= state.questions.length,
+          };
+        }
+        if (state.lastGradedData) {
+          socket.emit('popquiz/graded', state.lastGradedData);
+        }
+      }
     }
   });
 
@@ -296,12 +327,14 @@ const popquizEvents = (io, socket, touchRoom) => {
 
     const isGameOver = state.currentQuestionIndex + 1 >= state.questions.length;
 
-    io.to(data.roomname).emit('popquiz/graded', {
+    state.lastGradedData = {
       correctChoiceIndex: correctIndex,
       results,
       scores: state.scores,
       isGameOver,
-    });
+    };
+
+    io.to(data.roomname).emit('popquiz/graded', state.lastGradedData);
   });
 
   socket.on('popquiz/nextRound', function(data) {
@@ -344,6 +377,7 @@ const popquizEvents = (io, socket, touchRoom) => {
     } else {
       state.currentQuestionIndex += 1;
       state.correctChoiceIndex = null;
+      state.lastGradedData = null;
       emitRoundStart(io, data.roomname, state);
     }
   });

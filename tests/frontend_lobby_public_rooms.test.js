@@ -283,4 +283,59 @@ describe('Frontend Lobby Public Rooms Activity Filtering', () => {
     expect($('#group').css('display')).not.toBe('none');
     expect($('#leaveGroup').css('display')).toBe('none');
   });
+
+  test('submitting roomSearchForm immediately emits join with lowercase room name without waiting for debounce', async () => {
+    const lobbyCode = fs.readFileSync(path.join(__dirname, '../public/javascripts/lobby/lobby.js'), 'utf8');
+    eval(lobbyCode);
+
+    await new Promise((r) => setTimeout(r, 20));
+
+    $('#roomSearch').val('  CAT  ').trigger('input');
+
+    // #join should be enabled upon typing
+    expect($('#join').prop('disabled')).toBe(false);
+
+    $('#roomSearchForm').trigger('submit');
+
+    expect(socketMock.emit).toHaveBeenCalledWith('join', {
+      newRoom: 'cat',
+      player: expect.any(Object),
+    });
+    expect($('#roomSearch').val()).toBe('');
+    expect($('#join').prop('disabled')).toBe(true);
+  });
+
+  test('joined event with error message displays the error in #foundplayers', async () => {
+    const lobbyCode = fs.readFileSync(path.join(__dirname, '../public/javascripts/lobby/lobby.js'), 'utf8');
+    eval(lobbyCode);
+
+    await new Promise((r) => setTimeout(r, 20));
+
+    const socketOnHandlers = {};
+    socketMock.on.mock.calls.forEach(([evt, handler]) => {
+      socketOnHandlers[evt] = handler;
+    });
+
+    socketOnHandlers['joined']({ message: 'Room not found.' });
+
+    expect($('#foundplayers').text()).toContain('Room not found.');
+    expect($('#foundplayers').find('.text-danger').length).toBe(1);
+  });
+
+  test('roomSearch input clears placeholder on focus and restores it on blur', async () => {
+    $('#roomSearch').attr('placeholder', 'join');
+    const lobbyCode = fs.readFileSync(path.join(__dirname, '../public/javascripts/lobby/lobby.js'), 'utf8');
+    eval(lobbyCode);
+
+    await new Promise((r) => setTimeout(r, 20));
+
+    expect($('#roomSearch').attr('placeholder')).toBe('join');
+
+    $('#roomSearch').trigger('focus');
+    expect($('#roomSearch').attr('placeholder')).toBe('');
+
+    $('#roomSearch').trigger('blur');
+    expect($('#roomSearch').attr('placeholder')).toBe('join');
+  });
 });
+

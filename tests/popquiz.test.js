@@ -347,5 +347,89 @@ describe('Pop Quiz Hosted Activity Socket Handlers', () => {
       totalQuestions: 2,
     }));
   });
+
+  test('re-emitting popquiz/ready after grading sends popquiz/graded with correct answer to reconnecting socket', () => {
+    // 1. Host readies and starts quiz
+    socketHost.trigger('popquiz/ready', {
+      roomname,
+      playerId: 'HostTeacher',
+      playerNumber: 1,
+      isHost: true,
+      questions: [
+        ['cat', 'dog'],
+        ['sun', 'moon'],
+      ],
+    });
+    socketGuest1.trigger('popquiz/ready', {
+      roomname,
+      playerId: 'Student1',
+      playerNumber: 2,
+      isHost: false,
+    });
+
+    socketHost.trigger('popquiz/setNumbers', {
+      roomname,
+      id: 'HostTeacher',
+    });
+
+    // 2. Student selects choice 1 ('dog')
+    socketGuest1.trigger('popquiz/select', {
+      roomname,
+      playerId: 'Student1',
+      choiceIndex: 1,
+    });
+
+    // 3. Host grades choice 1 as correct
+    socketHost.trigger('popquiz/grade', {
+      roomname,
+      id: 'HostTeacher',
+      correctChoiceIndex: 1,
+    });
+
+    expect(ioMock.emit).toHaveBeenCalledWith('popquiz/graded', expect.objectContaining({
+      correctChoiceIndex: 1,
+      scores: expect.objectContaining({ Student1: 1 }),
+    }));
+
+    // 4. Host simulates page refresh: emits popquiz/ready on a new socket instance
+    const socketHostRefreshed = {
+      id: 'socket-host-refreshed',
+      data: {},
+      join: jest.fn(),
+      emit: jest.fn(),
+      on: jest.fn(),
+    };
+    popquizEvents(ioMock, socketHostRefreshed, jest.fn());
+
+    const refreshHandlers = {};
+    socketHostRefreshed.on.mock.calls.forEach(([evt, handler]) => {
+      refreshHandlers[evt] = handler;
+    });
+
+    refreshHandlers['popquiz/ready']({
+      roomname,
+      playerId: 'HostTeacher',
+      playerNumber: 1,
+      isHost: true,
+    });
+
+    // Verify socket received roundstart, playerselected, AND graded
+    expect(socketHostRefreshed.emit).toHaveBeenCalledWith('popquiz/roundstart', expect.objectContaining({
+      questionIndex: 0,
+      choices: ['cat', 'dog'],
+    }));
+
+    expect(socketHostRefreshed.emit).toHaveBeenCalledWith('popquiz/playerselected', expect.objectContaining({
+      playerId: 'Student1',
+      choiceIndex: 1,
+    }));
+
+    expect(socketHostRefreshed.emit).toHaveBeenCalledWith('popquiz/graded', expect.objectContaining({
+      correctChoiceIndex: 1,
+      scores: expect.objectContaining({ Student1: 1 }),
+      isGameOver: false,
+    }));
+  });
 });
+
 

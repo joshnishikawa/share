@@ -648,24 +648,36 @@ $(function(){
 
 // EVENTS //////////////////////////////////////////////////////////////////////
   let roomSearchTimeout;
+  $("#roomSearch").on('focus', function(){
+    const current = $(this).attr('placeholder');
+    if (current) {
+      $(this).data('placeholder', current);
+      $(this).attr('placeholder', '');
+    }
+  }).on('blur', function(){
+    const orig = $(this).data('placeholder') || 'join';
+    $(this).attr('placeholder', orig);
+  });
+
   $("#roomSearch").on('input', function(){
-    // Debounce room search to avoid excessive server calls
     clearTimeout(roomSearchTimeout);
+    const query = $("#roomSearch").val().trim().toLowerCase();
+    if (!query) {
+      $("#foundplayers").empty();
+      $("#join").prop('disabled', true);
+      return;
+    }
+    // Enable button immediately when user inputs text so they can submit without waiting
+    $("#join").prop('disabled', false);
     roomSearchTimeout = setTimeout(function() {
-      const query = $("#roomSearch").val().trim();
-      if (!query) {
-        $("#foundplayers").empty();
-        $("#join").prop('disabled', true);
-        return;
-      }
       socket.emit('roomSearch', query);
     }, 300); // Wait 300ms after user stops typing
   });
 
   $("#roomSearchForm").on('submit', function(e){
     e.preventDefault();
-    if ($("#join").prop('disabled')) return; // if #join disabled, room !exists
-    const newRoom = $("#roomSearch").val().trim();
+    clearTimeout(roomSearchTimeout);
+    const newRoom = $("#roomSearch").val().trim().toLowerCase();
     if (!newRoom) return;
     socket.emit('join', {newRoom: newRoom, player: player});
     $("#roomSearch").val('');
@@ -704,7 +716,7 @@ $(function(){
     e.preventDefault();
     const targetRoom = $(this).data("room");
     if (!targetRoom) return;
-    socket.emit("join", { newRoom: targetRoom, player: player });
+    socket.emit("join", { newRoom: String(targetRoom).trim().toLowerCase(), player: player });
   });
 
   $(document).on("click", ".activity", function () {
@@ -879,6 +891,7 @@ $(function(){
     if (!data || !data.room) {
       if (data && data.message) {
         $("#info").text(data.message);
+        $("#foundplayers").html('<div class="text-danger fw-bold">' + escapeHtml(data.message) + '</div>');
       }
       return;
     }
@@ -938,7 +951,7 @@ $(function(){
   socket.on('roomSearch', function(data){
     $("#foundplayers").empty();
 
-    if (data && data.roomname != player.roomname) {
+    if (data && String(data.roomname).toLowerCase() != String(player.roomname || '').toLowerCase()) {
       for (let i = 0; i < data.players.length; i++) {
         const p = data.players[i];
         const safeColor = sanitizeColor(p.color);
@@ -949,6 +962,9 @@ $(function(){
     }
     else {
       $("#foundplayers").empty();
+      if ($("#roomSearch").val().trim()) {
+        $("#foundplayers").html('<div class="text-muted small">No group found</div>');
+      }
       $("#join").prop('disabled', true);
     }
   });

@@ -46,10 +46,25 @@
   }
 
   #activityExit {
-    width: 34px;
-    height: 34px;
-    line-height: 1;
+    width: 48px;
+    height: 48px;
     padding: 0;
+  }
+
+  #roomSearch:focus::placeholder {
+    color: transparent;
+  }
+
+  #roomSearch:focus::-webkit-input-placeholder {
+    color: transparent;
+  }
+
+  #roomSearch:focus::-moz-placeholder {
+    color: transparent;
+  }
+
+  #roomSearch:focus:-ms-input-placeholder {
+    color: transparent;
   }
 </style>
 
@@ -59,12 +74,12 @@
     <%- include('../students/navbar') -%>
   </div>
 
-  <div class="container-fluid mt-3">
+  <div class="container-fluid">
     <div class="row">
       <div id="lobbyColumn" class="col-sm-4 mb-3">
 
   <!-- MY GROUP -->
-        <div id="myGroup" class="container alert-primary border border-primary rounded-3 px-3 pb-3 mb-3">
+        <div id="myGroup" class="container alert-primary border border-primary rounded-3 px-3 pb-3 my-3">
           <div class="row">
 
             <div class="col-3">
@@ -109,7 +124,7 @@
 
 
   <!-- FRIEND'S GROUP -->
-        <div id="group" class="container alert-success text-center border border-success rounded-3 py-3 px-3" style="display: none;">
+        <div id="group" class="container alert-success text-center border border-success rounded-3 p-3" style="display: none;">
           <div class="row">
 
             <div class="col-12 g-0">
@@ -120,7 +135,7 @@
                 <button id="join" class="btn btn-success" disabled title="Join group" aria-label="Join group">
                   <i class="material-icons fs-1">groups</i>
                 </button>
-                <input id="roomSearch" class="form-control fs-1 text-success text-center" placeholder="join" aria-label="Room search input" title="Enter room name to search">
+                <input id="roomSearch" class="form-control fs-1 text-success text-center" placeholder="join" aria-label="Room search input" title="Enter room name to search" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
 
               </form>
             </div>
@@ -141,16 +156,16 @@
       </div> 
 
       <div id="activityColumn" class="col-sm-8">
-        <div id="activityHeader" class="d-flex justify-content-between align-items-center mb-2 gap-2">
+        <div id="activityHeader" class="d-flex justify-content-between align-items-center">
           <!-- Left: Host Badge & Room Name -->
-          <div class="d-flex align-items-center gap-2 flex-shrink-0">
-            <button id="activityExit" class="btn btn-sm d-none" title="Leave activity" aria-label="Leave activity">
-              <img src="/image/exit.svg" class="img-fluid"></i>
-            </button>
-            <span id="activityHostBadge" class="small badge bg-warning text-dark d-none px-1" style="font-size: 0.75rem;" title="You are the Table Host" aria-label="Table Host">
-              Host
+          <div class="d-flex align-items-center">
+            <div id="activityExit" class="d-none me-2" title="Leave activity" aria-label="Leave activity">
+              <img src="/image/exit.svg" class="h-100 w-100"></i>
+            </div>
+            <span id="activityRoomName" class="fs-2 fw-bold text-success"></span>&nbsp;
+            <span id="activityHostBadge" class="badge bg-warning text-dark d-none px-1 mb-3" style="font-size: 0.6rem;" title="You are the Table Host" aria-label="Table Host">
+              H
             </span>
-            <div id="activityRoomName" class="fs-6 fw-bold text-primary"></div>
           </div>
 
           <!-- Middle: User Instructions / Status -->
